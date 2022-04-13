@@ -4,7 +4,7 @@
 # Check # # ------------------------------------------------------------------ #
 #########
 
-export bktitle="USM: Universal Server Menu v1.5 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.7 - By José Humberto"
 export password=0
 export processname=0
 export process=0
