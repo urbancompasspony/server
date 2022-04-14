@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.9.1 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.8.2 - By José Humberto"
 export password=0
 export processname=0
 export process=0
@@ -151,8 +151,6 @@ RSync: Sincronia do Backup em Nuvem ou para um backup RAID 1. Se estiver Executa
   esac
 menu01
 }
-
-
 
 # Processos de Sistema
 function menu03 {
@@ -430,63 +428,131 @@ Mais informações em AJUDA! " 0 0 ; menu053
   fi
 }
 
-
-
 # ---------------------------------------------------------------------------- #
 
-# Maquinas Virtuais
+# Máquinas Virtuais 2.0
+
 function menu02 {
 if [[ $(which virt-manager 2>/dev/null) ]]; then
-  var5=$(dialog --help-button --help-label 'Ajuda' --title 'Gestão de VMs' --backtitle "Virt-Manager detectado. Bem-Vindo ao Gestor de Máquinas Virtuais!" --menu "Gestão de Máquinas Virtuais" 0 0 0 \
-  A 'Status de Todas as VMs' \
-  B 'Ligar Todas as VMs' \
-  C 'Desligar Todas as VMs' \
-  X 'Voltar' 2>&1 > /dev/tty )
+  menu022 "1p" && vm1=$vms && vm11=$sts
+  menu022 "2p" && vm2=$vms && vm12=$sts
+  menu022 "3p" && vm3=$vms && vm13=$sts
+  menu022 "4p" && vm4=$vms && vm14=$sts
+  menu022 "5p" && vm5=$vms && vm15=$sts
+  menu022 "6p" && vm6=$vms && vm16=$sts
+  menu022 "7p" && vm7=$vms && vm17=$sts
+  menu022 "8p" && vm8=$vms && vm18=$sts
+  menu022 "9p" && vm9=$vms && vm19=$sts
+  menu022 "10p" && vm10=$vms && vm110=$sts
+
+  menuxy=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Ajuda' --backtitle "Virt-Manager detectado. Bem-Vindo ao Gestor de Máquinas Virtuais!" --title "Gestão de VMs" --menu "Gestão de Máquinas Virtuais"  0 0 0 \
+  Status "Geral" \
+  "$vm1" "$vm11" \
+  "$vm2" "$vm12" \
+  "$vm3" "$vm13" \
+  "$vm4" "$vm14" \
+  "$vm5" "$vm15" \
+  "$vm6" "$vm16" \
+  "$vm7" "$vm17" \
+  "$vm8" "$vm18" \
+  "$vm9" "$vm19" \
+  "$vm10" "$vm110" \
+  Iniciar "Todas!" \
+  Parar "Todas!" \
+  Voltar "" 2>&1 > /dev/tty )
 
   case $? in
-    2) dialog --title 'Ajuda' --msgbox "Status de Todas as VMs: Ver o menu AJUDA dentro desta opção! \n \n
+    2) dialog --title " " --msgbox "Aqui são exibidas apenas as VMs em estado de Executando ou Parado. \n
+Caso uma VM não apareça na listagem, verifique o real estado da mesma no menu Status Geral! \n \n
+Status Geral: Exibe a situação real de todas as VMs configuradas no sistema. \n
+Nome da VM + Estado: Permite controlar a VM: reiniciando, desligando ou ligando a mesma. \n \n
 Ligar Todas as VMs: Inicializará apenas as VMs em estado de -Shut Off- detectadas. \n
 Serão ignoradas todas as demais VMs em quaisquer outros estados. \n \n
-Desligar Todas as VMs: Desligará apenas as VMs em estado de -running- detectadas.
-Serão ignoradas todas as demais VMs em quaisquer outros estados. \n \n
-Para maiores detalhes vide AJUDA dentro do menu Status de Todas as VMs!
-" 0 0 ; menu02 ;;
+Desligar Todas as VMs: Desligará apenas as VMs em estado de -running- detectadas. \n
+Serão ignoradas todas as demais VMs em quaisquer outros estados. \n
+Para maiores informações ver AJUDA em Status Geral. \n \n" 0 0 ; menu02 ;;
   esac
 
-  case "$var5" in
-  A) menu08 ;;
-  B) menu081 ;;
-  C) menu082 ;;
-  X) echo a ;;
+  case "$menuxy" in
+  Status) menu025 ;;
+  "$vm1") chkvm="$vm11"; nmvm="$vm1"; menu021 ;;
+  "$vm2") chkvm="$vm12"; nmvm="$vm2"; menu021 ;;
+  "$vm3") chkvm="$vm13"; nmvm="$vm3"; menu021 ;;
+  "$vm4") chkvm="$vm14"; nmvm="$vm4"; menu021 ;;
+  "$vm5") chkvm="$vm15"; nmvm="$vm5"; menu021 ;;
+  "$vm6") chkvm="$vm16"; nmvm="$vm6"; menu021 ;;
+  "$vm7") chkvm="$vm17"; nmvm="$vm7"; menu021 ;;
+  "$vm8") chkvm="$vm18"; nmvm="$vm8"; menu021 ;;
+  "$vm9") chkvm="$vm19"; nmvm="$vm9"; menu021 ;;
+  "$vm10") chkvm="$vm110"; nmvm="$vm10"; menu021 ;;
+  Iniciar) menu023 ;;
+  Parar) menu024 ;;
+  Voltar) echo a ;;
   esac
 else
   dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DE MÁQUINA VIRTUAL' --msgbox "O VirtManager não foi encontrado neste sistema ou você não possui as permissões para acessá-lo!" 7 50
 fi
 }
 
-# Status de Máquinas Virtuais
-function menu08 {
-  virtmgr0=`virsh list --all`
-  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Maquinas Virtuais encontradas" --backtitle "Status do VirtManager" --msgbox "$virtmgr0" 0 0
+function menu021 {
 
-  case $? in
-    2) dialog --title 'Ajuda' --msgbox "Name: Nome da máquina virtual [VM] conforme ela foi registrada no virt-manager \n \n
-State é a situação em que a VM se encontra. Os States podem ser:\n \n
-running*: VM executando normalmente. \n
-paused*: VM em estado deliberado de pausa. \n
-idle*: VM em estado de pausa, normalmente por alta carga de I/O e aguardando o sistema host voltar a responder. \n
-pmsuspended*: VM suspendida com PowerState S3. \n
-in shutdown*: VM em processo de desligamento. \n \n
-shut off: VM desligada apenas. \n
-crashed: Significa que a VM travou e parou de responder abruptamente por algum erro grave, seja do próprio sistema virtualizado ou erro de disco do host. \n \n
-* = Em qualquer estado a VM pode corromper se for desligada abruptamente!" 0 0 ; menu08 ;;
-  esac
-
-  menu02
+if [ "$chkvm" = "Executando" ]; then # se Executando...
+  dialog --title "$nmvm" --yesno "Deseja reiniciar a VM $nmvm ?" 6 40
+  if [ $? = 0 ]; then
+    virsh reboot "$nmvm"
+    dialog --title "$nmvm" --msgbox "A VM $nmvm foi reiniciada!" 6 40
+    menu02
+  fi
+  
+  dialog --title "$nmvm" --yesno "Deseja desligar a VM $nmvm ?" 6 40
+  if [ $? = 0 ]; then
+    virsh shutdown "$nmvm"
+    dialog --title "$nmvm" --msgbox "A VM $nmvm foi desligada!" 6 40
+    menu02
+  fi
+  
+  dialog --title "$nmvm" --yesno "Deseja desligar FORÇADAMENTE a VM $nmvm ?" 6 40
+  if [ $? = 0 ]; then
+    virsh destroy "$nmvm"
+    dialog --title "$nmvm" --msgbox "A VM $nmvm foi desligada de forma forçada!" 6 40
+    menu02
+  fi
+  
+else # se Parado
+  if [ "$chkvm" = "- - -" ]; then
+    dialog --title "$nmvm" --msgbox "A VM $nmvm não existe!" 6 40
+    menu02
+  fi
+  
+  if [ "$chkvm" = "Parado" ]; then
+    dialog --title "$nmvm" --yesno "Deseja tentar ligar a VM $nmvm ?" 6 40
+    if [ $? = 0 ]; then
+      virsh start "$nmvm"
+      dialog --title "$nmvm" --msgbox "Verifique se a VM $nmvm iniciou!" 6 40
+      menu02
+    fi
+    menu02
+  fi
+fi
 }
 
-function menu081 {
-dialog --title 'Confirmação' --backtitle 'Confirmação de Início de VMs!' --yesno "Deseja inicializar todas as VMs?" 0 0
+# Status das VMs
+function menu022 {
+vms=`virsh list | grep running | sed -n "$1" | awk '{print $2}'`
+if [ "$vms" = "" ]; then
+  vms=`virsh list --all | grep "shut off" | sed -n "$1" | awk '{print $2}'`
+  sts=`echo "Parado"`
+  if [ "$vms" = "" ]; then
+    vms=`echo "- - -"`
+    sts=`echo "- - -"`
+  fi
+else
+  sts=`echo "Executando"`
+fi
+}
+
+function menu023 {
+dialog --title 'Confirmação' --backtitle 'Confirmação de Início de Todas as VMs!' --yesno "Deseja inicializar todas as VMs?" 0 0
 if [ $? = 0 ]; then
   for i in $(virsh list --all | grep "shut off" | awk '{print $2}')
   do
@@ -498,17 +564,39 @@ fi
 menu02
 }
 
-function menu082 {
-dialog --title 'Confirmação' --backtitle 'Confirmação de Desligamento de VMs!' --yesno "Deseja desligar todas as VMs?" 0 0
+function menu024 {
+dialog --title 'Confirmação' --backtitle 'Confirmação de Desligamento de Todas as VMs!' --yesno "Deseja desligar todas as VMs?" 0 0
   if [ $? = 0 ]; then
   for i in $(virsh list | grep running | awk '{print $2}')
   do
   virsh shutdown $i
-  dialog --title 'Status:' --msgbox "VM $1 Encerrada!" 0 0
+  dialog --title 'Status:' --msgbox "VM $1 desligada!" 0 0
   done
   menu02
   fi
 menu02
+}
+
+# Status de Máquinas Virtuais
+function menu025 {
+  virtmgr0=`virsh list --all`
+  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Maquinas Virtuais encontradas:" --backtitle "Status do VirtManager" --msgbox "$virtmgr0" 0 0
+
+  case $? in
+    2) dialog --title 'Ajuda' --msgbox "Name: Nome da máquina virtual [VM] conforme ela foi registrada no virt-manager \n \n
+State é a situação em que a VM se encontra. Os States podem ser:\n \n
+running*: VM executando normalmente. \n
+paused*: VM em estado deliberado de pausa. \n
+idle*: VM em estado de pausa, normalmente por alta carga de I/O e aguardando o \n
+sistema host voltar a responder. \n
+pmsuspended*: VM suspendida com PowerState S3. \n
+in shutdown*: VM em processo de desligamento. \n \n
+shut off: VM desligada normalmente. \n
+crashed: Significa que a VM travou e parou de responder abruptamente por algum erro grave, \n
+seja do próprio sistema virtualizado ou erro de disco do host. \n \n
+* = Em qualquer um destes estados a VM pode corromper se for desligada abruptamente!" 0 0 ; menu025 ;;
+  esac
+  menu02
 }
 
 # ---------------------------------------------------------------------------- #
@@ -863,10 +951,12 @@ function m01 {
 errvm=" "
 VM1="$errvm"; VM2="$errvm"; VM3="$errvm"; VM4="$errvm"; VM5="$errvm"; VM6="$errvm"; VM7="$errvm"; VM8="$errvm"; VM9="$errvm"; VM10="$errvm"
 
-#virsh list --all | grep "shut off" | awk '{print $2}'
-#virsh list | grep running | awk '{print $2}'
+#virsh list --all | grep "shut off" | sed -n 1p | awk '{print $2}'
+#virsh list | grep running | sed -n 1p | awk '{print $2}'
 
-VM1=`virsh list --all | sed -n 4p | awk '{print $2}'`
+VM1I=`virsh list | grep running | sed -n 1p | awk '{print $2}'`
+VM1O=`virsh list --all | grep "shut off" | sed -n 1p | awk '{print $2}'`
+
 if [ "$VM1" = "" ]; then
   VM1=`echo " "`
 fi
@@ -939,8 +1029,6 @@ fi
 }
 
 function m02 {
-
-
   var9=$(dialog --backtitle "SMART" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
   A 'SMART A' \
   B 'SMART B' \
