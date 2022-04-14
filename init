@@ -1,23 +1,99 @@
 #!/bin/bash
 
-#########
-# Check # # ------------------------------------------------------------------ #
-#########
+# ============================================================================ #
 
-export bktitle="USM: Universal Server Menu v1.7 - By José Humberto"
+#########################
+# Universal Server Menu # #--------------------------------------------------- #
+#########################
+                                                            ####################
+# ------------------------------------------------------- # # By José Humberto #
+                                                            ####################
+
+# ============================================================================ #
+
+# Variáveis Globais
+export bktitle="USM: Universal Server Menu v1.9 - By José Humberto"
 export password=0
 export processname=0
 export process=0
 export status=0
 export pkg=0
 
-#############
-# Functions # # -------------------------------------------------------------- #
-#############
+# Checagem de Dependências
+function pkg {
+REQUIRED_PKG="$1"
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
+echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
+if [ "" = "$PKG_OK" ]; then
+  echo "$REQUIRED_PKG não encontrado. Instalando..."
+  sudo apt update; sudo apt install $REQUIRED_PKG -y
+fi
+}
 
-# MENU STATUS
-function menu68
-  {  menu04=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
+pkg dialog
+pkg curl
+pkg lm-sensors
+pkg whois
+pkg arp-scan
+pkg traceroute
+pkg libatasmart-bin
+
+###########
+# Funções # # ---------------------------------------------------------------- #
+###########
+
+# PASSWORD
+function init {
+password=$(dialog --backtitle "$bktitle" --title 'Acesso ao Server Menu' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
+
+if [ -z "$password" ]; then
+  clear
+  echo "É necessário digitar sua senha para continuar. Saindo..."
+  echo "Para voltar digite 'menu' "
+else
+  start
+fi
+}
+
+# MAIN LOOP
+function start {
+  while true; do
+    sensors0=`sensors || echo "Incompatível em Máquina Virtual!"`
+    datetime=`date +"%d/%m %H:%M"` # Data e Hora
+
+    var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 0 \
+    A 'Status do Sistema' \
+    B 'Máquinas Virtuais' \
+    C 'Processos do Sistema' \
+    D 'Controlador de Dominio' \
+    E 'Ferramentas do Sistema' \
+    F 'Reiniciar o Sistema' \
+    G 'Desligar o Sistema' \
+    X 'SAIR' \
+    0 'Acesso Restrito' 2>&1 > /dev/tty )
+    
+    [ $? -ne 0 ] && echo "Saindo... Para voltar digite 'menu'!" && break
+    case "$var1" in
+
+    A) menu01 ;;
+    B) menu02 ;;
+    C) menu03 ;;
+    D) menu04 ;;
+    E) menu05 ;;
+    F) menu06 ;;
+    G) menu07 ;;
+    X) echo "Saindo... Para voltar digite 'menu'!" && exit && break ;;
+    0) m0x ;;
+    esac
+  done
+}
+
+##########
+# STATUS # #------------------------------------------------------------------ #
+##########
+
+function menu01
+  {  var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
   A 'Sistema' \
   B 'Temperatura' \
   C 'Consumo dos Discos' \
@@ -25,21 +101,21 @@ function menu68
   X 'Voltar' 2>&1 > /dev/tty )
 
 #  case $? in
-#    2) dialog --title 'Ajuda' --msgbox " " 0 0 ; menu68 ;;
+#    2) dialog --title 'Ajuda' --msgbox " " 0 0 ; menu01 ;;
 #  esac
 
-  case "$menu04" in
+  case "$var2" in
 
-  A) menu70 ;;
-  B) menu72 ;;
-  C) menu74 ;;
-  D) dialog --title '' --msgbox "Em Breve!" 0 0 ; menu68 ;;
+  A) menu11 ;;
+  B) menu12 ;;
+  C) menu13 ;;
+  D) dialog --title '' --msgbox "Em Breve!" 0 0 ; menu01 ;;
   X) echo a ;;
   esac
 }
 
 # Status de Sistema
-function menu70 {
+function menu11 {
   ip=`hostname -I | awk '{print $1}'` # Coleta do IP atual!
   ip2=`dig @resolver4.opendns.com myip.opendns.com +short` # IP Externo
   uptime=`uptime | awk {'print $3 $4 $5'}`
@@ -71,32 +147,29 @@ XOrgs em Execução: Para sistemas sem interface de usuário mas que permitem ex
 Balance BTRFS: Manutenção de rotina do sistema. Se estiver em Execução, o computador NÃO poderá ser desligado! \n
 Rsnapshot: Backup incremental automatizado. Se estiver Executando, o computador não poderá ser desligado! \n
 RSync: Sincronia do Backup em Nuvem ou para um backup RAID 1. Se estiver Executando, o computador não poderá ser desligado!
-" 0 0 ;;
+" 0 0 ; menu11 ;;
   esac
-menu68
+menu01
 }
 
-# Status de Processos
-function menu69 {
-prcs=`echo "$password" | sudo -S systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente"`
-}
+
 
 # Processos de Sistema
-function menu71 {
+function menu03 {
 
-  menu69 smbd && smb1=$prcs
-  menu69 samba-ad-dc && smb2=$prcs
-  menu69 apache2 && apache=$prcs
-  menu69 lighttpd && lighttp=$prcs
-  menu69 pihole-FTL && pihole=$prcs
-  menu69 drbd && drbd1=$prcs
-  menu69 corosync && corosync1=$prcs
-  menu69 pacemaker && pacemaker1=$prcs
-  menu69 openfire && spark=$prcs
-  menu69 mysqld && mysql=$prcs
-  menu69 cups1 cups && cups1=$prcs
-  menu69 motion && motion1=$prcs
-  menu69 dwagent && dwagent1=$prcs
+  menu09 smbd && smb1=$prcs
+  menu09 samba-ad-dc && smb2=$prcs
+  menu09 apache2 && apache=$prcs
+  menu09 lighttpd && lighttp=$prcs
+  menu09 pihole-FTL && pihole=$prcs
+  menu09 drbd && drbd1=$prcs
+  menu09 corosync && corosync1=$prcs
+  menu09 pacemaker && pacemaker1=$prcs
+  menu09 openfire && spark=$prcs
+  menu09 mysqld && mysql=$prcs
+  menu09 cups1 cups && cups1=$prcs
+  menu09 motion && motion1=$prcs
+  menu09 dwagent && dwagent1=$prcs
 
   vpn=`ip a | grep tun 1> /dev/null && echo "Executando" || echo "Parado ou Ausente"`
 
@@ -115,7 +188,7 @@ function menu71 {
   L "Motion     : $motion1" \
   M "DWAgent    : $dwagent1" \
   N "VPN Client : $vpn" \
-  O "Voltar" 2>&1 > /dev/tty )
+  X "Voltar" 2>&1 > /dev/tty )
 
   case $? in
     2) dialog --title 'Ajuda com Significados de Status' --msgbox "A lista abaixo não necessariamente informa todos os processos configurados! \n
@@ -134,59 +207,64 @@ CUPS: Servidor de impressão em Rede através dos protocolos HTTP ou SMB. \n
 Motion: Processo usado pelo Motion, para monitorar WebCams ou ainda sistemas de CFTV. \n
 DWAgent: Se houver um Acesso Remoto com DWService executando nesta máquina. \n
 VPN Client: Se este Servidor está conectado em uma VPN atuando como cliente. \n
-" 0 0 ; menu71 ;;
+" 0 0 ; menu03 ;;
 esac
 
   case "$menuxx" in
-  A) status="$smb1"; processname="Samba"; process="smbd"; menu711 ;;
-  B) status="$smb2"; processname="Dominio"; process="samba-ad-dc"; menu711 ;;
-  C) status="$apache"; processname="Apache2"; process="apache2"; menu711 ;;
-  D) status="$lighttp"; processname="Lighttp"; process="lighttp"; menu711 ;;
-  E) status="$pihole"; processname="PiHole"; process="pihole-FTL"; menu711 ;;
-  F) echo a ;; #status="$drbd1"; processname="DRBD"; process="drbd"; menu711 ;;
-  G) echo b ;; #status="$corosync1"; processname="Corosync"; process="corosync"; menu711 ;;
-  H) echo c ;; #status="$pacemaker1"; processname="Pacemaker"; process="pacemaker"; menu711 ;;
-  I) status="$spark"; processname="Spark"; process="openfire"; menu711 ;;
-  J) status="$mysql"; processname="MySQL"; process="mysql"; menu711 ;;
-  K) status="$cups1"; processname="CUPS"; process="cups"; menu711 ;;
-  L) status="$motion1"; processname="Motion"; process="motion"; menu711 ;;
-  M) status="$dwagent1"; processname="DWAgent"; process="dwagent"; menu711 ;;
-  N) status="$vpn"; processname="VPN Client"; process="openvpn"; menu711 ;;
-  O) echo a ;;
+  A) status="$smb1"; processname="Samba"; process="smbd"; menu031 ;;
+  B) status="$smb2"; processname="Dominio"; process="samba-ad-dc"; menu031 ;;
+  C) status="$apache"; processname="Apache2"; process="apache2"; menu031 ;;
+  D) status="$lighttp"; processname="Lighttp"; process="lighttp"; menu031 ;;
+  E) status="$pihole"; processname="PiHole"; process="pihole-FTL"; menu031 ;;
+  F) echo a ;; #status="$drbd1"; processname="DRBD"; process="drbd"; menu031 ;;
+  G) echo b ;; #status="$corosync1"; processname="Corosync"; process="corosync"; menu031 ;;
+  H) echo c ;; #status="$pacemaker1"; processname="Pacemaker"; process="pacemaker"; menu031 ;;
+  I) status="$spark"; processname="Spark"; process="openfire"; menu031 ;;
+  J) status="$mysql"; processname="MySQL"; process="mysql"; menu031 ;;
+  K) status="$cups1"; processname="CUPS"; process="cups"; menu031 ;;
+  L) status="$motion1"; processname="Motion"; process="motion"; menu031 ;;
+  M) status="$dwagent1"; processname="DWAgent"; process="dwagent"; menu031 ;;
+  N) status="$vpn"; processname="VPN Client"; process="openvpn"; menu031 ;;
+  X) echo a ;;
   esac
 }
 
-function menu711 {
+function menu031 {
 if [ "$status" = "Executando" ]; then # se Executando...
   dialog --title "$processname" --yesno "Deseja reiniciar o processo $processname ?" 6 40
   if [ $? = 0 ]; then
     echo "$password" | sudo -S systemctl restart "$process"
     dialog --title "$processname" --msgbox "O processo $processname foi reiniciado!" 6 40
-    menu71
+    menu03
   else
     dialog --title "$processname" --yesno "Deseja parar o processo $processname ?" 6 40
     if [ $? = 0 ]; then
     echo "$password" | sudo -S systemctl stop "$process"
     dialog --title "$processname" --msgbox "O processo $processname foi parado!" 6 40
-    menu71
+    menu03
     fi
   fi
-  menu71
+  menu03
 else # se Parado
   dialog --title "$processname" --yesno "Deseja tentar iniciar o processo $processname ?" 6 40
   if [ $? = 0 ]; then
     echo "$password" | sudo -S systemctl start "$process"
     dialog --title "$processname" --msgbox "Verifique se o $processname iniciou." 6 40
-    menu71
+    menu03
   fi
-  menu71
+  menu03
 fi
+}
+
+# Status de Processos
+function menu09 {
+prcs=`echo "$password" | sudo -S systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente"`
 }
 
 # ------------------------------------------------------------------------------------- #
 
 # Status Temperatura
-function menu72 {
+function menu12 {
 dialog --cr-wrap --help-button --help-label 'Ajuda' --backtitle 'Temperatura, Potencia e Rotação de Cooler(s) [Se disponível!]' --msgbox "$sensors0" 0 0
 
   case $? in
@@ -204,16 +282,16 @@ Resultados que indicam rotação de cooler: \n
 Resultados que indicam Baterias: \n
 (BAT0-acpi-xxx) (fam15h_power-pci-xxxx) \n \n
 Em Progresso: Novas indicações são adicionadas periodicamente!
-" 0 0 ; menu72 ;;
+" 0 0 ; menu12 ;;
   esac
 
-menu68
+menu01
 }
 
 # ---------------------------------------------------------------------------- #
 
 # Status de Consumo dos Discos
-function menu74 {
+function menu13 {
   sdisks=`df -Th`
   dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Discos encontrados" --backtitle "Status do Armazenamento" --msgbox "$sdisks" 0 0
 
@@ -230,16 +308,16 @@ Usado: Espaço que já foi utilizado. \n
 Disp.: Espaço restante. \n
 Uso%: Porcentagem de uso do disco comparado ao tamanho total. \n
 Montado em: Local aonde o disco está acessível naquele momento. \n
-\n" 0 0; menu74 ;;
+\n" 0 0; menu13 ;;
   esac
-menu68
+menu01
 }
 
 # ---------------------------------------------------------------------------- #
 
 # Ferramentas do Sistema
-function menu75 {
-  menu04=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
+function menu05 {
+  var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
   A 'Velocimetro Internet' \
   B 'Arp-Scan' \
   C 'WhoIs' \
@@ -258,43 +336,43 @@ este não tenha ocultado seus dados. \n \n
 TraceRoute: Calcula quantos Hops, saltos, a latência que uma conexão deste \n
 servidor tem até um site especificado. \n \n
 Governador de CPU: Ver o menu AJUDA dentro desta opção!
-" 0 0 ; menu75 ;;
+" 0 0 ; menu05 ;;
   esac
 
-  case "$menu04" in
+  case "$var6" in
 
-  A) dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "Após o resultado do teste, pressione 'q' para sair!" 0 0; curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 - | less ; menu75 ;;
-  B) dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "Para ler os IPs use as Setas Cima/Baixo, para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S arp-scan -l | less ; menu75 ;;
-  C) menu751 ;;
-  D) menu752 ;;
-  E) menu753 ;;
+  A) dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "Após o resultado do teste, pressione 'q' para sair!" 0 0; curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 - | less ; menu05 ;;
+  B) dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "Para ler os IPs use as Setas Cima/Baixo, para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S arp-scan -l | less ; menu05 ;;
+  C) menu051 ;;
+  D) menu052 ;;
+  E) menu053 ;;
   X) echo a ;;
   esac
 }
 
 #WhoIS
-function menu751 {
+function menu051 {
   site=$(dialog --title 'WhoIs' --backtitle "Identificar de Propriedade de um WebSite" --inputbox "Digite o site que deseja localizar informações. Use o seguinte modelo: exemplo.com.br" 10 40 2>&1 > /dev/tty)
   dialog --msgbox "Para ler o resultado use as Setas para Cima e Baixo. \n
 Para fechar aperte 'q'!" 0 0
-  whois "$site" | less ; menu75
+  whois "$site" | less ; menu05
 }
 
 # Traceroute
-function menu752 {
+function menu052 {
   site=$(dialog --title 'TraceRoute' --backtitle "Identificador de hops/saltos que um computador dá, até acessar um site especificado." --inputbox "Digite o site que deseja analisar os Saltos. Use o seguinte modelo: \n
 exemplo.com.br \n
 A identificação estará concluída quando um (END) surgir no final." 14 40 2>&1 > /dev/tty)
   dialog --msgbox "Para ler o resultado use as Setas para Cima e Baixo. \n
 Para fechar aperte 'q'!" 0 0
-  traceroute "$site" | less; menu75
+  traceroute "$site" | less; menu05
 }
 
 # Governador de CPU
-function menu753 {
+function menu053 {
   governor1=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor`
   governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors`
-  menu06=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "Troca do Governador de CPU" --menu "Governador de CPU Atual: \n
+  var3=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "Troca do Governador de CPU" --menu "Governador de CPU Atual: \n
 $governor1" 0 0 0 \
   A 'Conservative' \
   B 'OnDemand' \
@@ -324,42 +402,157 @@ acordo com a aplicação. Este é o modo que trás o melhor custo-benefício de 
 Um governador aplicado passa a operar imediatamente! \n \n
 Detectamos estes governadores abaixo como suportados: \n \n
 > $governor2 <
-" 0 0 ; menu753 ;;
+" 0 0 ; menu053 ;;
   esac
 
-  case "$menu06" in
+  case "$var3" in
 
-  A) menu7661 conservative ;;
-  B) menu7661 ondemand ;;
-  C) menu7661 userspace ;;
-  D) menu7661 powersave ;;
-  E) menu7661 performance ;;
-  F) menu7661 schedutil ;;
-  X) echo a ; menu753 ;;
+  A) menu10 conservative ;;
+  B) menu10 ondemand ;;
+  C) menu10 userspace ;;
+  D) menu10 powersave ;;
+  E) menu10 performance ;;
+  F) menu10 schedutil ;;
+  X) echo a ; menu053 ;;
   esac
 }
 
 # Governador de CPU 2
-function menu7661 {
+function menu10 {
   governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors`
   govr=$(echo "$password" | sudo -S echo $1 | sudo -S tee /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor 2> /dev/null 1> /dev/null && echo "si" || echo "no")
   if [ "$govr" = "si" ]; then
-    dialog --cr-wrap --title "Bem sucedido!" --backtitle "Troca de Governador" --msgbox "Governador trocado com sucesso!" 0 0 ; menu753
+    dialog --cr-wrap --title "Bem sucedido!" --backtitle "Troca de Governador" --msgbox "Governador trocado com sucesso!" 0 0 ; menu053
   else
     dialog --cr-wrap --title "ERRO" --backtitle "Troca de Governador" --msgbox "Seu sistema não suporta o governador escolhido. Detectamos estes governadores abaixo como suportados: \n \n
 > $governor2 < \n \n
-Mais informações em AJUDA! " 0 0 ; menu753
+Mais informações em AJUDA! " 0 0 ; menu053
+  fi
+}
+
+
+
+# ---------------------------------------------------------------------------- #
+
+# Maquinas Virtuais
+function menu02 {
+if [[ $(which virt-manager 2>/dev/null) ]]; then
+  var5=$(dialog --help-button --help-label 'Ajuda' --title 'Gestão de VMs' --backtitle "Virt-Manager detectado. Bem-Vindo ao Gestor de Máquinas Virtuais!" --menu "Gestão de Máquinas Virtuais" 0 0 0 \
+  A 'Status de Todas as VMs' \
+  B 'Ligar Todas as VMs' \
+  C 'Desligar Todas as VMs' \
+  X 'Voltar' 2>&1 > /dev/tty )
+
+  case $? in
+    2) dialog --title 'Ajuda' --msgbox "Status de Todas as VMs: Ver o menu AJUDA dentro desta opção! \n \n
+Ligar Todas as VMs: Inicializará apenas as VMs em estado de -Shut Off- detectadas. \n
+Serão ignoradas todas as demais VMs em quaisquer outros estados. \n \n
+Desligar Todas as VMs: Desligará apenas as VMs em estado de -running- detectadas.
+Serão ignoradas todas as demais VMs em quaisquer outros estados. \n \n
+Para maiores detalhes vide AJUDA dentro do menu Status de Todas as VMs!
+" 0 0 ; menu02 ;;
+  esac
+
+  case "$var5" in
+  A) menu08 ;;
+  B) menu081 ;;
+  C) menu082 ;;
+  X) echo a ;;
+  esac
+else
+  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DE MÁQUINA VIRTUAL' --msgbox "O VirtManager não foi encontrado neste sistema ou você não possui as permissões para acessá-lo!" 7 50
+fi
+}
+
+# Status de Máquinas Virtuais
+function menu08 {
+  virtmgr0=`virsh list --all`
+  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Maquinas Virtuais encontradas" --backtitle "Status do VirtManager" --msgbox "$virtmgr0" 0 0
+
+  case $? in
+    2) dialog --title 'Ajuda' --msgbox "Name: Nome da máquina virtual [VM] conforme ela foi registrada no virt-manager \n \n
+State é a situação em que a VM se encontra. Os States podem ser:\n \n
+running*: VM executando normalmente. \n
+paused*: VM em estado deliberado de pausa. \n
+idle*: VM em estado de pausa, normalmente por alta carga de I/O e aguardando o sistema host voltar a responder. \n
+pmsuspended*: VM suspendida com PowerState S3. \n
+in shutdown*: VM em processo de desligamento. \n \n
+shut off: VM desligada apenas. \n
+crashed: Significa que a VM travou e parou de responder abruptamente por algum erro grave, seja do próprio sistema virtualizado ou erro de disco do host. \n \n
+* = Em qualquer estado a VM pode corromper se for desligada abruptamente!" 0 0 ; menu08 ;;
+  esac
+
+  menu02
+}
+
+function menu081 {
+dialog --title 'Confirmação' --backtitle 'Confirmação de Início de VMs!' --yesno "Deseja inicializar todas as VMs?" 0 0
+if [ $? = 0 ]; then
+  for i in $(virsh list --all | grep "shut off" | awk '{print $2}')
+  do
+  virsh start $i
+  dialog --title 'Status:' --msgbox "VM $i Iniciada!" 0 0
+  done
+  menu02
+fi
+menu02
+}
+
+function menu082 {
+dialog --title 'Confirmação' --backtitle 'Confirmação de Desligamento de VMs!' --yesno "Deseja desligar todas as VMs?" 0 0
+  if [ $? = 0 ]; then
+  for i in $(virsh list | grep running | awk '{print $2}')
+  do
+  virsh shutdown $i
+  dialog --title 'Status:' --msgbox "VM $1 Encerrada!" 0 0
+  done
+  menu02
+  fi
+menu02
+}
+
+# ---------------------------------------------------------------------------- #
+
+# Reinicio
+function menu06 {
+  bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+  rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+  rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+  if [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ]; then
+    dialog --cr-wrap --title 'ERRO AO REINICIAR' --backtitle 'ERRO AO TENTAR REINICIAR.' --msgbox "Reinício bloqueado! \n
+Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
+  else
+    dialog --title 'Reiniciar' --backtitle 'R E I N I C I A R' --yesno 'Deseja reiniciar este sistema?' 0 0
+    if [ $? = 0 ]; then
+      echo "$password" | sudo -S reboot
+    fi
+  fi
+}
+
+# Desligamento
+function menu07 {
+  rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+  rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+  bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+  if [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ]; then
+    dialog --cr-wrap --title 'ERRO AO DESLIGAR' --backtitle 'ERRO AO TENTAR DESLIGAR.' --msgbox "Desligamento bloqueado! \n
+Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
+  else
+    dialog --title 'Desligar' --backtitle 'D E S L I G A R' --yesno 'Deseja desligar este sistema?' 0 0
+    if [ $? = 0 ]; then
+      echo "$password" | sudo -S shutdown -h now
+    fi
   fi
 }
 
 # ---------------------------------------------------------------------------- #
 
 # Controlador de Dominio
-function menu77 {
-  menu69 samba-ad-dc && smb2=$prcs
+function menu04 {
+  menu09 samba-ad-dc && smb2=$prcs
 
   if [ "$smb2" = "Executando" ]; then
-    menu07=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
+    var4=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
     A 'Criar um Usuário' \
     B 'Exibir todos os Usuários' \
     C 'Exibir Grupos de um Usuario' \
@@ -377,22 +570,22 @@ function menu77 {
     O 'Exibir todos os Computadores' \
     X 'Voltar' 2>&1 > /dev/tty )
 
-    case "$menu07" in
-    A) menu774 ;;
-    B) menu771 ;;
-    C) menu785 ;;
-    D) menu780 ;;
-    E) menu782 ;;
-    F) menu776 ;;
-    G) menu777 ;;
-    H) menu775 ;;
-    I) menu784 ;;
-    J) menu778 ;;
-    K) menu779 ;;
-    L) menu773 ;;
-    M) menu781 ;;
-    N) menu783 ;;
-    O) menu772 ;;
+    case "$var4" in
+    A) menuD ;;
+    B) menuA ;;
+    C) menuO ;;
+    D) menuJ ;;
+    E) menuL ;;
+    F) menuF ;;
+    G) menuG ;;
+    H) menuE ;;
+    I) menuN ;;
+    J) menuH ;;
+    K) menuI ;;
+    L) menuC ;;
+    M) menuK ;;
+    N) menuM ;;
+    O) menuB ;;
     X) start ;;
     esac
   else
@@ -400,40 +593,40 @@ function menu77 {
   fi
 }
 
-function menu771 {
-  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários Cadastrados." --msgbox "Para ver os nomes use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user list | less; menu77
+function menuA {
+  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários Cadastrados." --msgbox "Para ver os nomes use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user list | less; menu04
 }
 
-function menu772 {
-  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores Cadastrados." --msgbox "Para ver os computadores use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool computer list | less; menu77
+function menuB {
+  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores Cadastrados." --msgbox "Para ver os computadores use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool computer list | less; menu04
 }
 
-function menu773 {
-  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos criados." --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool group list | less; menu77
+function menuC {
+  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos criados." --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool group list | less; menu04
 }
 
-function menu774 {
+function menuD {
   validusr=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --inputbox "Insira um nome de usuário \n
 Exemplo: joao_neves" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && menu77
+  [ $? -ne 0 ] && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu774
+    menuD
   fi
 
   validpss=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --insecure --passwordbox 'Crie uma nova senha para o usuário' 0 0 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && menu77
+  [ $? -ne 0 ] && menu04
   if [ -z "$validpss" ]; then
     dialog --title "ERRO" --msgbox "Senha não pode ficar em branco!" 8 40
-    menu774
+    menuD
   fi
 
   validsur=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de Exibição \n
 Exemplo: João Neves" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && menu77
+  [ $? -ne 0 ] && menu04
   if [ -z "$validsur" ]; then
     dialog --title "ERRO" --msgbox "Exibição não pode ficar em branco!" 8 40
-    menu774
+    menuD
   fi
 
 # 000 #
@@ -442,376 +635,247 @@ Exemplo: João Neves" 0 0 2>&1 > /dev/tty)
 Esta opção só pode ser definida agora. Se escolher Não, deverá usar o RSAT caso mude de ideia." 0 0
   if [ $? = 0 ]; then
     echo "$password" | sudo -S sudo samba-tool user create "$validusr" "$validpss" --surname="$validsur" --must-change-at-next-login
-    dialog --title "Informação" --msgbox "Usuário criado com sucesso!" 8 40
   else
     echo "$password" | sudo -S sudo samba-tool user create "$validusr" "$validpss" --surname="$validsur"
-    dialog --title "Informação" --msgbox "Usuário criado com sucesso!" 8 40
   fi
 
-  dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr não deve expirar?" 0 0
+  dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr não deve expirar mais?" 0 0
   if [ $? = 0 ]; then
     echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr" --noexpiry
-    dialog --title "Informação" --msgbox "A senha de $validusr não expira!" 8 40
+    dialog --title "Informação" --msgbox "A senha de $validusr não expira mais!" 8 40
+    dialog --title "Informação" --msgbox "Usuário $validusr criado e configurado com sucesso!" 8 40
+    menu04
   else
-    dialog --title "Informação" --msgbox "Usuário configurado com sucesso!" 8 40
+    dialog --title "Informação" --msgbox "Usuário $validusr criado e configurado com sucesso!" 8 40
+    menu04
   fi
 }
 
-function menu775 {
+function menuE {
   validusr=$(dialog --title 'AD-DC' --backtitle "Trocar a senha de usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu775
+    menuE
   fi
 
   validpss=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --insecure --passwordbox 'Crie uma nova senha para o usuário' 0 0 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && menu77
+  [ $? -ne 0 ] && menu04
   if [ -z "$validpss" ]; then
     dialog --title "ERRO" --msgbox "Senha não pode ficar em branco!" 8 40
-    menu775
+    menuE
   fi
 
   echo "$password" | sudo -S samba-tool user setpassword "$validusr" --newpassword="$validpss"
-  dialog --title "Informação" --msgbox "Senha trocada com sucesso!" 8 40
-  menu77
+  dialog --title "Informação" --msgbox "Senha de $validusr trocada com sucesso!" 8 40
+  menu04
 }
 
-function menu776 {
+function menuF {
   validusr=$(dialog --title 'AD-DC' --backtitle "Bloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu776
+    menuF
   fi
   echo "$password" | sudo -S samba-tool user disable "$validusr"
   dialog --title "Informação" --msgbox "Usuário $validusr bloqueado com sucesso!" 7 25
-  menu77
+  menu04
 }
 
-function menu777 {
+function menuG {
   validusr=$(dialog --title 'AD-DC' --backtitle "Desbloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu777
+    menuG
   fi
   echo "$password" | sudo -S samba-tool user enable "$validusr"
   dialog --title "Informação" --msgbox "Usuário $validusr desbloqueado com sucesso!" 7 25
-  menu77
+  menu04
 }
 
-function menu778 {
+function menuH {
   validusr=$(dialog --title 'AD-DC' --backtitle "Excluir usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu778
+    menuH
   fi
   dialog --title 'Confirmação' --backtitle 'Exclusão de Usuário' --yesno 'Deseja excluir este usuário?' 0 0
-  #[ $? -ne 0 ] && break && menu77
   if [ $? = 0 ]; then
     echo "$password" | sudo -S samba-tool user delete "$validusr"
     dialog --title "Informação" --msgbox "Usuário $validusr excluído com sucesso!" 7 25
-    menu77
+    menu04
   fi
 }
 
-function menu779 {
+function menuI {
   validgrp=$(dialog --title 'AD-DC' --backtitle "Criar um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menu779
+    menuI
   fi
   echo "$password" | sudo -S samba-tool group add "$validgrp"
-  dialog --title "Informação" --msgbox "Grupo $validgrp desbloqueado com sucesso!" 7 25
-  menu77
+  dialog --title "Informação" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
+  menu04
 }
 
-function menu780 {
+function menuJ {
   validusr=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome do Usuario" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu780
+    menuJ
   fi
   validgrp=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menu780
+    menuJ
   fi
   echo "$password" | sudo -S samba-tool group addmembers "$validgrp" "$validusr"
   dialog --title "Informação" --msgbox "O usuário $validusr foi adicionado ao grupo $validgrp !" 8 40
-  menu77
+  menu04
 }
 
-function menu781 {
+function menuK {
   validgrp=$(dialog --title 'AD-DC' --backtitle "Exibir membros de um grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menu781
+    menuK
   fi
   dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "Para ver os membros use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool group listmembers "$validgrp" | less
-  menu77
+  menu04
 }
 
-function menu782 {
+function menuL {
   validusr=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Usuario" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu782
+    menuL
   fi
   validgrp=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menu782
+    menuL
   fi
   echo "$password" | sudo -S samba-tool group removemembers "$validgrp" "$validusr"
   dialog --title "Informação" --msgbox "O usuário $validusr foi removido do grupo $validgrp !" 8 40
-  menu77
+  menu04
 }
 
-function menu783 {
+function menuM {
   validgrp=$(dialog --title 'AD-DC' --backtitle "Excluir grupo do Domínio em $HOSTNAME" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu77
+  [ $? -ne 0 ] && break && menu04
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menu783
+    menuM
   fi
   dialog --title 'Confirmação' --backtitle 'Exclusão de Grupo' --yesno "Deseja excluir o grupo $validgrp?" 0 0
-#  [ $? -ne 0 ] && break && menu77
+
   if [ $? = 0 ]; then
     echo "$password" | sudo -S samba-tool group delete "$validgrp"
     dialog --title "Informação" --msgbox "Grupo $validgrp excluído com sucesso!" 7 25
-    menu77
+    menu04
   fi
 }
 
-function menu784 {
-  validsur=$(dialog --title 'AD-DC' --backtitle "Alterar Política de Senha" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && menu77
-  if [ -z "$validsur" ]; then
+function menuN {
+  validusr=$(dialog --title 'AD-DC' --backtitle "Alterar Política de Senha" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
+  [ $? -ne 0 ] && menu04
+  if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu784
+    menuN
   fi
 
   dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "$validusr deve trocar a senha ao logar?" 0 0
   if [ $? = 0 ]; then
-    dialog --title "Informação" --msgbox "Esse recurso só é possível no ato da criação de um usuário!" 8 40
+    dialog --title "Informação" --msgbox "Esse recurso só funciona no ato da criação de um usuário!" 8 40
   fi
 
-  dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr não deve expirar?" 0 0
+  dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr não deve mais expirar?" 0 0
   if [ $? = 0 ]; then
     echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr" --noexpiry
+    dialog --title "Informação" --msgbox "A senha de $validusr não expira mais!" 8 40
+    menu04
   fi
-  dialog --title "Informação" --msgbox "A senha de $validusr não expira!" 8 40
+  menu04
 }
 
-function menu785 {
+function menuO {
   validusr=$(dialog --title 'AD-DC' --backtitle "Exibir grupos de um usuário em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu785
+  [ $? -ne 0 ] && break && menuO
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu785
+    menuO
   fi
   dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user getgroups "$validusr" | less
-  menu77
+  menu04
 }
 
-# ---------------------------------------------------------------------------- #
+################################################################################
+#                                                                              #
+################################################################################
 
-# Maquinas Virtuais
-function menu79 {
+# Acesso Restrito!
 
-if [[ $(which virt-manager 2>/dev/null) ]]; then
+function m0x {
+  dialog --title 'F.F.E.' --msgbox "Ferramentas e Funções Experimentais" 0 0
+  password02=$(dialog --backtitle "Somente Pessoal Autorizado" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha.' 0 0 2>&1 > /dev/tty)
+  if [ "$password02" = "1345278" ]; then
+    dialog --title 'Porteiro:' --msgbox "Clift Claft Still, a Porta se Abriu!" 6 40
+    m00
+  else
+    dialog --title 'Acesso Proibido' --msgbox "Permissão Negada" 0 0
+  fi
+}
 
-  menu08=$(dialog --help-button --help-label 'Ajuda' --title 'Gestão de VMs' --backtitle "Virt-Manager detectado. Bem-Vindo ao Gestor de Máquinas Virtuais!" --menu "Gestão de Máquinas Virtuais" 0 0 0 \
-  A 'Status de Todas as VMs' \
-  B 'Ligar Todas as VMs' \
-  C 'Desligar Todas as VMs' \
+# Clift Claft Still, a Porta se Abriu!
+
+function m00 {
+  var7=$(dialog --backtitle "Ferramentas e Funções Experimentais!" --title 'Atenção' --menu "Menu Restrito" 0 0 0 \
+  A 'Projeto 01' \
+  B 'Projeto 02' \
+  C 'Projeto 03' \
+  D 'Projeto 04' \
+  E 'Projeto 05' \
   X 'Voltar' 2>&1 > /dev/tty )
-
   case $? in
-    2) dialog --title 'Ajuda' --msgbox "Status de Todas as VMs: Ver o menu AJUDA dentro desta opção! \n \n
-Ligar Todas as VMs: Inicializará apenas as VMs em estado de -Shut Off- detectadas. \n
-Serão ignoradas todas as demais VMs em quaisquer outros estados. \n \n
-Desligar Todas as VMs: Desligará apenas as VMs em estado de -running- detectadas.
-Serão ignoradas todas as demais VMs em quaisquer outros estados. \n \n
-Para maiores detalhes vide AJUDA dentro do menu Status de Todas as VMs!
-" 0 0 ; menu79 ;;
+    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
   esac
-
-  case "$menu08" in
-
-  A) menu73 ;;
-  B) menu731 ;;
-  C) menu732 ;;
+  case "$var7" in
+  A) m01 ;;
+  B) m02 ;;
+  C) m03 ;;
+  D) m04 ;;
+  E) m05 ;;
   X) echo a ;;
   esac
-
-else
-
-  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DE MÁQUINA VIRTUAL' --msgbox "O VirtManager não foi encontrado neste sistema ou você não possui as permissões para acessá-lo!" 7 50
-
-fi
 }
 
-function menu731 {
-dialog --title 'Confirmação' --backtitle 'Confirmação de Início de VMs!' --yesno "Deseja inicializar todas as VMs?" 0 0
-if [ $? = 0 ]; then
-  for i in $(virsh list --all | grep "shut off" | awk '{print $2}')
-  do
-  virsh start $i
-  dialog --title 'Status:' --msgbox "VM $i Iniciada!" 0 0
-  done
-
-  menu79
-fi
-menu79
+function m01 {
+  echo a
 }
 
-function menu732 {
-dialog --title 'Confirmação' --backtitle 'Confirmação de Desligamento de VMs!' --yesno "Deseja desligar todas as VMs?" 0 0
-  if [ $? = 0 ]; then
-  for i in $(virsh list | grep running | awk '{print $2}')
-  do
-  virsh shutdown $i
-  dialog --title 'Status:' --msgbox "VM $1 Encerrada!" 0 0
-  done
-
-  menu79
-  fi
-menu79
+function m02 {
+  echo a
 }
 
-# Status de Máquinas Virtuais
-function menu73 {
-  virtmgr0=`virsh list --all`
-  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Maquinas Virtuais encontradas" --backtitle "Status do VirtManager" --msgbox "$virtmgr0" 0 0
-
-  case $? in
-    2) dialog --title 'Ajuda' --msgbox "Name: Nome da máquina virtual [VM] conforme ela foi registrada no virt-manager \n \n
-State é a situação em que a VM se encontra. Os States podem ser:\n \n
-running*: VM executando normalmente. \n
-paused*: VM em estado deliberado de pausa. \n
-idle*: VM em estado de pausa, normalmente por alta carga de I/O e aguardando o sistema host voltar a responder. \n
-pmsuspended*: VM suspendida com PowerState S3. \n
-in shutdown*: VM em processo de desligamento. \n \n
-shut off: VM desligada apenas. \n
-crashed: Significa que a VM travou e parou de responder abruptamente por algum erro grave, seja do próprio sistema virtualizado ou erro de disco do host. \n \n
-* = Em qualquer estado a VM pode corromper se for desligada abruptamente!" 0 0 ; menu73 ;;
-  esac
-
-  menu79
+function m03 {
+  echo a
 }
 
-# ---------------------------------------------------------------------------- #
-
-# Reinicio
-function menu84 {
-  bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-
-  if [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ]; then
-    dialog --cr-wrap --title 'ERRO AO REINICIAR' --backtitle 'ERRO AO TENTAR REINICIAR.' --msgbox "Reinício bloqueado! \n
-Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
-  else
-    dialog --title 'Reiniciar' --backtitle 'R E I N I C I A R' --yesno 'Deseja reiniciar este sistema?' 0 0
-    if [ $? = 0 ]; then
-      echo "$password" | sudo -S reboot
-    fi
-  fi
+function m04 {
+  echo a
 }
 
-# Desligamento
-function menu85 {
-  rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+################################################################################
+#                                                                              #
+################################################################################
 
-  if [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ]; then
-    dialog --cr-wrap --title 'ERRO AO DESLIGAR' --backtitle 'ERRO AO TENTAR DESLIGAR.' --msgbox "Desligamento bloqueado! \n
-Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
-  else
-    dialog --title 'Desligar' --backtitle 'D E S L I G A R' --yesno 'Deseja desligar este sistema?' 0 0
-    if [ $? = 0 ]; then
-      echo "$password" | sudo -S shutdown -h now
-    fi
-  fi
-}
-
-########
-# Loop # # ------------------------------------------------------------------- #
-########
-
-function start {
-  while true; do
-    sensors0=`sensors || echo "Incompatível em Máquina Virtual!"`
-    datetime=`date +"%d/%m %H:%M"` # Data e Hora
-
-    menu05=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 0 \
-    A 'Status do Sistema' \
-    B 'Máquinas Virtuais' \
-    C 'Processos do Sistema' \
-    D 'Controlador de Dominio' \
-    E 'Ferramentas do Sistema' \
-    F 'Reiniciar o Sistema' \
-    G 'Desligar o Sistema' \
-    X 'SAIR' 2>&1 > /dev/tty )
-
-    [ $? -ne 0 ] && echo "Saindo... Para voltar digite 'menu'!" && break
-    case "$menu05" in
-
-    A) menu68 ;;
-    B) menu79 ;;
-    C) menu71 ;;
-    D) menu77 ;;
-    E) menu75 ;;
-    F) menu84 ;;
-    G) menu85 ;;
-    X) echo "Saindo... Para voltar digite 'menu'!" && exit && break ;;
-    esac
-  done
-}
-
-################
-# Dependências # ------------------------------------------------------------- #
-################
-
-function pkg {
-REQUIRED_PKG="$1"
-PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
-echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
-if [ "" = "$PKG_OK" ]; then
-  echo "$REQUIRED_PKG não encontrado. Instalando..."
-  sudo apt update; sudo apt install $REQUIRED_PKG -y
-fi
-}
-
-pkg dialog
-pkg curl
-pkg lm-sensors
-pkg whois
-pkg arp-scan
-pkg traceroute
-pkg libatasmart-bin
-
-##########
-# Passwd # ------------------------------------------------------------------- #
-##########
-
-password=$(dialog --backtitle "$bktitle" --title 'Acesso ao Server Menu' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
-
-if [ -z "$password" ]; then
-  clear
-  echo "É necessário digitar sua senha para continuar. Saindo..."
-  echo "Para voltar digite 'menu' "
-else
-  start
-fi
+init
