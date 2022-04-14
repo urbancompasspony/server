@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.9 - By José Humberto"
+export bktitle="USM: Universal Server Menu v2.0 - By José Humberto"
 export password=0
 export processname=0
 export process=0
@@ -413,7 +413,7 @@ Detectamos estes governadores abaixo como suportados: \n \n
   D) menu10 powersave ;;
   E) menu10 performance ;;
   F) menu10 schedutil ;;
-  X) echo a ; menu053 ;;
+  X) echo a ; menu05 ;;
   esac
 }
 
