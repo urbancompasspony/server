@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.0 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.9.1 - By José Humberto"
 export password=0
 export processname=0
 export process=0
@@ -859,19 +859,143 @@ function m00 {
 }
 
 function m01 {
-  echo a
+
+errvm="Não Encontrada"
+VM1="$errvm"; VM2="$errvm"; VM3="$errvm"; VM4="$errvm"; VM5="$errvm"; VM6="$errvm"; VM7="$errvm"; VM8="$errvm"; VM9="$errvm"; VM10="$errvm"
+
+#virsh list --all | grep "shut off" | awk '{print $2}'
+#virsh list | grep running | awk '{print $2}'
+
+VM1=`virsh list --all | sed -n 4p | awk '{print $2}'`
+if [ "$VM1" = "" ]; then
+  VM1=`echo "Não há mais VMs!"`
+fi
+
+VM2=`virsh list --all | sed -n 4p | awk '{print $2}' || echo "Não Encontrada"`
+VM3=`virsh list --all | sed -n 5p | awk '{print $2}' || echo "Não Encontrada"`
+VM4=`virsh list --all | sed -n 6p | awk '{print $2}' || echo "Não Encontrada"`
+VM5=`virsh list --all | sed -n 7p | awk '{print $2}' || echo "Não Encontrada"`
+VM6=`virsh list --all | sed -n 8p | awk '{print $2}' || echo "Não Encontrada"`
+VM7=`virsh list --all | sed -n 9p | awk '{print $2}' || echo "Não Encontrada"`
+VM8=`virsh list --all | sed -n 10p | awk '{print $2}' || echo "Não Encontrada"`
+VM9=`virsh list --all | sed -n 11p | awk '{print $2}' || echo "Não Encontrada"`
+VM10=`virsh list --all | sed -n 12p | awk '{print $2}' || echo "Não Encontrada"`
+
+  var8=$(dialog --backtitle "Maquinas Virtuais" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
+  A "$VM1" \
+  B "$VM2" \
+  C "$VM3" \
+  D "$VM4" \
+  E "$VM5" \
+  F "$VM6" \
+  G "$VM7" \
+  H "$VM8" \
+  I "$VM9" \
+  J "$VM10" \
+  X 'Voltar' 2>&1 > /dev/tty )
+  case $? in
+    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
+  esac
+  case "$var8" in
+  A) m01 ;;
+  B) m02 ;;
+  C) m03 ;;
+  D) m04 ;;
+  E) m05 ;;
+  X) echo a ;;
+  esac
 }
 
 function m02 {
-  echo a
+
+
+  var9=$(dialog --backtitle "SMART" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
+  A 'SMART A' \
+  B 'SMART B' \
+  C 'SMART C' \
+  D 'SMART D' \
+  E 'SMART E' \
+  X 'Voltar' 2>&1 > /dev/tty )
+  case $? in
+    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
+  esac
+  case "$var9" in
+  A) m01 ;;
+  B) m02 ;;
+  C) m03 ;;
+  D) m04 ;;
+  E) m05 ;;
+  X) echo a ;;
+  esac
 }
 
 function m03 {
-  echo a
+
+
+  var10=$(dialog --backtitle "A" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
+  A 'A' \
+  B 'B' \
+  C 'C' \
+  D 'D' \
+  E 'E' \
+  X 'Voltar' 2>&1 > /dev/tty )
+  case $? in
+    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
+  esac
+  case "$var10" in
+  A) m01 ;;
+  B) m02 ;;
+  C) m03 ;;
+  D) m04 ;;
+  E) m05 ;;
+  X) echo a ;;
+  esac
 }
 
 function m04 {
-  echo a
+
+
+  var11=$(dialog --backtitle "B" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
+  A 'A' \
+  B 'B' \
+  C 'C' \
+  D 'D' \
+  E 'E' \
+  X 'Voltar' 2>&1 > /dev/tty )
+  case $? in
+    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
+  esac
+  case "$var11" in
+  A) m01 ;;
+  B) m02 ;;
+  C) m03 ;;
+  D) m04 ;;
+  E) m05 ;;
+  X) echo a ;;
+  esac
+}
+
+function m05 {
+
+
+  var12=$(dialog --backtitle "C" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
+  A 'A' \
+  B 'B' \
+  C 'C' \
+  D 'D' \
+  E 'E' \
+  X 'Voltar' 2>&1 > /dev/tty )
+  case $? in
+    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
+  esac
+  case "$var12" in
+  A) m01 ;;
+  B) m02 ;;
+  C) m03 ;;
+  D) m04 ;;
+  E) m05 ;;
+  X) echo a ;;
+  esac
 }
 
 ################################################################################
