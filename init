@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.8.2 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.8.3 - By José Humberto"
 export password=0
 export processname=0
 export process=0
@@ -127,6 +127,7 @@ function menu11 {
   xorg=`ls /tmp/.X11-unix | wc -l`
 
   dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Informações do Sistema" --msgbox "
+  Nome da Máquina: $HOSTNAME \n
   Data e Hora Local: $datetime \n \n
   IP Local  : $ip \n
   IP Externo: $ip2 \n \n
