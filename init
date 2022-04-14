@@ -860,7 +860,7 @@ function m00 {
 
 function m01 {
 
-errvm="Não Encontrada"
+errvm=" "
 VM1="$errvm"; VM2="$errvm"; VM3="$errvm"; VM4="$errvm"; VM5="$errvm"; VM6="$errvm"; VM7="$errvm"; VM8="$errvm"; VM9="$errvm"; VM10="$errvm"
 
 #virsh list --all | grep "shut off" | awk '{print $2}'
@@ -868,18 +868,18 @@ VM1="$errvm"; VM2="$errvm"; VM3="$errvm"; VM4="$errvm"; VM5="$errvm"; VM6="$errv
 
 VM1=`virsh list --all | sed -n 4p | awk '{print $2}'`
 if [ "$VM1" = "" ]; then
-  VM1=`echo "Não há mais VMs!"`
+  VM1=`echo " "`
 fi
 
-VM2=`virsh list --all | sed -n 4p | awk '{print $2}' || echo "Não Encontrada"`
-VM3=`virsh list --all | sed -n 5p | awk '{print $2}' || echo "Não Encontrada"`
-VM4=`virsh list --all | sed -n 6p | awk '{print $2}' || echo "Não Encontrada"`
-VM5=`virsh list --all | sed -n 7p | awk '{print $2}' || echo "Não Encontrada"`
-VM6=`virsh list --all | sed -n 8p | awk '{print $2}' || echo "Não Encontrada"`
-VM7=`virsh list --all | sed -n 9p | awk '{print $2}' || echo "Não Encontrada"`
-VM8=`virsh list --all | sed -n 10p | awk '{print $2}' || echo "Não Encontrada"`
-VM9=`virsh list --all | sed -n 11p | awk '{print $2}' || echo "Não Encontrada"`
-VM10=`virsh list --all | sed -n 12p | awk '{print $2}' || echo "Não Encontrada"`
+VM2=`virsh list --all | sed -n 4p | awk '{print $2}'`
+VM3=`virsh list --all | sed -n 5p | awk '{print $2}'`
+VM4=`virsh list --all | sed -n 6p | awk '{print $2}'`
+VM5=`virsh list --all | sed -n 7p | awk '{print $2}'`
+VM6=`virsh list --all | sed -n 8p | awk '{print $2}'`
+VM7=`virsh list --all | sed -n 9p | awk '{print $2}'`
+VM8=`virsh list --all | sed -n 10p | awk '{print $2}'`
+VM9=`virsh list --all | sed -n 11p | awk '{print $2}'`
+VM10=`virsh list --all | sed -n 12p | awk '{print $2}'`
 
   var8=$(dialog --backtitle "Maquinas Virtuais" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
   A "$VM1" \
@@ -897,13 +897,45 @@ VM10=`virsh list --all | sed -n 12p | awk '{print $2}' || echo "Não Encontrada"
     2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
   esac
   case "$var8" in
-  A) m01 ;;
-  B) m02 ;;
-  C) m03 ;;
-  D) m04 ;;
-  E) m05 ;;
+  A) m011 ;;
+  B) m011 ;;
+  C) m011 ;;
+  D) m011 ;;
+  E) m011 ;;
+  F) m011 ;;
+  G) m011 ;;
+  H) m011 ;;
+  I) m011 ;;
+  J) m011 ;;
   X) echo a ;;
   esac
+}
+
+function m011 {
+if [ "$status" = "Executando" ]; then # se Executando...
+  dialog --title "$processname" --yesno "Deseja reiniciar o processo $processname ?" 6 40
+  if [ $? = 0 ]; then
+    echo "$password" | sudo -S systemctl restart "$process"
+    dialog --title "$processname" --msgbox "O processo $processname foi reiniciado!" 6 40
+    menu03
+  else
+    dialog --title "$processname" --yesno "Deseja parar o processo $processname ?" 6 40
+    if [ $? = 0 ]; then
+    echo "$password" | sudo -S systemctl stop "$process"
+    dialog --title "$processname" --msgbox "O processo $processname foi parado!" 6 40
+    menu03
+    fi
+  fi
+  menu03
+else # se Parado
+  dialog --title "$processname" --yesno "Deseja tentar iniciar o processo $processname ?" 6 40
+  if [ $? = 0 ]; then
+    echo "$password" | sudo -S systemctl start "$process"
+    dialog --title "$processname" --msgbox "Verifique se o $processname iniciou." 6 40
+    menu03
+  fi
+  menu03
+fi
 }
 
 function m02 {
