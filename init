@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.8.5 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.8.6 - By José Humberto"
 export password=0
 export processname=0
 export process=0
@@ -96,7 +96,7 @@ function menu01
   {  var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
   A 'Sistema' \
   B 'Temperatura' \
-  C 'Consumo dos Discos' \
+  C 'Armazenamento' \
   D 'S.M.A.R.T.' \
   X 'Voltar' 2>&1 > /dev/tty )
 
@@ -283,7 +283,6 @@ Resultados que indicam Baterias: \n
 Em Progresso: Novas indicações são adicionadas periodicamente!
 " 0 0 ; menu12 ;;
   esac
-
 menu01
 }
 
@@ -327,7 +326,7 @@ function menu14 {
   menu140 "sdh" && dump8=$skd && dumpst8=$stssd
   menu140 "sdi" && dump9=$skd && dumpst9=$stssd
 
-  menusk=$(dialog --help-button --help-label 'Ajuda' --backtitle "LibATASmart-bin" --title "S.M.A.R.T." --menu ""  0 0 0 \
+  menusk=$(dialog --help-button --help-label 'Ajuda' --backtitle "Análise de Atributos SMART!" --title "S.M.A.R.T." --menu ""  0 0 0 \
   "/dev/sda" "$dumpst1" \
   "/dev/sdb" "$dumpst2" \
   "/dev/sdc" "$dumpst3" \
@@ -367,10 +366,7 @@ function menu140 {
 }
 
 function menu141 {
-  dialog --cr-wrap --help-button --help-label 'Ajuda' --backtitle /dev/$1 --msgbox "$2" 0 0
-  case $? in
-    2) dialog --title "Definições de SMART!" --msgbox "$TEXTO" 0 0 ; menu141 ;;
-  esac
+  dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0; menu14
 }
 
 TEXTO="As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só \n
