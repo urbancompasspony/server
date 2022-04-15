@@ -109,7 +109,7 @@ function menu01
   A) menu11 ;;
   B) menu12 ;;
   C) menu13 ;;
-  D) dialog --title '' --msgbox "Em Breve!" 0 0 ; menu01 ;;
+  D) menu14 ;;
   X) echo a ;;
   esac
 }
@@ -310,6 +310,61 @@ Montado em: Local aonde o disco está acessível naquele momento. \n
 \n" 0 0; menu13 ;;
   esac
 menu01
+}
+
+# ---------------------------------------------------------------------------- #
+
+# SKDUMP!
+function menu14 {
+
+  menu140 "sda" && dump1=$skd && dumpst1=$stssd
+  menu140 "sdb" && dump2=$skd && dumpst2=$stssd
+  menu140 "sdc" && dump3=$skd && dumpst3=$stssd
+  menu140 "sdd" && dump4=$skd && dumpst4=$stssd
+  menu140 "sde" && dump5=$skd && dumpst5=$stssd
+  menu140 "sdf" && dump6=$skd && dumpst6=$stssd
+  menu140 "sdg" && dump7=$skd && dumpst7=$stssd
+  menu140 "sdh" && dump8=$skd && dumpst8=$stssd
+  menu140 "sdi" && dump9=$skd && dumpst9=$stssd
+
+  menusk=$(dialog --help-button --help-label 'Ajuda' --backtitle "LibATASmart-bin" --title "S.M.A.R.T." --menu ""  0 0 0 \
+  "/dev/sda" "$dumpst1" \
+  "/dev/sdb" "$dumpst2" \
+  "/dev/sdc" "$dumpst3" \
+  "/dev/sdd" "$dumpst4" \
+  "/dev/sde" "$dumpst5" \
+  "/dev/sdf" "$dumpst6" \
+  "/dev/sdg" "$dumpst7" \
+  "/dev/sdh" "$dumpst8" \
+  "/dev/sdi" "$dumpst9" \
+  Voltar "" 2>&1 > /dev/tty )
+
+  case $? in
+    2) dialog --title "Definições de SMART!" --msgbox "" 0 0 ; menu14 ;;
+  esac
+
+  case "$menusk" in
+  "/dev/sda") dialog --cr-wrap --backtitle "/dev/sda" --msgbox "$dump1" 0 0 ; menu14 ;;
+  "/dev/sdb") dialog --cr-wrap --backtitle "/dev/sdb" --msgbox "$dump2" 0 0 ; menu14 ;;
+  "/dev/sdc") dialog --cr-wrap --backtitle "/dev/sdc" --msgbox "$dump3" 0 0 ; menu14 ;;
+  "/dev/sdd") dialog --cr-wrap --backtitle "/dev/sdd" --msgbox "$dump4" 0 0 ; menu14 ;;
+  "/dev/sde") dialog --cr-wrap --backtitle "/dev/sde" --msgbox "$dump5" 0 0 ; menu14 ;;
+  "/dev/sdf") dialog --cr-wrap --backtitle "/dev/sdf" --msgbox "$dump6" 0 0 ; menu14 ;;
+  "/dev/sdg") dialog --cr-wrap --backtitle "/dev/sdg" --msgbox "$dump7" 0 0 ; menu14 ;;
+  "/dev/sdh") dialog --cr-wrap --backtitle "/dev/sdh" --msgbox "$dump8" 0 0 ; menu14 ;;
+  "/dev/sdi") dialog --cr-wrap --backtitle "/dev/sdi" --msgbox "$dump9" 0 0 ; menu14 ;;
+  Voltar) echo a ;;
+  esac
+}
+
+function menu140 {
+  stssd=`ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente"`
+  if [ "$stssd" = "Presente" ]; then
+    skd=`skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}'`
+  else
+    skd=`echo "Disco ausente!"`
+    #stssd=`echo "Ausente"`
+  fi
 }
 
 # ---------------------------------------------------------------------------- #
