@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.8.3 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.8.5 - By José Humberto"
 export password=0
 export processname=0
 export process=0
@@ -340,7 +340,17 @@ function menu14 {
   Voltar "" 2>&1 > /dev/tty )
 
   case $? in
-    2) dialog --title "Definições de SMART!" --msgbox "" 0 0 ; menu14 ;;
+    2) dialog --title "Definições de SMART!" --msgbox "As informações SMART de um H.D.D. ou S.S.D. são variadas mas só \n
+algumas partes realmente interessam: \n \n
+\n
+\n
+\n
+\n
+\n
+\n
+\n
+\n
+" 0 0 ; menu14 ;;
   esac
 
   case "$menusk" in
