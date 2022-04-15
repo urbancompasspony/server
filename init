@@ -371,7 +371,7 @@ function menu141 {
 
 TEXTO="As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só \n
 algumas partes realmente interessam. Nem todos os HDDs e SSDs exibem todas  \n
-essas informações, isso depende do fabricante. As mais graves são: \n \n
+essas informações, isso depende do fabricante. As mais importantes são: \n \n
 01 (0x01) Read Error Rate: Taxa de erro geral durante as leituras do disco. \n
 Ao lado do atributo 07 (0x07), se estiver muito alto, causará muita lentidão. \n \n
 05 (0x05) Reallocated Sectors Count: Conhecidos também como BadBlocks, indicam falhas de gravação no disco. \n
