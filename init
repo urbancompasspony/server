@@ -360,7 +360,7 @@ function menu14 {
 function menu140 {
   stssd=`ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente"`
   if [ "$stssd" = "Presente" ]; then
-    skd=`skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}'`
+    skd=`echo "$password" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}'`
   else
     skd=`echo "Disco ausente!"`
     #stssd=`echo "Ausente"`
