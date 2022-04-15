@@ -61,7 +61,7 @@ function start {
     sensors0=`sensors || echo "Incompatível em Máquina Virtual!"`
     datetime=`date +"%d/%m %H:%M"` # Data e Hora
 
-    var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 0 \
+    var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
     A 'Status do Sistema' \
     B 'Máquinas Virtuais' \
     C 'Processos do Sistema' \
@@ -340,16 +340,31 @@ function menu14 {
   Voltar "" 2>&1 > /dev/tty )
 
   case $? in
-    2) dialog --title "Definições de SMART!" --msgbox "As informações SMART de um H.D.D. ou S.S.D. são variadas mas só \n
-algumas partes realmente interessam: \n \n
-\n
-\n
-\n
-\n
-\n
-\n
-\n
-\n
+    2) dialog --title "Definições de SMART!" --msgbox "As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só \n
+algumas partes realmente interessam. Nem todos os HDDs e SSDs exibem todas  \n
+essas informações, isso depende do fabricante. As mais graves são: \n \n
+05 (0x05) Reallocated Sectors Count: Conhecidos também como BadBlocks, indicam falhas de gravação no disco. \n
+A longo prazo isso pode resultar em perda do disco dentro de alguns meses. \n \n
+10 (0x0A) Spin Retry Count: Quantidade de vezes que o HDD tentou inicializar após uma falha interna. \n
+A médio prazo isso significa falhas graves das cabeças de leitura e o disco poderá parar em alguns meses. \n \n
+184 (0xB8) End-to-End error (ou IOEDC): Indica erros nos dados que transitam do disco ou SSD para a memória RAM. \n
+Imediatamente causa muito lentidão de acesso aos dados; com valores altos desse atributo, há perdas de dados. \n \n
+195 (0xC3) Hardware ECC Recovered: Sozinho não quer dizer muita coisa; porém somado ao resultado do atributo 187 \n
+abaixo, significa que o disco está perdendo dados mas ainda está se recuperando. Lentidão extrema é prevista. \n \n
+187 (0xBB) Reported Uncorrectable Errors: Erros incorrigíveis que foram reportados durante o processamento do, \n
+Hardware ECC do próprio HDD. Valores altos significam disco extremamente lento. \n \n
+188 (0xBC) Command Timeout: Quantidade de vezes que o HDD ou SSD desistiu de fazer uma leitura. \n
+Um valor alto indica falha geral da placa lógica do disco. \n \n
+196 (0xC4) Reallocation Event Count: Quantidade de vezes que o disco copiou dados de um setor ruim para um bom, \n
+se auto-recuperando. Os valores podem ser altos sem perdas de dados, mas a lentidão será notável. \n \n
+197 (0xC5) Current Pending Sector Count: Setores que aguardam ser remapeados. Altos valores do atributo 187 ou \n
+mesmo do atributo 05 indicam que o HDD está com setores defeituosos e está com dificuldades de lidar. Lentidão. \n \n
+198 (0xC6) (Offline) Uncorrectable Sector Count: Costuma indicar erros na superfície dos discos ou ainda uma falha \n
+mecânica geral da cabeça de leitura dos discos, ou ainda de multiplexadoras de SSDs. \n \n
+201 (0xC9) Soft Read Error Rate (ou TA Counter Detected): Quantidade de erros causados por software. \n
+Valores altos indicam a presença de bad sectors (diferente de bad blocks), que podem ser corrigidos com \n
+ferramentas de análise, como o HD Regenerator. \n \n
+As informações acima são referências para análises da saúde dos discos. Atenção ao interpretar os resultados!
 " 0 0 ; menu14 ;;
   esac
 
