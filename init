@@ -372,6 +372,11 @@ function menu141 {
 TEXTO="As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só \n
 algumas partes realmente interessam. Nem todos os HDDs e SSDs exibem todas  \n
 essas informações, isso depende do fabricante. As mais graves são: \n \n
+01 (0x01) Read Error Rate: Taxa de erro geral durante as leituras do disco. \n
+Ao lado do atributo 05, se estiver muito alto, causará muita lentidão. \n \n
+05 (0x05) Seek Error Rate: Erro das cabeças magnéticas; podem surgir \n
+por danos ao braço de leitura ou alargamento térmico do disco rígido. \n
+Normalmente não é preocupante mas ao lado do atributo 01 pode causar lentidão. \n \n
 05 (0x05) Reallocated Sectors Count: Conhecidos também como BadBlocks, indicam falhas de gravação no disco. \n
 A longo prazo isso pode resultar em perda do disco dentro de alguns meses. \n \n
 10 (0x0A) Spin Retry Count: Quantidade de vezes que o HDD tentou inicializar após uma falha interna. \n
