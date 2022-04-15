@@ -109,7 +109,7 @@ function menu01
   A) menu11 ;;
   B) menu12 ;;
   C) menu13 ;;
-  D) menu14 ;;
+  D) menu141 ;;
   X) echo a ;;
   esac
 }
@@ -315,17 +315,20 @@ menu01
 # ---------------------------------------------------------------------------- #
 
 # SKDUMP!
-function menu14 {
+function menu141 {
+menu140 "sda" && dump1=$skd && dumpst1=$stssd
+menu140 "sdb" && dump2=$skd && dumpst2=$stssd
+menu140 "sdc" && dump3=$skd && dumpst3=$stssd
+menu140 "sdd" && dump4=$skd && dumpst4=$stssd
+menu140 "sde" && dump5=$skd && dumpst5=$stssd
+menu140 "sdf" && dump6=$skd && dumpst6=$stssd
+menu140 "sdg" && dump7=$skd && dumpst7=$stssd
+menu140 "sdh" && dump8=$skd && dumpst8=$stssd
+menu140 "sdi" && dump9=$skd && dumpst9=$stssd
+menu14
+}
 
-  menu140 "sda" && dump1=$skd && dumpst1=$stssd
-  menu140 "sdb" && dump2=$skd && dumpst2=$stssd
-  menu140 "sdc" && dump3=$skd && dumpst3=$stssd
-  menu140 "sdd" && dump4=$skd && dumpst4=$stssd
-  menu140 "sde" && dump5=$skd && dumpst5=$stssd
-  menu140 "sdf" && dump6=$skd && dumpst6=$stssd
-  menu140 "sdg" && dump7=$skd && dumpst7=$stssd
-  menu140 "sdh" && dump8=$skd && dumpst8=$stssd
-  menu140 "sdi" && dump9=$skd && dumpst9=$stssd
+function menu14 {
 
   menusk=$(dialog --help-button --help-label 'Ajuda' --backtitle "LibATASmart-bin" --title "S.M.A.R.T." --menu ""  0 0 0 \
   "/dev/sda" "$dumpst1" \
