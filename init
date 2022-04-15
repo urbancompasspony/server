@@ -371,19 +371,19 @@ function menu141 {
 
 TEXTO="As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só \n
 algumas partes realmente interessam. Nem todos os HDDs e SSDs exibem todas  \n
-essas informações, isso depende do fabricante. As mais importantes são: \n \n
+essas informações, isso depende do fabricante. As mais graves são: \n \n
 01 (0x01) Read Error Rate: Taxa de erro geral durante as leituras do disco. \n
-Ao lado do atributo 05, se estiver muito alto, causará muita lentidão. \n \n
-05 (0x05) Seek Error Rate: Erro das cabeças magnéticas; podem surgir \n
-por danos ao braço de leitura ou alargamento térmico do disco rígido. \n
-Normalmente não é preocupante mas ao lado do atributo 01 pode causar lentidão. \n \n
+Ao lado do atributo 07 (0x07), se estiver muito alto, causará muita lentidão. \n \n
 05 (0x05) Reallocated Sectors Count: Conhecidos também como BadBlocks, indicam falhas de gravação no disco. \n
 A longo prazo isso pode resultar em perda do disco dentro de alguns meses. \n \n
+07 (0x07) Seek Error Rate: Erro das cabeças magnéticas; podem surgir \n
+por danos ao braço de leitura ou alargamento térmico do disco rígido. \n
+Normalmente não é preocupante mas ao lado do atributo 01 (0x01) pode causar lentidão. \n \n
 10 (0x0A) Spin Retry Count: Quantidade de vezes que o HDD tentou inicializar após uma falha interna. \n
 A médio prazo isso significa falhas graves das cabeças de leitura e o disco poderá parar em alguns meses. \n \n
 184 (0xB8) End-to-End error (ou IOEDC): Indica erros nos dados que transitam do disco ou SSD para a memória RAM. \n
 Imediatamente causa muito lentidão de acesso aos dados; com valores altos desse atributo, há perdas de dados. \n \n
-195 (0xC3) Hardware ECC Recovered: Sozinho não quer dizer muita coisa; porém somado ao resultado do atributo 187 \n
+195 (0xC3) Hardware ECC Recovered: Sozinho não quer dizer muita coisa; porém somado ao resultado do atributo 187 (0xBB) \n
 abaixo, significa que o disco está perdendo dados mas ainda está se recuperando. Lentidão extrema é prevista. \n \n
 187 (0xBB) Reported Uncorrectable Errors: Erros incorrigíveis que foram reportados durante o processamento do, \n
 Hardware ECC do próprio HDD. Valores altos significam disco extremamente lento. \n \n
@@ -391,8 +391,8 @@ Hardware ECC do próprio HDD. Valores altos significam disco extremamente lento.
 Um valor alto indica falha geral da placa lógica do disco. \n \n
 196 (0xC4) Reallocation Event Count: Quantidade de vezes que o disco copiou dados de um setor ruim para um bom, \n
 se auto-recuperando. Os valores podem ser altos sem perdas de dados, mas a lentidão será notável. \n \n
-197 (0xC5) Current Pending Sector Count: Setores que aguardam ser remapeados. Altos valores do atributo 187 ou \n
-mesmo do atributo 05 indicam que o HDD está com setores defeituosos e está com dificuldades de lidar. Lentidão. \n \n
+197 (0xC5) Current Pending Sector Count: Setores que aguardam ser remapeados. Altos valores do atributo 187 (0xBB) ou \n
+mesmo do atributo 05 (0x05) indicam que o HDD está com setores defeituosos e está com dificuldades de lidar. Lentidão. \n \n
 198 (0xC6) (Offline) Uncorrectable Sector Count: Costuma indicar erros na superfície dos discos ou ainda uma falha \n
 mecânica geral da cabeça de leitura dos discos, ou ainda de multiplexadoras de SSDs. \n \n
 201 (0xC9) Soft Read Error Rate (ou TA Counter Detected): Quantidade de erros causados por software. \n
