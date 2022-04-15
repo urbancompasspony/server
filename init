@@ -340,7 +340,40 @@ function menu14 {
   Voltar "" 2>&1 > /dev/tty )
 
   case $? in
-    2) dialog --title "Definições de SMART!" --msgbox "As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só \n
+    2) dialog --title "Definições de SMART!" --msgbox "$TEXTO" 0 0 ; menu14 ;;
+  esac
+
+  case "$menusk" in
+  "/dev/sda") menu141 "sda" "$dump1" ; menu14 ;;
+  "/dev/sdb") menu141 "sdb" "$dump2" ; menu14 ;;
+  "/dev/sdc") menu141 "sdc" "$dump3" ; menu14 ;;
+  "/dev/sdd") menu141 "sdd" "$dump4" ; menu14 ;;
+  "/dev/sde") menu141 "sde" "$dump5" ; menu14 ;;
+  "/dev/sdf") menu141 "sdf" "$dump6" ; menu14 ;;
+  "/dev/sdg") menu141 "sdg" "$dump7" ; menu14 ;;
+  "/dev/sdh") menu141 "sdh" "$dump8" ; menu14 ;;
+  "/dev/sdi") menu141 "sdi" "$dump9" ; menu14 ;;
+  Voltar) echo a ;;
+  esac
+}
+
+function menu140 {
+  stssd=`ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente"`
+  if [ "$stssd" = "Presente" ]; then
+    skd=`echo "$password" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}'`
+  else
+    skd=`echo "Disco ausente!"`
+  fi
+}
+
+function menu141 {
+  dialog --cr-wrap --help-button --help-label 'Ajuda' --backtitle /dev/$1 --msgbox "$2" 0 0
+  case $? in
+    2) dialog --title "Definições de SMART!" --msgbox "$TEXTO" 0 0 ; menu141 ;;
+  esac
+}
+
+TEXTO="As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só \n
 algumas partes realmente interessam. Nem todos os HDDs e SSDs exibem todas  \n
 essas informações, isso depende do fabricante. As mais graves são: \n \n
 05 (0x05) Reallocated Sectors Count: Conhecidos também como BadBlocks, indicam falhas de gravação no disco. \n
@@ -364,33 +397,7 @@ mecânica geral da cabeça de leitura dos discos, ou ainda de multiplexadoras de
 201 (0xC9) Soft Read Error Rate (ou TA Counter Detected): Quantidade de erros causados por software. \n
 Valores altos indicam a presença de bad sectors (diferente de bad blocks), que podem ser corrigidos com \n
 ferramentas de análise, como o HD Regenerator. \n \n
-As informações acima são referências para análises da saúde dos discos. Atenção ao interpretar os resultados!
-" 0 0 ; menu14 ;;
-  esac
-
-  case "$menusk" in
-  "/dev/sda") dialog --cr-wrap --backtitle "/dev/sda" --msgbox "$dump1" 0 0 ; menu14 ;;
-  "/dev/sdb") dialog --cr-wrap --backtitle "/dev/sdb" --msgbox "$dump2" 0 0 ; menu14 ;;
-  "/dev/sdc") dialog --cr-wrap --backtitle "/dev/sdc" --msgbox "$dump3" 0 0 ; menu14 ;;
-  "/dev/sdd") dialog --cr-wrap --backtitle "/dev/sdd" --msgbox "$dump4" 0 0 ; menu14 ;;
-  "/dev/sde") dialog --cr-wrap --backtitle "/dev/sde" --msgbox "$dump5" 0 0 ; menu14 ;;
-  "/dev/sdf") dialog --cr-wrap --backtitle "/dev/sdf" --msgbox "$dump6" 0 0 ; menu14 ;;
-  "/dev/sdg") dialog --cr-wrap --backtitle "/dev/sdg" --msgbox "$dump7" 0 0 ; menu14 ;;
-  "/dev/sdh") dialog --cr-wrap --backtitle "/dev/sdh" --msgbox "$dump8" 0 0 ; menu14 ;;
-  "/dev/sdi") dialog --cr-wrap --backtitle "/dev/sdi" --msgbox "$dump9" 0 0 ; menu14 ;;
-  Voltar) echo a ;;
-  esac
-}
-
-function menu140 {
-  stssd=`ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente"`
-  if [ "$stssd" = "Presente" ]; then
-    skd=`echo "$password" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}'`
-  else
-    skd=`echo "Disco ausente!"`
-    #stssd=`echo "Ausente"`
-  fi
-}
+As informações acima são referências para análises da saúde dos discos. Atenção ao interpretar os resultados!"
 
 # ---------------------------------------------------------------------------- #
 
