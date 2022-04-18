@@ -783,50 +783,51 @@ function menuC {
 }
 
 function menuD {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --inputbox "Insira um nome de usuário \n
-Exemplo: joao_neves" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && menu04
-  if [ -z "$validusr" ]; then
-    dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menuD
-  fi
+VALUE1=""
+VALUE2=""
+VALUE3=""
 
-  validpss=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --insecure --passwordbox 'Crie uma nova senha para o usuário' 0 0 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && menu04
-  if [ -z "$validpss" ]; then
-    dialog --title "ERRO" --msgbox "Senha não pode ficar em branco!" 8 40
-    menuD
-  fi
+VALUE0=$(dialog --ok-label "Criar"  --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --title "Adicionar Usuário" --form "Preencha todos os>
+Navegue com as setas." 15 50 0 \
+"Usuário: " 1 1 "$VALUE1" 1 10 34 0 \
+"Exibição:" 2 1 "$VALUE2" 2 10 34 0 \
+"Senha:" 3 1 "$VALUE3" 3 10 34 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
-  validsur=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de Exibição \n
-Exemplo: João Neves" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && menu04
-  if [ -z "$validsur" ]; then
-    dialog --title "ERRO" --msgbox "Exibição não pode ficar em branco!" 8 40
-    menuD
-  fi
+if [ $? -ne 0 ]; then
+  menu04
+fi
 
-# 000 #
+validusr1=$(echo "$VALUE0" | sed -n 1p)
+validsur1=$(echo "$VALUE0" | sed -n 2p)
+validpss1=$(echo "$VALUE0" | sed -n 3p)
 
-  dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "$validusr deve trocar a senha ao logar? \n
+if [ -z "$validpss1" ] || [ -z "$validusr1" ] || [ -z "$validsur1" ]; then
+  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 6 20
+  menuD
+fi
+
+dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "$validusr1 deve trocar a senha ao logar? \n
 Esta opção só pode ser definida agora. Se escolher Não, deverá usar o RSAT caso mude de ideia." 0 0
-  if [ $? = 0 ]; then
-    echo "$password" | sudo -S sudo samba-tool user create "$validusr" "$validpss" --surname="$validsur" --must-change-at-next-login
-  else
-    echo "$password" | sudo -S sudo samba-tool user create "$validusr" "$validpss" --surname="$validsur"
-  fi
 
-  dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr não deve expirar mais?" 0 0
-  if [ $? = 0 ]; then
-    echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr" --noexpiry
-    dialog --title "Informação" --msgbox "A senha de $validusr não expira mais!" 8 40
-    dialog --title "Informação" --msgbox "Usuário $validusr criado e configurado com sucesso!" 8 40
-    menu04
-  else
-    dialog --title "Informação" --msgbox "Usuário $validusr criado e configurado com sucesso!" 8 40
-    menu04
-  fi
+if [ $? = 0 ]; then
+  echo "$password" | sudo -S sudo samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1" --must-change-at-next-login
+else
+  echo "$password" | sudo -S sudo samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1"
+fi
+
+dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr não deve expirar mais?" 0 0
+if [ $? = 0 ]; then
+  echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr1" --noexpiry
+  dialog --title "Informação" --msgbox "A senha de $validusr1 não expira mais!" 8 40
+  dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
+  menu04
+else
+  dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
+  menu04
+fi
 }
+
 
 function menuE {
   validusr=$(dialog --title 'AD-DC' --backtitle "Trocar a senha de usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
