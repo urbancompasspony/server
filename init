@@ -787,7 +787,7 @@ VALUE1="joao_naves"
 VALUE2="João Naves"
 VALUE3="1234567Ab"
 
-VALUE0=$(dialog --ok-label "Criar"  --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --title "Adicionar Usuário" --form "Preencha todos os campos! \n
+VALUE0=$(dialog --ok-label "Criar"  --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --title "Adicionar Usuário" --form "Preencha todos os campos! Apague os modelos. \n
 Navegue com as setas para cima e baixo." 15 50 0 \
 "Usuário: " 1 1 "$VALUE1" 1 10 34 0 \
 "Exibição:" 2 1 "$VALUE2" 2 10 34 0 \
