@@ -783,12 +783,12 @@ function menuC {
 }
 
 function menuD {
-VALUE1=""
-VALUE2=""
-VALUE3=""
+VALUE1="joao_naves"
+VALUE2="João Naves"
+VALUE3="1234567Ab"
 
-VALUE0=$(dialog --ok-label "Criar"  --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --title "Adicionar Usuário" --form "Preencha todos os>
-Navegue com as setas." 15 50 0 \
+VALUE0=$(dialog --ok-label "Criar"  --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --title "Adicionar Usuário" --form "Preencha todos os campos! \n
+Navegue com as setas para cima e baixo." 15 50 0 \
 "Usuário: " 1 1 "$VALUE1" 1 10 34 0 \
 "Exibição:" 2 1 "$VALUE2" 2 10 34 0 \
 "Senha:" 3 1 "$VALUE3" 3 10 34 0 \
