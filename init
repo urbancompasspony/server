@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.9.2 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.9.3 - By José Humberto"
 export password=0
 export processname=0
 export process=0
@@ -921,15 +921,30 @@ function menuJ {
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
     menu04
+  else  
+    validgrp=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
+    [ $? -ne 0 ] && break && menu04
+    if [ -z "$validgrp" ]; then
+      dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
+      menu04
+    fi    
   fi
-  validgrp=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
-  if [ -z "$validgrp" ]; then
-    dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
+  
+  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
+  if [ "$repeated" = "$validusr" ]; then
+    repeated2=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
+    if [ "$repeated2" = "$validgrp" ]; then
+      echo "$password" | sudo -S samba-tool group addmembers "$validgrp" "$validusr"
+      dialog --title "Informação" --msgbox "O usuário $validusr foi adicionado ao grupo $validgrp!" 8 40
+      menu04
+    else
+      dialog --title "ERRO" --msgbox "Grupo inválido!" 8 40
+      menu04
+    fi
+  else
+    dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
     menu04
   fi
-  echo "$password" | sudo -S samba-tool group addmembers "$validgrp" "$validusr"
-  dialog --title "Informação" --msgbox "O usuário $validusr foi adicionado ao grupo $validgrp!" 8 40
   menu04
 }
 
@@ -949,16 +964,31 @@ function menuL {
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
+    menu04  
+  else
+    validgrp=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
+    [ $? -ne 0 ] && break && menu04
+    if [ -z "$validgrp" ]; then
+      dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
+      menu04
+    fi
+  fi
+  
+  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
+  if [ "$repeated" = "$validusr" ]; then
+    repeated2=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
+    if [ "$repeated2" = "$validgrp" ]; then
+    echo "$password" | sudo -S samba-tool group removemembers "$validgrp" "$validusr"
+    dialog --title "Informação" --msgbox "O usuário $validusr foi removido do grupo $validgrp!" 8 40
+    menu04
+    else
+      dialog --title "ERRO" --msgbox "Grupo inválido!" 8 40
+      menu04
+    fi
+  else
+    dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
     menu04
   fi
-  validgrp=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
-  if [ -z "$validgrp" ]; then
-    dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menu04
-  fi
-  echo "$password" | sudo -S samba-tool group removemembers "$validgrp" "$validusr"
-  dialog --title "Informação" --msgbox "O usuário $validusr foi removido do grupo $validgrp!" 8 40
   menu04
 }
 
@@ -1007,7 +1037,15 @@ function menuO {
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
     menu04
   fi
-  dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user getgroups "$validusr" | less
+  
+  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
+  if [ "$repeated" = "$validusr" ]; then
+    dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user getgroups "$validusr" | less
+    menu04
+  else
+    dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
+    menu04
+  fi
   menu04
 }
 
