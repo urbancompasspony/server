@@ -729,7 +729,7 @@ function menu04 {
   menu09 samba-ad-dc && smb2=$prcs
 
   if [ "$smb2" = "Executando" ]; then
-    var4=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
+    var4=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
     A 'Criar um Usuário' \
     B 'Exibir todos os Usuários' \
     C 'Procurar Usuário' \
@@ -1168,7 +1168,7 @@ Windows Server 2012* - 4.4 e posterior \n
 Windows Server 2008_R2 - 4.0 e posterior \n
 Windows Server 2008 - 4.0 e posterior \n
 Windows Server 2003 - 4.0 e posterior \n \n
-* = Nível funcional não está estável o suficiente para AD-DC SAMBA. \n
+* = Nível funcional não está estável o suficiente. \n
 Caso implementado, melhorias no Kerberos também não serão disponibilizados nesse nível. \n
 " 0 0 ; menuR ;;
   esac
