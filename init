@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.8.8 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.8.9 - By José Humberto"
 export password=0
 export processname=0
 export process=0
