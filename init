@@ -752,7 +752,7 @@ function menu04 {
     case "$var4" in
     A) menuD ;;
     B) menuA ;;
-    C) dialog --title "ERRO" --msgbox "Em testes!" 6 20 ;;
+    C) menuP ;;
     D) menuO ;;
     E) menuJ ;;
     F) menuL ;;
@@ -763,7 +763,7 @@ function menu04 {
     K) menuH ;;
     L) menuI ;;
     M) menuC ;;
-    N) dialog --title "ERRO" --msgbox "Em testes!" 6 20 ;;
+    N) menuQ ;;
     O) menuK ;;
     P) menuM ;;
     Q) menuB ;;
@@ -813,7 +813,7 @@ fi
 
 repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
 if [ "$repeated" = "$validusr1" ]; then
-  dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 8 40
+  dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 6 20
   menuD
 fi
 
@@ -1010,10 +1010,19 @@ validusr=$(dialog --title 'AD-DC' --backtitle "Busca se o usuário já existe no
 [ $? -ne 0 ] && break && menu04
 if [ -z "$validusr" ]; then
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-  menuE
+  menuD
 fi
-  
-dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários Cadastrados." --msgbox "Para ver os nomes use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user list | less; menu04
+repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
+if [ "$repeated" = "$validusr1" ]; then
+  dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 6 20
+  menu04
+else
+  dialog --title 'Informação' --yesno "Deseja criar o usuário $validusr1 ?" 0 0
+  if [ $? = 0 ]; then
+    menuD
+  fi
+  menu04
+fi
 }
 
 function menuQ {
@@ -1021,10 +1030,19 @@ validgrp=$(dialog --title 'AD-DC' --backtitle "Busca se o grupo já existe no Do
 [ $? -ne 0 ] && break && menu04
 if [ -z "$validgrp" ]; then
   dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-  menuE
+  menuD
 fi
- 
-dialog --title 'AD-DC' --backtitle "Resultados da Busca" --msgbox "Para ver os nomes use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user list | less; menu04
+repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validgrp")
+if [ "$repeated" = "$validgrp" ]; then
+  dialog --title "Informação" --msgbox "O grupo $validgrp já foi cadastrado!" 6 20
+  menu04
+else
+  dialog --title 'Informação' --yesno "Deseja criar o grupo $validgrp ?" 0 0
+  if [ $? = 0 ]; then
+    menuD
+  fi
+  menu04
+fi
 }
 
 ################################################################################
