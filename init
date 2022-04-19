@@ -1008,7 +1008,7 @@ function menuO {
 function menuP {
 validusr1=$(dialog --title 'AD-DC' --backtitle "Busca se o usuário já existe no Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && break && menu04
-if [ -z "$validusr" ]; then
+if [ -z "$validusr1" ]; then
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
   menuP
 fi
@@ -1033,7 +1033,7 @@ fi
 function menuQ {
 validgrp1=$(dialog --title 'AD-DC' --backtitle "Busca se o grupo já existe no Domínio em $HOSTNAME" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && break && menu04
-if [ -z "$validgrp" ]; then
+if [ -z "$validgrp1" ]; then
   dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 6 20
   menuQ
 fi
