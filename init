@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.8.8 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.8.9 - By José Humberto"
 export password=0
 export processname=0
 export process=0
@@ -1014,7 +1014,7 @@ if [ -z "$validusr1" ]; then
 fi
 
 repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
-if [ "$repeated" = "$validusr1" ]; then
+if [ "$repeated2" = "$validusr1" ]; then
   dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 8 40
   dialog --title 'Informação' --yesno "Deseja procurar por outro usuário?" 8 40
   if [ $? = 0 ]; then
