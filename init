@@ -732,37 +732,41 @@ function menu04 {
     var4=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
     A 'Criar um Usuário' \
     B 'Exibir todos os Usuários' \
-    C 'Exibir Grupos de um Usuario' \
-    D 'Adicionar um Usuário a um Grupo' \
-    E 'Remover Usuário de um Grupo' \
-    F 'Bloquear um Usuário' \
-    G 'Desbloquear um Usuário' \
-    H 'Alterar a Senha de um Usuário' \
-    I 'Alterar Politica de um Usuário' \
-    J 'Excluir um Usuário' \
-    K 'Criar um Grupo' \
-    L 'Exibir todos os Grupos' \
-    M 'Exibir Usuários de um Grupo' \
-    N 'Excluir um Grupo' \
-    O 'Exibir todos os Computadores' \
+    C 'Procurar Usuário' \
+    D 'Exibir Grupos de um Usuario' \
+    E 'Adicionar um Usuário a um Grupo' \
+    F 'Remover Usuário de um Grupo' \
+    G 'Bloquear um Usuário' \
+    H 'Desbloquear um Usuário' \
+    I 'Alterar a Senha de um Usuário' \
+    J 'Alterar Politica de um Usuário' \
+    K 'Excluir um Usuário' \
+    L 'Criar um Grupo' \
+    M 'Exibir todos os Grupos' \
+    N 'Procurar Grupo' \
+    O 'Exibir Usuários de um Grupo' \
+    P 'Excluir um Grupo' \
+    Q 'Exibir todos os Computadores' \
     X 'Voltar' 2>&1 > /dev/tty )
 
     case "$var4" in
     A) menuD ;;
     B) menuA ;;
-    C) menuO ;;
-    D) menuJ ;;
-    E) menuL ;;
-    F) menuF ;;
-    G) menuG ;;
-    H) menuE ;;
-    I) menuN ;;
-    J) menuH ;;
-    K) menuI ;;
-    L) menuC ;;
-    M) menuK ;;
-    N) menuM ;;
-    O) menuB ;;
+    C) echo a ;;
+    D) menuO ;;
+    E) menuJ ;;
+    F) menuL ;;
+    G) menuF ;;
+    H) menuG ;;
+    I) menuE ;;
+    J) menuN ;;
+    K) menuH ;;
+    L) menuI ;;
+    M) menuC ;;
+    N) echo a ;;
+    O) menuK ;;
+    P) menuM ;;
+    Q) menuB ;;
     X) start ;;
     esac
   else
@@ -994,6 +998,14 @@ function menuO {
   fi
   dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user getgroups "$validusr" | less
   menu04
+}
+
+function menuP {
+  echo "a"
+}
+
+function menuQ {
+  echo "b"
 }
 
 ################################################################################
