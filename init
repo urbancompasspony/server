@@ -733,7 +733,7 @@ function menu04 {
     A 'Criar um Usuário' \
     B 'Exibir todos os Usuários' \
     C 'Procurar Usuário' \
-    D 'Exibir Grupos de um Usuario' \
+    D 'Exibir Grupos de um Usuário' \
     E 'Adicionar um Usuário a um Grupo' \
     F 'Remover Usuário de um Grupo' \
     G 'Bloquear um Usuário' \
@@ -775,15 +775,15 @@ function menu04 {
 }
 
 function menuA {
-  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários Cadastrados." --msgbox "Para ver os nomes use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user list | less; menu04
+  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "Para ver os nomes use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user list | less; menu04
 }
 
 function menuB {
-  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores Cadastrados." --msgbox "Para ver os computadores use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool computer list | less; menu04
+  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "Para ver os computadores use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool computer list | less; menu04
 }
 
 function menuC {
-  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos criados." --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool group list | less; menu04
+  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool group list | less; menu04
 }
 
 function menuD {
@@ -808,12 +808,12 @@ validpss1=$(echo "$VALUE0" | sed -n 3p)
 
 if [ -z "$validpss1" ] || [ -z "$validusr1" ] || [ -z "$validsur1" ]; then
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 6 20
-  menuD
+  menu04
 fi
 
 repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
 if [ "$repeated" = "$validusr1" ]; then
-  dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 6 20
+  dialog --title "Informação" --msgbox "O usuário $validusr1 já existe!" 6 20
   menuD
 fi
 
@@ -833,24 +833,25 @@ if [ $? = 0 ]; then
   dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
   menu04
 else
+  dialog --title "Informação" --msgbox "A senha de $validusr1 expira em 14 dias!" 8 40
   dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
   menu04
 fi
 }
 
 function menuE {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Trocar a senha de usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
+  validusr=$(dialog --title 'AD-DC' --backtitle "Trocar a senha de usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menuE
+    menu04
   fi
 
   validpss=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --insecure --passwordbox 'Crie uma nova senha para o usuário' 0 0 2>&1 > /dev/tty )
   [ $? -ne 0 ] && menu04
   if [ -z "$validpss" ]; then
     dialog --title "ERRO" --msgbox "Senha não pode ficar em branco!" 8 40
-    menuE
+    menu04
   fi
 
   echo "$password" | sudo -S samba-tool user setpassword "$validusr" --newpassword="$validpss"
@@ -859,11 +860,11 @@ function menuE {
 }
 
 function menuF {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Bloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
+  validusr=$(dialog --title 'AD-DC' --backtitle "Bloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menuF
+    menu04
   fi
   echo "$password" | sudo -S samba-tool user disable "$validusr"
   dialog --title "Informação" --msgbox "Usuário $validusr bloqueado com sucesso!" 7 25
@@ -871,11 +872,11 @@ function menuF {
 }
 
 function menuG {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Desbloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
+  validusr=$(dialog --title 'AD-DC' --backtitle "Desbloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menuG
+    menu04
   fi
   echo "$password" | sudo -S samba-tool user enable "$validusr"
   dialog --title "Informação" --msgbox "Usuário $validusr desbloqueado com sucesso!" 7 25
@@ -883,11 +884,11 @@ function menuG {
 }
 
 function menuH {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Excluir usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
+  validusr=$(dialog --title 'AD-DC' --backtitle "Excluir usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menuH
+    menu04
   fi
   dialog --title 'Confirmação' --backtitle 'Exclusão de Usuário' --yesno 'Deseja excluir este usuário?' 0 0
   if [ $? = 0 ]; then
@@ -902,11 +903,11 @@ function menuI {
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menuI
+    menu04
   fi
   repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
   if [ "$repeated" = "$validgrp" ]; then
-    dialog --title "Informação" --msgbox "O grupo $validgrp já foi cadastrado!" 6 20
+    dialog --title "Informação" --msgbox "O grupo $validgrp já existe!" 6 20
     menuD
   fi
   echo "$password" | sudo -S samba-tool group add "$validgrp"
@@ -915,20 +916,20 @@ function menuI {
 }
 
 function menuJ {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome do Usuario" 0 0 2>&1 > /dev/tty)
+  validusr=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome de Usuário" 0 0 2>&1 > /dev/tty)
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menuJ
+    menu04
   fi
   validgrp=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menuJ
+    menu04
   fi
   echo "$password" | sudo -S samba-tool group addmembers "$validgrp" "$validusr"
-  dialog --title "Informação" --msgbox "O usuário $validusr foi adicionado ao grupo $validgrp !" 8 40
+  dialog --title "Informação" --msgbox "O usuário $validusr foi adicionado ao grupo $validgrp!" 8 40
   menu04
 }
 
@@ -937,27 +938,27 @@ function menuK {
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menuK
+    menu04
   fi
   dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "Para ver os membros use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool group listmembers "$validgrp" | less
   menu04
 }
 
 function menuL {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Usuario" 0 0 2>&1 > /dev/tty)
+  validusr=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Usuário" 0 0 2>&1 > /dev/tty)
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menuL
+    menu04
   fi
   validgrp=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menuL
+    menu04
   fi
   echo "$password" | sudo -S samba-tool group removemembers "$validgrp" "$validusr"
-  dialog --title "Informação" --msgbox "O usuário $validusr foi removido do grupo $validgrp !" 8 40
+  dialog --title "Informação" --msgbox "O usuário $validusr foi removido do grupo $validgrp!" 8 40
   menu04
 }
 
@@ -966,7 +967,7 @@ function menuM {
   [ $? -ne 0 ] && break && menu04
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menuM
+    menu04
   fi
   dialog --title 'Confirmação' --backtitle 'Exclusão de Grupo' --yesno "Deseja excluir o grupo $validgrp?" 0 0
 
@@ -978,11 +979,11 @@ function menuM {
 }
 
 function menuN {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Alterar Política de Senha" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
+  validusr=$(dialog --title 'AD-DC' --backtitle "Alterar Política de Senha" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
   [ $? -ne 0 ] && menu04
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menuN
+    menu04
   fi
 
   dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "$validusr deve trocar a senha ao logar?" 0 0
@@ -1000,22 +1001,23 @@ function menuN {
 }
 
 function menuO {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Exibir grupos de um usuário em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
+  validusr=$(dialog --title 'AD-DC' --backtitle "Exibir grupos de um usuário em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
   [ $? -ne 0 ] && break && menuO
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menuO
+    menu04
   fi
   dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user getgroups "$validusr" | less
   menu04
 }
 
 function menuP {
-validusr1=$(dialog --title 'AD-DC' --backtitle "Busca se o usuário já existe no Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
+validusr1=$(dialog --title 'AD-DC' --backtitle "Busca se o usuário existe no Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário. \n
+Exemplo: joao_naves" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && break && menu04
 if [ -z "$validusr1" ]; then
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-  menuP
+  menu04
 fi
 
 repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
@@ -1040,11 +1042,11 @@ fi
 }
 
 function menuQ {
-validgrp1=$(dialog --title 'AD-DC' --backtitle "Busca se o grupo já existe no Domínio em $HOSTNAME" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
+validgrp1=$(dialog --title 'AD-DC' --backtitle "Busca se o grupo existe no Domínio em $HOSTNAME" --inputbox "Insira o nome de grupo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && break && menu04
 if [ -z "$validgrp1" ]; then
   dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-  menuQ
+  menu04
 fi
 
 repeated3=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp1")
@@ -1075,7 +1077,7 @@ fi
 # Acesso Restrito!
 
 function m0x {
-#  dialog --title 'F.F.E.' --msgbox "Ferramentas e Funções Experimentais" 0 0
+#  dialog --title 'F.F.E.' --msgbox "Ferramentas e Funções Exclusivas" 0 0
   password02=$(dialog --backtitle "Somente Pessoal Autorizado" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha.' 0 0 2>&1 > /dev/tty)
   if [ "$password02" = "1345278" ]; then
     dialog --title 'Porteiro:' --msgbox "Clift Claft Still, a Porta se Abriu!" 6 40
@@ -1088,7 +1090,7 @@ function m0x {
 # Clift Claft Still, a Porta se Abriu!
 
 function m00 {
-  var7=$(dialog --backtitle "Ferramentas e Funções Experimentais!" --title 'Atenção' --menu "Menu Restrito" 0 0 0 \
+  var7=$(dialog --backtitle "Ferramentas e Funções Exclusivas!" --title 'Atenção' --menu "Menu Restrito" 0 0 0 \
   A 'Projeto 01' \
   B 'Projeto 02' \
   C 'Projeto 03' \
