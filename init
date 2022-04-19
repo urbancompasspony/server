@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.8.6 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.8.8 - By José Humberto"
 export password=0
 export processname=0
 export process=0
@@ -752,7 +752,7 @@ function menu04 {
     case "$var4" in
     A) menuD ;;
     B) menuA ;;
-    C) echo a ;;
+    C) echo "a" ;;
     D) menuO ;;
     E) menuJ ;;
     F) menuL ;;
@@ -763,7 +763,7 @@ function menu04 {
     K) menuH ;;
     L) menuI ;;
     M) menuC ;;
-    N) echo a ;;
+    N) echo "a" ;;
     O) menuK ;;
     P) menuM ;;
     Q) menuB ;;
