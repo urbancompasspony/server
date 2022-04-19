@@ -1151,10 +1151,10 @@ function menuR {
   domainv=`echo "$password" | sudo -S samba-tool domain level show`
 
   dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Informações do Domínio" --msgbox "
-  Nome da Máquina: $HOSTNAME \n \n
-  Versão do SAMBA: $smbv \n \n
-  Nível do Domínio: $domainv \n
-  " 0 0
+Nome da Máquina: $HOSTNAME \n \n
+Versão do SAMBA: $smbv \n \n
+Nível do Domínio: $domainv \n
+" 0 0
 
   case $? in
     2) dialog --title 'Ajuda com Significados' --msgbox "Nome da Máquina: Nome usado na identificação do Servidor. \n \n
@@ -1162,14 +1162,14 @@ Versão do SAMBA: Versão atualmente instalada e configurada no sistema. \n
 É substituída em atualizações do sistema quando há correções de segurança. \n \n
 Nível do Domínio: O nível funcional do domínio representa o quão semelhante o \n
 SAMBA está comparado ao Windows Server. Atualmente os níveis funcionais suportados são: \n \n
-Nível Funcional - Versão disponível do SAMBA: \n
+Nível Funcional - Versão disponível do SAMBA: \n \n
 Windows Server 2012_R2* - 4.4 e posterior \n
 Windows Server 2012* - 4.4 e posterior \n
 Windows Server 2008_R2 - 4.0 e posterior \n
 Windows Server 2008 - 4.0 e posterior \n
 Windows Server 2003 - 4.0 e posterior \n \n
-* = Nível funcional não está disponível para AD-DC SAMBA. Melhorias no Kerberos também não são \n
-disponibilizadas para o SAMBA. \n
+* = Nível funcional não está estável o suficiente para AD-DC SAMBA. \n
+Caso implementado, melhorias no Kerberos também não serão disponibilizados nesse nível. \n
 " 0 0 ; menuR ;;
   esac
 menu04
