@@ -1012,7 +1012,6 @@ if [ -z "$validusr1" ]; then
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
   menuP
 fi
-
 repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
 if [ "$repeated2" = "$validusr1" ]; then
   dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 8 40
@@ -1022,7 +1021,7 @@ if [ "$repeated2" = "$validusr1" ]; then
   fi
   menu04
 else
-  dialog --title 'Informação' --yesno "O usuário não foi encontrado. Deseja cria-lo?" 8 40
+  dialog --title 'Informação' --yesno "O usuário não foi encontrado. Deseja criá-lo?" 8 40
   if [ $? = 0 ]; then
     menuD
   fi
@@ -1037,9 +1036,8 @@ if [ -z "$validgrp1" ]; then
   dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
   menuQ
 fi
-
 repeated3=$(echo "$password" | sudo -S samba-tool user list | grep "$validgrp1")
-if [ "$repeated" = "$validgrp1" ]; then
+if [ "$repeated3" = "$validgrp1" ]; then
   dialog --title "Informação" --msgbox "O grupo $validgrp1 já foi cadastrado!" 8 40
   dialog --title 'Informação' --yesno "Deseja procurar por outro grupo?" 8 40
   if [ $? = 0 ]; then
@@ -1047,7 +1045,7 @@ if [ "$repeated" = "$validgrp1" ]; then
   fi
   menu04
 else
-  dialog --title 'Informação' --yesno "O grupo não foi encontrado. Deseja cria-lo?" 8 40
+  dialog --title 'Informação' --yesno "O grupo não foi encontrado. Deseja criá-lo?" 8 40
   if [ $? = 0 ]; then
     menuI
   fi
