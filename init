@@ -369,7 +369,7 @@ function menu141 {
   dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0; menu14
 }
 
-TEXTO="As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só \n
+TEXTO="As informações SMART de um HDD ou SSD são variadas mas só \n
 algumas partes realmente interessam. Nem todos os HDDs e SSDs exibem todas  \n
 essas informações, isso depende do fabricante. As mais importantes são: \n \n
 01 (0x01) Read Error Rate: Taxa de erro geral durante as leituras do disco. \n
