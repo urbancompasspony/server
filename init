@@ -1006,18 +1006,23 @@ function menuO {
 }
 
 function menuP {
-validusr=$(dialog --title 'AD-DC' --backtitle "Busca se o usuário já existe no Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
+validusr1=$(dialog --title 'AD-DC' --backtitle "Busca se o usuário já existe no Domínio em $HOSTNAME" --inputbox "Insira o nome do usuário" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && break && menu04
 if [ -z "$validusr" ]; then
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-  menuD
+  menuP
 fi
+
 repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
 if [ "$repeated" = "$validusr1" ]; then
   dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 6 20
+  dialog --title 'Informação' --yesno "Deseja procurar por outro usuário?" 6 20
+  if [ $? = 0 ]; then
+    menuP
+  fi
   menu04
 else
-  dialog --title 'Informação' --yesno "Deseja criar o usuário $validusr1 ?" 0 0
+  dialog --title 'Informação' --yesno "O usuário não foi encontrado. Deseja cria-lo?" 8 40
   if [ $? = 0 ]; then
     menuD
   fi
@@ -1026,20 +1031,25 @@ fi
 }
 
 function menuQ {
-validgrp=$(dialog --title 'AD-DC' --backtitle "Busca se o grupo já existe no Domínio em $HOSTNAME" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
+validgrp1=$(dialog --title 'AD-DC' --backtitle "Busca se o grupo já existe no Domínio em $HOSTNAME" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && break && menu04
 if [ -z "$validgrp" ]; then
-  dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-  menuD
+  dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 6 20
+  menuQ
 fi
-repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validgrp")
-if [ "$repeated" = "$validgrp" ]; then
-  dialog --title "Informação" --msgbox "O grupo $validgrp já foi cadastrado!" 6 20
+
+repeated3=$(echo "$password" | sudo -S samba-tool user list | grep "$validgrp1")
+if [ "$repeated" = "$validgrp1" ]; then
+  dialog --title "Informação" --msgbox "O grupo $validgrp1 já foi cadastrado!" 6 20
+  dialog --title 'Informação' --yesno "Deseja procurar por outro grupo?" 6 20
+  if [ $? = 0 ]; then
+    menuQ
+  fi
   menu04
 else
-  dialog --title 'Informação' --yesno "Deseja criar o grupo $validgrp ?" 0 0
+  dialog --title 'Informação' --yesno "O grupo não foi encontrado. Deseja cria-lo?" 8 40
   if [ $? = 0 ]; then
-    menuD
+    menuI
   fi
   menu04
 fi
