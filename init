@@ -12,7 +12,7 @@
 # ============================================================================ #
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.8.9 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.8.8 - By José Humberto"
 export password=0
 export processname=0
 export process=0
@@ -369,7 +369,7 @@ function menu141 {
   dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0; menu14
 }
 
-TEXTO="As informações SMART de um HDD ou SSD são variadas mas só \n
+TEXTO="As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só \n
 algumas partes realmente interessam. Nem todos os HDDs e SSDs exibem todas  \n
 essas informações, isso depende do fabricante. As mais importantes são: \n \n
 01 (0x01) Read Error Rate: Taxa de erro geral durante as leituras do disco. \n
@@ -1014,9 +1014,9 @@ if [ -z "$validusr1" ]; then
 fi
 
 repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
-if [ "$repeated2" = "$validusr1" ]; then
-  dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 6 20
-  dialog --title 'Informação' --yesno "Deseja procurar por outro usuário?" 6 20
+if [ "$repeated" = "$validusr1" ]; then
+  dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 8 40
+  dialog --title 'Informação' --yesno "Deseja procurar por outro usuário?" 8 40
   if [ $? = 0 ]; then
     menuP
   fi
@@ -1034,14 +1034,14 @@ function menuQ {
 validgrp1=$(dialog --title 'AD-DC' --backtitle "Busca se o grupo já existe no Domínio em $HOSTNAME" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && break && menu04
 if [ -z "$validgrp1" ]; then
-  dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 6 20
+  dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
   menuQ
 fi
 
 repeated3=$(echo "$password" | sudo -S samba-tool user list | grep "$validgrp1")
-if [ "$repeated3" = "$validgrp1" ]; then
-  dialog --title "Informação" --msgbox "O grupo $validgrp1 já foi cadastrado!" 6 20
-  dialog --title 'Informação' --yesno "Deseja procurar por outro grupo?" 6 20
+if [ "$repeated" = "$validgrp1" ]; then
+  dialog --title "Informação" --msgbox "O grupo $validgrp1 já foi cadastrado!" 8 40
+  dialog --title 'Informação' --yesno "Deseja procurar por outro grupo?" 8 40
   if [ $? = 0 ]; then
     menuQ
   fi
