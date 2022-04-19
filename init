@@ -1014,7 +1014,7 @@ if [ -z "$validusr1" ]; then
 fi
 
 repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
-if [ "$repeated" = "$validusr1" ]; then
+if [ "$repeated2" = "$validusr1" ]; then
   dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 6 20
   dialog --title 'Informação' --yesno "Deseja procurar por outro usuário?" 6 20
   if [ $? = 0 ]; then
@@ -1039,7 +1039,7 @@ if [ -z "$validgrp1" ]; then
 fi
 
 repeated3=$(echo "$password" | sudo -S samba-tool user list | grep "$validgrp1")
-if [ "$repeated" = "$validgrp1" ]; then
+if [ "$repeated3" = "$validgrp1" ]; then
   dialog --title "Informação" --msgbox "O grupo $validgrp1 já foi cadastrado!" 6 20
   dialog --title 'Informação' --yesno "Deseja procurar por outro grupo?" 6 20
   if [ $? = 0 ]; then
