@@ -904,6 +904,11 @@ function menuI {
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
     menuI
   fi
+  repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
+  if [ "$repeated" = "$validgrp" ]; then
+    dialog --title "Informação" --msgbox "O grupo $validgrp já foi cadastrado!" 6 20
+    menuD
+  fi
   echo "$password" | sudo -S samba-tool group add "$validgrp"
   dialog --title "Informação" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
   menu04
