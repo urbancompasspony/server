@@ -1,23 +1,36 @@
 #!/bin/bash
 
 # ============================================================================ #
-
-#########################
+#########################                                                      #
 # Universal Server Menu # ==================================================== #
-#########################
-                                                            ####################
+#########################                                                      #
+#                                                           ####################
 # ========================================================= # By José Humberto #
-                                                            ####################
-
+#                                                           ####################
 # ============================================================================ #
 
+# Versionamento: v1.9.4.0
+# 1.x.x.x: Mudanças drásticas, geralmente recursos novos e menus principais.
+# x.9.x.x: Mudanças pequenas, implementação de novas ferramentas.
+# x.x.4.x: Mudanças sutis, correções de bugs em ferramentas ou mesmo menus.
+# x.x.x.0: Micro-Mudanças, reorganização e limpeza de código; reorganização de menus existentes.
+# Se um item á esquerda mudar de escala, os itens á direita automaticamente zeram.
+# Ou seja, se 1.9.4.4 se tornar 1.9.5, último dígito se torna 0: 1.9.5.0.
+
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.9.4 - By José Humberto"
-export password=0
+export bktitle="USM: Universal Server Menu v1.9.4.0 - By José Humberto"
 export processname=0
 export process=0
 export status=0
 export pkg=0
+
+export password=0
+export password1=0
+export password2=0
+export password3=0
+
+hash1=""
+hash2=""
 
 # Checagem de Dependências
 function pkg {
@@ -25,7 +38,7 @@ REQUIRED_PKG="$1"
 PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
 echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
 if [ "" = "$PKG_OK" ]; then
-  echo "$REQUIRED_PKG não encontrado. Instalando..."
+  #echo "$REQUIRED_PKG não encontrado. Instalando..."
   sudo apt update; sudo apt install $REQUIRED_PKG -y
 fi
 }
@@ -45,6 +58,7 @@ pkg libatasmart-bin
 # PASSWORD
 function init {
 password=$(dialog --backtitle "$bktitle" --title 'Acesso ao Server Menu' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
+#password=$(echo -n "$password" | md5sum | awk {'print $1'})
 
 if [ -z "$password" ]; then
   clear
@@ -60,7 +74,6 @@ function start {
   while true; do
     sensors0=`sensors || echo "Incompatível em Máquina Virtual!"`
     datetime=`date +"%d/%m %H:%M"` # Data e Hora
-
     var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
     A 'Status do Sistema' \
     B 'Máquinas Virtuais' \
@@ -120,7 +133,7 @@ function menu11 {
   ip2=`dig @resolver4.opendns.com myip.opendns.com +short` # IP Externo
   uptime=`uptime | awk {'print $3 $4 $5'}`
   datetime=`date +"%d/%m %H:%M"` # Data e Hora
-  governor=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor`
+  governor=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível em Máquina Virtual!"`
   bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
   rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
   rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
@@ -457,8 +470,8 @@ Para fechar aperte 'q'!" 0 0
 
 # Governador de CPU
 function menu053 {
-  governor1=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor`
-  governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors`
+  governor1=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível em Máquina Virtual!"`
+  governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors || echo "Indisponível em Máquina Virtual!"`
   var3=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "Troca do Governador de CPU" --menu "Governador de CPU Atual: \n
 $governor1" 0 0 0 \
   A 'Conservative' \
@@ -1183,8 +1196,9 @@ menu04
 
 function m0x {
 #  dialog --title 'F.F.E.' --msgbox "Ferramentas e Funções Exclusivas" 0 0
-  password02=$(dialog --backtitle "Somente Pessoal Autorizado" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha.' 0 0 2>&1 > /dev/tty)
-  if [ "$password02" = "1345278" ]; then
+  password2=$(dialog --backtitle "Somente Pessoal Autorizado" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha' 0 0 2>&1 > /dev/tty)
+  #password3=$(echo -n "$password2" | md5sum | awk {'print $1'})
+  if [ "$password2" = "1345278" ]; then
     dialog --title 'Porteiro:' --msgbox "Clift Claft Still, a Porta se Abriu!" 6 40
     m00
   else
@@ -1216,85 +1230,45 @@ function m00 {
 }
 
 function m01 {
-
-errvm=" "
-VM1="$errvm"; VM2="$errvm"; VM3="$errvm"; VM4="$errvm"; VM5="$errvm"; VM6="$errvm"; VM7="$errvm"; VM8="$errvm"; VM9="$errvm"; VM10="$errvm"
-
-#virsh list --all | grep "shut off" | sed -n 1p | awk '{print $2}'
-#virsh list | grep running | sed -n 1p | awk '{print $2}'
-
-VM1I=`virsh list | grep running | sed -n 1p | awk '{print $2}'`
-VM1O=`virsh list --all | grep "shut off" | sed -n 1p | awk '{print $2}'`
-
-if [ "$VM1" = "" ]; then
-  VM1=`echo " "`
-fi
-
-VM2=`virsh list --all | sed -n 4p | awk '{print $2}'`
-VM3=`virsh list --all | sed -n 5p | awk '{print $2}'`
-VM4=`virsh list --all | sed -n 6p | awk '{print $2}'`
-VM5=`virsh list --all | sed -n 7p | awk '{print $2}'`
-VM6=`virsh list --all | sed -n 8p | awk '{print $2}'`
-VM7=`virsh list --all | sed -n 9p | awk '{print $2}'`
-VM8=`virsh list --all | sed -n 10p | awk '{print $2}'`
-VM9=`virsh list --all | sed -n 11p | awk '{print $2}'`
-VM10=`virsh list --all | sed -n 12p | awk '{print $2}'`
-
-  var8=$(dialog --backtitle "Maquinas Virtuais" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
-  A "$VM1" \
-  B "$VM2" \
-  C "$VM3" \
-  D "$VM4" \
-  E "$VM5" \
-  F "$VM6" \
-  G "$VM7" \
-  H "$VM8" \
-  I "$VM9" \
-  J "$VM10" \
+  var10=$(dialog --backtitle "A" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
+  A 'A' \
+  B 'B' \
+  C 'C' \
+  D 'D' \
+  E 'E' \
   X 'Voltar' 2>&1 > /dev/tty )
   case $? in
     2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
   esac
-  case "$var8" in
-  A) m011 ;;
-  B) m011 ;;
-  C) m011 ;;
-  D) m011 ;;
-  E) m011 ;;
-  F) m011 ;;
-  G) m011 ;;
-  H) m011 ;;
-  I) m011 ;;
-  J) m011 ;;
+  case "$var10" in
+  A) m01 ;;
+  B) m02 ;;
+  C) m03 ;;
+  D) m04 ;;
+  E) m05 ;;
   X) echo a ;;
   esac
 }
 
 function m011 {
-if [ "$status" = "Executando" ]; then # se Executando...
-  dialog --title "$processname" --yesno "Deseja reiniciar o processo $processname ?" 6 40
-  if [ $? = 0 ]; then
-    echo "$password" | sudo -S systemctl restart "$process"
-    dialog --title "$processname" --msgbox "O processo $processname foi reiniciado!" 6 40
-    menu03
-  else
-    dialog --title "$processname" --yesno "Deseja parar o processo $processname ?" 6 40
-    if [ $? = 0 ]; then
-    echo "$password" | sudo -S systemctl stop "$process"
-    dialog --title "$processname" --msgbox "O processo $processname foi parado!" 6 40
-    menu03
-    fi
-  fi
-  menu03
-else # se Parado
-  dialog --title "$processname" --yesno "Deseja tentar iniciar o processo $processname ?" 6 40
-  if [ $? = 0 ]; then
-    echo "$password" | sudo -S systemctl start "$process"
-    dialog --title "$processname" --msgbox "Verifique se o $processname iniciou." 6 40
-    menu03
-  fi
-  menu03
-fi
+  var10=$(dialog --backtitle "A" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
+  A 'A' \
+  B 'B' \
+  C 'C' \
+  D 'D' \
+  E 'E' \
+  X 'Voltar' 2>&1 > /dev/tty )
+  case $? in
+    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
+  esac
+  case "$var10" in
+  A) m01 ;;
+  B) m02 ;;
+  C) m03 ;;
+  D) m04 ;;
+  E) m05 ;;
+  X) echo a ;;
+  esac
 }
 
 function m02 {
@@ -1319,8 +1293,6 @@ function m02 {
 }
 
 function m03 {
-
-
   var10=$(dialog --backtitle "A" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
   A 'A' \
   B 'B' \
@@ -1342,8 +1314,6 @@ function m03 {
 }
 
 function m04 {
-
-
   var11=$(dialog --backtitle "B" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
   A 'A' \
   B 'B' \
@@ -1365,8 +1335,6 @@ function m04 {
 }
 
 function m05 {
-
-
   var12=$(dialog --backtitle "C" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
   A 'A' \
   B 'B' \
@@ -1383,6 +1351,42 @@ function m05 {
   C) m03 ;;
   D) m04 ;;
   E) m05 ;;
+  X) echo a ;;
+  esac
+}
+
+################################################################################
+#                                                                              #
+################################################################################
+
+function m1x {
+  dialog --title 'F.F.A.' --msgbox "Ferramentas e Funções Avançadas" 0 0
+  password3=$(dialog --backtitle "Somente Pessoal Autorizado" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha' 0 0 2>&1 > /dev/tty)
+  if [ "$password3" = "1345278" ]; then
+    dialog --title 'Porteiro:' --msgbox "Clift Claft Still, a Porta se Abriu!" 6 40
+    m10
+  else
+    dialog --title 'Acesso Proibido' --msgbox "Permissão Negada" 0 0
+  fi
+}
+
+function m10 {
+  var10=$(dialog --backtitle "A" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
+  A 'A' \
+  B 'B' \
+  C 'C' \
+  D 'D' \
+  E 'E' \
+  X 'Voltar' 2>&1 > /dev/tty )
+  case $? in
+    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
+  esac
+  case "$var10" in
+  A) m11 ;;
+  B) m12 ;;
+  C) m13 ;;
+  D) m14 ;;
+  E) m15 ;;
   X) echo a ;;
   esac
 }
