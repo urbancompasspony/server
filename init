@@ -18,7 +18,7 @@
 # Ou seja, se 1.9.4.4 se tornar 1.9.5, último dígito se torna 0: 1.9.5.0.
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.9.4.0 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.9.5.0 - By José Humberto"
 export processname=0
 export process=0
 export status=0
@@ -50,6 +50,7 @@ pkg whois
 pkg arp-scan
 pkg traceroute
 pkg libatasmart-bin
+pkg mutt
 
 ###########
 # Funções # # ---------------------------------------------------------------- #
@@ -80,8 +81,9 @@ function start {
     C 'Processos do Sistema' \
     D 'Controlador de Dominio' \
     E 'Ferramentas do Sistema' \
-    F 'Reiniciar o Sistema' \
-    G 'Desligar o Sistema' \
+    F 'Reportar por E-mail' \
+    G 'Reiniciar o Sistema' \
+    H 'Desligar o Sistema' \
     X 'SAIR' \
     0 'Acesso Restrito' 2>&1 > /dev/tty )
     
@@ -93,8 +95,9 @@ function start {
     C) menu03 ;;
     D) menu04 ;;
     E) menu05 ;;
-    F) menu06 ;;
-    G) menu07 ;;
+    F) menu08 ;;
+    G) menu06 ;;
+    H) menu07 ;;
     X) echo "Saindo... Para voltar digite 'menu'!" && exit && break ;;
     0) m0x ;;
     esac
@@ -733,6 +736,26 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
       echo "$password" | sudo -S shutdown -h now
     fi
   fi
+}
+
+function menu08 {
+  validmail=$(dialog --title 'E-mail' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios" 9 40 2>&1 > /dev/tty)
+  var13=$(dialog --title 'E-mail' --backtitle "Resumo por E-mail" --menu "Relatórios:" 0 0 0 \
+  A 'Sistema' \
+  B 'Temperatura' \
+  C 'Armazenamento' \
+  D 'S.M.A.R.T.' \
+  X 'Voltar' 2>&1 > /dev/tty )
+  case $? in
+    2) dialog --title " " --msgbox "Em Breve!" 0 0 ; m01 ;;
+  esac
+  case "$var13" in
+  A) dialog --cr-wrap --title ' ' --backtitle '' --msgbox "Em Breve!" 0 0 ;;
+  B) dialog --cr-wrap --title ' ' --backtitle '' --msgbox "Em Breve!" 0 0 ;;
+  C) dialog --cr-wrap --title ' ' --backtitle '' --msgbox "Em Breve!" 0 0 ;;
+  D) dialog --cr-wrap --title ' ' --backtitle '' --msgbox "Em Breve!" 0 0 ;;
+  X) echo a ;;
+  esac
 }
 
 # ---------------------------------------------------------------------------- #
