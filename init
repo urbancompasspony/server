@@ -15,19 +15,10 @@
 # rc-1: Correções de bugs de ferramentas ou menus
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.0-rc3 - By José Humberto"
+export bktitle="USM: Universal Server Menu v2.1-rc0"
 
-export processname=0
-export validmail=0
-export process=0
-export status=0
-export pkg=0
-
-export password=0
-export password1=0
-export password2=0
-export password3=0
-
+export processname=0; export validmail=0; export process=0; export status=0; export pkg=0
+export password=0; export password1=0; export password2=0; export password3=0
 export report=0
 
 Recado="Relatõrio gerado automaticamente pelo sistema Universal Server Menu!
@@ -71,16 +62,10 @@ password=$(dialog --backtitle "$bktitle" --title 'Acesso ao Server Menu' --insec
 if [ -z "$password" ]; then
   clear
   echo "É necessário digitar sua senha para continuar. Saindo..."
-  echo "Para voltar digite 'menu' "
+  echo "Para voltar, digite 'menu' "
 else
   start
 fi
-
-#dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja habilitar a emissão de relatórios?" 8 40
-#if [ $? = 0 ]; then
-#  report=1
-#  validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 #40 2>&1 > /dev/tty)
-#fi
 }
 
 # MAIN LOOP
@@ -88,17 +73,15 @@ function start {
   while true; do
     datetime=`date +"%d/%m %H:%M"` # Data e Hora
     var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
-    A 'Status do Sistema' \
+    A 'Status' \
     B 'Máquinas Virtuais' \
-    C 'Processos do Sistema' \
-    D 'Controlador de Dominio' \
-    E 'Ferramentas do Sistema' \
-    F 'Funções Avançadas' \
-    G 'Reiniciar o Sistema' \
-    H 'Desligar o Sistema' \
+    C 'Processos' \
+    D 'Controlador de Domínio' \
+    E 'Ferramentas' \
+    F 'Avançado' \
     X 'SAIR' 2>&1 > /dev/tty )
     
-    [ $? -ne 0 ] && echo "Saindo... Para voltar digite 'menu'!" && break
+    [ $? -ne 0 ] && echo "Saindo... Para voltar, digite 'menu'!" && break
     case "$var1" in
 
     A) menu01 ;;
@@ -107,9 +90,7 @@ function start {
     D) menu04 ;;
     E) menu05 ;;
     F) m1x ;;
-    G) menu06 ;;
-    H) menu07 ;;
-    X) echo "Saindo... Para voltar digite 'menu'!" && exit && break ;;
+    X) echo "Saindo... Para voltar, digite 'menu'!" && exit && break ;;
     esac
   done
 }
@@ -118,36 +99,34 @@ function start {
 # STATUS # #------------------------------------------------------------------ #
 ##########
 
-function menu01
-  {  var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
-  A 'Sistema' \
-  B 'Temperatura' \
-  C 'Armazenamento' \
-  D 'S.M.A.R.T.' \
-  X 'Voltar' 2>&1 > /dev/tty )
-#  case $? in
-#    2) dialog --title 'Ajuda' --msgbox " " 0 0 ; menu01 ;;
-#  esac
-  case "$var2" in
-  A) menu11 ;;
-  B) menu12 ;;
-  C) menu13 ;;
-  D) menu14 ;;
-  X) echo a ;;
-  esac
+function menu01 {
+var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
+A 'Sistema' \
+B 'Temperatura' \
+C 'Armazenamento' \
+D 'S.M.A.R.T.' \
+X 'Voltar' 2>&1 > /dev/tty )
+
+case "$var2" in
+A) menu11 ;;
+B) menu12 ;;
+C) menu13 ;;
+D) menu14 ;;
+X) echo a ;;
+esac
 }
 
 # Status de Sistema
 function menu11 {
-  ip=`hostname -I | awk '{print $1}'` # Coleta do IP atual!
-  ip2=`dig @resolver4.opendns.com myip.opendns.com +short` # IP Externo
-  uptime=`uptime | awk {'print $3 $4 $5'}`
-  datetime=`date +"%d/%m %H:%M"` # Data e Hora
-  governor=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível em Máquina Virtual!"`
-  bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  xorg=`ls /tmp/.X11-unix | wc -l`
+ip=`hostname -I | awk '{print $1}'` # Coleta do IP atual!
+ip2=`dig @resolver4.opendns.com myip.opendns.com +short` # IP Externo
+uptime=`uptime | awk {'print $3 $4 $5'}`
+datetime=`date +"%d/%m %H:%M"` # Data e Hora
+governor=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível em Máquina Virtual!"`
+bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+xorg=`ls /tmp/.X11-unix | wc -l`
 
 TEXTMAIL="Nome da Máquina: $HOSTNAME
 Data e Hora Local: $datetime
@@ -166,29 +145,22 @@ Governador de CPU: $governor"
 
 TEXTAO01="IP Local: Geralmente é o IP Fixado localmente ou no servidor DHCP.
 IP Externo: Se houver acesso externo, monitora qual o IP Externo coletado naquele momento.
+
 Uptime: Mostra a quantos dias, horas e/ou minutos o servidor está ligado.
 Governador de CPU: Mostra como está a execução do processador, se em Máximo Desempenho, Economia de Energia ou outro.
 XOrgs em Execução: Para sistemas sem interface de usuário mas que permitem executar aplicações Xinit.
+
 Balance BTRFS: Manutenção de rotina do sistema. Se estiver em Execução, o computador NÃO poderá ser desligado!
 Rsnapshot: Backup incremental automatizado. Se estiver Executando, o computador não poderá ser desligado!
 RSync: Sincronia do Backup em Nuvem ou para um backup RAID 1. Se estiver Executando, o computador não poderá ser desligado!"
 
 dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Informações do Sistema" --msgbox "$TEXTMAIL" 0 0
 
-  case $? in
-    2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO01" 0 0 ; menu11 ;;
-  esac
-  
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$Recado $TEXTMAIL $TEXTAO01 $Mensagem" | mutt -s "Relatório de Status de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu01
-  fi
-else
-  menu01
-fi
+case $? in
+  2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO01" 0 0 ; menu11 ;;
+esac
+
+menu08 "$Recado $TEXTMAIL $TEXTAO01 $Mensagem"
 
 menu01
 }
@@ -324,24 +296,15 @@ Resultados que indicam Baterias:
 (BAT0-acpi-xxx) (fam15h_power-pci-xxxx)
 Em Progresso: Novas indicações são adicionadas periodicamente!"
 
-  case $? in
-    2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO02" 0 0 ; menu12 ;;
-  esac
+case $? in
+  2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO02" 0 0 ; menu12 ;;
+esac
 
 if [ "$sensors1" = "Incompatível em Máquina Virtual!" ]; then
   dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
   menu01
 else
-  if [ "$report" = "1" ]; then
-    dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-    if [ $? = 0 ]; then
-      echo "$Recado $sensors0 $TEXTAO02 $Mensagem" | mutt -s "Relatório de Temperatura de $HOSTNAME" "$validmail"
-      dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-      menu01
-    fi
-  else
-    menu01
-  fi
+  menu08 "$Recado $sensors0 $TEXTAO02 $Mensagem"
 fi
 
 menu01
@@ -370,20 +333,11 @@ Disp.: Espaço restante.
 Uso%: Porcentagem de uso do disco comparado ao tamanho total.
 Montado em: Local aonde o disco está acessível naquele momento."
 
-  case $? in
-    2) dialog --title 'Ajuda' --msgbox "$TEXTAO03" 0 0; menu13 ;;
-  esac
-  
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$Recado $sdisks $TEXTAO03 $Mensagem" | mutt -s "Relatório de Armazenamento de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu01
-  fi
-else
-  menu01
-fi
+case $? in
+  2) dialog --title 'Ajuda' --msgbox "$TEXTAO03" 0 0; menu13 ;;
+esac
+ 
+menu08 "$Recado $sdisks $TEXTAO03 $Mensagem"
   
 menu01
 }
@@ -444,17 +398,8 @@ function menu140 {
 
 function menu141 {
 dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0
-  
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$Recado $2 $TEXTAO04 $Mensagem" | mutt -s "Relatório de SMART de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu14
-  fi
-else
-  menu14
-fi
+
+menu08 "$Recado $2 $TEXTAO04 $Mensagem"
 
 menu14
 }
@@ -515,7 +460,9 @@ function menu05 {
   C 'WhoIs' \
   D 'TraceRoute' \
   E 'Governador de CPU' \
-  F 'Emissão de Relatórios' \
+  F 'Relatórios por E-mail' \
+  G 'Reiniciar' \
+  H 'Desligar' \
   X 'Voltar' 2>&1 > /dev/tty )
 
   case $? in
@@ -540,6 +487,8 @@ Governador de CPU: Ver o menu AJUDA dentro desta opção!
   D) menu052 ;;
   E) menu053 ;;
   F) menu054 ;;
+  G) menu06 ;;
+  H) menu07 ;;
   X) echo a ;;
   esac
 }
@@ -550,16 +499,7 @@ dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "Pressio
 speedy=`curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -`
 dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "$speedy" 0 0
 
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$speedy" | mutt -s "Relatório de SpeedTest de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu05
-  fi
-else
-  menu05
-fi
+menu08 "$speedy"
 
 menu05
 }
@@ -570,16 +510,7 @@ dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msg
 arpscn=`echo "$password" | sudo -S arp-scan -l`
 dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "$arpscan" 0 0
 
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$arpscn" | mutt -s "Relatório de ARP-Scan de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu05
-  fi
-else
-  menu05
-fi
+menu08 "$arpscn"
 
 menu05
 }
@@ -591,17 +522,8 @@ dialog --title "WhoIs" --msgbox "Pressione Enter para iniciar o teste e aguarde!
 wis=`whois "$site"`
 dialog --title "WhoIs" --msgbox "$wis" 0 0
 
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$wis" | mutt -s "Relatório de WhoIs de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu05
-  fi
-else
-  menu05
-fi
-  
+menu08 "$wis"
+ 
 menu05
 }
 
@@ -613,17 +535,8 @@ A identificação estará concluída quando um (END) surgir no final." 14 40 2>&
 dialog --title "Traceroute" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 trot=`traceroute "$site"`
 dialog --title "Traceroute" --msgbox "$trot" 0 0
-  
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$trot" | mutt -s "Relatório de Traceroute de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu05
-  fi
-else
-  menu05
-fi
+
+menu08 "$trot"
   
 menu05
 }
@@ -686,7 +599,7 @@ else
   if [ "$report" = "0" ]; then
     dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja habilitar a emissão de relatórios?" 8 40
     if [ $? = 0 ]; then  
-      validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
+      validmail=$(dialog --title " " --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados! Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@mail.com, user2@mail.com" 12 40 2>&1 > /dev/tty)
       if [ -z "$validmail" ]; then
         dialog --cr-wrap --title "Erro no E-mail!" --backtitle "Erro detectado" --msgbox "Digite um e-mail válido!" 0 0
         menu05
@@ -697,10 +610,10 @@ else
   else
     dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja trocar o e-mail de emissão de relatórios?" 8 40
     if [ $? = 0 ]; then
-      validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
+      validmail=$(dialog --title " " --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
       menu05
     fi
-    dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja desativar a emissão de relatórios?" 8 40
+    dialog --title "Confirmação" --backtitle "Relatórios" --yesno "Deseja desativar a emissão de relatórios?" 8 40
     if [ $? = 0 ]; then
       report="0"
       menu05
@@ -898,34 +811,50 @@ seja do próprio sistema virtualizado ou erro de disco do host. \n \n
 
 # Reinicio
 function menu06 {
-  bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  if [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ]; then
-    dialog --cr-wrap --title 'ERRO AO REINICIAR' --backtitle 'ERRO AO TENTAR REINICIAR.' --msgbox "Reinício bloqueado! \n
+bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+
+if [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ]; then
+  dialog --cr-wrap --title 'ERRO AO REINICIAR' --backtitle 'ERRO AO TENTAR REINICIAR.' --msgbox "Reinício bloqueado! \n
 Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
-  else
-    dialog --title 'Reiniciar' --backtitle 'R E I N I C I A R' --yesno 'Deseja reiniciar este sistema?' 0 0
-    if [ $? = 0 ]; then
-      echo "$password" | sudo -S reboot
-    fi
+else
+  dialog --title 'Reiniciar' --backtitle 'R E I N I C I A R' --yesno 'Deseja reiniciar este sistema?' 0 0
+  if [ $? = 0 ]; then
+    echo "$password" | sudo -S reboot
   fi
+  menu05
+fi
 }
 
 # Desligamento
 function menu07 {
-  rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-  if [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ]; then
-    dialog --cr-wrap --title 'ERRO AO DESLIGAR' --backtitle 'ERRO AO TENTAR DESLIGAR.' --msgbox "Desligamento bloqueado! \n
+rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+
+if [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ]; then
+  dialog --cr-wrap --title 'ERRO AO DESLIGAR' --backtitle 'ERRO AO TENTAR DESLIGAR.' --msgbox "Desligamento bloqueado! \n
 Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
-  else
-    dialog --title 'Desligar' --backtitle 'D E S L I G A R' --yesno 'Deseja desligar este sistema?' 0 0
-    if [ $? = 0 ]; then
-      echo "$password" | sudo -S shutdown -h now
-    fi
+else
+  dialog --title 'Desligar' --backtitle 'D E S L I G A R' --yesno 'Deseja desligar este sistema?' 0 0
+  if [ $? = 0 ]; then
+    echo "$password" | sudo -S shutdown -h now
   fi
+  menu05
+fi
+}
+
+# Relatórios por Email!
+
+function menu08 {
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar este relatório para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$1" | mutt -s "Relatório - $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+  fi
+fi
 }
 
 ################################################################################
@@ -936,8 +865,29 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
 function menu04 {
   menu09 samba-ad-dc && smb2=$prcs
 
-  if [ "$smb2" = "Executando" ]; then
+  #if [ "$smb2" = "Executando" ]; then
     var4=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
+    A 'Gestão de Usuários' \
+    B 'Gestão de Grupos' \
+    C 'Gestão de Computadores' \
+    D 'Informações do Domínio' \
+    X 'Voltar' 2>&1 > /dev/tty )
+
+    case "$var4" in
+
+    A) menu041 ;;
+    B) menu042 ;;
+    C) menu043 ;;
+    D) menuR ;;
+    X) echo "a" ;;
+    esac
+  #else
+  # dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DO ACTIVE DIRECTORY' --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
+  #fi
+}
+
+function menu041 {
+    var41=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
     A 'Criar um Usuário' \
     B 'Exibir todos os Usuários' \
     C 'Procurar Usuário' \
@@ -949,16 +899,9 @@ function menu04 {
     I 'Alterar a Senha de um Usuário' \
     J 'Alterar Politica de um Usuário' \
     K 'Excluir um Usuário' \
-    L 'Criar um Grupo' \
-    M 'Exibir todos os Grupos' \
-    N 'Procurar Grupo' \
-    O 'Exibir Usuários de um Grupo' \
-    P 'Excluir um Grupo' \
-    Q 'Exibir todos os Computadores' \
-    R 'Informações do Domínio' \
     X 'Voltar' 2>&1 > /dev/tty )
 
-    case "$var4" in
+    case "$var41" in
     A) menuD ;;
     B) menuA ;;
     C) menuP ;;
@@ -970,77 +913,71 @@ function menu04 {
     I) menuE ;;
     J) menuN ;;
     K) menuH ;;
-    L) menuI ;;
-    M) menuC ;;
-    N) menuQ ;;
-    O) menuK ;;
-    P) menuM ;;
-    Q) menuB ;;
-    R) menuR ;;
-    X) start ;;
+    X) menu04 ;;
     esac
-  else
-   dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DO ACTIVE DIRECTORY' --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
-  fi
+  #else
+  # dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DO ACTIVE DIRECTORY' --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
+  #fi
+}
+
+function menu042 {
+    var42=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
+    A 'Criar um Grupo' \
+    B 'Exibir todos os Grupos' \
+    C 'Procurar Grupo' \
+    D 'Exibir Usuários de um Grupo' \
+    E 'Excluir um Grupo' \
+    X 'Voltar' 2>&1 > /dev/tty )
+
+    case "$var42" in
+    A) menuI ;;
+    B) menuC ;;
+    C) menuQ ;;
+    D) menuK ;;
+    E) menuM ;;
+    X) menu04 ;;
+    esac
+  #else
+  # dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DO ACTIVE DIRECTORY' --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
+  #fi
+}
+
+function menu043 {
+    var43=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
+    A 'Exibir todos os Computadores' \
+    X 'Voltar' 2>&1 > /dev/tty )
+
+    case "$var43" in
+    A) menuB ;;
+    X) menu04 ;;
+    esac
+  #else
+  # dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DO ACTIVE DIRECTORY' --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
+  #fi
 }
 
 function menuA {
 dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "Pressione Enter para visualizar os Usuários! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 usrlst=`echo "$password" | sudo -S samba-tool user list`
-#dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "$usrlst" 0 0
 echo "$usrlst" | less
-
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$Recado $usrlst $Mensagem" | mutt -s "Relatório de Usuários de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu04
-  fi
-else
-  menu04
-fi
-
-menu04
+menu08 "$Recado $usrlst $Mensagem"
+menu041
 }
 
 function menuB {
 dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "Pressione Enter para visualizar os Computadores! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 cmplist=`echo "$password" | sudo -S samba-tool computer list`
-#dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "$complist" 0 0
 echo "$cmplist" | less
-
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$Recado $complist $Mensagem" | mutt -s "Relatório de Computadores de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu04
-  fi
-else
-  menu04
-fi
-
-menu04
+menu08 "$Recado $complist $Mensagem"
+menu043
 }
 
 function menuC {
 dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 grplist=`echo "$password" | sudo -S samba-tool group list`
-#dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "$grplist" 0 0
 echo "$grplist" | less
-
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$Recado $grplist $Mensagem" | mutt -s "Relatório de Grupos de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu04
-  fi
-else
-  menu04
-fi
-menu04
+menu08 "$Recado $grplist $Mensagem"
+menu042
 }
 
 function menuD {
@@ -1056,7 +993,7 @@ Navegue com as setas para cima e baixo." 15 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
 if [ $? -ne 0 ]; then
-  menu04
+  menu041
 fi
 
 validusr1=$(echo "$VALUE0" | sed -n 1p)
@@ -1065,7 +1002,7 @@ validpss1=$(echo "$VALUE0" | sed -n 3p)
 
 if [ -z "$validpss1" ] || [ -z "$validusr1" ] || [ -z "$validsur1" ]; then
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 6 20
-  menu04
+  menu041
 fi
 
 repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
@@ -1088,102 +1025,102 @@ if [ $? = 0 ]; then
   echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr1" --noexpiry
   dialog --title "Informação" --msgbox "A senha de $validusr1 não expira mais!" 8 40
   dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
-  menu04
+  menu041
 else
   dialog --title "Informação" --msgbox "A senha de $validusr1 expira em 14 dias!" 8 40
   dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
-  menu04
+  menu041
 fi
 }
 
 function menuE {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Trocar a senha de usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
-  if [ -z "$validusr" ]; then
-    dialog --title "ERROR" --msgbox "Usuário não pode ficar em branco!" 7 25
-    menu04
-  fi
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    validpss=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --insecure --passwordbox 'Crie uma nova senha para o usuário' 0 0 2>&1 > /dev/tty )
-    [ $? -ne 0 ] && menu04
-    if [ -z "$validpss" ]; then
-      dialog --title "ERROR" --msgbox "Senha não pode ficar em branco!" 7 25
-      menu04
-    else
-      echo "$password" | sudo -S samba-tool user setpassword "$validusr" --newpassword="$validpss"
-      dialog --title "Informação" --msgbox "Senha de $validusr trocada com sucesso!" 8 40
-      menu04
-    fi
+validusr=$(dialog --title 'AD-DC' --backtitle "Trocar a senha de usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && break && menu041
+if [ -z "$validusr" ]; then
+  dialog --title "ERROR" --msgbox "Usuário não pode ficar em branco!" 7 25
+  menu041
+fi
+repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
+if [ "$repeated" = "$validusr" ]; then
+  validpss=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --insecure --passwordbox 'Crie uma nova senha para o usuário' 0 0 2>&1 > /dev/tty )
+  [ $? -ne 0 ] && menu041
+  if [ -z "$validpss" ]; then
+    dialog --title "ERROR" --msgbox "Senha não pode ficar em branco!" 7 25
+    menu041
   else
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    menu04
+    echo "$password" | sudo -S samba-tool user setpassword "$validusr" --newpassword="$validpss"
+    dialog --title "Informação" --msgbox "Senha de $validusr trocada com sucesso!" 8 40
+    menu041
   fi
+else
+  dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
+  menu041
+fi
 }
 
 function menuF {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Bloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
-  if [ -z "$validusr" ]; then
-    dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu04
-  fi
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    echo "$password" | sudo -S samba-tool user disable "$validusr"
-    dialog --title "Informação" --msgbox "Usuário $validusr bloqueado com sucesso!" 7 25
-    menu04
-  else
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    menu04
-  fi
+validusr=$(dialog --title 'AD-DC' --backtitle "Bloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && break && menu041
+if [ -z "$validusr" ]; then
+  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
+  menu041
+fi
+repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
+if [ "$repeated" = "$validusr" ]; then
+  echo "$password" | sudo -S samba-tool user disable "$validusr"
+  dialog --title "Informação" --msgbox "Usuário $validusr bloqueado com sucesso!" 7 25
+  menu041
+else
+  dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
+  menu041
+fi
 }
 
 function menuG {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Desbloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
-  if [ -z "$validusr" ]; then
-    dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu04
-  fi
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    echo "$password" | sudo -S samba-tool user enable "$validusr"
-    dialog --title "Informação" --msgbox "Usuário $validusr desbloqueado com sucesso!" 7 25
-    menu04
-  else
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    menu04
-  fi
+validusr=$(dialog --title 'AD-DC' --backtitle "Desbloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && break && menu041
+if [ -z "$validusr" ]; then
+  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
+  menu041
+fi
+repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
+if [ "$repeated" = "$validusr" ]; then
+  echo "$password" | sudo -S samba-tool user enable "$validusr"
+  dialog --title "Informação" --msgbox "Usuário $validusr desbloqueado com sucesso!" 7 25
+  menu041
+else
+  dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
+  menu041
+fi
 }
 
 function menuH {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Excluir usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
-  if [ -z "$validusr" ]; then
-    dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu04
+validusr=$(dialog --title 'AD-DC' --backtitle "Excluir usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && break && menu041
+if [ -z "$validusr" ]; then
+  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
+  menu041
+fi
+repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
+if [ "$repeated" = "$validusr" ]; then
+  dialog --title 'Confirmação' --backtitle 'Exclusão de Usuário' --yesno 'Deseja excluir este usuário?' 0 0
+  if [ $? = 0 ]; then
+    echo "$password" | sudo -S samba-tool user delete "$validusr"
+    dialog --title "Informação" --msgbox "Usuário $validusr excluído com sucesso!" 7 25
+    menu041
   fi
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    dialog --title 'Confirmação' --backtitle 'Exclusão de Usuário' --yesno 'Deseja excluir este usuário?' 0 0
-    if [ $? = 0 ]; then
-      echo "$password" | sudo -S samba-tool user delete "$validusr"
-      dialog --title "Informação" --msgbox "Usuário $validusr excluído com sucesso!" 7 25
-      menu04
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    menu04
-  fi
+else
+  dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
+  menu041
+fi
 }
 
 function menuI {
   validgrp=$(dialog --title 'AD-DC' --backtitle "Criar um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
+  [ $? -ne 0 ] && break && menu042
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menu04
+    menu042
   fi
   repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
   if [ "$repeated" = "$validgrp" ]; then
@@ -1192,22 +1129,22 @@ function menuI {
   else
     echo "$password" | sudo -S samba-tool group add "$validgrp"
     dialog --title "Informação" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
-    menu04
+    menu042
   fi
 }
 
 function menuJ {
   validusr=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome de Usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
+  [ $? -ne 0 ] && break && menu041
   if [ -z "$validusr" ]; then
     dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu04
+    menu041
   else  
     validgrp=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-    [ $? -ne 0 ] && break && menu04
+    [ $? -ne 0 ] && break && menu041
     if [ -z "$validgrp" ]; then
       dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-      menu04
+      menu041
     fi    
   fi
   repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
@@ -1216,90 +1153,78 @@ function menuJ {
     if [ "$repeated2" = "$validgrp" ]; then
       echo "$password" | sudo -S samba-tool group addmembers "$validgrp" "$validusr"
       dialog --title "Informação" --msgbox "O usuário $validusr foi adicionado ao grupo $validgrp!" 8 40
-      menu04
+      menu041
     else
       dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
-      menu04
+      menu041
     fi
   else
     dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    menu04
+    menu041
   fi
-  menu04
+  menu041
 }
 
 function menuK {
 validgrp=$(dialog --title 'AD-DC' --backtitle "Exibir Usuários de um grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && break && menu04
+[ $? -ne 0 ] && break && menu042
 if [ -z "$validgrp" ]; then
   dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-  menu04
+  menu042
 fi
   
 repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
 if [ "$repeated" = "$validgrp" ]; then
   dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox ""
   usrgrps=`echo "$password" | sudo -S samba-tool group listmembers "$validgrp"`
-  #dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "$usrgrps"
   echo "usrgrps" | less
 else
   dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
-  menu04
+  menu042
 fi
-
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$Recado $usrgrps $Mensagem" | mutt -s "Relatório de Usuários de Grupo de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu04
-  fi
-else
-  menu04
-fi
-
-menu04
+menu08 "$Recado $usrgrps $Mensagem"
+menu042
 }
 
 function menuL {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
-  if [ -z "$validusr" ]; then
-    dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu04  
-  else
-    validgrp=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-    [ $? -ne 0 ] && break && menu04
-    if [ -z "$validgrp" ]; then
-      dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-      menu04
-    fi
+validusr=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Usuário" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && break && menu041
+if [ -z "$validusr" ]; then
+  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
+  menu041 
+else
+  validgrp=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
+  [ $? -ne 0 ] && break && menu041
+  if [ -z "$validgrp" ]; then
+    dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
+    menu041
   fi
+fi
   
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    repeated2=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
-    if [ "$repeated2" = "$validgrp" ]; then
-      echo "$password" | sudo -S samba-tool group removemembers "$validgrp" "$validusr"
-      dialog --title "Informação" --msgbox "O usuário $validusr foi removido do grupo $validgrp!" 8 40
-      menu04
-    else
-      dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
-      menu04
-    fi
+repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
+if [ "$repeated" = "$validusr" ]; then
+  repeated2=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
+  if [ "$repeated2" = "$validgrp" ]; then
+    echo "$password" | sudo -S samba-tool group removemembers "$validgrp" "$validusr"
+    dialog --title "Informação" --msgbox "O usuário $validusr foi removido do grupo $validgrp!" 8 40
+    menu041
   else
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    menu04
+    dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
+    menu041
   fi
-  menu04
+else
+  dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
+  menu041
+fi
+menu041
 }
 
 function menuM {
   validgrp=$(dialog --title 'AD-DC' --backtitle "Excluir grupo do Domínio em $HOSTNAME" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
+  [ $? -ne 0 ] && break && menu042
   if [ -z "$validgrp" ]; then
     dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menu04
+    menu042
   fi
   repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
   if [ "$repeated" = "$validgrp" ]; then  
@@ -1307,38 +1232,38 @@ function menuM {
     if [ $? = 0 ]; then
       echo "$password" | sudo -S samba-tool group delete "$validgrp"
       dialog --title "Informação" --msgbox "Grupo $validgrp excluído com sucesso!" 7 25
-      menu04
+      menu042
     fi
   else
     dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
-    menu04
+    menu042
   fi
 }
 
 function menuN {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Alterar Política de Senha" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && menu04
-  if [ -z "$validusr" ]; then
-    dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu04
+validusr=$(dialog --title 'AD-DC' --backtitle "Alterar Política de Senha" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && menu041
+if [ -z "$validusr" ]; then
+  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
+  menu041
+fi
+repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
+if [ "$repeated" = "$validusr" ]; then
+  dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "$validusr deve trocar a senha ao logar?" 0 0
+  if [ $? = 0 ]; then
+    dialog --title "Informação" --msgbox "No U.S.M. esse recurso só funciona no ato da criação de um usuário!" 8 40
   fi
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "$validusr deve trocar a senha ao logar?" 0 0
-    if [ $? = 0 ]; then
-      dialog --title "Informação" --msgbox "No U.S.M. esse recurso só funciona no ato da criação de um usuário!" 8 40
-    fi
-    dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr não deve mais expirar?" 0 0
-    if [ $? = 0 ]; then
-      echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr" --noexpiry
-      dialog --title "Informação" --msgbox "A senha de $validusr não expira mais!" 8 40
-      menu04
-    fi
-    menu04
-  else
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    menu04
+  dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr não deve mais expirar?" 0 0
+  if [ $? = 0 ]; then
+    echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr" --noexpiry
+    dialog --title "Informação" --msgbox "A senha de $validusr não expira mais!" 8 40
+    menu041
   fi
+  menu041
+else
+  dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
+  menu041
+fi
 }
 
 function menuO {
@@ -1346,7 +1271,7 @@ validusr=$(dialog --title 'AD-DC' --backtitle "Exibir grupos de um usuário em $
 [ $? -ne 0 ] && break && menuO
 if [ -z "$validusr" ]; then
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-  menu04
+  menu041
 fi
 repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
 if [ "$repeated" = "$validusr" ]; then
@@ -1356,30 +1281,19 @@ if [ "$repeated" = "$validusr" ]; then
   echo "grpsusr" | less
 else
   dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
-  menu04
+  menu041
 fi
-
-if [ "$report" = "1" ]; then
-  dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$Recado $grpsusr $Mensagem" | mutt -s "Relatório de Grupos de Usuário de $HOSTNAME" "$validmail"
-    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
-    menu04
-  fi
-else
-  menu04
-fi
-
-menu04
+menu08 "$Recado $grpsusr $Mensagem"
+menu041
 }
 
 function menuP {
 validusr1=$(dialog --title 'AD-DC' --backtitle "Busca se o usuário existe no Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário. \n
 Exemplo: joao_naves" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && break && menu04
+[ $? -ne 0 ] && break && menu041
 if [ -z "$validusr1" ]; then
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-  menu04
+  menu041
 fi
 repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
 if [ "$repeated2" = "$validusr1" ]; then
@@ -1388,7 +1302,7 @@ if [ "$repeated2" = "$validusr1" ]; then
   if [ $? = 0 ]; then
     menuP
   fi
-  menu04
+  menu041
 else
   dialog --title 'Informação' --yesno "O usuário $validusr1 não foi encontrado. Deseja cria-lo?" 8 40
   if [ $? = 0 ]; then
@@ -1398,16 +1312,16 @@ else
   if [ $? = 0 ]; then
     menuP
   fi
-  menu04
+  menu041
 fi
 }
 
 function menuQ {
 validgrp1=$(dialog --title 'AD-DC' --backtitle "Busca se o grupo existe no Domínio em $HOSTNAME" --inputbox "Insira o nome de grupo" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && break && menu04
+[ $? -ne 0 ] && break && menu042
 if [ -z "$validgrp1" ]; then
   dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-  menu04
+  menu042
 fi
 repeated3=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp1")
 if [ "$repeated3" = "$validgrp1" ]; then
@@ -1416,7 +1330,7 @@ if [ "$repeated3" = "$validgrp1" ]; then
   if [ $? = 0 ]; then
     menuQ
   fi
-  menu04
+  menu042
 else
   dialog --title 'Informação' --yesno "O grupo $validgrp1 não foi encontrado. Deseja cria-lo?" 8 40
   if [ $? = 0 ]; then
@@ -1426,7 +1340,7 @@ else
   if [ $? = 0 ]; then
     menuQ
   fi
-  menu04
+  menu042
 fi
 }
 
