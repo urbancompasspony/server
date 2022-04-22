@@ -41,6 +41,7 @@ echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
 if [ "" = "$PKG_OK" ]; then
   #echo "$REQUIRED_PKG não encontrado. Instalando..."
   sudo apt update; sudo apt install $REQUIRED_PKG -y
+  #mkdir -p ~/.mutt/cache/headers && mkdir ~/.mutt/cache/bodies && touch ~/.mutt/certificates && touch ~/.mutt/muttrc
 fi
 }
 
@@ -74,7 +75,6 @@ fi
 # MAIN LOOP
 function start {
   while true; do
-    sensors0=`sensors || echo "Incompatível em Máquina Virtual!"`
     datetime=`date +"%d/%m %H:%M"` # Data e Hora
     var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
     A 'Status do Sistema' \
@@ -278,6 +278,7 @@ prcs=`echo "$password" | sudo -S systemctl is-active --quiet $1 && echo "Executa
 
 # Status Temperatura
 function menu12 {
+sensors0=`sensors || echo "Incompatível em Máquina Virtual!"`
 dialog --cr-wrap --help-button --help-label 'Ajuda' --backtitle 'Temperatura, Potencia e Rotação de Cooler(s) [Se disponível!]' --msgbox "$sensors0" 0 0
 
   case $? in
@@ -737,8 +738,8 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
 }
 
 function menu08 {
-  validmail=$(dialog --title 'E-mail' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios" 9 40 2>&1 > /dev/tty)
-  var13=$(dialog --title 'E-mail' --backtitle "Resumo por E-mail" --menu "Relatórios:" 0 0 0 \
+  validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
+  var13=$(dialog --title 'Relatórios por E-mail' --backtitle "Os relatórios serão enviados para $validmail!" --menu "Relatórios" 0 0 0 \
   A 'Sistema' \
   B 'Temperatura' \
   C 'Armazenamento' \
@@ -748,12 +749,131 @@ function menu08 {
     2) dialog --title " " --msgbox "Em Breve!" 0 0 ; m01 ;;
   esac
   case "$var13" in
-  A) dialog --cr-wrap --title ' ' --backtitle '' --msgbox "Em Breve!" 0 0 ;;
-  B) dialog --cr-wrap --title ' ' --backtitle '' --msgbox "Em Breve!" 0 0 ;;
-  C) dialog --cr-wrap --title ' ' --backtitle '' --msgbox "Em Breve!" 0 0 ;;
-  D) dialog --cr-wrap --title ' ' --backtitle '' --msgbox "Em Breve!" 0 0 ;;
+  A) menu081 ;;
+  B) menu082 ;;
+  C) menu083 ;;
+  D) menu084 ;;
   X) echo a ;;
   esac
+}
+
+function menu081 {
+ip=`hostname -I | awk '{print $1}'`
+ip2=`dig @resolver4.opendns.com myip.opendns.com +short`
+uptime=`uptime | awk {'print $3 $4 $5'}`
+datetime=`date +"%d/%m %H:%M"`
+governor=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível em Máquina Virtual!"`
+bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+xorg=`ls /tmp/.X11-unix | wc -l`
+
+TEXTMAIL="Nome da Máquina: $HOSTNAME
+Data e Hora Local: $datetime
+IP Local  : $ip
+IP Externo: $ip2
+UpTime: $uptime
+XOrgs em Execução: $xorg
+Balance BTRFS: $bbalance
+RSnapshot: $rrsnap
+RSync: $rsync1
+Governador de CPU: $governor
+"
+
+dialog --title "O relatório foi gerado:" --msgbox "$TEXTMAIL" 0 0
+dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
+if [ $? = 0 ]; then
+  echo "$TEXTMAIL" | mutt -s "Relatório de Servidor: $HOSTNAME" "$validmail"
+fi
+dialog --title 'Novo Relatorio' --backtitle 'Relatório de Sistema' --yesno 'Deseja criar outro relatório?' 0 0
+if [ $? = 0 ]; then
+  menu08
+fi
+}
+
+function menu082 {
+sensors1=`sensors || echo "Incompatível em Máquina Virtual!"`
+
+TEXTMAIL="$sensors1"
+
+if [ "$sensors1" = "Incompatível em Máquina Virtual!" ]; then
+  dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
+else
+  dialog --title "O relatório foi gerado:" --msgbox "$TEXTMAIL" 0 0
+  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$TEXTMAIL" | mutt -s "Relatório de Servidor: $HOSTNAME" "$validmail"
+  fi
+  dialog --title 'Novo Relatorio' --backtitle 'Relatório de Sistema' --yesno 'Deseja criar outro relatório?' 0 0
+  if [ $? = 0 ]; then
+    menu08
+  fi
+fi
+}
+
+function menu083 {
+sdisks=`df -Th`
+
+TEXTMAIL=`$sdisks`
+
+dialog --title "O relatório foi gerado:" --msgbox "$TEXTMAIL" 0 0
+dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
+if [ $? = 0 ]; then
+  echo "$TEXTMAIL" | mutt -s "Relatório de Servidor: $HOSTNAME" "$validmail"
+fi
+dialog --title 'Novo Relatorio' --backtitle 'Relatório de Sistema' --yesno 'Deseja criar outro relatório?' 0 0
+if [ $? = 0 ]; then
+  menu08
+fi
+}
+
+function menu084 {
+menu140 "sda" && dump1=$skd && dumpst1=$stssd
+menu140 "sdb" && dump2=$skd && dumpst2=$stssd
+menu140 "sdc" && dump3=$skd && dumpst3=$stssd
+menu140 "sdd" && dump4=$skd && dumpst4=$stssd
+menu140 "sde" && dump5=$skd && dumpst5=$stssd
+menu140 "sdf" && dump6=$skd && dumpst6=$stssd
+menu140 "sdg" && dump7=$skd && dumpst7=$stssd
+menu140 "sdh" && dump8=$skd && dumpst8=$stssd
+menu140 "sdi" && dump9=$skd && dumpst9=$stssd
+
+TEXTMAIL="/dev/sda:
+$dump1
+
+/dev/sdb:
+$dump2
+
+/dev/sdc:
+$dump3
+
+/dev/sdd:
+$dump4
+
+/dev/sde:
+$dump5
+
+/dev/sdf:
+$dump6
+
+/dev/sdg:
+$dump7
+
+/dev/sdh:
+$dump8
+
+/dev/sdi:
+$dump9"
+
+dialog --title "O relatório foi gerado:" --msgbox "$TEXTMAIL" 0 0
+dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
+if [ $? = 0 ]; then
+  echo "$TEXTMAIL" | mutt -s "Relatório de Servidor: $HOSTNAME" "$validmail"
+fi
+dialog --title 'Novo Relatorio' --backtitle 'Relatório de Sistema' --yesno 'Deseja criar outro relatório?' 0 0
+if [ $? = 0 ]; then
+  menu08
+fi
 }
 
 # ---------------------------------------------------------------------------- #
