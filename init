@@ -15,7 +15,7 @@
 # rc-1: Correções de bugs de ferramentas ou menus
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.1-rc1"
+export bktitle="USM: Universal Server Menu v2.1-rc0"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0
 export password=0; export password1=0; export password2=0; export password3=0
@@ -1175,9 +1175,9 @@ fi
   
 repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
 if [ "$repeated" = "$validgrp" ]; then
-  dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox ""
+  dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
   usrgrps=`echo "$password" | sudo -S samba-tool group listmembers "$validgrp"`
-  echo "usrgrps" | less
+  echo "$usrgrps" | less
 else
   dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
   menu042
@@ -1275,10 +1275,9 @@ if [ -z "$validusr" ]; then
 fi
 repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
 if [ "$repeated" = "$validusr" ]; then
-  dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "" 0 0
+  dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
   grpsusr=`echo "$password" | sudo -S samba-tool user getgroups "$validusr"`
-  #dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "$grpsusr" 0 0
-  echo "grpsusr" | less
+  echo "$grpsusr" | less
 else
   dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
   menu041
