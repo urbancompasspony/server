@@ -18,9 +18,10 @@
 # Ou seja, se 1.9.4.4 se tornar 1.9.5, último dígito se torna 0: 1.9.5.0.
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.9.5.0 - By José Humberto"
+export bktitle="USM: Universal Server Menu v1.9.5.1 - By José Humberto"
 
 export processname=0
+export validmail=0
 export process=0
 export status=0
 export pkg=0
@@ -82,7 +83,7 @@ function start {
     C 'Processos do Sistema' \
     D 'Controlador de Dominio' \
     E 'Ferramentas do Sistema' \
-    F 'Reportar por E-mail' \
+    F 'Criar Relatórios' \
     G 'Funções Avançadas' \
     H 'Reiniciar o Sistema' \
     I 'Desligar o Sistema' \
@@ -96,7 +97,7 @@ function start {
     C) menu03 ;;
     D) menu04 ;;
     E) menu05 ;;
-    F) menu08 ;;
+    F) menu08x ;;
     G) m1x ;;
     H) menu06 ;;
     I) menu07 ;;
@@ -737,10 +738,14 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
   fi
 }
 
+function menu08x {
+validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
+menu08
+}
+
 function menu08 {
-  validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
-  var13=$(dialog --title 'Relatórios por E-mail' --backtitle "Os relatórios serão enviados para $validmail!" --menu "Relatórios" 0 0 0 \
-  A 'Sistema' \
+  var13=$(dialog --title 'Relatórios' --backtitle "Os relatórios serão enviados para $validmail!" --menu "Relatórios" 0 0 0 \
+  A 'Geral' \
   B 'Temperatura' \
   C 'Armazenamento' \
   D 'S.M.A.R.T.' \
@@ -780,12 +785,12 @@ RSync: $rsync1
 Governador de CPU: $governor
 "
 
-dialog --title "O relatório foi gerado:" --msgbox "$TEXTMAIL" 0 0
+dialog --title "O relatório gerado:" --msgbox "$TEXTMAIL" 0 0
 dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
 if [ $? = 0 ]; then
-  echo "$TEXTMAIL" | mutt -s "Relatório de Servidor: $HOSTNAME" "$validmail"
+  echo "$TEXTMAIL" | mutt -s "Relatório de Status de $HOSTNAME" "$validmail"
 fi
-dialog --title 'Novo Relatorio' --backtitle 'Relatório de Sistema' --yesno 'Deseja criar outro relatório?' 0 0
+dialog --title 'Novo Relatorio' --backtitle 'Relatório' --yesno 'Deseja criar outro relatório?' 0 0
 if [ $? = 0 ]; then
   menu08
 fi
@@ -799,12 +804,12 @@ TEXTMAIL="$sensors1"
 if [ "$sensors1" = "Incompatível em Máquina Virtual!" ]; then
   dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
 else
-  dialog --title "O relatório foi gerado:" --msgbox "$TEXTMAIL" 0 0
+  dialog --title "O relatório gerado:" --msgbox "$TEXTMAIL" 0 0
   dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
   if [ $? = 0 ]; then
-    echo "$TEXTMAIL" | mutt -s "Relatório de Servidor: $HOSTNAME" "$validmail"
+    echo "$TEXTMAIL" | mutt -s "Relatório de Temperatura de $HOSTNAME" "$validmail"
   fi
-  dialog --title 'Novo Relatorio' --backtitle 'Relatório de Sistema' --yesno 'Deseja criar outro relatório?' 0 0
+  dialog --title 'Novo Relatorio' --backtitle 'Relatório' --yesno 'Deseja criar outro relatório?' 0 0
   if [ $? = 0 ]; then
     menu08
   fi
@@ -816,10 +821,10 @@ sdisks=`df -Th`
 
 TEXTMAIL=`$sdisks`
 
-dialog --title "O relatório foi gerado:" --msgbox "$TEXTMAIL" 0 0
+dialog --title "O relatório gerado:" --msgbox "$TEXTMAIL" 0 0
 dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
 if [ $? = 0 ]; then
-  echo "$TEXTMAIL" | mutt -s "Relatório de Servidor: $HOSTNAME" "$validmail"
+  echo "$TEXTMAIL" | mutt -s "Relatório de Armazenamento de $HOSTNAME" "$validmail"
 fi
 dialog --title 'Novo Relatorio' --backtitle 'Relatório de Sistema' --yesno 'Deseja criar outro relatório?' 0 0
 if [ $? = 0 ]; then
@@ -865,10 +870,10 @@ $dump8
 /dev/sdi:
 $dump9"
 
-dialog --title "O relatório foi gerado:" --msgbox "$TEXTMAIL" 0 0
+dialog --title "O relatório gerado:" --msgbox "$TEXTMAIL" 0 0
 dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
 if [ $? = 0 ]; then
-  echo "$TEXTMAIL" | mutt -s "Relatório de Servidor: $HOSTNAME" "$validmail"
+  echo "$TEXTMAIL" | mutt -s "Relatório de SMART de $HOSTNAME" "$validmail"
 fi
 dialog --title 'Novo Relatorio' --backtitle 'Relatório de Sistema' --yesno 'Deseja criar outro relatório?' 0 0
 if [ $? = 0 ]; then
@@ -902,6 +907,7 @@ function menu04 {
     P 'Excluir um Grupo' \
     Q 'Exibir todos os Computadores' \
     R 'Informações do Domínio' \
+    S 'Criar Relatórios' \
     X 'Voltar' 2>&1 > /dev/tty )
 
     case "$var4" in
@@ -923,6 +929,7 @@ function menu04 {
     P) menuM ;;
     Q) menuB ;;
     R) menuR ;;
+    S) menuS ;;
     X) start ;;
     esac
   else
@@ -1327,6 +1334,48 @@ Caso implementado, melhorias no Kerberos também não serão disponibilizados ne
 " 0 0 ; menuR ;;
   esac
 menu04
+}
+
+function menuSx {
+validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
+menuS0
+}
+
+function menuS0 {
+  var13=$(dialog --title 'Relatórios' --backtitle "Os relatórios serão enviados para $validmail!" --menu "Relatórios" 0 0 0 \
+  A 'Lista de Usuários' \
+  B 'Lista de Grupos' \
+  C 'Lista de Computadores' \
+  X 'Voltar' 2>&1 > /dev/tty )
+  case $? in
+    2) dialog --title " " --msgbox "Em Breve!" 0 0 ; m01 ;;
+  esac
+  case "$var13" in
+  A) menuS1 ;;
+  B) menuS2 ;;
+  C) menuS3 ;;
+  X) echo "a" ;;
+  esac
+}
+
+function menuS1 {
+sensors1=`sensors || echo "Incompatível em Máquina Virtual!"`
+
+TEXTMAIL="$sensors1"
+
+if [ "$sensors1" = "Incompatível em Máquina Virtual!" ]; then
+  dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
+else
+  dialog --title "O relatório gerado:" --msgbox "$TEXTMAIL" 0 0
+  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$TEXTMAIL" | mutt -s "Relatório de Temperatura de $HOSTNAME" "$validmail"
+  fi
+  dialog --title 'Novo Relatorio' --backtitle 'Relatório' --yesno 'Deseja criar outro relatório?' 0 0
+  if [ $? = 0 ]; then
+    menuS0
+  fi
+fi
 }
 
 ################################################################################
