@@ -863,27 +863,27 @@ fi
 
 # Controlador de Dominio
 function menu04 {
-  menu09 samba-ad-dc && smb2=$prcs
+menu09 samba-ad-dc && smb2=$prcs
 
-  #if [ "$smb2" = "Executando" ]; then
-    var4=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
-    A 'Gestão de Usuários' \
-    B 'Gestão de Grupos' \
-    C 'Gestão de Computadores' \
-    D 'Informações do Domínio' \
-    X 'Voltar' 2>&1 > /dev/tty )
+if [ "$smb2" = "Executando" ]; then
+  var4=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
+  A 'Gestão de Usuários' \
+  B 'Gestão de Grupos' \
+  C 'Gestão de Computadores' \
+  D 'Informações do Domínio' \
+  X 'Voltar' 2>&1 > /dev/tty )
 
-    case "$var4" in
+  case "$var4" in
 
-    A) menu041 ;;
-    B) menu042 ;;
-    C) menu043 ;;
-    D) menuR ;;
-    X) echo "a" ;;
-    esac
-  #else
-  # dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DO ACTIVE DIRECTORY' --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
-  #fi
+  A) menu041 ;;
+  B) menu042 ;;
+  C) menu043 ;;
+  D) menuR ;;
+  X) echo "a" ;;
+  esac
+else
+ dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DO ACTIVE DIRECTORY' --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
+fi
 }
 
 function menu041 {
