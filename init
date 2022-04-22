@@ -10,15 +10,12 @@
 # ============================================================================ #
 
 # Versionamento: v1.9.4.0
-# 1.x.x.x: Mudanças drásticas, geralmente recursos novos e menus principais.
-# x.9.x.x: Mudanças pequenas, implementação de novas ferramentas.
-# x.x.4.x: Mudanças sutis, correções de bugs em ferramentas ou mesmo menus.
-# x.x.x.0: Micro-Mudanças, reorganização e limpeza de código; reorganização de menus existentes.
-# Se um item á esquerda mudar de escala, os itens á direita automaticamente zeram.
-# Ou seja, se 1.9.4.4 se tornar 1.9.5, último dígito se torna 0: 1.9.5.0.
+# 1.x: Mudanças drásticas, geralmente recursos novos e menus principais.
+# x.9: Mudanças pequenas, implementação de novas ferramentas.
+# rc-1: Correções de bugs de ferramentas ou menus
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v1.9.5.1 - By José Humberto"
+export bktitle="USM: Universal Server Menu v2.0-rc1 - By José Humberto"
 
 export processname=0
 export validmail=0
@@ -31,8 +28,7 @@ export password1=0
 export password2=0
 export password3=0
 
-hash1=""
-hash2=""
+export report=0
 
 # Checagem de Dependências
 function pkg {
@@ -71,6 +67,12 @@ if [ -z "$password" ]; then
 else
   start
 fi
+
+#dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja habilitar a emissão de relatórios?" 8 40
+#if [ $? = 0 ]; then
+#  report=1
+#  validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 #40 2>&1 > /dev/tty)
+#fi
 }
 
 # MAIN LOOP
@@ -83,10 +85,9 @@ function start {
     C 'Processos do Sistema' \
     D 'Controlador de Dominio' \
     E 'Ferramentas do Sistema' \
-    F 'Criar Relatórios' \
-    G 'Funções Avançadas' \
-    H 'Reiniciar o Sistema' \
-    I 'Desligar o Sistema' \
+    F 'Funções Avançadas' \
+    G 'Reiniciar o Sistema' \
+    H 'Desligar o Sistema' \
     X 'SAIR' 2>&1 > /dev/tty )
     
     [ $? -ne 0 ] && echo "Saindo... Para voltar digite 'menu'!" && break
@@ -97,10 +98,9 @@ function start {
     C) menu03 ;;
     D) menu04 ;;
     E) menu05 ;;
-    F) menu08x ;;
-    G) m1x ;;
-    H) menu06 ;;
-    I) menu07 ;;
+    F) m1x ;;
+    G) menu06 ;;
+    H) menu07 ;;
     X) echo "Saindo... Para voltar digite 'menu'!" && exit && break ;;
     esac
   done
@@ -141,30 +141,47 @@ function menu11 {
   rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
   xorg=`ls /tmp/.X11-unix | wc -l`
 
-  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Informações do Sistema" --msgbox "
-  Nome da Máquina: $HOSTNAME \n
-  Data e Hora Local: $datetime \n \n
-  IP Local  : $ip \n
-  IP Externo: $ip2 \n \n
-  UpTime: $uptime \n
-  XOrgs em Execução: $xorg \n \n
-  Balance BTRFS: $bbalance \n
-  RSnapshot: $rrsnap \n
-  RSync: $rsync1 \n \n
-  Governador de CPU: $governor \n
-  " 0 0
+TEXTMAIL="Nome da Máquina: $HOSTNAME
+Data e Hora Local: $datetime
+
+IP Local  : $ip
+IP Externo: $ip2
+
+UpTime: $uptime
+XOrgs em Execução: $xorg
+
+Balance BTRFS: $bbalance
+RSnapshot: $rrsnap
+RSync: $rsync1
+
+Governador de CPU: $governor"
+
+TEXTAO01="IP Local: Geralmente é o IP Fixado localmente ou no servidor DHCP.
+IP Externo: Se houver acesso externo, monitora qual o IP Externo coletado naquele momento.
+Uptime: Mostra a quantos dias, horas e/ou minutos o servidor está ligado.
+Governador de CPU: Mostra como está a execução do processador, se em Máximo Desempenho, Economia de Energia ou outro.
+XOrgs em Execução: Para sistemas sem interface de usuário mas que permitem executar aplicações Xinit.
+Balance BTRFS: Manutenção de rotina do sistema. Se estiver em Execução, o computador NÃO poderá ser desligado!
+Rsnapshot: Backup incremental automatizado. Se estiver Executando, o computador não poderá ser desligado!
+RSync: Sincronia do Backup em Nuvem ou para um backup RAID 1. Se estiver Executando, o computador não poderá ser desligado!"
+
+dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Informações do Sistema" --msgbox "$TEXTMAIL" 0 0
 
   case $? in
-    2) dialog --title 'Ajuda com Significados de Status' --msgbox "IP Local: Geralmente é o IP Fixado localmente ou no servidor DHCP. \n
-IP Externo: Se houver acesso externo, monitora qual o IP Externo coletado naquele momento. \n \n
-Uptime: Mostra a quantos dias, horas e/ou minutos o servidor está ligado. \n \n
-Governador de CPU: Mostra como está a execução do processador, se em Máximo Desempenho, Economia de Energia ou outro. \n
-XOrgs em Execução: Para sistemas sem interface de usuário mas que permitem executar aplicações Xinit. \n \n
-Balance BTRFS: Manutenção de rotina do sistema. Se estiver em Execução, o computador NÃO poderá ser desligado! \n
-Rsnapshot: Backup incremental automatizado. Se estiver Executando, o computador não poderá ser desligado! \n
-RSync: Sincronia do Backup em Nuvem ou para um backup RAID 1. Se estiver Executando, o computador não poderá ser desligado!
-" 0 0 ; menu11 ;;
+    2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO01" 0 0 ; menu11 ;;
   esac
+  
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$TEXTMAIL $TEXTAO01" | mutt -s "Relatório de Status de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu01
+  fi
+else
+  menu01
+fi
+
 menu01
 }
 
@@ -280,25 +297,45 @@ prcs=`echo "$password" | sudo -S systemctl is-active --quiet $1 && echo "Executa
 # Status Temperatura
 function menu12 {
 sensors0=`sensors || echo "Incompatível em Máquina Virtual!"`
+
 dialog --cr-wrap --help-button --help-label 'Ajuda' --backtitle 'Temperatura, Potencia e Rotação de Cooler(s) [Se disponível!]' --msgbox "$sensors0" 0 0
 
+TEXTAO02="A temperatura costuma ter valores atuais, mínimos (low) e máximos (high)
+Além disso, há também a temperatura Crítica (Crit.): Se o sistema atingir ela,
+vai desligar instantaneamente por segurança.
+
+Resultados que indicam temperaturas de CPU:
+(edge) (cpu_thermal-xxx) (asus-isa-xxxx) (Core X) (coretemp-isa-xxxx)
+Resultados que indicam temperaturas de GPU:
+(amdgpu-pci-xxxx) (ISA Adapter)
+Resultados que indicam temperaturas de Chipset:
+(k10temp-pci-xxxx) (acpitz-acpi-xxxx)
+Resultados que indicam rotação de cooler:
+(cpu_cooler) (fan1) (RPM)
+Resultados que indicam Baterias:
+(BAT0-acpi-xxx) (fam15h_power-pci-xxxx)
+Em Progresso: Novas indicações são adicionadas periodicamente!"
+
   case $? in
-    2) dialog --title 'Ajuda com Significados de Status' --msgbox "A temperatura costuma ter valores atuais, mínimos (low) e máximos (high). \n
-Além disso, há também a temperatura Crítica (Crit.): Se o sistema atingir ela, \n
-vai desligar instantaneamente por segurança. \n \n
-Resultados que indicam temperaturas de CPU: \n
-(edge) (cpu_thermal-xxx) (asus-isa-xxxx) (Core X) (coretemp-isa-xxxx) \n
-Resultados que indicam temperaturas de GPU: \n
-(amdgpu-pci-xxxx) (ISA Adapter) \n
-Resultados que indicam temperaturas de Chipset: \n
-(k10temp-pci-xxxx) (acpitz-acpi-xxxx) \n
-Resultados que indicam rotação de cooler: \n
-(cpu_cooler) (fan1) (RPM) \n
-Resultados que indicam Baterias: \n
-(BAT0-acpi-xxx) (fam15h_power-pci-xxxx) \n \n
-Em Progresso: Novas indicações são adicionadas periodicamente!
-" 0 0 ; menu12 ;;
+    2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO02" 0 0 ; menu12 ;;
   esac
+
+if [ "$sensors1" = "Incompatível em Máquina Virtual!" ]; then
+  dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
+  menu01
+else
+  if [ "$report" = "1" ]; then
+    dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+    if [ $? = 0 ]; then
+      echo "$sensors0 $TEXTAO02" | mutt -s "Relatório de Temperatura de $HOSTNAME" "$validmail"
+      dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+      menu01
+    fi
+  else
+    menu01
+  fi
+fi
+
 menu01
 }
 
@@ -306,24 +343,40 @@ menu01
 
 # Status de Consumo dos Discos
 function menu13 {
-  sdisks=`df -Th`
-  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Discos encontrados" --backtitle "Status do Armazenamento" --msgbox "$sdisks" 0 0
+sdisks=`df -Th`
+dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Discos encontrados" --backtitle "Status do Armazenamento" --msgbox "$sdisks" 0 0
+
+TEXTAO03="Os resultados são de discos acessíveis no sistema. 
+Se um disco não aparecer aqui, significa que está em estado de erro ou foi ejetado.
+
+As opções são:
+[Sist. Arq.] [Tipo] [Tam.] [Usado] [Disp.] [Uso%] [Montado em]
+
+Aonde:
+
+Sist. Arq.: Os mais importantes são começados com //IP e /dev.
+Tipo: Podem ser EXT4, BTRFS, NTFS, FAT32, etc.
+Tam.: Tamanho total do armazenamento.
+Usado: Espaço que já foi utilizado.
+Disp.: Espaço restante.
+Uso%: Porcentagem de uso do disco comparado ao tamanho total.
+Montado em: Local aonde o disco está acessível naquele momento."
 
   case $? in
-    2) dialog --title 'Ajuda' --msgbox "Os resultados são de discos acessíveis no sistema. 
-Se um não aparecer aqui, significa que está em estado de erro ou foi ejetado. \n \n
-As opções são: \n
-[Sist. Arq.] [Tipo] [Tam.] [Usado] [Disp.] [Uso%] [Montado em] \n \n
-Aonde: \n \n
-Sist. Arq.: Os mais importantes são começados com //IP e /dev. \n
-Tipo: Podem ser EXT4, BTRFS, NTFS, FAT32, etc. \n
-Tam.: Tamanho total do armazenamento. \n
-Usado: Espaço que já foi utilizado. \n
-Disp.: Espaço restante. \n
-Uso%: Porcentagem de uso do disco comparado ao tamanho total. \n
-Montado em: Local aonde o disco está acessível naquele momento. \n
-\n" 0 0; menu13 ;;
+    2) dialog --title 'Ajuda' --msgbox "$TEXTAO03" 0 0; menu13 ;;
   esac
+  
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$sdisks $TEXTAO03" | mutt -s "Relatório de Armazenamento de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu01
+  fi
+else
+  menu01
+fi
+  
 menu01
 }
 
@@ -355,7 +408,7 @@ function menu14 {
   Voltar "" 2>&1 > /dev/tty )
 
   case $? in
-    2) dialog --title "Definições de SMART!" --msgbox "$TEXTO" 0 0 ; menu14 ;;
+    2) dialog --title "Definições de SMART!" --msgbox "$TEXTAO04" 0 0 ; menu14 ;;
   esac
 
   case "$menusk" in
@@ -382,38 +435,66 @@ function menu140 {
 }
 
 function menu141 {
-  dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0; menu14
+dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0
+  
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$2 $TEXTAO04" | mutt -s "Relatório de SMART de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu14
+  fi
+else
+  menu14
+fi
+
+menu14
 }
 
-TEXTO="As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só \n
-algumas partes realmente interessam. Nem todos os HDDs e SSDs exibem todas  \n
-essas informações, isso depende do fabricante. As mais importantes são: \n \n
-01 (0x01) Read Error Rate: Taxa de erro geral durante as leituras do disco. \n
-Ao lado do atributo 07 (0x07), se estiver muito alto, causará muita lentidão. \n \n
-05 (0x05) Reallocated Sectors Count: Conhecidos também como BadBlocks, indicam falhas de gravação no disco. \n
-A longo prazo isso pode resultar em perda do disco dentro de alguns meses. \n \n
-07 (0x07) Seek Error Rate: Erro das cabeças magnéticas; podem surgir \n
-por danos ao braço de leitura ou alargamento térmico do disco rígido. \n
-Normalmente não é preocupante mas ao lado do atributo 01 (0x01) pode causar lentidão. \n \n
-10 (0x0A) Spin Retry Count: Quantidade de vezes que o HDD tentou inicializar após uma falha interna. \n
-A médio prazo isso significa falhas graves das cabeças de leitura e o disco poderá parar em alguns meses. \n \n
-184 (0xB8) End-to-End error (ou IOEDC): Indica erros nos dados que transitam do disco ou SSD para a memória RAM. \n
-Imediatamente causa muito lentidão de acesso aos dados; com valores altos desse atributo, há perdas de dados. \n \n
-195 (0xC3) Hardware ECC Recovered: Sozinho não quer dizer muita coisa; porém somado ao resultado do atributo 187 (0xBB) \n
-abaixo, significa que o disco está perdendo dados mas ainda está se recuperando. Lentidão extrema é prevista. \n \n
-187 (0xBB) Reported Uncorrectable Errors: Erros incorrigíveis que foram reportados durante o processamento do, \n
-Hardware ECC do próprio HDD. Valores altos significam disco extremamente lento. \n \n
-188 (0xBC) Command Timeout: Quantidade de vezes que o HDD ou SSD desistiu de fazer uma leitura. \n
-Um valor alto indica falha geral da placa lógica do disco. \n \n
-196 (0xC4) Reallocation Event Count: Quantidade de vezes que o disco copiou dados de um setor ruim para um bom, \n
-se auto-recuperando. Os valores podem ser altos sem perdas de dados, mas a lentidão será notável. \n \n
-197 (0xC5) Current Pending Sector Count: Setores que aguardam ser remapeados. Altos valores do atributo 187 (0xBB) ou \n
-mesmo do atributo 05 (0x05) indicam que o HDD está com setores defeituosos e está com dificuldades de lidar. Lentidão. \n \n
-198 (0xC6) (Offline) Uncorrectable Sector Count: Costuma indicar erros na superfície dos discos ou ainda uma falha \n
-mecânica geral da cabeça de leitura dos discos, ou ainda de multiplexadoras de SSDs. \n \n
-201 (0xC9) Soft Read Error Rate (ou TA Counter Detected): Quantidade de erros causados por software. \n
-Valores altos indicam a presença de bad sectors (diferente de bad blocks), que podem ser corrigidos com \n
-ferramentas de análise, como o HD Regenerator. \n \n
+TEXTAO04="
+
+As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só
+algumas partes realmente interessam. Nem todos os HDDs e SSDs exibem todas
+essas informações, isso depende do fabricante. As mais importantes são:
+
+01 (0x01) Read Error Rate: Taxa de erro geral durante as leituras do disco.
+Ao lado do atributo 07 (0x07), se estiver muito alto, causará muita lentidão.
+
+05 (0x05) Reallocated Sectors Count: Conhecidos também como BadBlocks, indicam falhas de gravação no disco.
+A longo prazo isso pode resultar em perda do disco dentro de alguns meses.
+
+07 (0x07) Seek Error Rate: Erro das cabeças magnéticas; podem surgir
+por danos ao braço de leitura ou alargamento térmico do disco rígido.
+Normalmente não é preocupante mas ao lado do atributo 01 (0x01) pode causar lentidão.
+
+10 (0x0A) Spin Retry Count: Quantidade de vezes que o HDD tentou inicializar após uma falha interna.
+A médio prazo isso significa falhas graves das cabeças de leitura e o disco poderá parar em alguns meses.
+
+184 (0xB8) End-to-End error (ou IOEDC): Indica erros nos dados que transitam do disco ou SSD para a memória RAM.
+Imediatamente causa muito lentidão de acesso aos dados; com valores altos desse atributo, há perdas de dados.
+
+195 (0xC3) Hardware ECC Recovered: Sozinho não quer dizer muita coisa; porém somado ao resultado do atributo 187 (0xBB)
+abaixo, significa que o disco está perdendo dados mas ainda está se recuperando. Lentidão extrema é prevista.
+
+187 (0xBB) Reported Uncorrectable Errors: Erros incorrigíveis que foram reportados durante o processamento do,
+Hardware ECC do próprio HDD. Valores altos significam disco extremamente lento.
+
+188 (0xBC) Command Timeout: Quantidade de vezes que o HDD ou SSD desistiu de fazer uma leitura.
+Um valor alto indica falha geral da placa lógica do disco.
+
+196 (0xC4) Reallocation Event Count: Quantidade de vezes que o disco copiou dados de um setor ruim para um bom,
+se auto-recuperando. Os valores podem ser altos sem perdas de dados, mas a lentidão será notável.
+
+197 (0xC5) Current Pending Sector Count: Setores que aguardam ser remapeados. Altos valores do atributo 187 (0xBB) ou
+mesmo do atributo 05 (0x05) indicam que o HDD está com setores defeituosos e está com dificuldades de lidar. Lentidão.
+
+198 (0xC6) (Offline) Uncorrectable Sector Count: Costuma indicar erros na superfície dos discos ou ainda uma falha
+mecânica geral da cabeça de leitura dos discos, ou ainda de multiplexadoras de SSDs.
+
+201 (0xC9) Soft Read Error Rate (ou TA Counter Detected): Quantidade de erros causados por software.
+Valores altos indicam a presença de bad sectors (diferente de bad blocks), que podem ser corrigidos com
+ferramentas de análise, como o HD Regenerator.
+
 As informações acima são referências para análises da saúde dos discos. Atenção ao interpretar os resultados!"
 
 # ---------------------------------------------------------------------------- #
@@ -426,6 +507,7 @@ function menu05 {
   C 'WhoIs' \
   D 'TraceRoute' \
   E 'Governador de CPU' \
+  F 'Emissão de Relatórios' \
   X 'Voltar' 2>&1 > /dev/tty )
 
   case $? in
@@ -444,38 +526,105 @@ Governador de CPU: Ver o menu AJUDA dentro desta opção!
 
   case "$var6" in
 
-  A) dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "Após o resultado do teste, pressione 'q' para sair!" 0 0; curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 - | less ; menu05 ;;
-  B) dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "Para ler os IPs use as Setas Cima/Baixo, para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S arp-scan -l | less ; menu05 ;;
+  A) menu050 ;;
+  B) menu0501 ;;
   C) menu051 ;;
   D) menu052 ;;
   E) menu053 ;;
+  F) menu054 ;;
   X) echo a ;;
   esac
 }
 
+# SpeedTest
+function menu050 {
+dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
+speedy=`curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -`
+dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "$speedy" 0 0
+
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$speedy" | mutt -s "Relatório de SpeedTest de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu05
+  fi
+else
+  menu05
+fi
+
+menu05
+}
+
+# Arp-Scan
+function menu0501 {
+dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
+arpscn=`echo "$password" | sudo -S arp-scan -l`
+dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "$arpscan" 0 0
+
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$arpscn" | mutt -s "Relatório de ARP-Scan de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu05
+  fi
+else
+  menu05
+fi
+
+menu05
+}
+
 #WhoIS
 function menu051 {
-  site=$(dialog --title 'WhoIs' --backtitle "Identificar de Propriedade de um WebSite" --inputbox "Digite o site que deseja localizar informações. Use o seguinte modelo: exemplo.com.br" 10 40 2>&1 > /dev/tty)
-  dialog --msgbox "Para ler o resultado use as Setas para Cima e Baixo. \n
-Para fechar aperte 'q'!" 0 0
-  whois "$site" | less ; menu05
+site=$(dialog --title 'WhoIs' --backtitle "Identificar de Propriedade de um WebSite" --inputbox "Digite o site que deseja localizar informações. Use o seguinte modelo: exemplo.com.br" 10 40 2>&1 > /dev/tty)
+dialog --title "WhoIs" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
+wis=`whois "$site"`
+dialog --title "WhoIs" --msgbox "$wis" 0 0
+
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$wis" | mutt -s "Relatório de WhoIs de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu05
+  fi
+else
+  menu05
+fi
+  
+menu05
 }
 
 # Traceroute
 function menu052 {
-  site=$(dialog --title 'TraceRoute' --backtitle "Identificador de hops/saltos que um computador dá, até acessar um site especificado." --inputbox "Digite o site que deseja analisar os Saltos. Use o seguinte modelo: \n
+site=$(dialog --title 'TraceRoute' --backtitle "Identificador de hops/saltos que um computador dá, até acessar um site especificado." --inputbox "Digite o site que deseja analisar os Saltos. Use o seguinte modelo: \n
 exemplo.com.br \n
 A identificação estará concluída quando um (END) surgir no final." 14 40 2>&1 > /dev/tty)
-  dialog --msgbox "Para ler o resultado use as Setas para Cima e Baixo. \n
-Para fechar aperte 'q'!" 0 0
-  traceroute "$site" | less; menu05
+dialog --title "Traceroute" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
+trot=`traceroute "$site"`
+dialog --title "Traceroute" --msgbox "$trot" 0 0
+  
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$trot" | mutt -s "Relatório de Traceroute de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu05
+  fi
+else
+  menu05
+fi
+  
+menu05
 }
 
 # Governador de CPU
 function menu053 {
-  governor1=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível em Máquina Virtual!"`
-  governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors || echo "Indisponível em Máquina Virtual!"`
-  var3=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "Troca do Governador de CPU" --menu "Governador de CPU Atual: \n
+governor1=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível em Máquina Virtual!"`
+governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors || echo "Indisponível em Máquina Virtual!"`
+var3=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "Troca do Governador de CPU" --menu "Governador de CPU Atual: \n
 $governor1" 0 0 0 \
   A 'Conservative' \
   B 'OnDemand' \
@@ -518,6 +667,39 @@ Detectamos estes governadores abaixo como suportados: \n \n
   F) menu10 schedutil ;;
   X) echo a ; menu05 ;;
   esac
+}
+
+function menu054 {
+pong=`ping google.com -c 1 1> /dev/null 2> /dev/null && echo "ok" || echo "notok"`
+
+if [ "$pong" = "notok" ]; then
+  dialog --cr-wrap --title "Erro na Rede" --backtitle "Erro detectado" --msgbox "O sistema não pode se comunicar com a rede local! Verifique sua conexão e tente novamente mais tarde." 8 40
+else
+  if [ "$report" = "0" ]; then
+    dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja habilitar a emissão de relatórios?" 8 40
+    if [ $? = 0 ]; then  
+      validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
+      if [ -z "$validmail" ]; then
+        dialog --cr-wrap --title "Erro no E-mail!" --backtitle "Erro detectado" --msgbox "Digite um e-mail válido!" 0 0
+        menu05
+      fi
+      report="1"
+      menu05
+    fi
+  else
+    dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja trocar o e-mail de emissão de relatórios?" 8 40
+    if [ $? = 0 ]; then
+      validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
+      menu05
+    fi
+    dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja desativar a emissão de relatórios?" 8 40
+    if [ $? = 0 ]; then
+      report="0"
+      menu05
+    fi
+  menu05
+  fi
+fi
 }
 
 # Governador de CPU 2
@@ -738,150 +920,9 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
   fi
 }
 
-function menu08x {
-validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
-menu08
-}
-
-function menu08 {
-  var13=$(dialog --title 'Relatórios' --backtitle "Os relatórios serão enviados para $validmail!" --menu "Relatórios" 0 0 0 \
-  A 'Geral' \
-  B 'Temperatura' \
-  C 'Armazenamento' \
-  D 'S.M.A.R.T.' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title " " --msgbox "Em Breve!" 0 0 ; m01 ;;
-  esac
-  case "$var13" in
-  A) menu081 ;;
-  B) menu082 ;;
-  C) menu083 ;;
-  D) menu084 ;;
-  X) echo a ;;
-  esac
-}
-
-function menu081 {
-ip=`hostname -I | awk '{print $1}'`
-ip2=`dig @resolver4.opendns.com myip.opendns.com +short`
-uptime=`uptime | awk {'print $3 $4 $5'}`
-datetime=`date +"%d/%m %H:%M"`
-governor=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível em Máquina Virtual!"`
-bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-xorg=`ls /tmp/.X11-unix | wc -l`
-
-TEXTMAIL="Nome da Máquina: $HOSTNAME
-Data e Hora Local: $datetime
-IP Local  : $ip
-IP Externo: $ip2
-UpTime: $uptime
-XOrgs em Execução: $xorg
-Balance BTRFS: $bbalance
-RSnapshot: $rrsnap
-RSync: $rsync1
-Governador de CPU: $governor
-"
-
-dialog --title "O relatório gerado:" --msgbox "$TEXTMAIL" 0 0
-dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
-if [ $? = 0 ]; then
-  echo "$TEXTMAIL" | mutt -s "Relatório de Status de $HOSTNAME" "$validmail"
-fi
-dialog --title 'Novo Relatorio' --backtitle 'Relatório' --yesno 'Deseja criar outro relatório?' 0 0
-if [ $? = 0 ]; then
-  menu08
-fi
-}
-
-function menu082 {
-sensors1=`sensors || echo "Incompatível em Máquina Virtual!"`
-
-TEXTMAIL="$sensors1"
-
-if [ "$sensors1" = "Incompatível em Máquina Virtual!" ]; then
-  dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
-else
-  dialog --title "O relatório gerado:" --msgbox "$TEXTMAIL" 0 0
-  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$TEXTMAIL" | mutt -s "Relatório de Temperatura de $HOSTNAME" "$validmail"
-  fi
-  dialog --title 'Novo Relatorio' --backtitle 'Relatório' --yesno 'Deseja criar outro relatório?' 0 0
-  if [ $? = 0 ]; then
-    menu08
-  fi
-fi
-}
-
-function menu083 {
-sdisks=`df -Th`
-
-TEXTMAIL=`$sdisks`
-
-dialog --title "O relatório gerado:" --msgbox "$TEXTMAIL" 0 0
-dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
-if [ $? = 0 ]; then
-  echo "$TEXTMAIL" | mutt -s "Relatório de Armazenamento de $HOSTNAME" "$validmail"
-fi
-dialog --title 'Novo Relatorio' --backtitle 'Relatório de Sistema' --yesno 'Deseja criar outro relatório?' 0 0
-if [ $? = 0 ]; then
-  menu08
-fi
-}
-
-function menu084 {
-menu140 "sda" && dump1=$skd && dumpst1=$stssd
-menu140 "sdb" && dump2=$skd && dumpst2=$stssd
-menu140 "sdc" && dump3=$skd && dumpst3=$stssd
-menu140 "sdd" && dump4=$skd && dumpst4=$stssd
-menu140 "sde" && dump5=$skd && dumpst5=$stssd
-menu140 "sdf" && dump6=$skd && dumpst6=$stssd
-menu140 "sdg" && dump7=$skd && dumpst7=$stssd
-menu140 "sdh" && dump8=$skd && dumpst8=$stssd
-menu140 "sdi" && dump9=$skd && dumpst9=$stssd
-
-TEXTMAIL="/dev/sda:
-$dump1
-
-/dev/sdb:
-$dump2
-
-/dev/sdc:
-$dump3
-
-/dev/sdd:
-$dump4
-
-/dev/sde:
-$dump5
-
-/dev/sdf:
-$dump6
-
-/dev/sdg:
-$dump7
-
-/dev/sdh:
-$dump8
-
-/dev/sdi:
-$dump9"
-
-dialog --title "O relatório gerado:" --msgbox "$TEXTMAIL" 0 0
-dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
-if [ $? = 0 ]; then
-  echo "$TEXTMAIL" | mutt -s "Relatório de SMART de $HOSTNAME" "$validmail"
-fi
-dialog --title 'Novo Relatorio' --backtitle 'Relatório de Sistema' --yesno 'Deseja criar outro relatório?' 0 0
-if [ $? = 0 ]; then
-  menu08
-fi
-}
-
-# ---------------------------------------------------------------------------- #
+################################################################################
+#                                                                              #
+################################################################################
 
 # Controlador de Dominio
 function menu04 {
@@ -907,7 +948,6 @@ function menu04 {
     P 'Excluir um Grupo' \
     Q 'Exibir todos os Computadores' \
     R 'Informações do Domínio' \
-    S 'Criar Relatórios' \
     X 'Voltar' 2>&1 > /dev/tty )
 
     case "$var4" in
@@ -929,7 +969,6 @@ function menu04 {
     P) menuM ;;
     Q) menuB ;;
     R) menuR ;;
-    S) menuS ;;
     X) start ;;
     esac
   else
@@ -938,15 +977,59 @@ function menu04 {
 }
 
 function menuA {
-  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "Para ver os nomes use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user list | less; menu04
+dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "Pressione Enter e aguarde!" 0 0
+usrlst=`echo "$password" | sudo -S samba-tool user list`
+dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "$usrlst" 0 0
+
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$usrlst" | mutt -s "Relatório de Usuários de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu04
+  fi
+else
+  menu04
+fi
+
+menu04
 }
 
 function menuB {
-  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "Para ver os computadores use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool computer list | less; menu04
+dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "Pressione Enter e aguarde!" 0 0
+cmplist=`echo "$password" | sudo -S samba-tool computer list`
+dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "$complist" 0 0
+
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$complist" | mutt -s "Relatório de Computadores de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu04
+  fi
+else
+  menu04
+fi
+
+menu04
 }
 
 function menuC {
-  dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool group list | less; menu04
+dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "Pressione Enter e aguarde!" 0 0
+grplist=`echo "$password" | sudo -S samba-tool group list`
+dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "$grplist" 0 0
+  
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$grplist" | mutt -s "Relatório de Grupos de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu04
+  fi
+else
+  menu04
+fi
+menu04
 }
 
 function menuD {
@@ -1135,21 +1218,35 @@ function menuJ {
 }
 
 function menuK {
-  validgrp=$(dialog --title 'AD-DC' --backtitle "Exibir membros de um grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menu04
-  if [ -z "$validgrp" ]; then
-    dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-    menu04
-  fi
+validgrp=$(dialog --title 'AD-DC' --backtitle "Exibir Usuários de um grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && break && menu04
+if [ -z "$validgrp" ]; then
+  dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
+  menu04
+fi
   
-  repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
-  if [ "$repeated" = "$validgrp" ]; then
-    dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "Para ver os membros use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool group listmembers "$validgrp" | less
-    menu04
-  else
-    dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
+repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
+if [ "$repeated" = "$validgrp" ]; then
+  dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox ""
+  usrgrps=`echo "$password" | sudo -S samba-tool group listmembers "$validgrp"`
+  dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "$usrgrps"
+else
+  dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
+  menu04
+fi
+
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$usrgrps" | mutt -s "Relatório de Usuários de Grupo de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
     menu04
   fi
+else
+  menu04
+fi
+
+menu04
 }
 
 function menuL {
@@ -1233,21 +1330,34 @@ function menuN {
 }
 
 function menuO {
-  validusr=$(dialog --title 'AD-DC' --backtitle "Exibir grupos de um usuário em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-  [ $? -ne 0 ] && break && menuO
-  if [ -z "$validusr" ]; then
-    dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-    menu04
-  fi
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Para ver os grupos use as setas para Cima e Baixo. Para fechar pressione 'q'!" 0 0; echo "$password" | sudo -S samba-tool user getgroups "$validusr" | less
-    menu04
-  else
-    dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
-    menu04
-  fi
+validusr=$(dialog --title 'AD-DC' --backtitle "Exibir grupos de um usuário em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && break && menuO
+if [ -z "$validusr" ]; then
+  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
   menu04
+fi
+repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
+if [ "$repeated" = "$validusr" ]; then
+  dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "" 0 0
+  grpsusr=`echo "$password" | sudo -S samba-tool user getgroups "$validusr"`
+  dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "$grpsusr" 0 0
+else
+  dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
+  menu04
+fi
+
+if [ "$report" = "1" ]; then
+  dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
+  if [ $? = 0 ]; then
+    echo "$grpsusr" | mutt -s "Relatório de Grupos de Usuário de $HOSTNAME" "$validmail"
+    dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+    menu04
+  fi
+else
+  menu04
+fi
+
+menu04
 }
 
 function menuP {
@@ -1334,48 +1444,6 @@ Caso implementado, melhorias no Kerberos também não serão disponibilizados ne
 " 0 0 ; menuR ;;
   esac
 menu04
-}
-
-function menuSx {
-validmail=$(dialog --title ' ' --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
-menuS0
-}
-
-function menuS0 {
-  var13=$(dialog --title 'Relatórios' --backtitle "Os relatórios serão enviados para $validmail!" --menu "Relatórios" 0 0 0 \
-  A 'Lista de Usuários' \
-  B 'Lista de Grupos' \
-  C 'Lista de Computadores' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title " " --msgbox "Em Breve!" 0 0 ; m01 ;;
-  esac
-  case "$var13" in
-  A) menuS1 ;;
-  B) menuS2 ;;
-  C) menuS3 ;;
-  X) echo "a" ;;
-  esac
-}
-
-function menuS1 {
-sensors1=`sensors || echo "Incompatível em Máquina Virtual!"`
-
-TEXTMAIL="$sensors1"
-
-if [ "$sensors1" = "Incompatível em Máquina Virtual!" ]; then
-  dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
-else
-  dialog --title "O relatório gerado:" --msgbox "$TEXTMAIL" 0 0
-  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar o relatório para $validmail?" 8 40
-  if [ $? = 0 ]; then
-    echo "$TEXTMAIL" | mutt -s "Relatório de Temperatura de $HOSTNAME" "$validmail"
-  fi
-  dialog --title 'Novo Relatorio' --backtitle 'Relatório' --yesno 'Deseja criar outro relatório?' 0 0
-  if [ $? = 0 ]; then
-    menuS0
-  fi
-fi
 }
 
 ################################################################################
