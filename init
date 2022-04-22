@@ -15,7 +15,7 @@
 # rc-1: Correções de bugs de ferramentas ou menus
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.0-rc2 - By José Humberto"
+export bktitle="USM: Universal Server Menu v2.0-rc3 - By José Humberto"
 
 export processname=0
 export validmail=0
@@ -987,7 +987,8 @@ function menu04 {
 function menuA {
 dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "Pressione Enter e aguarde!" 0 0
 usrlst=`echo "$password" | sudo -S samba-tool user list`
-dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "$usrlst" 0 0
+#dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "$usrlst" 0 0
+echo "$usrlst" | less
 
 if [ "$report" = "1" ]; then
   dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
@@ -1006,7 +1007,8 @@ menu04
 function menuB {
 dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "Pressione Enter e aguarde!" 0 0
 cmplist=`echo "$password" | sudo -S samba-tool computer list`
-dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "$complist" 0 0
+#dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "$complist" 0 0
+echo "$cmplist" | less
 
 if [ "$report" = "1" ]; then
   dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
@@ -1025,8 +1027,9 @@ menu04
 function menuC {
 dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "Pressione Enter e aguarde!" 0 0
 grplist=`echo "$password" | sudo -S samba-tool group list`
-dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "$grplist" 0 0
-  
+#dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "$grplist" 0 0
+echo "$grplist" | less
+
 if [ "$report" = "1" ]; then
   dialog --title 'Confirmação' --backtitle 'Relatório de Domínio' --yesno "Deseja enviar essas informações para $validmail?" 8 40
   if [ $? = 0 ]; then
@@ -1237,7 +1240,8 @@ repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
 if [ "$repeated" = "$validgrp" ]; then
   dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox ""
   usrgrps=`echo "$password" | sudo -S samba-tool group listmembers "$validgrp"`
-  dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "$usrgrps"
+  #dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "$usrgrps"
+  echo "usrgrps" | less
 else
   dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
   menu04
@@ -1348,7 +1352,8 @@ repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
 if [ "$repeated" = "$validusr" ]; then
   dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "" 0 0
   grpsusr=`echo "$password" | sudo -S samba-tool user getgroups "$validusr"`
-  dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "$grpsusr" 0 0
+  #dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "$grpsusr" 0 0
+  echo "grpsusr" | less
 else
   dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
   menu04
