@@ -30,6 +30,10 @@ export password3=0
 
 export report=0
 
+Mensagem="
+
+AVISO LEGAL: Esta mensagem, inclusive seus anexos, pode conter informações confidenciais e deve ser resguardado o devido sigilo de seu conteúdo. Caso a tenha recebido indevidamente, por favor apague-a imediatamente e comunique o remetente. Qualquer forma de utilização, reprodução, retransmissão, alteração, distribuição e/ou divulgação de conteúdo desta mensagem ou de parte dele, sem a autorização expressa de seu remetente, é estritamente proibida."
+
 # Checagem de Dependências
 function pkg {
 REQUIRED_PKG="$1"
@@ -174,7 +178,7 @@ dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encon
 if [ "$report" = "1" ]; then
   dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
   if [ $? = 0 ]; then
-    echo "$TEXTMAIL $TEXTAO01" | mutt -s "Relatório de Status de $HOSTNAME" "$validmail"
+    echo "$TEXTMAIL $TEXTAO01 $Mensagem" | mutt -s "Relatório de Status de $HOSTNAME" "$validmail"
     dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
     menu01
   fi
@@ -327,7 +331,7 @@ else
   if [ "$report" = "1" ]; then
     dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
     if [ $? = 0 ]; then
-      echo "$sensors0 $TEXTAO02" | mutt -s "Relatório de Temperatura de $HOSTNAME" "$validmail"
+      echo "$sensors0 $TEXTAO02 $Mensagem" | mutt -s "Relatório de Temperatura de $HOSTNAME" "$validmail"
       dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
       menu01
     fi
@@ -369,7 +373,7 @@ Montado em: Local aonde o disco está acessível naquele momento."
 if [ "$report" = "1" ]; then
   dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
   if [ $? = 0 ]; then
-    echo "$sdisks $TEXTAO03" | mutt -s "Relatório de Armazenamento de $HOSTNAME" "$validmail"
+    echo "$sdisks $TEXTAO03 $Mensagem" | mutt -s "Relatório de Armazenamento de $HOSTNAME" "$validmail"
     dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
     menu01
   fi
@@ -440,7 +444,7 @@ dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0
 if [ "$report" = "1" ]; then
   dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar essas informações para $validmail?" 8 40
   if [ $? = 0 ]; then
-    echo "$2 $TEXTAO04" | mutt -s "Relatório de SMART de $HOSTNAME" "$validmail"
+    echo "$2 $TEXTAO04 $Mensagem" | mutt -s "Relatório de SMART de $HOSTNAME" "$validmail"
     dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
     menu14
   fi
