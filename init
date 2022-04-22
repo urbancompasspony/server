@@ -985,7 +985,7 @@ function menu04 {
 }
 
 function menuA {
-dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "Pressione Enter e aguarde!" 0 0
+dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "Pressione Enter para visualizar os Usuários! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 usrlst=`echo "$password" | sudo -S samba-tool user list`
 #dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "$usrlst" 0 0
 echo "$usrlst" | less
@@ -1005,7 +1005,7 @@ menu04
 }
 
 function menuB {
-dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "Pressione Enter e aguarde!" 0 0
+dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "Pressione Enter para visualizar os Computadores! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 cmplist=`echo "$password" | sudo -S samba-tool computer list`
 #dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "$complist" 0 0
 echo "$cmplist" | less
@@ -1025,7 +1025,7 @@ menu04
 }
 
 function menuC {
-dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "Pressione Enter e aguarde!" 0 0
+dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 grplist=`echo "$password" | sudo -S samba-tool group list`
 #dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "$grplist" 0 0
 echo "$grplist" | less
