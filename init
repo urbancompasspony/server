@@ -19,6 +19,7 @@
 
 # Variáveis Globais
 export bktitle="USM: Universal Server Menu v1.9.5.0 - By José Humberto"
+
 export processname=0
 export process=0
 export status=0
@@ -82,10 +83,10 @@ function start {
     D 'Controlador de Dominio' \
     E 'Ferramentas do Sistema' \
     F 'Reportar por E-mail' \
-    G 'Reiniciar o Sistema' \
-    H 'Desligar o Sistema' \
-    X 'SAIR' \
-    0 'Acesso Restrito' 2>&1 > /dev/tty )
+    G 'Funções Avançadas' \
+    H 'Reiniciar o Sistema' \
+    I 'Desligar o Sistema' \
+    X 'SAIR' 2>&1 > /dev/tty )
     
     [ $? -ne 0 ] && echo "Saindo... Para voltar digite 'menu'!" && break
     case "$var1" in
@@ -96,10 +97,10 @@ function start {
     D) menu04 ;;
     E) menu05 ;;
     F) menu08 ;;
-    G) menu06 ;;
-    H) menu07 ;;
+    G) m1x ;;
+    H) menu06 ;;
+    I) menu07 ;;
     X) echo "Saindo... Para voltar digite 'menu'!" && exit && break ;;
-    0) m0x ;;
     esac
   done
 }
@@ -115,13 +116,10 @@ function menu01
   C 'Armazenamento' \
   D 'S.M.A.R.T.' \
   X 'Voltar' 2>&1 > /dev/tty )
-
 #  case $? in
 #    2) dialog --title 'Ajuda' --msgbox " " 0 0 ; menu01 ;;
 #  esac
-
   case "$var2" in
-
   A) menu11 ;;
   B) menu12 ;;
   C) menu13 ;;
@@ -1215,176 +1213,9 @@ menu04
 #                                                                              #
 ################################################################################
 
-# Acesso Restrito!
-
-function m0x {
-#  dialog --title 'F.F.E.' --msgbox "Ferramentas e Funções Exclusivas" 0 0
-  password2=$(dialog --backtitle "Somente Pessoal Autorizado" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha' 0 0 2>&1 > /dev/tty)
-  #password3=$(echo -n "$password2" | md5sum | awk {'print $1'})
-  if [ "$password2" = "1345278" ]; then
-    dialog --title 'Porteiro:' --msgbox "Clift Claft Still, a Porta se Abriu!" 6 40
-    m00
-  else
-    dialog --title 'Acesso Proibido' --msgbox "Permissão Negada" 0 0
-  fi
-}
-
-# Clift Claft Still, a Porta se Abriu!
-
-function m00 {
-  var7=$(dialog --backtitle "Ferramentas e Funções Exclusivas!" --title 'Atenção' --menu "Menu Restrito" 0 0 0 \
-  A 'Projeto 01' \
-  B 'Projeto 02' \
-  C 'Projeto 03' \
-  D 'Projeto 04' \
-  E 'Projeto 05' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
-  esac
-  case "$var7" in
-  A) m01 ;;
-  B) m02 ;;
-  C) m03 ;;
-  D) m04 ;;
-  E) m05 ;;
-  X) echo a ;;
-  esac
-}
-
-function m01 {
-  var10=$(dialog --backtitle "A" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
-  A 'A' \
-  B 'B' \
-  C 'C' \
-  D 'D' \
-  E 'E' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
-  esac
-  case "$var10" in
-  A) m01 ;;
-  B) m02 ;;
-  C) m03 ;;
-  D) m04 ;;
-  E) m05 ;;
-  X) echo a ;;
-  esac
-}
-
-function m011 {
-  var10=$(dialog --backtitle "A" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
-  A 'A' \
-  B 'B' \
-  C 'C' \
-  D 'D' \
-  E 'E' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
-  esac
-  case "$var10" in
-  A) m01 ;;
-  B) m02 ;;
-  C) m03 ;;
-  D) m04 ;;
-  E) m05 ;;
-  X) echo a ;;
-  esac
-}
-
-function m02 {
-  var9=$(dialog --backtitle "SMART" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
-  A 'SMART A' \
-  B 'SMART B' \
-  C 'SMART C' \
-  D 'SMART D' \
-  E 'SMART E' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
-  esac
-  case "$var9" in
-  A) m01 ;;
-  B) m02 ;;
-  C) m03 ;;
-  D) m04 ;;
-  E) m05 ;;
-  X) echo a ;;
-  esac
-}
-
-function m03 {
-  var10=$(dialog --backtitle "A" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
-  A 'A' \
-  B 'B' \
-  C 'C' \
-  D 'D' \
-  E 'E' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
-  esac
-  case "$var10" in
-  A) m01 ;;
-  B) m02 ;;
-  C) m03 ;;
-  D) m04 ;;
-  E) m05 ;;
-  X) echo a ;;
-  esac
-}
-
-function m04 {
-  var11=$(dialog --backtitle "B" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
-  A 'A' \
-  B 'B' \
-  C 'C' \
-  D 'D' \
-  E 'E' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
-  esac
-  case "$var11" in
-  A) m01 ;;
-  B) m02 ;;
-  C) m03 ;;
-  D) m04 ;;
-  E) m05 ;;
-  X) echo a ;;
-  esac
-}
-
-function m05 {
-  var12=$(dialog --backtitle "C" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
-  A 'A' \
-  B 'B' \
-  C 'C' \
-  D 'D' \
-  E 'E' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
-  esac
-  case "$var12" in
-  A) m01 ;;
-  B) m02 ;;
-  C) m03 ;;
-  D) m04 ;;
-  E) m05 ;;
-  X) echo a ;;
-  esac
-}
-
-################################################################################
-#                                                                              #
-################################################################################
-
 function m1x {
-  dialog --title 'F.F.A.' --msgbox "Ferramentas e Funções Avançadas" 0 0
-  password3=$(dialog --backtitle "Somente Pessoal Autorizado" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha' 0 0 2>&1 > /dev/tty)
+  #dialog --title 'F.F.A.' --msgbox "Ferramentas e Funções Avançadas" 0 0
+  password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha' 0 0 2>&1 > /dev/tty)
   if [ "$password3" = "1345278" ]; then
     dialog --title 'Porteiro:' --msgbox "Clift Claft Still, a Porta se Abriu!" 6 40
     m10
@@ -1394,22 +1225,20 @@ function m1x {
 }
 
 function m10 {
-  var10=$(dialog --backtitle "A" --title 'Atenção' --menu "Menu de Testes" 0 0 0 \
-  A 'A' \
-  B 'B' \
-  C 'C' \
-  D 'D' \
-  E 'E' \
+  var10=$(dialog --backtitle " " --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
+  A 'Atualizar o Sistema' \
+  B 'Parar RSYNC' \
+  C 'Parar RSnapshot' \
+  D 'Parar Balance' \
   X 'Voltar' 2>&1 > /dev/tty )
   case $? in
     2) dialog --title 'Nothing' --msgbox "Nothing" 0 0 ; m01 ;;
   esac
   case "$var10" in
-  A) m11 ;;
-  B) m12 ;;
-  C) m13 ;;
-  D) m14 ;;
-  E) m15 ;;
+  A) echo "$password" | sudo -S apt update && echo "$password" | sudo -S apt upgrade -y ; echo "# # # Fim! Aperte Enter. # # #" ; read ; m10 ;;
+  B) echo "$password" | sudo -S killall rsync ; m10 ;;
+  C) echo "$password" | sudo -S killall rsnapshot ; m10 ;;
+  D) echo a ;;
   X) echo a ;;
   esac
 }
