@@ -15,7 +15,7 @@
 # rc-1: Correções de bugs de ferramentas ou menus
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.1-rc0"
+export bktitle="USM: Universal Server Menu v2.2-rc0"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0
 export password=0; export password1=0; export password2=0; export password3=0
@@ -70,29 +70,29 @@ fi
 
 # MAIN LOOP
 function start {
-  while true; do
-    datetime=`date +"%d/%m %H:%M"` # Data e Hora
-    var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
-    A 'Status' \
-    B 'Máquinas Virtuais' \
-    C 'Processos' \
-    D 'Controlador de Domínio' \
-    E 'Ferramentas' \
-    F 'Avançado' \
-    X 'SAIR' 2>&1 > /dev/tty )
+while true; do
+  datetime=`date +"%d/%m %H:%M"` # Data e Hora
+  var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
+  A 'Status' \
+  B 'Máquinas Virtuais' \
+  C 'Processos' \
+  D 'Controlador de Domínio' \
+  E 'Ferramentas' \
+  F 'Avançado' \
+  X 'SAIR' 2>&1 > /dev/tty )
     
-    [ $? -ne 0 ] && echo "Saindo... Para voltar, digite 'menu'!" && break
-    case "$var1" in
+  [ $? -ne 0 ] && echo "Saindo... Para voltar, digite 'menu'!" && break
+  case "$var1" in
 
-    A) menu01 ;;
-    B) menu02 ;;
-    C) menu03 ;;
-    D) menu04 ;;
-    E) menu05 ;;
-    F) m1x ;;
-    X) echo "Saindo... Para voltar, digite 'menu'!" && exit && break ;;
-    esac
-  done
+  A) menu01 ;;
+  B) menu02 ;;
+  C) menu03 ;;
+  D) menu04 ;;
+  E) menu05 ;;
+  F) m1x ;;
+  X) echo "Saindo... Para voltar, digite 'menu'!" && exit && break ;;
+  esac
+done
 }
 
 ##########
@@ -105,6 +105,8 @@ A 'Sistema' \
 B 'Temperatura' \
 C 'Armazenamento' \
 D 'S.M.A.R.T.' \
+E 'DRBD' \
+F 'PCS' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var2" in
@@ -112,6 +114,8 @@ A) menu11 ;;
 B) menu12 ;;
 C) menu13 ;;
 D) menu14 ;;
+E) menu15 ;;
+F) menu16 ;;
 X) echo a ;;
 esac
 }
@@ -306,7 +310,6 @@ if [ "$sensors1" = "Incompatível em Máquina Virtual!" ]; then
 else
   menu08 "$Recado $sensors0 $TEXTAO02 $Mensagem"
 fi
-
 menu01
 }
 
@@ -336,9 +339,7 @@ Montado em: Local aonde o disco está acessível naquele momento."
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO03" 0 0; menu13 ;;
 esac
- 
 menu08 "$Recado $sdisks $TEXTAO03 $Mensagem"
-  
 menu01
 }
 
@@ -388,19 +389,17 @@ function menu14 {
 }
 
 function menu140 {
-  stssd=`ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente"`
-  if [ "$stssd" = "Presente" ]; then
-    skd=`echo "$password" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}'`
-  else
-    skd=`echo "Disco ausente!"`
-  fi
+stssd=`ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente"`
+if [ "$stssd" = "Presente" ]; then
+  skd=`echo "$password" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}'`
+else
+  skd=`echo "Disco ausente!"`
+fi
 }
 
 function menu141 {
 dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0
-
 menu08 "$Recado $2 $TEXTAO04 $Mensagem"
-
 menu14
 }
 
@@ -449,6 +448,49 @@ Valores altos indicam a presença de bad sectors (diferente de bad blocks), que 
 ferramentas de análise, como o HD Regenerator.
 
 As informações acima são referências para análises da saúde dos discos. Atenção ao interpretar os resultados!"
+
+function menu15 {
+menu09 drbd && drbd1=$prcs
+
+if [ "$drbd1" = "Executando" ]; then
+  sdrbd=`echo "$password" | sudo -S drbdadm status`
+  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "DRBD" --backtitle "Status do DRBD" --msgbox "$sdrbd" 0 0
+
+  TEXTAO05=""
+
+  case $? in
+    2) dialog --title 'Ajuda' --msgbox "$TEXTAO05" 0 0; menu15 ;;
+  esac
+
+  menu08 "$Recado $sdrbd $TEXTAO05 $Mensagem"
+  menu01
+else
+  dialog --title "ERROR" --msgbox "O DRBD não está em execução ou não foi localizado neste sistema!" 0 0
+  menu01
+fi
+}
+
+function menu16 {
+menu09 corosync && corosync1=$prcs
+menu09 pacemaker && pacemaker1=$prcs
+
+if [ "$corosync1" = "Executando" ] && [ "$pacemaker1" = "Executando" ]; then 
+  spcs=`echo "$password" | sudo -S pcs status`
+  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "PCS" --backtitle "Status do Pacemaker/Corosync" --msgbox "$spcs" 0 0
+
+  TEXTAO06=""
+
+  case $? in
+    2) dialog --title 'Ajuda' --msgbox "$TEXTAO06" 0 0; menu16 ;;
+  esac
+
+  menu08 "$Recado $spcs $TEXTAO06 $Mensagem"
+  menu01
+else
+  dialog --title "ERROR" --msgbox "O DRBD não está em execução ou não foi localizado neste sistema!" 0 0
+  menu01
+fi
+}
 
 # ---------------------------------------------------------------------------- #
 
