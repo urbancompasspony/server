@@ -16,7 +16,7 @@
 #[ $? -ne 0 ] && menu02
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.4-rc1"
+export bktitle="USM: Universal Server Menu v2.4-rc2"
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0
 export password=0; export password1=0; export password2=0; export password3=0
 export report=0
@@ -77,12 +77,12 @@ esac
 
 function menu01 {
 var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
-A 'Sistema' \
-B 'Temperatura' \
-C 'Armazenamento' \
-D 'S.M.A.R.T.' \
-E 'Cluster: DRBD' \
-F 'Cluster: PCS' \
+A '*Sistema' \
+B '*Temperatura' \
+C '*Armazenamento' \
+D '*S.M.A.R.T.' \
+E '*Cluster: DRBD' \
+F '*Cluster: PCS' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
@@ -344,10 +344,10 @@ menu01
 # Ferramentas do Sistema
 function menu05 {
 var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
-A 'SpeedTest' \
-B 'Arp-Scan' \
-C 'WhoIs' \
-D 'TraceRoute' \
+A '*SpeedTest' \
+B '*Arp-Scan' \
+C '*WhoIs' \
+D '*TraceRoute' \
 E 'Governador de CPU' \
 F 'Relatórios' \
 G 'Reiniciar' \
@@ -453,12 +453,14 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
         dialog --cr-wrap --title "Erro no E-mail!" --backtitle "Erro detectado" --msgbox "Digite um e-mail válido!" 0 0
       else
         report="1"
+        dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
       fi
     fi
   else
     dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja trocar o e-mail de emissão de relatórios?" 8 40
     if [ $? = 0 ]; then
       validmail=$(dialog --title " " --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
+      dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
     else
       dialog --title "Confirmação" --backtitle "Relatórios" --yesno "Deseja desativar a emissão de relatórios?" 8 40
       if [ $? = 0 ]; then
@@ -715,9 +717,9 @@ start
 function menu041 {
 var41=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
 A 'Criar Usuário' \
-B 'Exibir todos os Usuários' \
+B '*Exibir todos os Usuários' \
 C 'Procurar Usuário' \
-D 'Exibir Grupos de Usuário' \
+D '*Exibir Grupos de Usuário' \
 E 'Adicionar Usuário a um Grupo' \
 F 'Remover Usuário de um Grupo' \
 G 'Bloquear Usuário' \
@@ -746,9 +748,9 @@ esac
 function menu042 {
 var42=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
 A 'Criar Grupo' \
-B 'Exibir todos os Grupos' \
+B '*Exibir todos os Grupos' \
 C 'Procurar Grupo' \
-D 'Exibir Usuários de um Grupo' \
+D '*Exibir Usuários de um Grupo' \
 E 'Excluir um Grupo' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
