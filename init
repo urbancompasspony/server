@@ -688,7 +688,7 @@ function menu04 {
 menu09 samba-ad-dc && smb2=$prcs
 
 if [ "$smb2" = "Executando" ]; then
-  var4=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
+  var4=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
   A 'Gestão de Usuários' \
   B 'Gestão de Grupos' \
   C 'Gestão de Computadores' \
@@ -711,7 +711,7 @@ start
 }
 
 function menu041 {
-var41=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
+var41=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
 A 'Criar Usuário' \
 B 'Exibir todos os Usuários' \
 C 'Procurar Usuário' \
@@ -742,7 +742,7 @@ esac
 }
 
 function menu042 {
-var42=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
+var42=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
 A 'Criar Grupo' \
 B 'Exibir todos os Grupos' \
 C 'Procurar Grupo' \
@@ -761,7 +761,7 @@ esac
 }
 
 function menu043 {
-var43=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 10 \
+var43=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
 A 'Exibir todos os Computadores' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
