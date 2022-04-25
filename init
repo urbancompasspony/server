@@ -16,7 +16,7 @@
 #[ $? -ne 0 ] && menu02
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.4"
+export bktitle="USM: Universal Server Menu v2.5"
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0
 export password=0; export password1=0; export password2=0; export password3=0
 export report=0
