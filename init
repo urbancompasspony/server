@@ -16,7 +16,7 @@
 #[ $? -ne 0 ] && menu02
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.5"
+export bktitle="USM: Universal Server Menu v2.4-rc1"
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0
 export password=0; export password1=0; export password2=0; export password3=0
 export report=0
@@ -451,17 +451,19 @@ else
 Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@mail.com, user2@mail.com" 15 40 2>&1 > /dev/tty)
       if [ -z "$validmail" ]; then
         dialog --cr-wrap --title "Erro no E-mail!" --backtitle "Erro detectado" --msgbox "Digite um e-mail válido!" 0 0
+      else
+        report="1"
       fi
-      report="1"
     fi
   else
     dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja trocar o e-mail de emissão de relatórios?" 8 40
     if [ $? = 0 ]; then
       validmail=$(dialog --title " " --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
-    fi
-    dialog --title "Confirmação" --backtitle "Relatórios" --yesno "Deseja desativar a emissão de relatórios?" 8 40
-    if [ $? = 0 ]; then
-      report="0"
+    else
+      dialog --title "Confirmação" --backtitle "Relatórios" --yesno "Deseja desativar a emissão de relatórios?" 8 40
+      if [ $? = 0 ]; then
+        report="0"
+      fi
     fi
   fi
 fi
@@ -1136,7 +1138,8 @@ Nível do Domínio: $domainv \n
 case $? in
   2) dialog --title 'Ajuda com Significados' --msgbox "$TEXTAO13" 0 0 ; menuR ;;
 esac
-[ $? -ne 0 ] && menu04
+
+menu08 "$Recado $domainv $Mensagem"
 menu04
 }
 
