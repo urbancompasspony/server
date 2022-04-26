@@ -30,8 +30,8 @@ export YUM_CMD=0; export APT_CMD=0; export pkg1=0
 
 # Checagem de Dependências
 function pkg {
-YUM_CMD=$(which apt 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
-APT_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+APT_CMD=$(which apt 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 
 if [ "$APT_CMD" = "sim" ]; then
   REQUIRED_PKG="$1"
