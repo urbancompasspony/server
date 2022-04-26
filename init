@@ -17,16 +17,17 @@
 
 # Controle
 hash2="4c3cbcadf7b8a9ae2932afc00560a0d6"
-hash3="9ae7c2a8e120d1e90a4915cba5a15e17"
+hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 FILE="/home/$USER/.lockinit"
 FILE2="/etc/.lockall"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.4-rc6"
+export bktitle="USM: Universal Server Menu v2.4"
+
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
-export YUM_CMD=0; export APT_CMD=0; export pkg1=0
+export YUM_CMD=0; export APT_CMD=0
 
 # Checagem de Dependências
 function pkg {
@@ -34,6 +35,7 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 APT_CMD=$(which apt 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 
 if [ "$APT_CMD" = "sim" ]; then
+  pkg1="apt"
   REQUIRED_PKG="$1"
   PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
   echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
@@ -42,15 +44,14 @@ if [ "$APT_CMD" = "sim" ]; then
     sudo apt update; sudo apt install $REQUIRED_PKG -y
     mkdir -p ~/.mutt/cache/headers && mkdir ~/.mutt/cache/bodies && touch ~/.mutt/certificates && touch ~/.mutt/muttrc
     echo -e "$TEXTAO07" > ~/.mutt/muttrc
-    pkg1="apt"
   fi
 else
   if [ "$YUM_CMD" = "sim" ]; then
-    echo "Sistema YUM detectado. Ignorando."
     pkg1="yum"
+    echo "Sistema YUM detectado. Ignorando."
   fi
-  echo "Sistema desconhecido."
   pkg1="pkg"
+  echo "Sistema desconhecido."
 fi
 }
 
@@ -1265,16 +1266,18 @@ fi
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
 A 'Atualizar o Sistema' \
-B 'Parar Rsync' \
-C 'Parar RSnapshot' \
-D 'Parar Balance' \
+B 'TRIM Disks' \
+C 'Parar Rsync' \
+D 'Parar RSnapshot' \
+E 'Parar Balance' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) m11 ;;
-B) m12 ;;
-C) m13 ;;
-D) dialog --title " " --msgbox "Indisponível no momento" 0 0 ; m10 ;;
+B) echo "$password" | sudo -S fstrim -va ; m10 ;;
+C) m12 ;;
+D) m13 ;;
+E) dialog --title " " --msgbox "Indisponível no momento" 0 0 ; m10 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1284,7 +1287,7 @@ dialog --title 'Informação' --yesno "Deseja atualizar o sistema operacional?" 
 if [ $? = 0 ]; then
   dialog --title 'Informação' --yesno "Tem certeza? Verifique se os processos em execução não pararão e/ou se configurações não serão perdidas." 8 40
   if [ $? = 0 ]; then
-    echo "$password" | sudo -S $pkg1 update && echo "$password" | sudo -S $pkg1 upgrade -y 
+    echo "$password" | sudo -S "$pkg1" update && echo "$password" | sudo -S "$pkg1" upgrade -y && echo "$password" | sudo -S "$pkg1" autoremove -y 
     echo "# # # Fim! Aperte Enter para continuar. # # #" ; read
     dialog --title " " --msgbox "Verifique se os processos em execução não pararam e/ou se configurações não foram perdidas." 8 40
   fi
