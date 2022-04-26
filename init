@@ -23,7 +23,7 @@ FILE="/home/$USER/.lockinit"
 FILE2="/etc/.lockall"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.4"
+export bktitle="USM: Universal Server Menu v2.4-rc1"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -58,7 +58,7 @@ fi
 
 # PASSWORD
 function init {
-FILE2="/etc/.lockall"; [ -f "$FILE2" ] && echo "# # # Menu Travado! Contate o administrador. # # #" && exit
+FILE2="/etc/.lockall"; [ -f "$FILE2" ] && echo "# # # Menu Travado! Saindo. # # #" && exit
 password=$(dialog --backtitle "$bktitle" --title 'Acesso ao USM' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
 hash1=`echo "$password" | md5sum | awk '{print $1}'`
 if [ -z "$password" ]; then
@@ -420,17 +420,38 @@ fi
 menu01
 }
 
+function menu17 {
+dialog --title "ERROR" --msgbox "EM CONSTRUÇÃO" 8 40
+menu05
+}
+
+function menu18 {
+userlog=`w`
+dialog --title "ERROR" --msgbox "$userlog" 20 60
+menu08 "$Recado $userlog $Mensagem"
+menu05
+}
+
+function menu19 {
+userlast=`last`
+dialog --title "ERROR" --msgbox "$userlast" 20 60
+menu08 "$Recado $userlast $Mensagem"
+menu05
+}
+
 # Ferramentas Normal
 function menu05 {
 var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
 A '*SpeedTest' \
 B '*Arp-Scan' \
 C '*WhoIs' \
-D '*TraceRoute' \
-E 'Governador de CPU' \
-F 'Relatórios' \
-G 'Reiniciar' \
-H 'Desligar' \
+D 'NMap' \
+E '*TraceRoute' \
+F '*Usuários Logados' \
+G '*Logins Anteriores' \
+H 'Relatórios' \
+I 'Reiniciar' \
+J 'Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -440,11 +461,13 @@ case "$var6" in
 A) menu050 ;;
 B) menu0501 ;;
 C) menu051 ;;
-D) menu052 ;;
-E) menu053 ;;
-F) menu054 ;;
-G) menu06 ;;
-H) menu07 ;;
+D) menu17 ;;
+E) menu052 ;;
+F) menu18 ;;
+G) menu19 ;;
+H) menu054 ;;
+I) menu06 ;;
+J) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -538,8 +561,21 @@ C) menu10 userspace ;;
 D) menu10 powersave ;;
 E) menu10 performance ;;
 F) menu10 schedutil ;;
-X) liminal "m3nu05" "menu05" ;;
+X) m10 ;;
 esac
+}
+
+# Governador de CPU 2
+function menu10 {
+governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors`
+govr=$(echo "$password" | sudo -S echo $1 | sudo -S tee /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor 2> /dev/null 1> /dev/null && echo "si" || echo "no")
+if [ "$govr" = "si" ]; then
+  dialog --cr-wrap --title "Bem sucedido!" --backtitle "Troca de Governador" --msgbox "Governador trocado com sucesso!" 0 0 ; menu053
+else
+  dialog --cr-wrap --title "ERRO" --backtitle "Troca de Governador" --msgbox "Seu sistema não suporta o governador escolhido. Detectamos estes governadores abaixo como suportados: \n \n
+> $governor2 < \n \n
+Mais informações em AJUDA!" 0 0 ; menu053
+fi
 }
 
 function menu054 {
@@ -575,19 +611,6 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
 fi
 
 liminal "m3nu05" "menu05"
-}
-
-# Governador de CPU 2
-function menu10 {
-governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors`
-govr=$(echo "$password" | sudo -S echo $1 | sudo -S tee /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor 2> /dev/null 1> /dev/null && echo "si" || echo "no")
-if [ "$govr" = "si" ]; then
-  dialog --cr-wrap --title "Bem sucedido!" --backtitle "Troca de Governador" --msgbox "Governador trocado com sucesso!" 0 0 ; menu053
-else
-  dialog --cr-wrap --title "ERRO" --backtitle "Troca de Governador" --msgbox "Seu sistema não suporta o governador escolhido. Detectamos estes governadores abaixo como suportados: \n \n
-> $governor2 < \n \n
-Mais informações em AJUDA!" 0 0 ; menu053
-fi
 }
 
 # Máquinas Virtuais
@@ -1267,18 +1290,20 @@ fi
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
 A 'Atualizar o Sistema' \
-B 'TRIM Disks' \
-C 'Parar Rsync' \
-D 'Parar RSnapshot' \
-E 'Parar Balance' \
+B 'Governador de CPU' \
+C 'TRIM Disks' \
+D 'Parar Rsync' \
+E 'Parar RSnapshot' \
+F 'Parar Balance' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) m11 ;;
-B) echo "$password" | sudo -S fstrim -va ; m10 ;;
-C) m12 ;;
-D) m13 ;;
-E) dialog --title " " --msgbox "Indisponível no momento" 0 0 ; m10 ;;
+B) menu053 ;;
+C) echo "$password" | sudo -S fstrim -va ; m10 ;;
+D) m12 ;;
+E) m13 ;;
+F) m14 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1324,7 +1349,18 @@ m10
 }
 
 function m14 { 
-  echo "fim?"
+blnc=$(dialog --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --inputbox "Insira o caminho:" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && m10
+if [ -z "$blnc" ]; then
+  dialog --title "ERRO" --msgbox "Caminho não pode ficar em branco!" 8 40
+else
+  dialog --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --yesno "Tem certeza que deseja parar o Balance em $blnc?" 8 40
+  if [ $? = 0 ]; then
+    echo "$password" | sudo -S btrfs balance cancel "$blnc"
+  fi
+fi
+
+m10
 }
 
 ################################################################################
