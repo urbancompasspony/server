@@ -23,7 +23,7 @@ FILE="/home/$USER/.lockinit"
 FILE2="/etc/.lockall"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.4"
+export bktitle="USM: Universal Server Menu v2.4-rc1"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -49,9 +49,10 @@ else
   if [ "$YUM_CMD" = "sim" ]; then
     pkg1="yum"
     echo "Sistema YUM detectado. Ignorando."
+  else
+    pkg1="pkg"
+    echo "Sistema desconhecido."
   fi
-  pkg1="pkg"
-  echo "Sistema desconhecido."
 fi
 }
 
