@@ -23,7 +23,7 @@ FILE="/home/$USER/.lockinit"
 FILE2="/etc/.lockall"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.4-rc5"
+export bktitle="USM: Universal Server Menu v2.4-rc6"
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
 export YUM_CMD=0; export APT_CMD=0; export pkg1=0
