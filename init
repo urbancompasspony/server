@@ -19,6 +19,7 @@
 hash2="9ae7c2a8e120d1e90a4915cba5a15e17"
 hash3="9ae7asdasasassasaa4915cba5a15e17"
 FILE="/home/$USER/.lockinit"
+FILE2="/etc/.lockall"
 
 # Variáveis Globais
 export bktitle="USM: Universal Server Menu v2.4-rc3"
@@ -52,6 +53,7 @@ else
     password=$(dialog --backtitle "$bktitle" --title 'Acesso Secreto Liberado!' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
     start
   else
+    FILE2="/etc/.lockall"; [ -f "$FILE2" ] && exit
     liminal "st4rt1" "start"
   fi
 fi
