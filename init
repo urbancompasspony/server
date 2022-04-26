@@ -16,7 +16,7 @@
 #[ $? -ne 0 ] && menu02
 
 # Controle
-hash2="4c3cbcadf7b8a9ae2932afc00560a0d6"
+hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 FILE="/home/$USER/.lockinit"
@@ -66,9 +66,8 @@ if [ -z "$password" ]; then
   echo "É necessário digitar sua senha para continuar. Saindo..."
   echo "Para voltar, digite 'menu'!"
 else
-# Troque a hash para adicionar mais possibilidades de senhas únicas!
   if [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ]; then
-    password=$(dialog --backtitle "$bktitle" --title 'Acesso Secreto Liberado!' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
+    password=$(dialog --backtitle "$bktitle." --title 'Acesso ao USM' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
     start
   else
     liminal "st4rt1" "start"
@@ -77,7 +76,6 @@ fi
 }
 
 function liminal {
-# Troque a hash para adicionar mais possibilidades de senhas únicas!
 if [ -f "$FILE" ]; then
   if [ "$hash1" = "$hash2" ]  || [ "$hash1" = "$hash3" ]; then
     $2
