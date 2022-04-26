@@ -16,26 +16,38 @@
 #[ $? -ne 0 ] && menu02
 
 # Controle
-hash2="9ae7c2a8e120d1e90a4915cba5a15e17"
-hash3="9ae7asdasasassasaa4915cba5a15e17"
+hash2="4c3cbcadf7b8a9ae2932afc00560a0d6"
+hash3="9ae7c2a8e120d1e90a4915cba5a15e17"
+
 FILE="/home/$USER/.lockinit"
 FILE2="/etc/.lockall"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.4-rc4"
+export bktitle="USM: Universal Server Menu v2.4-rc5"
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
+export YUM_CMD=0; APT_CMD=0
 
 # Checagem de Dependências
 function pkg {
-REQUIRED_PKG="$1"
-PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
-echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
-if [ "" = "$PKG_OK" ]; then
-  echo "$REQUIRED_PKG não encontrado. Instalando... Digite sua senha!"
-  sudo apt update; sudo apt install $REQUIRED_PKG -y
-  mkdir -p ~/.mutt/cache/headers && mkdir ~/.mutt/cache/bodies && touch ~/.mutt/certificates && touch ~/.mutt/muttrc
-  echo -e "$TEXTAO07" > ~/.mutt/muttrc
+YUM_CMD=$(which apt 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+APT_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+
+if [ "$APT_CMD" = "sim" ]; then
+  REQUIRED_PKG="$1"
+  PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
+  echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
+  if [ "" = "$PKG_OK" ]; then
+    echo "$REQUIRED_PKG não encontrado. Instalando... Digite sua senha!"
+    sudo apt update; sudo apt install $REQUIRED_PKG -y
+    mkdir -p ~/.mutt/cache/headers && mkdir ~/.mutt/cache/bodies && touch ~/.mutt/certificates && touch ~/.mutt/muttrc
+    echo -e "$TEXTAO07" > ~/.mutt/muttrc
+  fi
+else
+  if [ "$YUM_CMD" = "sim" ]; then
+    echo "Sistema YUM detectado. Ignorando."
+  fi
+  echo "Sistema desconhecido."
 fi
 }
 
