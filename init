@@ -15,11 +15,15 @@
 # rc-1: Correções de bugs de ferramentas ou menus
 #[ $? -ne 0 ] && menu02
 
+# Controle
+hash2="9ae7c2a8e120d1e90a4915cba5a15e17"
+hash3="9ae7asdasasassasaa4915cba5a15e17"
+FILE="/home/$USER/.lockinit"
+
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.4-rc2"
-export processname=0; export validmail=0; export process=0; export status=0; export pkg=0
-export password=0; export password1=0; export password2=0; export password3=0
-export report=0
+export bktitle="USM: Universal Server Menu v2.4-rc3"
+export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
+export password=0; export password2=0; export password3=0; export report=0; export advanced=0
 
 # Checagem de Dependências
 function pkg {
@@ -36,19 +40,38 @@ fi
 
 # PASSWORD
 function init {
-password=$(dialog --backtitle "$bktitle" --title 'Acesso ao Server Menu' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
+password=$(dialog --backtitle "$bktitle" --title 'Acesso ao USM' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
+hash1=`echo "$password" | md5sum | awk '{print $1}'`
 if [ -z "$password" ]; then
   clear
   echo "É necessário digitar sua senha para continuar. Saindo..."
-  echo "Para voltar, digite 'menu' "
+  echo "Para voltar, digite 'menu'!"
 else
-  start
+# Troque a hash para adicionar mais possibilidades de senhas únicas!
+  if [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ]; then
+    password=$(dialog --backtitle "$bktitle" --title 'Acesso Secreto Liberado!' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
+    start
+  else
+    liminal "st4rt1" "start"
+  fi
 fi
 }
 
-# SISTEMA
+function liminal {
+# Troque a hash para adicionar mais possibilidades de senhas únicas!
+if [ -f "$FILE" ]; then
+  if [ "$hash1" = "$hash2" ]  || [ "$hash1" = "$hash3" ]; then
+    $2
+  else
+    $1
+  fi
+else
+$2
+fi
+}
+
+# SISTEMA Normal
 function start {
-#while true; do
   datetime=`date +"%d/%m %H:%M"` # Data e Hora
   var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
   A 'Status Geral' \
@@ -58,7 +81,7 @@ function start {
   E 'Ferramentas' \
   F 'Avançado' \
   X 'SAIR' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
   A) menu01 ;;
   B) menu02 ;;
@@ -68,13 +91,34 @@ case "$var1" in
   F) m10 ;;
   X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
-#done
+}
+
+# Invertido
+function st4rt1 {
+  datetime=`date +"%d/%m %H:%M"` # Data e Hora
+  var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
+  A 'Status Geral' \
+  B 'Máquinas Virtuais' \
+  C 'Processos' \
+  D 'Active Directory' \
+  E 'Ferramentas' \
+  X 'SAIR' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && liminal "st4rt1" "start"
+case "$var1" in
+  A) m3nu01 ;;
+  B) menu02 ;;
+  C) menu03 ;;
+  D) menu04 ;;
+  E) m3nu05 ;;
+  X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
+esac
 }
 
 ##########
 # STATUS # #------------------------------------------------------------------ #
 ##########
 
+# Normal
 function menu01 {
 var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
 A '*Sistema' \
@@ -93,6 +137,22 @@ D) menu14 ;;
 E) menu15 ;;
 F) menu16 ;;
 X) start ;;
+esac
+}
+
+# Invertido
+function m3nu01 {
+var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
+A '*Sistema' \
+B '*Temperatura' \
+C '*Armazenamento' \
+X 'Voltar' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && liminal "st4rt1" "start"
+case "$var2" in
+A) menu11 ;;
+B) menu12 ;;
+C) menu13 ;;
+X) liminal "st4rt1" "start" ;;
 esac
 }
 
@@ -127,10 +187,10 @@ dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encon
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO01" 0 0 ; menu11 ;;
 esac
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && liminal "m3nu01" "menu01"
 menu08 "$Recado $TEXTMAIL $TEXTAO01 $Mensagem"
 
-start
+liminal "m3nu01" "menu01"
 }
 
 # Processos de Sistema
@@ -170,7 +230,7 @@ X "Voltar" 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO08" 0 0 ; menu03 ;;
 esac
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$menuxx" in
 A) status="$smb1"; processname="Samba"; process="smbd"; menu031 ;;
 B) status="$smb2"; processname="Dominio"; process="samba-ad-dc"; menu031 ;;
@@ -186,7 +246,7 @@ K) status="$cups1"; processname="CUPS"; process="cups"; menu031 ;;
 L) status="$motion1"; processname="Motion"; process="motion"; menu031 ;;
 M) status="$dwagent1"; processname="DWAgent"; process="dwagent"; menu031 ;;
 N) status="$vpn"; processname="VPN Client"; process="openvpn"; menu031 ;;
-X) start ;;
+X) liminal "st4rt1" "start" ;;
 esac
 #status="$drbd1"; processname="DRBD"; process="drbd"; menu031 ;;
 #status="$corosync1"; processname="Corosync"; process="corosync"; menu031 ;;
@@ -229,14 +289,14 @@ dialog --cr-wrap --help-button --help-label 'Ajuda' --backtitle 'Temperatura, Po
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO02" 0 0 ; menu12 ;;
 esac
-[ $? -ne 0 ] && menu01
+[ $? -ne 0 ] && liminal "m3nu01" "menu01"
 if [ "$sensors1" = "Incompatível em Máquina Virtual!" ]; then
   dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
 else
   menu08 "$Recado $sensors0 $TEXTAO02 $Mensagem"
 fi
 
-menu01
+liminal "m3nu01" "menu01"
 }
 
 # Status de Consumo dos Discos
@@ -246,9 +306,9 @@ dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Discos encontrados"
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO03" 0 0; menu13 ;;
 esac
-[ $? -ne 0 ] && menu01
+[ $? -ne 0 ] && liminal "m3nu01" "menu01"
 menu08 "$Recado $sdisks $TEXTAO03 $Mensagem"
-menu01
+liminal "m3nu01" "menu01"
 }
 
 # LibATASmart-bin!
@@ -341,7 +401,7 @@ fi
 menu01
 }
 
-# Ferramentas do Sistema
+# Ferramentas Normal
 function menu05 {
 var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
 A '*SpeedTest' \
@@ -354,9 +414,9 @@ G 'Reiniciar' \
 H 'Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; menu05 ;;
+  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
 esac
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var6" in
 A) menu050 ;;
 B) menu0501 ;;
@@ -366,7 +426,32 @@ E) menu053 ;;
 F) menu054 ;;
 G) menu06 ;;
 H) menu07 ;;
-X) start ;;
+X) liminal "st4rt1" "start" ;;
+esac
+}
+
+# Ferramentas Invertido
+function m3nu05 {
+var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
+A '*SpeedTest' \
+B '*Arp-Scan' \
+C '*TraceRoute' \
+D 'Relatórios' \
+E 'Reiniciar' \
+F 'Desligar' \
+X 'Voltar' 2>&1 > /dev/tty )
+case $? in
+  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
+esac
+[ $? -ne 0 ] && liminal "st4rt1" "start"
+case "$var6" in
+A) menu050 ;;
+B) menu0501 ;;
+C) menu052 ;;
+D) menu054 ;;
+E) menu06 ;;
+F) menu07 ;;
+X) liminal "st4rt1" "start" ;;
 esac
 }
 
@@ -376,7 +461,7 @@ dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "Pressio
 speedy=`curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -`
 dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "$speedy" 0 0
 menu08 "$speedy"
-menu05
+liminal "m3nu05" "menu05"
 }
 
 # Arp-Scan
@@ -385,7 +470,7 @@ dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msg
 arpscn=`echo "$password" | sudo -S arp-scan -l`
 dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "$arpscan" 0 0
 menu08 "$arpscn"
-menu05
+liminal "m3nu05" "menu05"
 }
 
 #WhoIS
@@ -395,7 +480,7 @@ dialog --title "WhoIs" --msgbox "Pressione Enter para iniciar o teste e aguarde!
 wis=`whois "$site"`
 dialog --title "WhoIs" --msgbox "$wis" 0 0
 menu08 "$wis"
-menu05
+liminal "m3nu05" "menu05"
 }
 
 # Traceroute
@@ -407,7 +492,7 @@ dialog --title "Traceroute" --msgbox "Pressione Enter para iniciar o teste e agu
 trot=`traceroute "$site"`
 dialog --title "Traceroute" --msgbox "$trot" 0 0
 menu08 "$trot"
-menu05
+liminal "m3nu05" "menu05"
 }
 
 # Governador de CPU
@@ -426,7 +511,7 @@ X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO10" 0 0 ; menu053 ;;
 esac
-[ $? -ne 0 ] && menu05
+[ $? -ne 0 ] && liminal "m3nu05" "menu05"
 case "$var3" in
 A) menu10 conservative ;;
 B) menu10 ondemand ;;
@@ -434,7 +519,7 @@ C) menu10 userspace ;;
 D) menu10 powersave ;;
 E) menu10 performance ;;
 F) menu10 schedutil ;;
-X) menu05 ;;
+X) liminal "m3nu05" "menu05" ;;
 esac
 }
 
@@ -442,7 +527,7 @@ function menu054 {
 pong=`ping google.com -c 1 1> /dev/null 2> /dev/null && echo "ok" || echo "notok"`
 if [ "$pong" = "notok" ]; then
   dialog --cr-wrap --title "Erro na Rede" --backtitle "Erro detectado" --msgbox "O sistema não pode se comunicar com a rede local! Verifique sua conexão e tente novamente mais tarde." 8 40
-  start
+  liminal "st4rt1" "start"
 else
   if [ "$report" = "0" ]; then
     dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja habilitar a emissão de relatórios?" 8 40
@@ -470,7 +555,7 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
   fi
 fi
 
-menu05
+liminal "m3nu05" "menu05"
 }
 
 # Governador de CPU 2
@@ -487,7 +572,6 @@ fi
 }
 
 # Máquinas Virtuais
-
 function menu02 {
 if [[ $(which virt-manager 2>/dev/null) ]]; then
   menu022 "1p" && vm1=$vms && vm11=$sts
@@ -521,7 +605,7 @@ if [[ $(which virt-manager 2>/dev/null) ]]; then
     2) dialog --title "Ajuda" --msgbox "$TEXTAO11" 0 0 ; menu02 ;;
   esac
   
-  [ $? -ne 0 ] && start
+  [ $? -ne 0 ] && liminal "st4rt1" "start"
   
   case "$menuxy" in
   Status) menu025 ;;
@@ -537,11 +621,11 @@ if [[ $(which virt-manager 2>/dev/null) ]]; then
   "$vm10") chkvm="$vm110"; nmvm="$vm10"; menu021 ;;
   Iniciar) menu023 ;;
   Parar) menu024 ;;
-  Voltar) start ;;
+  Voltar) liminal "st4rt1" "start" ;;
   esac
 else
   dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DE MÁQUINA VIRTUAL' --msgbox "O VirtManager não foi encontrado neste sistema ou você não possui as permissões para acessá-lo!" 7 50
-  start
+  liminal "st4rt1" "start"
 fi
 }
 
@@ -631,7 +715,7 @@ dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Maquinas Virtuais e
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO12" 0 0 ; menu025 ;;
 esac
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && liminal "st4rt1" "start"
 
 menu02
 }
@@ -651,7 +735,7 @@ else
   fi
 fi
 
-menu05
+liminal "m3nu05" "menu05"
 }
 
 # Desligamento
@@ -669,7 +753,7 @@ else
   fi
 fi
 
-menu05
+liminal "m3nu05" "menu05"
 }
 
 # Encaminhar relatórios por Email!
@@ -698,20 +782,20 @@ if [ "$smb2" = "Executando" ]; then
   C 'Gestão de Computadores' \
   D 'Informações do Domínio' \
   X 'Voltar' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && start
+  [ $? -ne 0 ] && liminal "st4rt1" "start"
   case "$var4" in
 
   A) menu041 ;;
   B) menu042 ;;
   C) menu043 ;;
   D) menuR ;;
-  X) echo "a" ;;
+  X) liminal "st4rt1" "start" ;;
   esac
 else
   dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DO ACTIVE DIRECTORY' --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
 fi
 
-start
+liminal "st4rt1" "start"
 }
 
 function menu041 {
@@ -728,7 +812,7 @@ I 'Alterar Senha de um Usuário' \
 J 'Alterar Politica de um Usuário' \
 K 'Excluir Usuário' \
 X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var41" in
 A) menuD ;;
 B) menuA ;;
@@ -753,7 +837,7 @@ C 'Procurar Grupo' \
 D '*Exibir Usuários de um Grupo' \
 E 'Excluir um Grupo' \
 X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var42" in
 A) menuI ;;
 B) menuC ;;
@@ -768,7 +852,7 @@ function menu043 {
 var43=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
 A 'Exibir todos os Computadores' \
 X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var43" in
 A) menuB ;;
 X) menu04 ;;
@@ -1152,7 +1236,7 @@ menu04
 function m1x {
 dialog --title 'F.F.A.' --msgbox "Ferramentas e Funções Avançadas" 0 0
 password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha' 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && liminal "st4rt1" "start"
 if [ "$password3" = "1345278" ]; then
   dialog --title 'Porteiro:' --msgbox "Clift Claft Still, a Porta se Abriu!" 6 40
   m10
@@ -1168,13 +1252,13 @@ B 'Parar Rsync' \
 C 'Parar RSnapshot' \
 D 'Parar Balance' \
 X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) m11 ;;
 B) m12 ;;
 C) m13 ;;
 D) dialog --title " " --msgbox "Indisponível no momento" 0 0 ; m10 ;;
-X) start ;;
+X) liminal "st4rt1" "start" ;;
 esac
 }
 
