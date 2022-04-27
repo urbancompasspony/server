@@ -21,13 +21,15 @@ hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 FILE="/home/$USER/.lockinit"
 FILE2="/etc/.lockall"
+FILE3="/tmp/.email"
+FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.4-rc1"
+export bktitle="USM: Universal Server Menu v2.5"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
-export YUM_CMD=0; export APT_CMD=0
+export YUM_CMD=0; export APT_CMD=0; export datetime=0; export datetime2=0; export confrel=0
 
 # Checagem de Dependências
 function pkg {
@@ -447,9 +449,10 @@ D 'NMap' \
 E '*TraceRoute' \
 F '*Usuários Logados' \
 G '*Logins Anteriores' \
-H 'Relatórios' \
-I 'Reiniciar' \
-J 'Desligar' \
+H 'Ajustes Relatórios' \
+I 'Relatórios Salvos' \
+J 'Reiniciar' \
+K 'Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -464,8 +467,9 @@ E) menu052 ;;
 F) menu18 ;;
 G) menu19 ;;
 H) menu054 ;;
-I) menu06 ;;
-J) menu07 ;;
+I) menu055 ;;
+J) menu06 ;;
+K) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -476,9 +480,10 @@ var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtit
 A '*SpeedTest' \
 B '*Arp-Scan' \
 C '*TraceRoute' \
-D 'Relatórios' \
-E 'Reiniciar' \
-F 'Desligar' \
+D 'Ajustes Relatórios' \
+E 'Relatórios Salvos' \
+F 'Reiniciar' \
+G 'Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -489,8 +494,9 @@ A) menu050 ;;
 B) menu0501 ;;
 C) menu052 ;;
 D) menu054 ;;
-E) menu06 ;;
-F) menu07 ;;
+E) menu055 ;;
+F) menu06 ;;
+G) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -508,7 +514,7 @@ liminal "m3nu05" "menu05"
 function menu0501 {
 dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 arpscn=`echo "$password" | sudo -S arp-scan -l`
-dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "$arpscan" 0 0
+dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "$arpscn" 0 0
 menu08 "$arpscn"
 liminal "m3nu05" "menu05"
 }
@@ -584,20 +590,43 @@ if [ "$pong" = "notok" ]; then
 else
   if [ "$report" = "0" ]; then
     dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja habilitar a emissão de relatórios?" 8 40
-    if [ $? = 0 ]; then  
-      validmail=$(dialog --title "Inserir Destinatário" --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados! \n \n
-Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@mail.com, user2@mail.com" 15 40 2>&1 > /dev/tty)
-      if [ -z "$validmail" ]; then
-        dialog --cr-wrap --title "Erro no E-mail!" --backtitle "Erro detectado" --msgbox "Digite um e-mail válido!" 0 0
-      else
+    if [ $? = 0 ]; then
+      if [ -f "$FILE3" ]; then
         report="1"
-        dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
-      fi
+        validmail=`awk 'NR==1' $FILE3`
+        dialog --cr-wrap --title "Informação" --backtitle "E-mail encontrado." --msgbox "Um e-mail usado anteriormente foi encontrado: \n
+$validmail" 8 40
+        dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja reutilizar este e-mail para emissão de relatórios?" 8 40
+          if [ $? = 0 ]; then
+            dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
+          else
+            validmail=$(dialog --title "Inserir Destinatário" --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados! \n \n
+Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@mail.com, user2@mail.com" 15 40 2>&1 > /dev/tty)
+            if [ -z "$validmail" ]; then
+              dialog --cr-wrap --title "Erro no E-mail!" --backtitle "Erro detectado" --msgbox "Digite um e-mail válido!" 0 0
+             else
+              echo "$validmail" > "/tmp/.email"
+              report="1"
+              dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
+            fi 
+          fi
+      else
+        validmail=$(dialog --title "Inserir Destinatário" --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados! \n \n
+Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@mail.com, user2@mail.com" 15 40 2>&1 > /dev/tty)
+        if [ -z "$validmail" ]; then
+          dialog --cr-wrap --title "Erro no E-mail!" --backtitle "Erro detectado" --msgbox "Digite um e-mail válido!" 0 0
+        else
+          echo "$validmail" > "/tmp/.email"
+          report="1"
+          dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
+        fi
+      fi      
     fi
   else
     dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja trocar o e-mail de emissão de relatórios?" 8 40
     if [ $? = 0 ]; then
       validmail=$(dialog --title " " --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
+      echo "$validmail" > "/tmp/.email"
       dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
     else
       dialog --title "Confirmação" --backtitle "Relatórios" --yesno "Deseja desativar a emissão de relatórios?" 8 40
@@ -605,6 +634,38 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
         report="0"
       fi
     fi
+  fi
+fi
+
+#liminal "st4rt1" "start"
+liminal "m3nu05" "menu05"
+}
+
+function menu055 {
+if [ "$report" = "0" ]; then
+  dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Relatórios desativados!" 0 0
+else
+  if [ -f "$FILE4" ]; then
+    validrelat=`cat "$FILE4"`
+    dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Um relatório salvo foi encontrado. \n \n
+$validrelat \n \n
+Deseja enviá-lo por e-mail?" 20 70
+    if [ $? = 0 ]; then
+      menu08 "$validrelat"
+      dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja apagar o relatório salvo?" 8 20
+      if [ $? = 0 ]; then
+        dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "O relatório salvo foi apagado!" 0 0
+        rm "$FILE4"
+      fi
+    else
+      dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja apagar o relatório salvo?" 8 20
+      if [ $? = 0 ]; then
+        dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "O relatório salvo foi apagado!" 0 0
+        rm "$FILE4"
+      fi  
+    fi
+  else
+    dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Nenhum relatório salvo foi encontrado!" 0 0
   fi
 fi
 
@@ -639,7 +700,7 @@ if [[ $(which virt-manager 2>/dev/null) ]]; then
   "$vm10" "$vm110" \
   Iniciar "Todas!" \
   Parar "Todas!" \
-  Voltar " " 2>&1 > /dev/tty )
+  "X Voltar" " " 2>&1 > /dev/tty )
 
   case $? in
     2) dialog --title "Ajuda" --msgbox "$TEXTAO11" 0 0 ; menu02 ;;
@@ -661,7 +722,7 @@ if [[ $(which virt-manager 2>/dev/null) ]]; then
   "$vm10") chkvm="$vm110"; nmvm="$vm10"; menu021 ;;
   Iniciar) menu023 ;;
   Parar) menu024 ;;
-  Voltar) liminal "st4rt1" "start" ;;
+  "X Voltar") liminal "st4rt1" "start" ;;
   esac
 else
   dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DE MÁQUINA VIRTUAL' --msgbox "O VirtManager não foi encontrado neste sistema ou você não possui as permissões para acessá-lo!" 7 50
@@ -798,7 +859,36 @@ liminal "m3nu05" "menu05"
 
 # Encaminhar relatórios por Email!
 function menu08 {
-if [ "$report" = "1" ]; then
+echo "$1" > "/tmp/.relat"
+
+if [ "$report" = "0" ]; then
+  if [ "$confrel" = "0" ]; then
+    dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Os relatórios não estão ativos. Deseja reativá-los temporariamente?" 8 40
+    if [ $? = 0 ]; then
+      if [ -f "$FILE3" ]; then
+        validmail=`awk 'NR==1' $FILE3`
+        dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
+$validmail" 15 40
+        if [ $? = 0 ]; then          
+          echo "$1" | mutt -s "Relatório - $HOSTNAME" "$validmail"
+          dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
+        else
+          dialog --title "Relatório" --msgbox "O atual relatório foi salvo! \n
+Utilize o menu 'Ferramentas > Relatórios' para trocar o destinatário. \n \n
+Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório por e-mail." 20 50
+          report="1"
+        fi
+      else  
+        dialog --title "Relatório" --msgbox "O atual relatório foi salvo! Utilize o menu 'Ferramentas > Relatórios' para trocar o destinatário. \n \n
+Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório por e-mail." 20 50
+        report="1"
+      fi
+    else
+      confrel="1"
+    fi
+  fi
+else
+  validmail=`awk 'NR==1' $FILE3`
   dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar este relatório para $validmail?" 8 40
   if [ $? = 0 ]; then
     echo "$1" | mutt -s "Relatório - $HOSTNAME" "$validmail"
@@ -1311,9 +1401,20 @@ dialog --title 'Informação' --yesno "Deseja atualizar o sistema operacional?" 
 if [ $? = 0 ]; then
   dialog --title 'Informação' --yesno "Tem certeza? Verifique se os processos em execução não pararão e/ou se configurações não serão perdidas." 8 40
   if [ $? = 0 ]; then
-    echo "$password" | sudo -S "$pkg1" update && echo "$password" | sudo -S "$pkg1" upgrade -y && echo "$password" | sudo -S "$pkg1" autoremove -y 
+    datetime=`date +"%d/%m %H:%M"` # Data e Hora
+    echo "$password" | sudo -S "$pkg1" update
+    upgrd=`apt list --upgradable`
+    echo "$password" | sudo -S "$pkg1" upgrade -y
+    echo "$password" | sudo -S "$pkg1" autoremove -y
+    datetime2=`date +"%d/%m %H:%M"` # Data e Hora
     echo "# # # Fim! Aperte Enter para continuar. # # #" ; read
-    dialog --title " " --msgbox "Verifique se os processos em execução não pararam e/ou se configurações não foram perdidas." 8 40
+    dialog --title "Informação" --msgbox "Verifique se os processos em execução não pararam e/ou se configurações não foram perdidas." 8 40
+    dialog --title "Relatório" --msgbox "Os pacotes a seguir foram atualizados: \n
+$upgrd" 20 50
+    dialog --title 'Relatório' --yesno "Deseja enviar este relatório por e-mail?" 8 40
+    if [ $? = 0 ]; then
+      menu08 "$Recado $Recado2 $datetime $Recado3 $upgrd $Recado4 $datetime2 $Mensagem"
+    fi
   fi
 fi
 
@@ -1367,9 +1468,20 @@ m10
 
 # Todos os Textões!
 
-Recado="Relatório gerado automaticamente pelo sistema Universal Server Menu!
+Recado="Relatório gerado pelo sistema de relatórios do $bktitle!
 
 "
+
+Recado2="Em "
+Recado3=" o sistema recebeu as atualizações mais recentes e está em dia com sua segurança! 
+Os pacotes atualizados foram os seguintes:
+
+"
+
+Recado4="
+
+As Atualizações foram concluídas ás "
+
 Mensagem="
 
 AVISO LEGAL: Esta mensagem, inclusive seus anexos, pode conter informações confidenciais e deve ser resguardado o devido sigilo de seu conteúdo. Caso a tenha recebido indevidamente, por favor apague-a imediatamente e comunique o remetente. Qualquer forma de utilização, reprodução, retransmissão, alteração, distribuição e/ou divulgação de conteúdo desta mensagem ou de parte dele, sem a autorização expressa de seu remetente, é estritamente proibida."
