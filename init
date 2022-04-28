@@ -1377,7 +1377,7 @@ fi
 
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
-A 'Atualizar o Sistema' \
+A '*Atualizar o Sistema' \
 B 'Governador de CPU' \
 C 'TRIM Disks' \
 D 'Parar Rsync' \
@@ -1409,11 +1409,13 @@ if [ $? = 0 ]; then
     datetime2=`date +"%d/%m %H:%M"` # Data e Hora
     echo "# # # Fim! Aperte Enter para continuar. # # #" ; read
     dialog --title "Informação" --msgbox "Verifique se os processos em execução não pararam e/ou se configurações não foram perdidas." 8 40
-    dialog --title "Relatório" --msgbox "Os pacotes a seguir foram atualizados: \n
+    if [ "$report" = "1" ]; then
+      dialog --title "Relatório" --msgbox "Os pacotes a seguir foram atualizados: \n
 $upgrd" 20 50
-    dialog --title 'Relatório' --yesno "Deseja enviar este relatório por e-mail?" 8 40
-    if [ $? = 0 ]; then
-      menu08 "$Recado $Recado2 $datetime $Recado3 $upgrd $Recado4 $datetime2 $Mensagem"
+      dialog --title 'Relatório' --yesno "Deseja enviar este relatório por e-mail?" 8 40
+      if [ $? = 0 ]; then
+        menu08 "$Recado $Recado2 $datetime $Recado3 $upgrd $Recado4 $datetime2 $Mensagem"
+      fi
     fi
   fi
 fi
