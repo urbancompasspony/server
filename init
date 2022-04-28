@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.5"
+export bktitle="USM: Universal Server Menu v2.5-rc1"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -70,9 +70,11 @@ if [ -z "$password" ]; then
 else
   if [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ]; then
     password=$(dialog --backtitle "$bktitle." --title 'Acesso ao USM' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
-    start
+    #start
+    menu054 ""
   else
-    liminal "st4rt1" "start"
+    #liminal "st4rt1" "start"
+    menu054 ""
   fi
 fi
 }
@@ -131,6 +133,10 @@ case "$var1" in
   E) m3nu05 ;;
   X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
+}
+
+function teste {
+  dialog --title "TESTES DE FUNCIONALIDADE" --msgbox "AÇÃO ESPERADA: $1" 20 40
 }
 
 ##########
@@ -451,8 +457,8 @@ F '*Usuários Logados' \
 G '*Logins Anteriores' \
 H 'Ajustes Relatórios' \
 I 'Relatórios Salvos' \
-J 'Reiniciar' \
-K 'Desligar' \
+J '*Reiniciar' \
+K '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -482,8 +488,8 @@ B '*Arp-Scan' \
 C '*TraceRoute' \
 D 'Ajustes Relatórios' \
 E 'Relatórios Salvos' \
-F 'Reiniciar' \
-G 'Desligar' \
+F '*Reiniciar' \
+G '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -594,11 +600,10 @@ else
       if [ -f "$FILE3" ]; then
         report="1"
         validmail=`awk 'NR==1' $FILE3`
-        dialog --cr-wrap --title "Informação" --backtitle "E-mail encontrado." --msgbox "Um e-mail usado anteriormente foi encontrado: \n
-$validmail" 8 40
-        dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja reutilizar este e-mail para emissão de relatórios?" 8 40
+        dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
+$validmail" 15 40
           if [ $? = 0 ]; then
-            dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
+            dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos menus com *!" 0 0
           else
             validmail=$(dialog --title "Inserir Destinatário" --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados! \n \n
 Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@mail.com, user2@mail.com" 15 40 2>&1 > /dev/tty)
@@ -637,8 +642,8 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
   fi
 fi
 
-#liminal "st4rt1" "start"
-liminal "m3nu05" "menu05"
+liminal "st4rt1" "start"
+#liminal "m3nu05" "menu05"
 }
 
 function menu055 {
@@ -832,7 +837,13 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
 else
   dialog --title 'Reiniciar' --backtitle 'R E I N I C I A R' --yesno 'Deseja reiniciar este sistema?' 0 0
   if [ $? = 0 ]; then
-    echo "$password" | sudo -S reboot
+    if [ "$report" = "1" ]; then
+      dialog --title 'Relatório' --yesno "Deseja enviar um relatório por e-mail sobre este reinício?" 8 40
+      if [ $? = 0 ]; then
+        menu08 "$Recado $Recado5 $datetime $Mensagem"
+      fi
+    fi
+  echo "$password" | sudo -S reboot
   fi
 fi
 
@@ -850,7 +861,13 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
 else
   dialog --title 'Desligar' --backtitle 'D E S L I G A R' --yesno 'Deseja desligar este sistema?' 0 0
   if [ $? = 0 ]; then
-    echo "$password" | sudo -S shutdown -h now
+    if [ "$report" = "1" ]; then
+      dialog --title 'Relatório' --yesno "Deseja enviar um relatório por e-mail sobre este desligamento?" 8 40
+      if [ $? = 0 ]; then
+        menu08 "$Recado $Recado6 $datetime $Mensagem"
+      fi
+    fi
+  echo "$password" | sudo -S shutdown -h now
   fi
 fi
 
@@ -1482,7 +1499,11 @@ Os pacotes atualizados foram os seguintes:
 
 Recado4="
 
-As Atualizações foram concluídas ás "
+As Atualizações foram concluídas em "
+
+Recado5="O sistema foi reiniciado em "
+
+Recado6="O sistema foi desligado em "
 
 Mensagem="
 
