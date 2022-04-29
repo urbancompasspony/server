@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.5-rc1"
+export bktitle="USM: Universal Server Menu v2.5-rc3"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -95,10 +95,10 @@ fi
 function start {
   datetime=`date +"%d/%m %H:%M"` # Data e Hora
   var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
-  A 'Status Geral' \
+  A '*Status Geral' \
   B 'Máquinas Virtuais' \
   C 'Processos' \
-  D 'Active Directory' \
+  D '*Active Directory' \
   E 'Ferramentas' \
   F 'Avançado' \
   X 'SAIR' 2>&1 > /dev/tty )
@@ -118,10 +118,10 @@ esac
 function st4rt1 {
   datetime=`date +"%d/%m %H:%M"` # Data e Hora
   var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
-  A 'Status Geral' \
+  A '*Status Geral' \
   B 'Máquinas Virtuais' \
   C 'Processos' \
-  D 'Active Directory' \
+  D '*Active Directory' \
   E 'Ferramentas' \
   X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
@@ -146,12 +146,12 @@ function teste {
 # Normal
 function menu01 {
 var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
-A '*Sistema' \
-B '*Temperatura' \
-C '*Armazenamento' \
-D '*S.M.A.R.T.' \
-E '*Cluster: DRBD' \
-F '*Cluster: PCS' \
+A 'Sistema' \
+B 'Temperatura' \
+C 'Armazenamento' \
+D 'S.M.A.R.T.' \
+E 'Cluster: DRBD' \
+F 'Cluster: PCS' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
@@ -168,9 +168,9 @@ esac
 # Invertido
 function m3nu01 {
 var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
-A '*Sistema' \
-B '*Temperatura' \
-C '*Armazenamento' \
+A 'Sistema' \
+B 'Temperatura' \
+C 'Armazenamento' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var2" in
@@ -387,7 +387,12 @@ fi
 
 function menu141 {
 dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0
-menu08 "$Recado $2 $TEXTAO04 $Mensagem"
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este SMART?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $2 $TEXTAO04 $Mensagem"
+  fi
+fi
 menu14
 }
 
@@ -400,7 +405,12 @@ if [ "$drbd1" = "Executando" ]; then
     2) dialog --title 'Ajuda' --msgbox "$TEXTAO05" 0 0; menu15 ;;
   esac
   [ $? -ne 0 ] && start
-  menu08 "$Recado $sdrbd $TEXTAO05 $Mensagem"
+  if [ "$report" = "1" ]; then
+    dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este SMART?" 8 40
+    if [ $? = 0 ]; then
+      menu08 "$Recado $sdrbd $TEXTAO05 $Mensagem"
+    fi
+  fi
 else
   dialog --title "ERROR" --msgbox "O DRBD não está em execução ou não foi localizado neste sistema!" 8 40
 fi
@@ -418,7 +428,12 @@ if [ "$corosync1" = "Executando" ] && [ "$pacemaker1" = "Executando" ]; then
     2) dialog --title 'Ajuda' --msgbox "$TEXTAO06" 0 0; menu16 ;;
   esac
   [ $? -ne 0 ] && start
-  menu08 "$Recado $spcs $TEXTAO06 $Mensagem"
+  if [ "$report" = "1" ]; then
+    dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este SMART?" 8 40
+    if [ $? = 0 ]; then
+      menu08 "$Recado $spcs $TEXTAO06 $Mensagem"
+    fi
+  fi
 else
   dialog --title "ERROR" --msgbox "O Pacemaker/Corosync não estão em execução ou não foram localizados neste sistema!" 8 40
 fi
@@ -433,15 +448,27 @@ menu05
 
 function menu18 {
 userlog=`w`
-dialog --title "ERROR" --msgbox "$userlog" 20 60
-menu08 "$Recado $userlog $Mensagem"
+dialog --title "Informação" --msgbox "$userlog" 20 60
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $userlog $Mensagem"
+  fi
+fi
+
 menu05
 }
 
 function menu19 {
 userlast=`last`
-dialog --title "ERROR" --msgbox "$userlast" 20 60
-menu08 "$Recado $userlast $Mensagem"
+dialog --title "Informação" --msgbox "$userlast" 20 60
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $userlast $Mensagem"
+  fi
+fi
+
 menu05
 }
 
@@ -512,7 +539,13 @@ function menu050 {
 dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 speedy=`curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -`
 dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "$speedy" 0 0
-menu08 "$speedy"
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $speedy $Mensagem"
+  fi
+fi
+
 liminal "m3nu05" "menu05"
 }
 
@@ -521,7 +554,13 @@ function menu0501 {
 dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 arpscn=`echo "$password" | sudo -S arp-scan -l`
 dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "$arpscn" 0 0
-menu08 "$arpscn"
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $arpscn $Mensagem"
+  fi
+fi
+
 liminal "m3nu05" "menu05"
 }
 
@@ -531,7 +570,13 @@ site=$(dialog --title 'WhoIs' --backtitle "Identificar de Propriedade de um WebS
 dialog --title "WhoIs" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 wis=`whois "$site"`
 dialog --title "WhoIs" --msgbox "$wis" 0 0
-menu08 "$wis"
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $wis $Mensagem"
+  fi
+fi
+
 liminal "m3nu05" "menu05"
 }
 
@@ -543,7 +588,13 @@ A identificação estará concluída quando um (END) surgir no final." 14 40 2>&
 dialog --title "Traceroute" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 trot=`traceroute "$site"`
 dialog --title "Traceroute" --msgbox "$trot" 0 0
-menu08 "$trot"
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $trot $Mensagem"
+  fi
+fi
+
 liminal "m3nu05" "menu05"
 }
 
@@ -931,7 +982,6 @@ if [ "$smb2" = "Executando" ]; then
   X 'Voltar' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && liminal "st4rt1" "start"
   case "$var4" in
-
   A) menu041 ;;
   B) menu042 ;;
   C) menu043 ;;
@@ -1011,7 +1061,13 @@ dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." 
 [ $? -ne 0 ] && menu041
 usrlst=`echo "$password" | sudo -S samba-tool user list`
 echo "$usrlst" | less
-menu08 "$Recado $usrlst $Mensagem"
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $usrlst $Mensagem"
+  fi
+fi
+
 menu041
 }
 
@@ -1020,7 +1076,13 @@ dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes
 [ $? -ne 0 ] && menu043
 cmplist=`echo "$password" | sudo -S samba-tool computer list`
 echo "$cmplist" | less
-menu08 "$Recado $complist $Mensagem"
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $complist $Mensagem"
+  fi
+fi
+
 menu043
 }
 
@@ -1029,7 +1091,13 @@ dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --m
 [ $? -ne 0 ] && menu042
 grplist=`echo "$password" | sudo -S samba-tool group list`
 echo "$grplist" | less
-menu08 "$Recado $grplist $Mensagem"
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $grplist $Mensagem"
+  fi
+fi
+
 menu042
 }
 
@@ -1230,7 +1298,13 @@ else
   fi
 fi
 
-menu08 "$Recado $usrgrps $Mensagem"
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $usrgrps $Mensagem"
+  fi
+fi
+
 menu042
 }
 
@@ -1320,8 +1394,13 @@ else
     dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
   fi
 fi
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $grpsusr $Mensagem"
+  fi
+fi
 
-menu08 "$Recado $grpsusr $Mensagem"
 menu041
 }
 
@@ -1371,8 +1450,13 @@ Nível do Domínio: $domainv \n
 case $? in
   2) dialog --title 'Ajuda com Significados' --msgbox "$TEXTAO13" 0 0 ; menuR ;;
 esac
+if [ "$report" = "1" ]; then
+  dialog --title 'Relatório' --yesno "Deseja enviar por e-mail este relatório?" 8 40
+  if [ $? = 0 ]; then
+    menu08 "$Recado $domainv $Mensagem"
+  fi
+fi
 
-menu08 "$Recado $domainv $Mensagem"
 menu04
 }
 
