@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.5-rc9"
+export bktitle="USM: Universal Server Menu v2.6"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -152,6 +152,7 @@ C '*Armazenamento' \
 D '*S.M.A.R.T.' \
 E '*Cluster: DRBD' \
 F '*Cluster: PCS' \
+G 'Velocidades de Rede' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
@@ -161,6 +162,7 @@ C) menu13 ;;
 D) menu14 ;;
 E) menu15 ;;
 F) menu16 ;;
+G) menu21 ;;
 X) start ;;
 esac
 }
@@ -171,12 +173,14 @@ var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
 A '*Sistema' \
 B '*Temperatura' \
 C '*Armazenamento' \
+D 'Velocidades de Rede' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var2" in
 A) menu11 ;;
 B) menu12 ;;
 C) menu13 ;;
+D) menu21 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -187,7 +191,7 @@ ip=`hostname -I | awk '{print $1}'`
 ip2=`dig @resolver4.opendns.com myip.opendns.com +short`
 uptime=`uptime | awk {'print $3 $4 $5'}`
 datetime=`date +"%d/%m %H:%M"`
-governor=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível em Máquina Virtual!"`
+governor=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!"`
 bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
 rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
 rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
@@ -309,13 +313,13 @@ function menu09 {
 
 # Status Temperatura
 function menu12 {
-sensors0=`sensors || echo "Incompatível em Máquina Virtual!"`
+sensors0=`sensors || echo "Indisponível!"`
 dialog --cr-wrap --help-button --help-label 'Ajuda' --backtitle 'Temperatura, Potencia e Rotação de Cooler(s) [Se disponível!]' --msgbox "$sensors0" 0 0
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO02" 0 0 ; menu12 ;;
 esac
 [ $? -ne 0 ] && liminal "m3nu01" "menu01"
-if [ "$sensors1" = "Incompatível em Máquina Virtual!" ]; then
+if [ "$sensors1" = "Indisponível!" ]; then
   dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
 else
   menu08 "$Recado $sensors0 $TEXTAO02 $Mensagem"
@@ -481,6 +485,18 @@ fi
 m10
 }
 
+function menu21 {
+resultenp=`ip a | sed -n '/enp/p' |  awk '!/mac/' | awk '{print $2}' | sed 's/.$//' | grep 'enp'`
+
+for i in $resultenp
+do
+  velo=`echo "$password" | sudo -S ethtool "$i" | grep Speed`
+  dialog --title 'Velocidades detectadas:' --msgbox "$i $velo" 8 40
+done
+
+liminal "m3nu01" "menu01"
+}
+
 # Ferramentas Normal
 function menu05 {
 var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
@@ -589,8 +605,8 @@ liminal "m3nu05" "menu05"
 
 # Governador de CPU
 function menu053 {
-governor1=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível em Máquina Virtual!"`
-governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors || echo "Indisponível em Máquina Virtual!"`
+governor1=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!"`
+governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors || echo "Indisponível!"`
 var3=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "Troca do Governador de CPU" --menu "Governador de CPU Atual: \n
 $governor1" 0 0 0 \
 A 'Conservative' \
