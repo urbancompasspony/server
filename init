@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.6"
+export bktitle="USM: Universal Server Menu v2.6.1"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -71,10 +71,10 @@ else
   if [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ]; then
     password=$(dialog --backtitle "$bktitle." --title 'Acesso ao USM' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
     #start
-    menu054 ""
+    menu054
   else
     #liminal "st4rt1" "start"
-    menu054 ""
+    menu054
   fi
 fi
 }
@@ -152,7 +152,7 @@ C '*Armazenamento' \
 D '*S.M.A.R.T.' \
 E '*Cluster: DRBD' \
 F '*Cluster: PCS' \
-G 'Velocidades de Rede' \
+G 'Placas de Rede' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
@@ -173,7 +173,7 @@ var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
 A '*Sistema' \
 B '*Temperatura' \
 C '*Armazenamento' \
-D 'Velocidades de Rede' \
+D 'Placas de Rede' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var2" in
@@ -196,6 +196,9 @@ bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && ech
 rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
 rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
 xorg=`ls /tmp/.X11-unix | wc -l`
+sysd1=`systemd-analyze | awk 'NR==1{print $5,$4,$8,$7}'`
+sysd2=`systemd-analyze | awk 'NR==1{print $11,$10,$14,$13}'`
+sysd3=`systemd-analyze | awk 'NR==1{print $15,$16}'`
 
 TEXTMAIL="Nome da Máquina: $HOSTNAME
 Data e Hora Local: $datetime
@@ -210,7 +213,12 @@ Balance BTRFS: $bbalance
 RSnapshot: $rrsnap
 RSync: $rsync1
 
-Governador de CPU: $governor"
+Governador de CPU: $governor
+
+Tempos de Boot:
+$sysd1
+$sysd2
+Tempo total $sysd3"
 
 dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Informações do Sistema" --msgbox "$TEXTMAIL" 0 0
 case $? in
@@ -461,12 +469,12 @@ if [ "$pihole1" = "Executando" ]; then
   dialog --backtitle "Servidor de DNS PiHole" --title "PiHole" --yesno "Deseja atualizar o PiHole?" 6 40
   if [ $? = 0 ]; then
     version1=`pihole -v`
+    datetime1=`date +"%d/%m %H:%M"` # Data e Hora
     pihole -up
     version2=`pihole -v`
-    dialog --title "Informação" --msgbox "PiHole atualizado com sucesso!
-$version2" 8 40
-    menu08 "$Recado
-PiHole atualizado! A versão anterior era:
+    datetime2=`date +"%d/%m %H:%M"` # Data e Hora
+    menu08 "$Recado PiHole atualizado de $datetime1 até $datetime2!
+A versão anterior era:
 
 $version1 
 
@@ -474,9 +482,7 @@ A nova versão é:
 
 $version2
 
-Atento ás novidades que a nova versão possa ter trago!
-
-$Mensagem"
+Atento ás novidades que a nova versão possa ter trago! $Mensagem"
     fi
 else
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
@@ -503,12 +509,12 @@ var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtit
 A '*SpeedTest' \
 B '*Arp-Scan' \
 C '*WhoIs' \
-D 'NMap' \
-E '*TraceRoute' \
-F '*Usuários Logados' \
-G '*Logins Anteriores' \
-H 'Ajustes Relatórios' \
-I 'Relatórios Salvos' \
+D '*TraceRoute' \
+E '*Usuários Logados' \
+F '*Logins Anteriores' \
+G 'Ajustes Relatórios' \
+H 'Relatórios Salvos' \
+I 'NMap' \
 J '*Reiniciar' \
 K '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
@@ -520,12 +526,12 @@ case "$var6" in
 A) menu050 ;;
 B) menu0501 ;;
 C) menu051 ;;
-D) menu17 ;;
-E) menu052 ;;
-F) menu18 ;;
-G) menu19 ;;
-H) menu054 ;;
-I) menu055 ;;
+D) menu052 ;;
+E) menu18 ;;
+F) menu19 ;;
+G) menu054 ;;
+H) menu055 ;;
+I) menu17 ;;
 J) menu06 ;;
 K) menu07 ;;
 X) liminal "st4rt1" "start" ;;
@@ -1003,17 +1009,17 @@ liminal "st4rt1" "start"
 
 function menu041 {
 var41=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
-A 'Criar Usuário' \
+A '*Criar Usuário' \
 B '*Exibir todos os Usuários' \
 C 'Procurar Usuário' \
 D '*Exibir Grupos de Usuário' \
-E 'Adicionar Usuário a um Grupo' \
-F 'Remover Usuário de um Grupo' \
-G 'Bloquear Usuário' \
-H 'Desbloquear Usuário' \
-I 'Alterar Senha de um Usuário' \
-J 'Alterar Politica de um Usuário' \
-K 'Excluir Usuário' \
+E '*Adicionar Usuário a um Grupo' \
+F '*Remover Usuário de um Grupo' \
+G '*Bloquear Usuário' \
+H '*Desbloquear Usuário' \
+I '*Alterar Senha de um Usuário' \
+J '*Alterar Politica de um Usuário' \
+K '*Excluir Usuário' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var41" in
@@ -1034,11 +1040,11 @@ esac
 
 function menu042 {
 var42=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
-A 'Criar Grupo' \
+A '*Criar Grupo' \
 B '*Exibir todos os Grupos' \
 C 'Procurar Grupo' \
 D '*Exibir Usuários de um Grupo' \
-E 'Excluir um Grupo' \
+E '*Excluir um Grupo' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var42" in
@@ -1053,7 +1059,7 @@ esac
 
 function menu043 {
 var43=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
-A 'Exibir todos os Computadores' \
+A '*Exibir todos os Computadores' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var43" in
@@ -1615,7 +1621,13 @@ Balance BTRFS: Manutenção de rotina do sistema. Se estiver em Execução, o co
 Rsnapshot: Backup incremental automatizado. Se estiver Executando, o computador não poderá ser desligado!
 RSync: Sincronia do Backup em Nuvem ou para um backup RAID 1. Se estiver Executando, o computador não poderá ser desligado!
 
-Governador de CPU: Mostra como está a execução do processador, se em Máximo Desempenho, Economia de Energia ou outro."
+Governador de CPU: Mostra como está a execução do processador, se em Máximo Desempenho, Economia de Energia ou outro.
+
+Tempos de Boot: Se o sistema foi instalado como UEFI você pode ver (firmware) e (loader) que são
+respectivamente a leitura da BIOS e depois a primeira leitura do HD identificando as partições.
+Na sequência, temos o (kernel) que representa o Linux propriamente dito; e o UserSpace,
+que são os aplicativos e ferramentas do Usuário. No final, o tempo total que o sistema
+demorou pra inicializar."
 
 TEXTAO02="A temperatura costuma ter valores atuais, mínimos (low) e máximos (high)
 Além disso, há também a temperatura Crítica (Crit.): Se o sistema atingir ela,
