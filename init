@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.5-rc5"
+export bktitle="USM: Universal Server Menu v2.5-rc6"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -1090,8 +1090,8 @@ $Mensagem"
         echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr1" --noexpiry
         dialog --title "Informação" --msgbox "A senha de $validusr1 não expira!" 8 40
         dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
-        menu08 "$Recado \n
-Usuário $validusr1 criado e configurado com sucesso! \n
+        menu08 "$Recado
+Usuário $validusr1 criado e configurado com sucesso!
 $Mensagem"
       fi
     fi
@@ -1116,8 +1116,8 @@ else
     else
       echo "$password" | sudo -S samba-tool user setpassword "$validusr" --newpassword="$validpss"
       dialog --title "Informação" --msgbox "Senha de $validusr trocada com sucesso!" 8 40
-        menu08 "$Recado \n
-Usuário $validusr teve a senha trocada com sucesso! \n
+        menu08 "$Recado
+Usuário $validusr teve a senha trocada com sucesso!
 $Mensagem"
     fi
   else
@@ -1138,8 +1138,8 @@ else
   if [ "$repeated" = "$validusr" ]; then
     echo "$password" | sudo -S samba-tool user disable "$validusr"
     dialog --title "Informação" --msgbox "Usuário $validusr bloqueado com sucesso!" 7 25
-    menu08 "$Recado \n
-Usuário $validusr bloqueado com sucesso! \n
+    menu08 "$Recado
+Usuário $validusr bloqueado com sucesso!
 $Mensagem"
   else
     dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
@@ -1159,8 +1159,8 @@ else
   if [ "$repeated" = "$validusr" ]; then
     echo "$password" | sudo -S samba-tool user enable "$validusr"
     dialog --title "Informação" --msgbox "Usuário $validusr desbloqueado com sucesso!" 7 25
-    menu08 "$Recado \n
-Usuário $validusr desbloqueado com sucesso! \n
+    menu08 "$Recado
+Usuário $validusr desbloqueado com sucesso!
 $Mensagem"
   else
     dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
@@ -1182,8 +1182,8 @@ else
     if [ $? = 0 ]; then
       echo "$password" | sudo -S samba-tool user delete "$validusr"
       dialog --title "Informação" --msgbox "Usuário $validusr excluído com sucesso!" 7 25
-    menu08 "$Recado \n
-Usuário $validusr excluído com sucesso! \n
+    menu08 "$Recado
+Usuário $validusr excluído com sucesso!
 $Mensagem"
     fi
   else
@@ -1206,8 +1206,8 @@ else
   else
     echo "$password" | sudo -S samba-tool group add "$validgrp"
     dialog --title "Informação" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
-    menu08 "$Recado \n
-Grupo $validgrp bloqueado com sucesso! \n
+    menu08 "$Recado
+Grupo $validgrp bloqueado com sucesso!
 $Mensagem"
   fi
 fi
@@ -1232,8 +1232,8 @@ else
       if [ "$repeated2" = "$validgrp" ]; then
         echo "$password" | sudo -S samba-tool group addmembers "$validgrp" "$validusr"
         dialog --title "Informação" --msgbox "O usuário $validusr foi adicionado ao grupo $validgrp!" 8 40
-        menu08 "$Recado \n
-Grupo $validusr adicionado ao grupo $validgrp com sucesso! \n
+        menu08 "$Recado
+Grupo $validusr adicionado ao grupo $validgrp com sucesso!
 $Mensagem"
       else
         dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
@@ -1258,16 +1258,15 @@ else
     dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
     usrgrps=`echo "$password" | sudo -S samba-tool group listmembers "$validgrp"`
     echo "$usrgrps" | less
-    menu08 "$Recado \n
-Usuário $validusr participa dos seguintes grupos: \n
-$validgrp \n
+    menu08 "$Recado
+Grupo $validgrp possui os seguintes membros:
+$usrgrps
 $Mensagem"
   else
     dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
   fi
 fi
 
-menu08 "$Recado $usrgrps $Mensagem"
 menu042
 }
 
@@ -1288,8 +1287,8 @@ else
       if [ "$repeated2" = "$validgrp" ]; then
         echo "$password" | sudo -S samba-tool group removemembers "$validgrp" "$validusr"
         dialog --title "Informação" --msgbox "O usuário $validusr foi removido do grupo $validgrp!" 8 40
-        menu08 "$Recado \n
-Usuário $validusr foi removido do grupo $validgrp! \n
+        menu08 "$Recado
+Usuário $validusr foi removido do grupo $validgrp!
 $Mensagem"
       else
         dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
@@ -1315,8 +1314,8 @@ else
     if [ $? = 0 ]; then
       echo "$password" | sudo -S samba-tool group delete "$validgrp"
       dialog --title "Informação" --msgbox "Grupo $validgrp excluído com sucesso!" 7 25
-      menu08 "$Recado \n
-Usuário $validgrp foi excluído com sucesso! \n
+      menu08 "$Recado
+Usuário $validgrp foi excluído com sucesso!
 $Mensagem"
     fi
   else
@@ -1359,16 +1358,15 @@ else
     dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
     grpsusr=`echo "$password" | sudo -S samba-tool user getgroups "$validusr"`
     echo "$grpsusr" | less
-    menu08 "$Recado \n
-Usuário $validusr está nos seguintes grupos: \n
-$grpsusr \n
+    menu08 "$Recado
+Usuário $validusr está nos seguintes grupos:
+$grpsusr
 $Mensagem"
   else
     dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
   fi
 fi
 
-menu08 "$Recado $grpsusr $Mensagem"
 menu041
 }
 
