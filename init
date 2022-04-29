@@ -196,9 +196,15 @@ bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && ech
 rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
 rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
 xorg=`ls /tmp/.X11-unix | wc -l`
-sysd1=`systemd-analyze | awk 'NR==1{print $5,$4,$8,$7}'`
-sysd2=`systemd-analyze | awk 'NR==1{print $11,$10,$14,$13}'`
-sysd3=`systemd-analyze | awk 'NR==1{print $15,$16}'`
+
+if [ -d "/sys/firmware/efi/" ]; then
+  sysd1=`systemd-analyze | awk 'NR==1{print $5,$4,$8,$7}'`
+  sysd2=`systemd-analyze | awk 'NR==1{print $11,$10,$14,$13}'`
+  sysd3=`systemd-analyze | awk 'NR==1{print $15,$16}'`
+else
+  sysd1=`systemd-analyze | awk 'NR==1{print $5,$4,$8,$7}'`
+  sysd3=`systemd-analyze | awk 'NR==1{print $9,$10}'`
+fi
 
 TEXTMAIL="Nome da Máquina: $HOSTNAME
 Data e Hora Local: $datetime
