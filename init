@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.5-rc4"
+export bktitle="USM: Universal Server Menu v2.5-rc5"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -332,6 +332,7 @@ case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO03" 0 0; menu13 ;;
 esac
 [ $? -ne 0 ] && liminal "m3nu01" "menu01"
+
 menu08 "$Recado $sdisks $TEXTAO03 $Mensagem"
 liminal "m3nu01" "menu01"
 }
@@ -387,6 +388,7 @@ fi
 
 function menu141 {
 dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0
+
 menu08 "$Recado $2 $TEXTAO04 $Mensagem"
 menu14
 }
@@ -428,12 +430,14 @@ menu01
 
 function menu17 {
 dialog --title "ERROR" --msgbox "EM CONSTRUÇÃO" 8 40
+
 menu05
 }
 
 function menu18 {
 userlog=`w`
 dialog --title "ERROR" --msgbox "$userlog" 20 60
+
 menu08 "$Recado $userlog $Mensagem"
 menu05
 }
@@ -441,6 +445,7 @@ menu05
 function menu19 {
 userlast=`last`
 dialog --title "ERROR" --msgbox "$userlast" 20 60
+
 menu08 "$Recado $userlast $Mensagem"
 menu05
 }
@@ -512,7 +517,8 @@ function menu050 {
 dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 speedy=`curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -`
 dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "$speedy" 0 0
-menu08 "$speedy"
+
+menu08 "$Recado $speedy $Mensagem"
 liminal "m3nu05" "menu05"
 }
 
@@ -521,7 +527,8 @@ function menu0501 {
 dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 arpscn=`echo "$password" | sudo -S arp-scan -l`
 dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "$arpscn" 0 0
-menu08 "$arpscn"
+
+menu08 "$Recado $arpscn $Mensagem"
 liminal "m3nu05" "menu05"
 }
 
@@ -531,7 +538,8 @@ site=$(dialog --title 'WhoIs' --backtitle "Identificar de Propriedade de um WebS
 dialog --title "WhoIs" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 wis=`whois "$site"`
 dialog --title "WhoIs" --msgbox "$wis" 0 0
-menu08 "$wis"
+
+menu08 "$Recado $wis $Mensagem"
 liminal "m3nu05" "menu05"
 }
 
@@ -543,7 +551,8 @@ A identificação estará concluída quando um (END) surgir no final." 14 40 2>&
 dialog --title "Traceroute" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 trot=`traceroute "$site"`
 dialog --title "Traceroute" --msgbox "$trot" 0 0
-menu08 "$trot"
+
+menu08 "$Recado $trot $Mensagem"
 liminal "m3nu05" "menu05"
 }
 
@@ -1069,6 +1078,9 @@ Esta opção só pode ser definida agora. Se escolher Não, deverá usar o RSAT 
         echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr1" --noexpiry
         dialog --title "Informação" --msgbox "A senha de $validusr1 não expira!" 8 40
         dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
+        menu08 "$Recado \n
+Usuário $validusr1 criado e configurado com sucesso! \n
+$Mensagem"
       fi
     else
       echo "$password" | sudo -S sudo samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1"
@@ -1078,6 +1090,9 @@ Esta opção só pode ser definida agora. Se escolher Não, deverá usar o RSAT 
         echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr1" --noexpiry
         dialog --title "Informação" --msgbox "A senha de $validusr1 não expira!" 8 40
         dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
+        menu08 "$Recado \n
+Usuário $validusr1 criado e configurado com sucesso! \n
+$Mensagem"
       fi
     fi
   fi
@@ -1094,13 +1109,16 @@ if [ -z "$validusr" ]; then
 else
   repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
   if [ "$repeated" = "$validusr" ]; then
-    validpss=$(dialog --title 'AD-DC' --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --insecure --passwordbox 'Crie uma nova senha para o usuário' 0 0 2>&1 > /dev/tty )
+    validpss=$(dialog --title 'AD-DC' --backtitle "Trocar a senha de usuário do Domínio em $HOSTNAME" --insecure --passwordbox 'Crie uma nova senha para o usuário' 0 0 2>&1 > /dev/tty )
 #    [ $? -ne 0 ] && menu041
     if [ -z "$validpss" ]; then
       dialog --title "ERROR" --msgbox "Senha não pode ficar em branco!" 7 25
     else
       echo "$password" | sudo -S samba-tool user setpassword "$validusr" --newpassword="$validpss"
       dialog --title "Informação" --msgbox "Senha de $validusr trocada com sucesso!" 8 40
+        menu08 "$Recado \n
+Usuário $validusr teve a senha trocada com sucesso! \n
+$Mensagem"
     fi
   else
     dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
@@ -1120,6 +1138,9 @@ else
   if [ "$repeated" = "$validusr" ]; then
     echo "$password" | sudo -S samba-tool user disable "$validusr"
     dialog --title "Informação" --msgbox "Usuário $validusr bloqueado com sucesso!" 7 25
+    menu08 "$Recado \n
+Usuário $validusr bloqueado com sucesso! \n
+$Mensagem"
   else
     dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
   fi
@@ -1138,6 +1159,9 @@ else
   if [ "$repeated" = "$validusr" ]; then
     echo "$password" | sudo -S samba-tool user enable "$validusr"
     dialog --title "Informação" --msgbox "Usuário $validusr desbloqueado com sucesso!" 7 25
+    menu08 "$Recado \n
+Usuário $validusr desbloqueado com sucesso! \n
+$Mensagem"
   else
     dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
   fi
@@ -1158,6 +1182,9 @@ else
     if [ $? = 0 ]; then
       echo "$password" | sudo -S samba-tool user delete "$validusr"
       dialog --title "Informação" --msgbox "Usuário $validusr excluído com sucesso!" 7 25
+    menu08 "$Recado \n
+Usuário $validusr excluído com sucesso! \n
+$Mensagem"
     fi
   else
     dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
@@ -1179,6 +1206,9 @@ else
   else
     echo "$password" | sudo -S samba-tool group add "$validgrp"
     dialog --title "Informação" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
+    menu08 "$Recado \n
+Grupo $validgrp bloqueado com sucesso! \n
+$Mensagem"
   fi
 fi
 
@@ -1202,6 +1232,9 @@ else
       if [ "$repeated2" = "$validgrp" ]; then
         echo "$password" | sudo -S samba-tool group addmembers "$validgrp" "$validusr"
         dialog --title "Informação" --msgbox "O usuário $validusr foi adicionado ao grupo $validgrp!" 8 40
+        menu08 "$Recado \n
+Grupo $validusr adicionado ao grupo $validgrp com sucesso! \n
+$Mensagem"
       else
         dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
       fi
@@ -1225,6 +1258,10 @@ else
     dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
     usrgrps=`echo "$password" | sudo -S samba-tool group listmembers "$validgrp"`
     echo "$usrgrps" | less
+    menu08 "$Recado \n
+Usuário $validusr participa dos seguintes grupos: \n
+$validgrp \n
+$Mensagem"
   else
     dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
   fi
@@ -1251,6 +1288,9 @@ else
       if [ "$repeated2" = "$validgrp" ]; then
         echo "$password" | sudo -S samba-tool group removemembers "$validgrp" "$validusr"
         dialog --title "Informação" --msgbox "O usuário $validusr foi removido do grupo $validgrp!" 8 40
+        menu08 "$Recado \n
+Usuário $validusr foi removido do grupo $validgrp! \n
+$Mensagem"
       else
         dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
       fi
@@ -1275,6 +1315,9 @@ else
     if [ $? = 0 ]; then
       echo "$password" | sudo -S samba-tool group delete "$validgrp"
       dialog --title "Informação" --msgbox "Grupo $validgrp excluído com sucesso!" 7 25
+      menu08 "$Recado \n
+Usuário $validgrp foi excluído com sucesso! \n
+$Mensagem"
     fi
   else
     dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
@@ -1316,6 +1359,10 @@ else
     dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
     grpsusr=`echo "$password" | sudo -S samba-tool user getgroups "$validusr"`
     echo "$grpsusr" | less
+    menu08 "$Recado \n
+Usuário $validusr está nos seguintes grupos: \n
+$grpsusr \n
+$Mensagem"
   else
     dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
   fi
@@ -1366,8 +1413,7 @@ domainv=`echo "$password" | sudo -S samba-tool domain level show`
 dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Informações do Domínio" --msgbox "
 Nome da Máquina: $HOSTNAME \n \n
 Versão do SAMBA: $smbv \n \n
-Nível do Domínio: $domainv \n
-" 0 0
+Nível do Domínio: $domainv \n \n" 0 0
 case $? in
   2) dialog --title 'Ajuda com Significados' --msgbox "$TEXTAO13" 0 0 ; menuR ;;
 esac
