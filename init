@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.5-rc7"
+export bktitle="USM: Universal Server Menu v2.5-rc8"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -429,14 +429,14 @@ menu01
 }
 
 function menu17 {
-dialog --title "ERROR" --msgbox "EM CONSTRUÇÃO" 8 40
+dialog --title "Informação" --msgbox "EM CONSTRUÇÃO" 8 40
 
 menu05
 }
 
 function menu18 {
 userlog=`w`
-dialog --title "ERROR" --msgbox "$userlog" 20 60
+dialog --title "Informação" --msgbox "$userlog" 20 60
 
 menu08 "$Recado $userlog $Mensagem"
 menu05
@@ -444,10 +444,40 @@ menu05
 
 function menu19 {
 userlast=`last`
-dialog --title "ERROR" --msgbox "$userlast" 20 60
+dialog --title "Informação" --msgbox "$userlast" 20 60
 
 menu08 "$Recado $userlast $Mensagem"
 menu05
+}
+
+function menu20 {
+menu09 pihole-FTL && pihole1=$prcs
+
+if [ "$pihole1" = "Executando" ]; then
+  dialog --backtitle "Servidor de DNS PiHole" --title "PiHole" --yesno "Deseja atualizar o PiHole?" 6 40
+  if [ $? = 0 ]; then
+    version1=`pihole -v`
+    pihole -up
+    version2=`pihole -v`
+    dialog --title "Informação" --msgbox "PiHole atualizado com sucesso!" 20 60
+    menu08 "$Recado
+PiHole atualizado! A versão anterior era:
+
+$version1 
+
+A nova versão é:
+
+$version2
+
+Atento ás novidades que a nova versão possa ter trago!
+
+$Mensagem"
+    fi
+else
+  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 20 60
+fi
+
+m10
 }
 
 # Ferramentas Normal
@@ -1439,20 +1469,22 @@ fi
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
 A '*Atualizar o Sistema' \
-B 'Governador de CPU' \
-C 'TRIM Disks' \
-D 'Parar Rsync' \
-E 'Parar RSnapshot' \
-F 'Parar Balance' \
+B 'Atualizar PiHole' \
+C 'Governador de CPU' \
+D 'TRIM Disks' \
+E 'Parar Rsync' \
+F 'Parar RSnapshot' \
+G 'Parar Balance' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) m11 ;;
-B) menu053 ;;
-C) echo "$password" | sudo -S fstrim -va ; m10 ;;
-D) m12 ;;
-E) m13 ;;
-F) m14 ;;
+B) menu20 ;;
+C) menu053 ;;
+D) echo "$password" | sudo -S fstrim -va ; m10 ;;
+E) m12 ;;
+F) m13 ;;
+G) m14 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
