@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.5-rc8"
+export bktitle="USM: Universal Server Menu v2.5-rc9"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -459,7 +459,8 @@ if [ "$pihole1" = "Executando" ]; then
     version1=`pihole -v`
     pihole -up
     version2=`pihole -v`
-    dialog --title "Informação" --msgbox "PiHole atualizado com sucesso!" 20 60
+    dialog --title "Informação" --msgbox "PiHole atualizado com sucesso!
+$version2" 8 40
     menu08 "$Recado
 PiHole atualizado! A versão anterior era:
 
@@ -474,7 +475,7 @@ Atento ás novidades que a nova versão possa ter trago!
 $Mensagem"
     fi
 else
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 20 60
+  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
 fi
 
 m10
