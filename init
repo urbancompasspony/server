@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.6.3"
+export bktitle="USM: Universal Server Menu v2.6.4"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -456,7 +456,7 @@ X 'Voltar' 2>&1 > /dev/tty )
 case "$var2" in
 A) echo "Modo Cliente. Para sair, precione CTRL + C!" ; udp-receiver --file=/dev/null ;;
 B) echo "Modo Servidor. Para sair, precione CTRL + C!" ; udp-sender --file=/dev/zero ;;
-X) liminal "m3nu05" "menu05" ;;
+X) m10 ;;
 esac
 }
 
@@ -465,7 +465,7 @@ userlog=`w`
 dialog --title "Informação" --msgbox "$userlog" 20 60
 
 menu08 "$Recado $userlog $Mensagem"
-menu05
+m10
 }
 
 function menu19 {
@@ -473,7 +473,7 @@ userlast=`last`
 dialog --title "Informação" --msgbox "$userlast" 20 60
 
 menu08 "$Recado $userlast $Mensagem"
-menu05
+m10
 }
 
 function menu20 {
@@ -588,21 +588,27 @@ menu08 "$Recado $TEXTAO14 $Mensagem"
 liminal "st4rt1" "start"
 }
 
+function menu23 {
+ipneigh1=`ip neigh`
+dialog --title 'IP Neigh' --msgbox "$ipneigh1" 0 0
+
+menu08 "$Recado $ipneigh1 $Mensagem"
+liminal "m3nu05" "menu05"
+}
+
 # Ferramentas Normal
 function menu05 {
 var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
 A '*SpeedTest' \
 B '*Arp-Scan' \
-C '*WhoIs' \
-D '*TraceRoute' \
-E '*Ping DNS' \
-F 'UDP-Cast' \
-G '*Usuários Logados' \
-H '*Logins Anteriores' \
-I 'Ajustes Relatórios' \
-J 'Relatórios Salvos' \
-K '*Reiniciar' \
-L '*Desligar' \
+C '*IP Neigh' \
+D '*WhoIs' \
+E '*TraceRoute' \
+F '*Ping DNS' \
+G 'Ajustes Relatórios' \
+H 'Relatórios Salvos' \
+I '*Reiniciar' \
+J '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -611,16 +617,14 @@ esac
 case "$var6" in
 A) menu050 ;;
 B) menu0501 ;;
-C) menu051 ;;
-D) menu052 ;;
-E) menu22 ;;
-F) menu17 ;;
-G) menu18 ;;
-H) menu19 ;;
-I) menu054 ;;
-J) menu055 ;;
-K) menu06 ;;
-L) menu07 ;;
+C) menu23 ;;
+D) menu051 ;;
+E) menu052 ;;
+F) menu22 ;;
+G) menu054 ;;
+H) menu055 ;;
+I) menu06 ;;
+J) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1585,6 +1589,9 @@ D 'TRIM Disks' \
 E 'Parar Rsync' \
 F 'Parar RSnapshot' \
 G 'Parar Balance' \
+H 'UDP-Cast' \
+I '*Usuários Logados' \
+J '*Logins Anteriores' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
@@ -1595,6 +1602,9 @@ D) echo "$password" | sudo -S fstrim -va ; m10 ;;
 E) m12 ;;
 F) m13 ;;
 G) m14 ;;
+H) menu17 ;;
+I) menu18 ;;
+J) menu19 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
