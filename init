@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.6.2"
+export bktitle="USM: Universal Server Menu v2.6.3"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -448,9 +448,16 @@ menu01
 }
 
 function menu17 {
-dialog --title "Informação" --msgbox "EM CONSTRUÇÃO" 8 40
-
-menu05
+var2=$(dialog --title 'UDPCast' --backtitle "UDP CAST" --menu "Escolha o modo!" 0 0 0 \
+A 'Cliente' \
+B 'Servidor' \
+X 'Voltar' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && start
+case "$var2" in
+A) echo "Modo Cliente. Para sair, precione CTRL + C!" ; udp-receiver --file=/dev/null ;;
+B) echo "Modo Servidor. Para sair, precione CTRL + C!" ; udp-sender --file=/dev/zero ;;
+X) liminal "m3nu05" "menu05" ;;
+esac
 }
 
 function menu18 {
@@ -588,13 +595,14 @@ A '*SpeedTest' \
 B '*Arp-Scan' \
 C '*WhoIs' \
 D '*TraceRoute' \
-E '*Usuários Logados' \
-F '*Logins Anteriores' \
-G '*Ping DNS' \
-H 'Ajustes Relatórios' \
-I 'Relatórios Salvos' \
-J '*Reiniciar' \
-K '*Desligar' \
+E '*Ping DNS' \
+F 'UDP-Cast' \
+G '*Usuários Logados' \
+H '*Logins Anteriores' \
+I 'Ajustes Relatórios' \
+J 'Relatórios Salvos' \
+K '*Reiniciar' \
+L '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -605,13 +613,14 @@ A) menu050 ;;
 B) menu0501 ;;
 C) menu051 ;;
 D) menu052 ;;
-E) menu18 ;;
-F) menu19 ;;
-G) menu22 ;;
-H) menu054 ;;
-I) menu055 ;;
-J) menu06 ;;
-K) menu07 ;;
+E) menu22 ;;
+F) menu17 ;;
+G) menu18 ;;
+H) menu19 ;;
+I) menu054 ;;
+J) menu055 ;;
+K) menu06 ;;
+L) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1941,6 +1950,7 @@ pkg arp-scan
 pkg traceroute
 pkg libatasmart-bin
 pkg mutt
+pkg udpcast
 
 # Início do Sistema:
 init
