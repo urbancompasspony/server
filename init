@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.6.4"
+export bktitle="USM: Universal Server Menu v2.6.5"
 
 export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
 export password=0; export password2=0; export password3=0; export report=0; export advanced=0
@@ -152,7 +152,6 @@ C '*Armazenamento' \
 D '*S.M.A.R.T.' \
 E '*Cluster: DRBD' \
 F '*Cluster: PCS' \
-G 'Placas de Rede' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
@@ -162,7 +161,6 @@ C) menu13 ;;
 D) menu14 ;;
 E) menu15 ;;
 F) menu16 ;;
-G) menu21 ;;
 X) start ;;
 esac
 }
@@ -173,14 +171,12 @@ var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
 A '*Sistema' \
 B '*Temperatura' \
 C '*Armazenamento' \
-D 'Placas de Rede' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var2" in
 A) menu11 ;;
 B) menu12 ;;
 C) menu13 ;;
-D) menu21 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -514,7 +510,7 @@ do
   dialog --title 'Velocidades detectadas:' --msgbox "$i $velo" 8 40
 done
 
-liminal "m3nu01" "menu01"
+liminal "m3nu05" "menu05"
 }
 
 function ping1 {
@@ -600,15 +596,16 @@ liminal "m3nu05" "menu05"
 function menu05 {
 var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
 A '*SpeedTest' \
-B '*Arp-Scan' \
-C '*IP Neigh' \
-D '*WhoIs' \
-E '*TraceRoute' \
-F '*Ping DNS' \
-G 'Ajustes Relatórios' \
-H 'Relatórios Salvos' \
-I '*Reiniciar' \
-J '*Desligar' \
+B 'Placas de Rede' \
+C '*Arp-Scan' \
+D '*IP Neigh' \
+E '*WhoIs' \
+F '*TraceRoute' \
+G '*Ping DNS' \
+H 'Ajustes Relatórios' \
+I 'Relatórios Salvos' \
+J '*Reiniciar' \
+K '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -616,15 +613,16 @@ esac
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var6" in
 A) menu050 ;;
-B) menu0501 ;;
-C) menu23 ;;
-D) menu051 ;;
-E) menu052 ;;
-F) menu22 ;;
-G) menu054 ;;
-H) menu055 ;;
-I) menu06 ;;
-J) menu07 ;;
+B) menu21 ;;
+C) menu0501 ;;
+D) menu23 ;;
+E) menu051 ;;
+F) menu052 ;;
+G) menu22 ;;
+H) menu054 ;;
+I) menu055 ;;
+J) menu06 ;;
+K) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -633,12 +631,13 @@ esac
 function m3nu05 {
 var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
 A '*SpeedTest' \
-B '*Arp-Scan' \
-C '*TraceRoute' \
-D 'Ajustes Relatórios' \
-E 'Relatórios Salvos' \
-F '*Reiniciar' \
-G '*Desligar' \
+B 'Placas de Rede' \
+C '*Arp-Scan' \
+D '*TraceRoute' \
+E 'Ajustes Relatórios' \
+F 'Relatórios Salvos' \
+G '*Reiniciar' \
+H '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -646,12 +645,13 @@ esac
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var6" in
 A) menu050 ;;
-B) menu0501 ;;
-C) menu052 ;;
-D) menu054 ;;
-E) menu055 ;;
-F) menu06 ;;
-G) menu07 ;;
+B) menu21 ;;
+C) menu0501 ;;
+D) menu052 ;;
+E) menu054 ;;
+F) menu055 ;;
+G) menu06 ;;
+H) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
