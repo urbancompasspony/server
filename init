@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-bktitle="USM: Universal Server Menu v2.7"
+bktitle="USM: Universal Server Menu v2.7.1"
 
 processname=0; validmail=0; process=0; status=0; pkg=0; hash1=0; password=0
 password2=0; password3=0; report=0; advanced=0; YUM_CMD=0
@@ -149,7 +149,6 @@ C '*Armazenamento' \
 D '*S.M.A.R.T.' \
 E '*Cluster: DRBD' \
 F '*Cluster: PCS' \
-G 'Custom Scripts' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
@@ -159,7 +158,6 @@ C) menu13 ;;
 D) menu14 ;;
 E) menu15 ;;
 F) menu16 ;;
-G) menu24 ;;
 X) start ;;
 esac
 }
@@ -181,22 +179,24 @@ esac
 }
 
 function menu24 {
-datetime=$(date +"%d/%m %H:%M")
+# Cluster
+echo "$password" | sudo -S bash /home/$USER/Scripts/Cluster 1> /dev/null 2> /dev/null || dialog --title "Script Cluster não iniciado" --msgbox "Arquivo ou diretório inexistente." 8 40
 script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+
+[ "$script1" = "Executando" ] && {
+dialog --title 'Script Cluster Inicializado' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 0 0
+}
+
+# Balloon
+bash /home/$USER/Scripts/Balloon 1> /dev/null 2> /dev/null || dialog --title 'Script Balloon não iniciado' --msgbox "Arquivo ou diretório inexistente." 8 40
 script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 
-TEXTMAIL2="Nome da Máquina: $HOSTNAME
-Data e Hora Local: $datetime
+[ "$script2" = "Executando" ] && {
+dialog --title 'Script Balloon Inicializado' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 0 0
+}
 
-Cluster: $script1
-
-Balloon: $script2
-"
-
-dialog --cr-wrap --title "Informações encontradas:" --backtitle "Scripts Customizados" --msgbox "$TEXTMAIL2" 0 0
-[ $? -ne 0 ] && liminal "m3nu01" "menu01"
-
-liminal "m3nu01" "menu01"
+[ $? -ne 0 ] && liminal "m3nu05" "menu05"
+liminal "m3nu05" "menu05"
 }
 
 # Status de Sistema
@@ -211,6 +211,21 @@ rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executan
 rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 xorg=$(ls /tmp/.X11-unix | wc -l)
+datetime=$(date +"%d/%m %H:%M")
+script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+
+[ $(which drbdadm 2>/dev/null) ] && [ $(which virt-manager 2>/dev/null) ] && {
+  aswb="sim"
+} || {
+  aswb="nao"
+  }
+
+[ $(which virt-manager 2>/dev/null) ] && {
+  aswd="sim"
+} || {
+  aswd="nao"
+  }
 
 [ -d "/sys/firmware/efi/" ] && {
   sysd1=$(systemd-analyze | awk 'NR==1{print $5,$4,$8,$7}')
@@ -236,6 +251,11 @@ RSync: $rsync1
 CoPy: $cp1
 
 Governador de CPU: $governor
+
+Cluster: $script1
+Deveria executar? $aswb
+Balloon: $script2
+Deveria executar? $aswd
 
 Tempos de Boot:
 $sysd1
@@ -621,10 +641,11 @@ D '*IP Neigh' \
 E '*WhoIs' \
 F '*TraceRoute' \
 G '*Ping DNS' \
-H 'Ajustes Relatórios' \
-I 'Relatórios Salvos' \
-J '*Reiniciar' \
-K '*Desligar' \
+H 'Iniciar Scripts' \
+I 'Ajustes Relatórios' \
+J 'Relatórios Salvos' \
+K '*Reiniciar' \
+L '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -638,10 +659,11 @@ D) menu23 ;;
 E) menu051 ;;
 F) menu052 ;;
 G) menu22 ;;
-H) menu054 ;;
-I) menu055 ;;
-J) menu06 ;;
-K) menu07 ;;
+H) menu24 ;;
+I) menu054 ;;
+J) menu055 ;;
+K) menu06 ;;
+L) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -653,10 +675,11 @@ A '*SpeedTest' \
 B 'Placas de Rede' \
 C '*Arp-Scan' \
 D '*TraceRoute' \
-E 'Ajustes Relatórios' \
-F 'Relatórios Salvos' \
-G '*Reiniciar' \
-H '*Desligar' \
+E 'Iniciar Scripts' \
+F 'Ajustes Relatórios' \
+G 'Relatórios Salvos' \
+H '*Reiniciar' \
+I '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -667,10 +690,11 @@ A) menu050 ;;
 B) menu21 ;;
 C) menu0501 ;;
 D) menu052 ;;
-E) menu054 ;;
-F) menu055 ;;
-G) menu06 ;;
-H) menu07 ;;
+E) menu24 ;;
+F) menu054 ;;
+G) menu055 ;;
+H) menu06 ;;
+I) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1780,6 +1804,11 @@ RSync: Sincronia do Backup em Nuvem ou para um backup RAID 1. Se estiver Executa
 CoPy: Sincronia de pastas locais. Se estiver Executando, o computador não poderá ser reiniciado ou desligado!
 
 Governador de CPU: Mostra como está a execução do processador, se em Máximo Desempenho, Economia de Energia ou outro.
+
+Cluster: Script que controla máquinas virtuais em sistemas clusterizados.
+Deveria executar? Requer virt-manager + DRBD configurados para confirmar.
+Balloon: Script que controla a memória RAM de máquinas virtuais.
+Deveria executar? Requer virt-manager configurado para confirmar.
 
 Tempos de Boot: Se o sistema foi instalado como UEFI você pode ver (firmware) e (loader) que são
 respectivamente a leitura da BIOS e depois a primeira leitura do HD identificando as partições.
