@@ -217,7 +217,9 @@ Aguarde 1 minuto até o novo IP ser validado." 8 40
       echo "$password" | sudo -S killall noip2
       dialog --title "$noip2" --msgbox "O NOIP foi parado!" 6 40
       }
-  }
+  } || {
+    echo "a" > /dev/null
+    }
 } || {
   dialog --title "$noip2" --yesno "Deseja tentar iniciar o NOIP?" 6 40
   [ $? = 0 ] && {
@@ -373,7 +375,9 @@ function menu031 {
       echo "$password" | sudo -S systemctl stop "$process"
       dialog --title "$processname" --msgbox "O processo $processname foi parado!" 6 40
       }
-  }
+  } || {
+    echo "a" > /dev/null
+    }
 } || {
   dialog --title "$processname" --yesno "Deseja tentar iniciar o processo $processname ?" 6 40
   [ $? = 0 ] && {
