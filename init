@@ -25,7 +25,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-bktitle="USM: Universal Server Menu v2.7.1"
+bktitle="USM: Universal Server Menu v2.7.2"
 
 processname=0; validmail=0; process=0; status=0; pkg=0; hash1=0; password=0
 password2=0; password3=0; report=0; advanced=0; YUM_CMD=0
@@ -218,7 +218,7 @@ Aguarde 1 minuto até o novo IP ser validado." 8 40
       dialog --title "$noip2" --msgbox "O NOIP foi parado!" 6 40
       }
   } || {
-    echo "a" > /dev/null
+    liminal "m3nu05" "menu05"
     }
 } || {
   dialog --title "$noip2" --yesno "Deseja tentar iniciar o NOIP?" 6 40
@@ -227,7 +227,7 @@ Aguarde 1 minuto até o novo IP ser validado." 8 40
     dialog --title "$noip2" --msgbox "Verifique se o NOIP iniciou no menu 'Status Geral > Sistema'!" 8 40
     }
 }
-
+liminal "m3nu05" "menu05"
 }
 
 # Status de Sistema
@@ -376,7 +376,7 @@ function menu031 {
       dialog --title "$processname" --msgbox "O processo $processname foi parado!" 6 40
       }
   } || {
-    echo "a" > /dev/null
+    menu03
     }
 } || {
   dialog --title "$processname" --yesno "Deseja tentar iniciar o processo $processname ?" 6 40
