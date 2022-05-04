@@ -180,20 +180,20 @@ esac
 
 function menu24 {
 # Cluster
-echo "$password" | sudo -S bash /home/$USER/Scripts/Cluster 1> /dev/null 2> /dev/null || dialog --title "Script Cluster não iniciado" --msgbox "Arquivo ou diretório inexistente." 8 40
 script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-
 [ "$script1" = "Executando" ] && {
-dialog --title 'Script Cluster Inicializado' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 0 0
-}
+  dialog --title 'Script Cluster Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
+} || {
+  echo "$password" | sudo -S bash /home/$USER/Scripts/Cluster & 1> /dev/null 2> /dev/null
+  }
 
 # Balloon
-bash /home/$USER/Scripts/Balloon 1> /dev/null 2> /dev/null || dialog --title 'Script Balloon não iniciado' --msgbox "Arquivo ou diretório inexistente." 8 40
 script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-
 [ "$script2" = "Executando" ] && {
-dialog --title 'Script Balloon Inicializado' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 0 0
-}
+  dialog --title 'Script Balloon Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
+} || {
+  bash /home/$USER/Scripts/Balloon & 1> /dev/null 2> /dev/null
+  }
 
 [ $? -ne 0 ] && liminal "m3nu05" "menu05"
 liminal "m3nu05" "menu05"
