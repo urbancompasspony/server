@@ -2,6 +2,8 @@
 
 # What is it?
 
+For now only in Brazillian Portuguese!
+
 A code to run an customizable menu based 100% on Shell Script and created over DIALOG.
 It will let you configure your linux server in no time!
 
