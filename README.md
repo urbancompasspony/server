@@ -22,7 +22,7 @@ After install, you will be prompted for your SUDO password to access the adminis
 
 Just type this on your terminal:
 
-##curl -sSL https://srv.linuxuniverse.com.br | bash
+## curl -sSL https://srv.linuxuniverse.com.br | bash
 
 # MENU
 
