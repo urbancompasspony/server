@@ -25,59 +25,61 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 # Variáveis Globais
-export bktitle="USM: Universal Server Menu v2.6.6"
+bktitle="USM: Universal Server Menu v2.7-rc1"
 
-export processname=0; export validmail=0; export process=0; export status=0; export pkg=0; export hash1=0
-export password=0; export password2=0; export password3=0; export report=0; export advanced=0
-export YUM_CMD=0; export APT_CMD=0; export datetime=0; export datetime2=0; export confrel=0
+processname=0; validmail=0; process=0; status=0; pkg=0; hash1=0; password=0
+password2=0; password3=0; report=0; advanced=0; YUM_CMD=0
+APT_CMD=0; datetime=0; datetime2=0; confrel=0
 
 # Checagem de Dependências
-function pkg {
-YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+function pkg                                                                   {
 APT_CMD=$(which apt 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 
-if [ "$APT_CMD" = "sim" ]; then
+[ "$APT_CMD" = "sim" ] && {
   pkg1="apt"
   REQUIRED_PKG="$1"
-  PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
-  echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
-  if [ "" = "$PKG_OK" ]; then
-    echo "$REQUIRED_PKG não encontrado. Instalando... Digite sua senha!"
+  PKG_OK=$(dpkg-query -W 1> /dev/null 2> /dev/null $REQUIRED_PKG && echo "sim" || echo "nao")
+
+  [ "$PKG_OK" = "nao" ] && {
+    echo "$REQUIRED_PKG não encontrado. Instalando..."
+    echo "Digite sua senha!"
     sudo apt update; sudo apt install $REQUIRED_PKG -y
     mkdir -p ~/.mutt/cache/headers && mkdir ~/.mutt/cache/bodies && touch ~/.mutt/certificates && touch ~/.mutt/muttrc
     echo -e "$TEXTAO07" > ~/.mutt/muttrc
-  fi
-else
-  if [ "$YUM_CMD" = "sim" ]; then
+    } || {
+      echo "ok" > /dev/null
+      }
+} || {
+  [ "$YUM_CMD" = "sim" ] && {
     pkg1="yum"
     echo "Sistema YUM detectado. Ignorando."
-  else
+  } || {
     pkg1="pkg"
     echo "Sistema desconhecido."
-  fi
-fi
+  }
 }
 
+                                                                               }
+
 # PASSWORD
-function init {
+function init                                                                  {
 FILE2="/etc/.lockall"; [ -f "$FILE2" ] && echo "# # # Menu Travado! Saindo. # # #" && exit
 password=$(dialog --backtitle "$bktitle" --title 'Acesso ao USM' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
-hash1=`echo "$password" | md5sum | awk '{print $1}'`
-if [ -z "$password" ]; then
+hash1=$(echo "$password" | md5sum | awk '{print $1}')
+[ -z "$password" ] && {
   clear
   echo "É necessário digitar sua senha para continuar. Saindo..."
   echo "Para voltar, digite 'menu'!"
-else
+} || {
   if [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ]; then
     password=$(dialog --backtitle "$bktitle." --title 'Acesso ao USM' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
-    #start
     menu054
   else
-    #liminal "st4rt1" "start"
     menu054
   fi
-fi
 }
+                                                                               }
 
 function liminal {
 if [ -f "$FILE" ]; then
@@ -93,45 +95,45 @@ fi
 
 # SISTEMA Normal
 function start {
-  datetime=`date +"%d/%m %H:%M"` # Data e Hora
-  var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
-  A 'Status Geral' \
-  B 'Máquinas Virtuais' \
-  C 'Processos' \
-  D 'Active Directory' \
-  E 'Ferramentas' \
-  F 'Avançado' \
-  X 'SAIR' 2>&1 > /dev/tty )
+datetime=$(date +"%d/%m %H:%M") # Data e Hora
+var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
+A 'Status Geral' \
+B 'Máquinas Virtuais' \
+C 'Processos' \
+D 'Active Directory' \
+E 'Ferramentas' \
+F 'Avançado' \
+X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
-  A) menu01 ;;
-  B) menu02 ;;
-  C) menu03 ;;
-  D) menu04 ;;
-  E) menu05 ;;
-  F) m10 ;;
-  X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
+A) menu01 ;;
+B) menu02 ;;
+C) menu03 ;;
+D) menu04 ;;
+E) menu05 ;;
+F) m10 ;;
+X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
 
 # Invertido
 function st4rt1 {
-  datetime=`date +"%d/%m %H:%M"` # Data e Hora
-  var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
-  A 'Status Geral' \
-  B 'Máquinas Virtuais' \
-  C 'Processos' \
-  D 'Active Directory' \
-  E 'Ferramentas' \
-  X 'SAIR' 2>&1 > /dev/tty )
+datetime=$(date +"%d/%m %H:%M") # Data e Hora
+var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
+A 'Status Geral' \
+B 'Máquinas Virtuais' \
+C 'Processos' \
+D 'Active Directory' \
+E 'Ferramentas' \
+X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
-  A) m3nu01 ;;
-  B) menu02 ;;
-  C) menu03 ;;
-  D) menu04 ;;
-  E) m3nu05 ;;
-  X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
+A) m3nu01 ;;
+B) menu02 ;;
+C) menu03 ;;
+D) menu04 ;;
+E) m3nu05 ;;
+X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
 
@@ -183,25 +185,25 @@ esac
 
 # Status de Sistema
 function menu11 {
-ip=`hostname -I | awk '{print $1}'`
-ip2=`dig @resolver4.opendns.com myip.opendns.com +short`
-uptime=`uptime | awk {'print $3 $4 $5'}`
-datetime=`date +"%d/%m %H:%M"`
-governor=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!"`
-bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-cp1=`ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-xorg=`ls /tmp/.X11-unix | wc -l`
+ip=$(hostname -I | awk '{print $1}')
+ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
+uptime=$(uptime | awk {'print $3 $4 $5'})
+datetime=$(date +"%d/%m %H:%M")
+governor=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!")
+bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+xorg=$(ls /tmp/.X11-unix | wc -l)
 
-if [ -d "/sys/firmware/efi/" ]; then
-  sysd1=`systemd-analyze | awk 'NR==1{print $5,$4,$8,$7}'`
-  sysd2=`systemd-analyze | awk 'NR==1{print $11,$10,$14,$13}'`
-  sysd3=`systemd-analyze | awk 'NR==1{print $15,$16}'`
-else
-  sysd1=`systemd-analyze | awk 'NR==1{print $5,$4,$8,$7}'`
-  sysd3=`systemd-analyze | awk 'NR==1{print $9,$10}'`
-fi
+[ -d "/sys/firmware/efi/" ] && {
+sysd1=$(systemd-analyze | awk 'NR==1{print $5,$4,$8,$7}')
+sysd2=$(systemd-analyze | awk 'NR==1{print $11,$10,$14,$13}')
+sysd3=$(systemd-analyze | awk 'NR==1{print $15,$16}')
+} || {
+sysd1=$(systemd-analyze | awk 'NR==1{print $5,$4,$8,$7}')
+sysd3=$(systemd-analyze | awk 'NR==1{print $9,$10}')
+}
 
 TEXTMAIL="Nome da Máquina: $HOSTNAME
 Data e Hora Local: $datetime
@@ -229,7 +231,7 @@ case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO01" 0 0 ; menu11 ;;
 esac
 
-[ $? -ne 0 ] && liminal "m3nu01" "menu01"
+[ $? -ne 0 ] && {liminal "m3nu01" "menu01"}
 menu08 "$Recado $TEXTMAIL $TEXTAO01 $Mensagem"
 
 liminal "m3nu01" "menu01"
@@ -251,7 +253,7 @@ menu09 cups1 cups && cups1=$prcs
 menu09 motion && motion1=$prcs
 menu09 dwagent && dwagent1=$prcs
 
-vpn=`ip a | grep tun 1> /dev/null && echo "Executando" || echo "Parado ou Ausente"`
+vpn=$(ip a | grep tun 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
 
 menuxx=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Ajuda' --backtitle "Processos Ativos, Parados ou Ausentes" --title 'Processos de Sistema' --menu " "  0 0 0 \
 A "Samba      : $smb1"  \
@@ -272,7 +274,7 @@ X "Voltar" 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO08" 0 0 ; menu03 ;;
 esac
-[ $? -ne 0 ] && liminal "st4rt1" "start"
+[ $? -ne 0 ] && {liminal "st4rt1" "start"}
 case "$menuxx" in
 A) status="$smb1"; processname="Samba"; process="smbd"; menu031 ;;
 B) status="$smb2"; processname="Dominio"; process="samba-ad-dc"; menu031 ;;
@@ -290,65 +292,63 @@ M) status="$dwagent1"; processname="DWAgent"; process="dwagent"; menu031 ;;
 N) status="$vpn"; processname="VPN Client"; process="openvpn"; menu031 ;;
 X) liminal "st4rt1" "start" ;;
 esac
-#status="$drbd1"; processname="DRBD"; process="drbd"; menu031 ;;
-#status="$corosync1"; processname="Corosync"; process="corosync"; menu031 ;;
-#status="$pacemaker1"; processname="Pacemaker"; process="pacemaker"; menu031 ;;
 }
 
 function menu031 {
-if [ "$status" = "Executando" ]; then
+[ "$status" = "Executando" ] && {
   dialog --title "$processname" --yesno "Deseja reiniciar o processo $processname ?" 6 40
-  if [ $? = 0 ]; then
+  [ $? = 0 ] && {
     echo "$password" | sudo -S systemctl restart "$process"
     dialog --title "$processname" --msgbox "O processo $processname foi reiniciado!" 6 40
-  else
+  } || {
     dialog --title "$processname" --yesno "Deseja parar o processo $processname ?" 6 40
-    if [ $? = 0 ]; then
+    [ $? = 0 ] && {
     echo "$password" | sudo -S systemctl stop "$process"
     dialog --title "$processname" --msgbox "O processo $processname foi parado!" 6 40
-    fi
-  fi
-else
+    }
+  }
+} || {
   dialog --title "$processname" --yesno "Deseja tentar iniciar o processo $processname ?" 6 40
-  if [ $? = 0 ]; then
-    echo "$password" | sudo -S systemctl start "$process"
-    dialog --title "$processname" --msgbox "Verifique se o $processname iniciou." 6 40
-  fi
-fi
+  [ $? = 0 ] && {
+  echo "$password" | sudo -S systemctl start "$process"
+  dialog --title "$processname" --msgbox "Verifique se o $processname iniciou." 6 40
+  }
+}
 
 menu03
 }
 
 # Status de Processos
 function menu09 {
-  prcs=`echo "$password" | sudo -S systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente"`
+  prcs=$(echo "$password" | sudo -S systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente")
 }
 
 # Status Temperatura
 function menu12 {
-sensors0=`sensors || echo "Indisponível!"`
+sensors0=$(sensors || echo "Indisponível!")
 dialog --cr-wrap --help-button --help-label 'Ajuda' --backtitle 'Temperatura, Potencia e Rotação de Cooler(s) [Se disponível!]' --msgbox "$sensors0" 0 0
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO02" 0 0 ; menu12 ;;
 esac
-[ $? -ne 0 ] && liminal "m3nu01" "menu01"
-if [ "$sensors1" = "Indisponível!" ]; then
+[ $? -ne 0 ] && {liminal "m3nu01" "menu01"}
+
+[ "$sensors1" = "Indisponível!" ] && {
   dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
-else
+} || {
   menu08 "$Recado $sensors0 $TEXTAO02 $Mensagem"
-fi
+}
 
 liminal "m3nu01" "menu01"
 }
 
 # Status de Consumo dos Discos
 function menu13 {
-sdisks=`df -Th`
+sdisks=$(df -Th)
 dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Discos encontrados" --backtitle "Status do Armazenamento" --msgbox "$sdisks" 0 0
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO03" 0 0; menu13 ;;
 esac
-[ $? -ne 0 ] && liminal "m3nu01" "menu01"
+[ $? -ne 0 ] && {liminal "m3nu01" "menu01"}
 
 menu08 "$Recado $sdisks $TEXTAO03 $Mensagem"
 liminal "m3nu01" "menu01"
@@ -379,7 +379,7 @@ Voltar "" 2>&1 > /dev/tty )
 case $? in
   2) dialog --title "Definições de SMART!" --msgbox "$TEXTAO04" 0 0 ; menu14 ;;
 esac
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && {start}
 case "$menusk" in
 "/dev/sda") menu141 "sda" "$dump1" ; menu14 ;;
 "/dev/sdb") menu141 "sdb" "$dump2" ; menu14 ;;
@@ -395,12 +395,12 @@ esac
 }
 
 function menu140 {
-stssd=`ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente"`
-if [ "$stssd" = "Presente" ]; then
-  skd=`echo "$password" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}'`
-else
-  skd=`echo "Disco ausente!"`
-fi
+stssd=$(ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente")
+[ "$stssd" = "Presente" ] && {
+  skd=$(echo "$password" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}')
+} || {
+  skd=$(echo "Disco ausente!")
+}
 }
 
 function menu141 {
@@ -412,17 +412,18 @@ menu14
 
 function menu15 {
 menu09 drbd && drbd1=$prcs
-if [ "$drbd1" = "Executando" ]; then
-  sdrbd=`echo "$password" | sudo -S drbdadm status`
+
+[ "$drbd1" = "Executando" ] && {
+  sdrbd=$(echo "$password" | sudo -S drbdadm status)
   dialog --cr-wrap --help-button --help-label 'Ajuda' --title "DRBD" --backtitle "Status do DRBD" --msgbox "$sdrbd" 0 0
   case $? in
     2) dialog --title 'Ajuda' --msgbox "$TEXTAO05" 0 0; menu15 ;;
   esac
-  [ $? -ne 0 ] && start
+  [ $? -ne 0 ] && {start}
   menu08 "$Recado $sdrbd $TEXTAO05 $Mensagem"
-else
+} || {
   dialog --title "ERROR" --msgbox "O DRBD não está em execução ou não foi localizado neste sistema!" 8 40
-fi
+}
 
 menu01
 }
@@ -430,17 +431,18 @@ menu01
 function menu16 {
 menu09 corosync && corosync1=$prcs
 menu09 pacemaker && pacemaker1=$prcs
-if [ "$corosync1" = "Executando" ] && [ "$pacemaker1" = "Executando" ]; then 
-  spcs=`echo "$password" | sudo -S pcs status`
+
+[ "$corosync1" = "Executando" ] && [ "$pacemaker1" = "Executando" ] && {
+  spcs=$(echo "$password" | sudo -S pcs status)
   dialog --cr-wrap --help-button --help-label 'Ajuda' --title "PCS" --backtitle "Status do Pacemaker/Corosync" --msgbox "$spcs" 0 0
   case $? in
     2) dialog --title 'Ajuda' --msgbox "$TEXTAO06" 0 0; menu16 ;;
   esac
-  [ $? -ne 0 ] && start
+  [ $? -ne 0 ] && {start}
   menu08 "$Recado $spcs $TEXTAO06 $Mensagem"
-else
+} || {
   dialog --title "ERROR" --msgbox "O Pacemaker/Corosync não estão em execução ou não foram localizados neste sistema!" 8 40
-fi
+}
 
 menu01
 }
@@ -450,7 +452,7 @@ var2=$(dialog --title 'UDPCast' --backtitle "UDP CAST" --menu "Escolha o modo!" 
 A 'Cliente' \
 B 'Servidor' \
 X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && {start}
 case "$var2" in
 A) echo "Modo Cliente. Para sair, precione CTRL + C!" ; udp-receiver --file=/dev/null ;;
 B) echo "Modo Servidor. Para sair, precione CTRL + C!" ; udp-sender --file=/dev/zero ;;
@@ -459,7 +461,7 @@ esac
 }
 
 function menu18 {
-userlog=`w`
+userlog=$(w)
 dialog --title "Informação" --msgbox "$userlog" 20 60
 
 menu08 "$Recado $userlog $Mensagem"
@@ -467,7 +469,7 @@ m10
 }
 
 function menu19 {
-userlast=`last`
+userlast=$(last)
 dialog --title "Informação" --msgbox "$userlast" 20 60
 
 menu08 "$Recado $userlast $Mensagem"
@@ -477,15 +479,15 @@ m10
 function menu20 {
 menu09 pihole-FTL && pihole1=$prcs
 
-if [ "$pihole1" = "Executando" ]; then
-  dialog --backtitle "Servidor de DNS PiHole" --title "PiHole" --yesno "Deseja atualizar o PiHole?" 6 40
-  if [ $? = 0 ]; then
-    version1=`pihole -v`
-    datetime1=`date +"%d/%m %H:%M"` # Data e Hora
-    pihole -up
-    version2=`pihole -v`
-    datetime2=`date +"%d/%m %H:%M"` # Data e Hora
-    menu08 "$Recado PiHole atualizado de $datetime1 até $datetime2!
+[ "$pihole1" = "Executando" ] && {
+dialog --backtitle "Servidor de DNS PiHole" --title "PiHole" --yesno "Deseja atualizar o PiHole?" 6 40
+  [ $? = 0 ] && {
+  version1=$(pihole -v)
+  datetime1=$(date +"%d/%m %H:%M") # Data e Hora
+  pihole -up
+  version2=$(pihole -v)
+  datetime2=$(date +"%d/%m %H:%M") # Data e Hora
+  menu08 "$Recado PiHole atualizado de $datetime1 até $datetime2!
 A versão anterior era:
 
 $version1 
@@ -495,20 +497,20 @@ A nova versão é:
 $version2
 
 Atento ás novidades que a nova versão possa ter trago! $Mensagem"
-    fi
-else
+  }
+} || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-fi
+}
 
 m10
 }
 
 function menu21 {
-resultenp=`ip a | sed -n '/enp/p' |  awk '!/mac/' | awk '{print $2}' | sed 's/.$//' | grep 'enp'`
+resultenp=$(ip a | sed -n '/enp/p' |  awk '!/mac/' | awk '{print $2}' | sed 's/.$//' | grep 'enp')
 
 for i in $resultenp
 do
-  velo=`echo "$password" | sudo -S ethtool "$i" | grep Speed`
+  velo=$(echo "$password" | sudo -S ethtool "$i" | grep Speed)
   dialog --title 'Velocidades detectadas:' --msgbox "$i $velo" 8 40
 done
 
@@ -524,41 +526,41 @@ function gauge1 {
 }
 
 function menu22 {
-Google_P=`ping1 "8.8.4.4"`
+Google_P=$(ping1 "8.8.4.4")
 gauge1 "8"
-Google_S=`ping1 "8.8.8.8"`
+Google_S=$(ping1 "8.8.8.8")
 gauge1 "14"
-OpenDNS_P=`ping1 "208.67.222.222"`
+OpenDNS_P=$(ping1 "208.67.222.222")
 gauge1 "19"
-OpenDNS_S=`ping1 "208.67.220.220"`
+OpenDNS_S=$(ping1 "208.67.220.220")
 gauge1 "22"
-Level3_P=`ping1 "4.2.2.1"`
+Level3_P=$(ping1 "4.2.2.1")
 gauge1 "24"
-Level3_S=`ping1 "4.2.2.2"`
+Level3_S=$(ping1 "4.2.2.2")
 gauge1 "28"
-Comodo_P=`ping1 "8.26.56.26"`
+Comodo_P=$(ping1 "8.26.56.26")
 gauge1 "32"
-Comodo_S=`ping1 "8.20.247.20"`
+Comodo_S=$(ping1 "8.20.247.20")
 gauge1 "36"
-DNSWATCH_P=`ping1 "84.200.69.80"`
+DNSWATCH_P=$(ping1 "84.200.69.80")
 gauge1 "42"
-DNSWATCH_S=`ping1 "84.200.70.40"`
+DNSWATCH_S=$(ping1 "84.200.70.40")
 gauge1 "46"
-Quad9_P=`ping1 "9.9.9.9"`
+Quad9_P=$(ping1 "9.9.9.9")
 gauge1 "50"
-Quad9_S=`ping1 "149.112.112.112"`
+Quad9_S=$(ping1 "149.112.112.112")
 gauge1 "57"
-Cloudflare_P=`ping1 "1.1.1.1"`
+Cloudflare_P=$(ping1 "1.1.1.1")
 gauge1 "67"
-Cloudflare_S=`ping1 "1.0.0.1"`
+Cloudflare_S=$(ping1 "1.0.0.1")
 gauge1 "74"
-Algar_P=`ping1 "200.225.197.34"`
+Algar_P=$(ping1 "200.225.197.34")
 gauge1 "79"
-Algar_S=`ping1 "200.225.197.37"`
+Algar_S=$(ping1 "200.225.197.37")
 gauge1 "85"
-GIGA_P=`ping1 "189.38.95.95"`
+GIGA_P=$(ping1 "189.38.95.95")
 gauge1 "96"
-GIGA_S=`ping1 "189.38.95.96"`
+GIGA_S=$(ping1 "189.38.95.96")
 gauge1 "100"
 
 TEXTAO14="Google 8.8.4.4: $Google_P
@@ -587,7 +589,7 @@ liminal "st4rt1" "start"
 }
 
 function menu23 {
-ipneigh1=`ip neigh`
+ipneigh1=$(ip neigh)
 dialog --title 'IP Neigh' --msgbox "$ipneigh1" 0 0
 
 menu08 "$Recado $ipneigh1 $Mensagem"
@@ -661,7 +663,7 @@ esac
 # SpeedTest
 function menu050 {
 dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
-speedy=`curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -`
+speedy=$(curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -)
 dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "$speedy" 0 0
 
 menu08 "$Recado $speedy $Mensagem"
@@ -671,7 +673,7 @@ liminal "m3nu05" "menu05"
 # Arp-Scan
 function menu0501 {
 dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
-arpscn=`echo "$password" | sudo -S arp-scan -l`
+arpscn=$(echo "$password" | sudo -S arp-scan -l)
 dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "$arpscn" 0 0
 
 menu08 "$Recado $arpscn $Mensagem"
@@ -682,7 +684,7 @@ liminal "m3nu05" "menu05"
 function menu051 {
 site=$(dialog --title 'WhoIs' --backtitle "Identificar de Propriedade de um WebSite" --inputbox "Digite o site que deseja localizar informações. Use o seguinte modelo: exemplo.com.br" 10 40 2>&1 > /dev/tty)
 dialog --title "WhoIs" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
-wis=`whois "$site"`
+wis=$(whois "$site")
 dialog --title "WhoIs" --msgbox "$wis" 0 0
 
 menu08 "$Recado $wis $Mensagem"
@@ -695,7 +697,7 @@ site=$(dialog --title 'TraceRoute' --backtitle "Identificador de hops/saltos que
 exemplo.com.br \n
 A identificação estará concluída quando um (END) surgir no final." 14 40 2>&1 > /dev/tty)
 dialog --title "Traceroute" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
-trot=`traceroute "$site"`
+trot=$(traceroute "$site")
 dialog --title "Traceroute" --msgbox "$trot" 0 0
 
 menu08 "$Recado $trot $Mensagem"
@@ -704,8 +706,8 @@ liminal "m3nu05" "menu05"
 
 # Governador de CPU
 function menu053 {
-governor1=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!"`
-governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors || echo "Indisponível!"`
+governor1=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!")
+governor2=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors || echo "Indisponível!")
 var3=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "Troca do Governador de CPU" --menu "Governador de CPU Atual: \n
 $governor1" 0 0 0 \
 A 'Conservative' \
@@ -732,7 +734,7 @@ esac
 
 # Governador de CPU 2
 function menu10 {
-governor2=`cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors`
+governor2=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors)
 govr=$(echo "$password" | sudo -S echo $1 | sudo -S tee /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor 2> /dev/null 1> /dev/null && echo "si" || echo "no")
 if [ "$govr" = "si" ]; then
   dialog --cr-wrap --title "Bem sucedido!" --backtitle "Troca de Governador" --msgbox "Governador trocado com sucesso!" 0 0 ; menu053
@@ -744,7 +746,7 @@ fi
 }
 
 function menu054 {
-pong=`ping google.com -c 1 1> /dev/null 2> /dev/null && echo "ok" || echo "notok"`
+pong=$(ping google.com -c 1 1> /dev/null 2> /dev/null && echo "ok" || echo "notok")
 if [ "$pong" = "notok" ]; then
   dialog --cr-wrap --title "Erro na Rede" --backtitle "Erro detectado" --msgbox "O sistema não pode se comunicar com a rede local! Verifique sua conexão e tente novamente mais tarde." 8 40
   liminal "st4rt1" "start"
@@ -754,7 +756,7 @@ else
     if [ $? = 0 ]; then
       if [ -f "$FILE3" ]; then
         report="1"
-        validmail=`awk 'NR==1' $FILE3`
+        validmail=$(awk 'NR==1' $FILE3)
         dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
 $validmail" 15 40
           if [ $? = 0 ]; then
@@ -806,7 +808,7 @@ if [ "$report" = "0" ]; then
   dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Relatórios desativados!" 0 0
 else
   if [ -f "$FILE4" ]; then
-    validrelat=`cat "$FILE4"`
+    validrelat=$(cat "$FILE4")
     dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Um relatório salvo foi encontrado. \n \n
 $validrelat \n \n
 Deseja enviá-lo por e-mail?" 20 70
@@ -928,16 +930,16 @@ menu02
 
 # Status das VMs
 function menu022 {
-vms=`virsh list | grep running | sed -n "$1" | awk '{print $2}'`
+vms=$(virsh list | grep running | sed -n "$1" | awk '{print $2}')
 if [ "$vms" = "" ]; then
-  vms=`virsh list --all | grep "shut off" | sed -n "$1" | awk '{print $2}'`
-  sts=`echo "Parado"`
+  vms=$(virsh list --all | grep "shut off" | sed -n "$1" | awk '{print $2}')
+  sts=$(echo "Parado")
   if [ "$vms" = "" ]; then
-    vms=`echo "- - -"`
-    sts=`echo "- - -"`
+    vms=$(echo "- - -")
+    sts=$(echo "- - -")
   fi
 else
-  sts=`echo "Executando"`
+  sts=$(echo "Executando")
 fi
 }
 
@@ -971,7 +973,7 @@ menu02
 
 # Status de Máquinas Virtuais
 function menu025 {
-virtmgr0=`virsh list --all`
+virtmgr0=$(virsh list --all)
 dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Maquinas Virtuais encontradas:" --backtitle "Status do VirtManager" --msgbox "$virtmgr0" 0 0
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO12" 0 0 ; menu025 ;;
@@ -983,9 +985,9 @@ menu02
 
 # Reinicio
 function menu06 {
-bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 if [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ]; then
   dialog --cr-wrap --title 'ERRO AO REINICIAR' --backtitle 'ERRO AO TENTAR REINICIAR.' --msgbox "Reinício bloqueado! \n
 Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
@@ -1007,10 +1009,10 @@ liminal "m3nu05" "menu05"
 
 # Desligamento
 function menu07 {
-rrsnap=`ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-rsync1=`ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-bbalance=`ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
-cp1=`ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado"`
+rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 
 if [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ] || [ "$cp1" = "Executando" ]; then
   dialog --cr-wrap --title 'ERRO AO DESLIGAR' --backtitle 'ERRO AO TENTAR DESLIGAR.' --msgbox "Desligamento bloqueado! \n
@@ -1040,7 +1042,7 @@ if [ "$report" = "0" ]; then
     dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Os relatórios não estão ativos. Deseja reativá-los temporariamente?" 8 40
     if [ $? = 0 ]; then
       if [ -f "$FILE3" ]; then
-        validmail=`awk 'NR==1' $FILE3`
+        validmail=$(awk 'NR==1' $FILE3)
         dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
 $validmail" 15 40
         if [ $? = 0 ]; then          
@@ -1062,7 +1064,7 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
     fi
   fi
 else
-  validmail=`awk 'NR==1' $FILE3`
+  validmail=$(awk 'NR==1' $FILE3)
   dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar este relatório para $validmail?" 8 40
   if [ $? = 0 ]; then
     echo "$1" | mutt -s "Relatório - $HOSTNAME" "$validmail"
@@ -1166,7 +1168,7 @@ esac
 function menuA {
 dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "Pressione Enter para visualizar os Usuários! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && menu041
-usrlst=`echo "$password" | sudo -S samba-tool user list`
+usrlst=$(echo "$password" | sudo -S samba-tool user list)
 echo "$usrlst" | less
 menu08 "$Recado $usrlst $Mensagem"
 menu041
@@ -1175,7 +1177,7 @@ menu041
 function menuB {
 dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "Pressione Enter para visualizar os Computadores! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && menu043
-cmplist=`echo "$password" | sudo -S samba-tool computer list`
+cmplist=$(echo "$password" | sudo -S samba-tool computer list)
 echo "$cmplist" | less
 menu08 "$Recado $complist $Mensagem"
 menu043
@@ -1184,7 +1186,7 @@ menu043
 function menuC {
 dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && menu042
-grplist=`echo "$password" | sudo -S samba-tool group list`
+grplist=$(echo "$password" | sudo -S samba-tool group list)
 echo "$grplist" | less
 menu08 "$Recado $grplist $Mensagem"
 menu042
@@ -1404,7 +1406,7 @@ else
   repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
   if [ "$repeated" = "$validgrp" ]; then
     dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
-    usrgrps=`echo "$password" | sudo -S samba-tool group listmembers "$validgrp"`
+    usrgrps=$(echo "$password" | sudo -S samba-tool group listmembers "$validgrp")
     echo "$usrgrps" | less
     menu08 "$Recado
 Grupo $validgrp possui os seguintes membros:
@@ -1504,7 +1506,7 @@ else
   repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
   if [ "$repeated" = "$validusr" ]; then
     dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
-    grpsusr=`echo "$password" | sudo -S samba-tool user getgroups "$validusr"`
+    grpsusr=$(echo "$password" | sudo -S samba-tool user getgroups "$validusr")
     echo "$grpsusr" | less
     menu08 "$Recado
 Usuário $validusr está nos seguintes grupos:
@@ -1554,8 +1556,8 @@ menu042
 }
 
 function menuR {
-smbv=`samba --version`
-domainv=`echo "$password" | sudo -S samba-tool domain level show`
+smbv=$(samba --version)
+domainv=$(echo "$password" | sudo -S samba-tool domain level show)
 dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Informações do Domínio" --msgbox "
 Nome da Máquina: $HOSTNAME \n \n
 Versão do SAMBA: $smbv \n \n
@@ -1618,12 +1620,12 @@ dialog --title 'Informação' --yesno "Deseja atualizar o sistema operacional?" 
 if [ $? = 0 ]; then
   dialog --title 'Informação' --yesno "Tem certeza? Verifique se os processos em execução não pararão e/ou se configurações não serão perdidas." 8 40
   if [ $? = 0 ]; then
-    datetime=`date +"%d/%m %H:%M"` # Data e Hora
+    datetime=$(date +"%d/%m %H:%M") # Data e Hora
     echo "$password" | sudo -S "$pkg1" update
-    upgrd=`apt list --upgradable`
+    upgrd=$(apt list --upgradable)
     echo "$password" | sudo -S "$pkg1" upgrade -y
     echo "$password" | sudo -S "$pkg1" autoremove -y
-    datetime2=`date +"%d/%m %H:%M"` # Data e Hora
+    datetime2=$(date +"%d/%m %H:%M") # Data e Hord
     echo "# # # Fim! Aperte Enter para continuar. # # #" ; read
     dialog --title "Informação" --msgbox "Verifique se os processos em execução não pararam e/ou se configurações não foram perdidas." 8 40
     if [ "$report" = "1" ]; then
