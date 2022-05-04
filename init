@@ -199,6 +199,35 @@ script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executand
 liminal "m3nu05" "menu05"
 }
 
+function menu25 {
+noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
+noip2="Serviço de DNS NO-IP!"
+
+[ "$noip0" = "Executando" ] && {
+  dialog --title "$noip2" --yesno "Deseja reiniciar o NOIP?" 6 40
+  [ $? = 0 ] && {
+    echo "$password" | sudo -S killall noip2
+    sleep 2
+    echo "$password" | sudo -S noip2
+    dialog --title "$noip2" --msgbox "O NOIP foi reiniciado! \n
+Aguarde 1 minuto até o novo IP ser validado." 8 40
+  } || {
+    dialog --title "$noip2" --yesno "Deseja parar o NOIP?" 6 40
+    [ $? = 0 ] && {
+      echo "$password" | sudo -S killall noip2
+      dialog --title "$noip2" --msgbox "O NOIP foi parado!" 6 40
+      }
+  }
+} || {
+  dialog --title "$noip2" --yesno "Deseja tentar iniciar o NOIP?" 6 40
+  [ $? = 0 ] && {
+    echo "$password" | sudo -S noip2
+    dialog --title "$noip2" --msgbox "Verifique se o NOIP iniciou no menu 'Status Geral > Sistema'!" 8 40
+    }
+}
+
+}
+
 # Status de Sistema
 function menu11 {
 ip=$(hostname -I | awk '{print $1}')
@@ -214,6 +243,7 @@ xorg=$(ls /tmp/.X11-unix | wc -l)
 datetime=$(date +"%d/%m %H:%M")
 script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
 
 [ $(which drbdadm 2>/dev/null) ] && [ $(which virt-manager 2>/dev/null) ] && {
   aswb="sim"
@@ -241,6 +271,7 @@ Data e Hora Local: $datetime
 
 IP Local  : $ip
 IP Externo: $ip2
+NOIP: $noip0
 
 UpTime: $uptime
 XOrgs em Execução: $xorg
@@ -642,10 +673,11 @@ E '*WhoIs' \
 F '*TraceRoute' \
 G '*Ping DNS' \
 H 'Iniciar Scripts' \
-I 'Ajustes Relatórios' \
-J 'Relatórios Salvos' \
-K '*Reiniciar' \
-L '*Desligar' \
+I 'Re-Iniciar NOIP' \
+J 'Ajustes Relatórios' \
+K 'Relatórios Salvos' \
+L '*Reiniciar' \
+M '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -660,10 +692,11 @@ E) menu051 ;;
 F) menu052 ;;
 G) menu22 ;;
 H) menu24 ;;
-I) menu054 ;;
-J) menu055 ;;
-K) menu06 ;;
-L) menu07 ;;
+I) menu25 ;;
+J) menu054 ;;
+K) menu055 ;;
+L) menu06 ;;
+M) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -676,10 +709,11 @@ B 'Placas de Rede' \
 C '*Arp-Scan' \
 D '*TraceRoute' \
 E 'Iniciar Scripts' \
-F 'Ajustes Relatórios' \
-G 'Relatórios Salvos' \
-H '*Reiniciar' \
-I '*Desligar' \
+F 'Re-Iniciar NOIP' \
+G 'Ajustes Relatórios' \
+H 'Relatórios Salvos' \
+I '*Reiniciar' \
+J '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -691,10 +725,11 @@ B) menu21 ;;
 C) menu0501 ;;
 D) menu052 ;;
 E) menu24 ;;
-F) menu054 ;;
-G) menu055 ;;
-H) menu06 ;;
-I) menu07 ;;
+F) menu25 ;;
+G) menu054 ;;
+H) menu055 ;;
+I) menu06 ;;
+J) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1794,6 +1829,7 @@ Data e Hora Local: Data e Hora de referência para logs e eventos.
 
 IP Local: Geralmente é o IP Fixado localmente ou no servidor DHCP.
 IP Externo: Se houver acesso externo, monitora qual o IP Externo coletado naquele momento.
+NOIP: Informa se o processo noip2 está em execução, validando o IP Externo. Atualiza a cada 15 minutos.
 
 Uptime: Mostra a quantos dias, horas e/ou minutos o servidor está ligado.
 XOrgs em Execução: Para sistemas sem interface de usuário mas que permitem executar aplicações Xinit.
