@@ -149,6 +149,7 @@ C '*Armazenamento' \
 D '*S.M.A.R.T.' \
 E '*Cluster: DRBD' \
 F '*Cluster: PCS' \
+G 'Custom Scripts' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
@@ -158,6 +159,7 @@ C) menu13 ;;
 D) menu14 ;;
 E) menu15 ;;
 F) menu16 ;;
+G) menu24 ;;
 X) start ;;
 esac
 }
@@ -176,6 +178,25 @@ B) menu12 ;;
 C) menu13 ;;
 X) liminal "st4rt1" "start" ;;
 esac
+}
+
+function menu24 {
+datetime=$(date +"%d/%m %H:%M")
+script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+
+TEXTMAIL2="Nome da Máquina: $HOSTNAME
+Data e Hora Local: $datetime
+
+Cluster: $script1
+
+Balloon: $script2
+"
+
+dialog --cr-wrap --title "Informações encontradas:" --backtitle "Scripts Customizados" --msgbox "$TEXTMAIL2" 0 0
+[ $? -ne 0 ] && liminal "m3nu01" "menu01"
+
+liminal "m3nu01" "menu01"
 }
 
 # Status de Sistema
@@ -1986,6 +2007,8 @@ Windows Server 2003 - 4.0 e posterior
 
 * = Nível funcional não está estável o suficiente.
 Caso implementado, melhorias no Kerberos também não serão disponibilizados nesse nível."
+
+TEXTAO14="Custom Scritpz"
 
 ################################################################################
 #                                                                              #
