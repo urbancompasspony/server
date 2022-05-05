@@ -1861,7 +1861,7 @@ menu09 pihole-FTL && pihole1=$prcs
     [ -z "$validurl" ] && {
       dialog --title "ERRO" --msgbox "URL não pode ficar em branco!" 8 40
     } || {
-      echo "$password" | sudo -S pihole --white-regex "$validurl"
+      echo "$password" | sudo -S pihole --white-wild "$validurl"
       dialog --title "Informação" --msgbox "O site $validurl foi liberado! Aguarde até que a mudança reverbere na rede local." 8 40
     }
     menu08 "$Recado O site $validurl foi liberado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
@@ -1884,7 +1884,7 @@ menu09 pihole-FTL && pihole1=$prcs
     [ -z "$validurl" ] && {
       dialog --title "ERRO" --msgbox "URL não pode ficar em branco!" 8 40
     } || {
-      echo "$password" | sudo -S pihole --regex "$validurl"
+      echo "$password" | sudo -S pihole --wild "$validurl"
       dialog --title "Informação" --msgbox "O site $validurl foi bloqueado! Aguarde até que a mudança reverbere na rede local." 8 40
     }
     menu08 "$Recado O site $validurl foi bloqueado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
