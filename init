@@ -1911,7 +1911,7 @@ menu26
 ################################################################################
 
 # Todos os Textões!
-Recado="Relatório gerado pelo sistema de relatórios do $bktitle!
+Recado="Relatório do sistema $HOSTNAME gerado pela interface de relatórios do $bktitle!
 
 "
 
