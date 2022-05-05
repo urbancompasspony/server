@@ -22,7 +22,7 @@ hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 version="v3.0"
-revis="r0.1"
+revis="r0.2"
 
 ################################################################################
 ################################################################################
@@ -1930,10 +1930,10 @@ function menu27 {
       echo "$1" >> "/home/$USER/.DOC/$datetime3.docx"
       }
     } || {
-      dialog --title "Informação" --msgbox "Fim." 8 40
+      m10
     }
 }
-  
+
 }
 
 function menu28 {
@@ -1946,7 +1946,7 @@ function menu28 {
       menu27 "$cusrelat"
       }
     } || {
-      dialog --title "Informação" --msgbox "Fim." 8 40
+      m10
     }
 
   
