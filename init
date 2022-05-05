@@ -1778,18 +1778,18 @@ menu09 pihole-FTL && pihole1=$prcs
   blockedsites=$(picron=$(pihole -c -e); echo "$picron" | awk 'NR==11 {print $4}')
   varpi=$(dialog --title 'Servidor de DNS PiHole' --backtitle "$bktitle" --menu "URLs Bloqueadas: \n
 $blockedsites" 0 0 0 \
-  A 'Resumo' \
-  B 'Atualizar PiHole' \
-  C 'Atualizar Gravity' \
-  D 'White List' \
-  E 'Black List' \
+  A '*Resumo' \
+  B '*Atualizar PiHole' \
+  C '*Atualizar Gravity' \
+  D '*White List' \
+  E '*Black List' \
   X 'Voltar' 2>&1 > /dev/tty )
   case $? in
     2) dialog --title 'Ajuda' --msgbox "$TEXTAO10" 0 0 ; menu053 ;;
   esac
   [ $? -ne 0 ] && liminal "m3nu05" "menu05"
   case "$varpi" in
-  A) picron=$(pihole -c -e | awk 'NR>=5 && NR<=17 {print}'); dialog --title 'Chronometer' --msgbox "$picron" 0 0 ; menu26 ;;
+  A) menu264 ;;
   B) menu20 ;;
   C) menu261 ;;
   D) menu262 ;;
@@ -1893,6 +1893,13 @@ menu09 pihole-FTL && pihole1=$prcs
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
   }
 
+menu26
+}
+
+function menu264 {
+picron=$(pihole -c -e | awk 'NR>=5 && NR<=17 {print}')
+dialog --title 'Chronometer' --msgbox "$picron" 0 0
+menu08 $recado $picron $mensagem
 menu26
 }
 
