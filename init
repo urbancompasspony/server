@@ -26,14 +26,13 @@ FILE2="/etc/.lockall"
 FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
-version="v2.8-rc1"
+version="v2.8-rc2"
 
 ################################################################################
 ################################################################################
 
 # Menu Title
-datetime=$(date +"%d/%m %H:%M")
-bktitle="|| USM: Universal Server Menu $version || Data e Hora: $datetime"
+bktitle="|| USM: Universal Server Menu $version ||"
 report=0; datetime2=0; confrel=0
 
 # Checagem de Dependências
@@ -82,10 +81,11 @@ hash1=$(echo "$password" | md5sum | awk '{print $1}')
 
 # SISTEMA Normal
 function start {
+datetime=$(date +"%d/%m %H:%M")
 uptime=$(uptime | awk {'print $3 $4 $5'})
 var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
-Usuário atual: $USER
-UpTime: $uptime"  0 0 8 \
+Data e Hora: $datetime
+UpTime: $uptime"  0 0 0 \
 A 'Status Geral' \
 B 'Máquinas Virtuais' \
 C 'Processos' \
@@ -111,10 +111,11 @@ esac
 
 # Invertido
 function st4rt1 {
+datetime=$(date +"%d/%m %H:%M")
 uptime=$(uptime | awk {'print $3 $4 $5'})
 var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
-Usuário atual: $USER
-UpTime: $uptime"  0 0 8 \
+Data e Hora: $datetime
+UpTime: $uptime"  0 0 0 \
 A 'Status Geral' \
 B 'Máquinas Virtuais' \
 C 'Processos' \
@@ -247,10 +248,11 @@ bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && ec
 rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-#xorg=$(ls /tmp/.X11-unix | wc -l)
 script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
+#xorg=$(ls /tmp/.X11-unix | wc -l)
+
 [ $(which drbdadm 2>/dev/null) ] && [ $(which virt-manager 2>/dev/null) ] && {
   aswb="sim"
 } || {
