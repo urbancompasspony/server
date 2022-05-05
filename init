@@ -32,7 +32,7 @@ version="v3.0"
 ################################################################################
 
 # Menu Title
-bktitle="|| USM: Universal Server Menu $version ||"
+bktitle="USM: Universal Server Menu $version"
 report=0; datetime2=0; confrel=0
 
 # Checagem de Dependências
