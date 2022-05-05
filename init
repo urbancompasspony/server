@@ -21,15 +21,24 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
+version="v3.0"
+revis="r0.1"
+
+################################################################################
+################################################################################
+
+# Docs
 FILE="/home/$USER/.lockinit"
 FILE2="/etc/.lockall"
 FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
-version="v3.0"
+doc_rel="0"
+datetime3=$(date +"%m-%Y") # Month
 
-################################################################################
-################################################################################
+[ -d /home/$USER/.DOC ] || { mkdir "/home/$USER/.DOC" 2> /dev/null; }
+[ -d /home/$USER/.DOC/$datetime3 ] || { mkdir "/home/$USER/.DOC/$datetime3" 2> /dev/null; }
+[ -f /home/$USER/.DOC/$datetime3 ] || { cp "/home/$USER/.DOC/relat.docx" "/home/$USER/.DOC/$datetime3.docx" 2> /dev/null; }
 
 # Menu Title
 bktitle="USM: Universal Server Menu $version"
@@ -62,7 +71,7 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 # PASSWORD
 function init {
 [ -f "$FILE2" ] && echo "# # # Menu Travado! Saindo. # # #" && exit
-password=$(dialog --backtitle "$bktitle" --title 'Acesso ao USM' --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
+password=$(dialog --backtitle "$bktitle" --title "Acesso ao USM - $revis" --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
 hash1=$(echo "$password" | md5sum | awk '{print $1}')
 [ -z "$password" ] && {
   clear
@@ -70,7 +79,7 @@ hash1=$(echo "$password" | md5sum | awk '{print $1}')
   echo "Para voltar, digite 'menu'!"
 } || {
   [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && {
-    password=$(dialog --backtitle "$bktitle." --title 'Acesso ao USM' --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
+    password=$(dialog --backtitle "$bktitle." --title "Acesso ao USM - $revis" --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
     menu054
   } || {
     menu054
@@ -81,6 +90,7 @@ hash1=$(echo "$password" | md5sum | awk '{print $1}')
 
 # SISTEMA Normal
 function start {
+doc_rel="1" # Relatorio!
 datetime=$(date +"%d/%m %H:%M")
 uptime=$(uptime | awk {'print $3 $4 $5'})
 var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
@@ -652,7 +662,7 @@ E '*Who Is' \
 F '*Trace Route' \
 G '*Ping DNS' \
 H 'Iniciar Scripts' \
-I 'Re-Iniciar NOIP' \
+I '*Re-Iniciar NOIP' \
 J 'Ajustes Relatórios' \
 K 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
@@ -684,7 +694,7 @@ B '*Speed Test' \
 C '*Arp-Scan' \
 D '*Trace Route' \
 E 'Iniciar Scripts' \
-F 'Re-Iniciar NOIP' \
+F '*Re-Iniciar NOIP' \
 G 'Ajustes Relatórios' \
 H 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
@@ -846,7 +856,6 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
 }
 
 liminal "st4rt1" "start"
-#liminal "m3nu05" "menu05"
 }
 
 function menu055 {
@@ -1646,8 +1655,8 @@ password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --ti
 
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
-A '*Atualizar o Sistema' \
-B 'PiHole' \
+A '#Atualizar o Sistema' \
+B '#PiHole' \
 C 'Governador de CPU' \
 D 'TRIM Disks' \
 E 'Parar Rsync' \
@@ -1657,6 +1666,7 @@ H 'Parar CoPy' \
 I 'UDP-Cast' \
 J '*Usuários Logados' \
 K '*Logins Anteriores' \
+L 'Relatório Customizado' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
@@ -1671,6 +1681,7 @@ H) m15 ;;
 I) menu17 ;;
 J) menu18 ;;
 K) menu19 ;;
+L) menu28 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1678,7 +1689,7 @@ esac
 function m11 {
 dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja atualizar o sistema operacional?" 8 40
 [ $? = 0 ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Verifique se os processos em execução não pararão e/ou se configurações não serão perdidas." 8 40
+  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza disso? Verifique se os processos em execução não pararão e/ou se configurações não serão perdidas." 8 40
   [ $? = 0 ] && {
     datetime=$(date +"%d/%m %H:%M")
     echo "$password" | sudo -S "$pkg1" update
@@ -1694,6 +1705,7 @@ $upgrd" 20 50
       dialog --title 'Relatório' --yesno "Deseja enviar este relatório por e-mail?" 8 40
       [ $? = 0 ] && {
         menu08 "$Recado $Recado2 $datetime $Recado3 $upgrd $Recado4 $datetime2 $Mensagem"
+        menu27 "$datetime : Nesta data o sistema recebeu as atualizações mais recentes. Sem maiores problemas a serem pontuados."
       }
     }
   }
@@ -1822,6 +1834,7 @@ A nova versão é:
 $version2
 
 Atento ás novidades que a nova versão possa ter trago! $Mensagem"
+    menu27 "$datetime : PiHole® atualizado desta data até $datetime2 para a versão mais nova!"
     }
 } || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
@@ -1841,6 +1854,7 @@ menu09 pihole-FTL && pihole1=$prcs
     datetime2=$(date +"%d/%m %H:%M") # Data e Hora
     blockedsites=$(picron=$(pihole -c -e); echo "$picron" | awk 'NR==11 {print $4}')
     menu08 "$Recado A lista de bloqueios foi atualizada de $datetime até $datetime2! Agora o sistema bloqueia $blockedsites sites maliciosos. $Mensagem"
+    menu27 "$datetime : A lista de bloqueios foi atualizada desta data até $datetime2! O sistema bloqueia $blockedsites sites maliciosos."
     }
 } || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
@@ -1865,6 +1879,7 @@ menu09 pihole-FTL && pihole1=$prcs
       dialog --title "Informação" --msgbox "O site $validurl foi liberado! Aguarde até que a mudança reverbere na rede local." 8 40
     }
     menu08 "$Recado O site $validurl foi liberado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
+    menu27 "$datetime : Nesta data o site $validurl foi liberado conforme solicitado."
     }
 } || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
@@ -1888,6 +1903,7 @@ menu09 pihole-FTL && pihole1=$prcs
       dialog --title "Informação" --msgbox "O site $validurl foi bloqueado! Aguarde até que a mudança reverbere na rede local." 8 40
     }
     menu08 "$Recado O site $validurl foi bloqueado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
+    menu27 "$datetime : Nesta data o site $validurl foi bloqueado conforme solicitado."
     }
 } || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
@@ -1904,6 +1920,36 @@ menu08 "$Recado Status do PiHole em $datetime:
 
 $picron $Mensagem"
 menu26
+}
+
+function menu27 {
+[ "$doc_rel"="1" ] && {
+  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar o relatório para $datetime3.docx?" 8 40
+  [ $? = 0 ] && {
+    [ -f "/home/$USER/.DOC/$datetime3.docx" ] && {
+      echo "$1" >> "/home/$USER/.DOC/$datetime3.docx"
+      }
+    } || {
+      dialog --title "Informação" --msgbox "Fim." 8 40
+    }
+}
+  
+}
+
+function menu28 {
+[ "$doc_rel"="1" ] && {
+  datetime=$(date +"%d/%m %H:%M")
+  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja criar um relatório customizado?" 8 40
+  [ $? = 0 ] && {
+      cusrelat=$(dialog --title 'Custom' --backtitle "$bktitle" --inputbox "O que deseja reportar?" 8 40 "$datetime : " 2>&1 > /dev/tty)
+      menu08 "$Recado $cusrelat $Mensagem"
+      menu27 "$cusrelat"
+      }
+    } || {
+      dialog --title "Informação" --msgbox "Fim." 8 40
+    }
+
+  
 }
 
 ################################################################################
