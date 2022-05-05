@@ -22,7 +22,7 @@ hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 version="v3.0"
-revis="r0.2"
+revis="r1.0"
 
 ################################################################################
 ################################################################################
@@ -37,8 +37,14 @@ doc_rel="0"
 datetime3=$(date +"%m-%Y") # Month
 
 [ -d /home/$USER/.DOC ] || { mkdir "/home/$USER/.DOC" 2> /dev/null; }
-[ -d /home/$USER/.DOC/$datetime3 ] || { mkdir "/home/$USER/.DOC/$datetime3" 2> /dev/null; }
-[ -f /home/$USER/.DOC/$datetime3 ] || { cp "/home/$USER/.DOC/relat.docx" "/home/$USER/.DOC/$datetime3.docx" 2> /dev/null; }
+[ -f /home/$USER/.DOC/$datetime3 ] || {
+cp "/home/$USER/.DOC/.relat.docx" "/home/$USER/.DOC/$datetime3.docx" 2> /dev/null
+
+TEXTAO14="
+Conforme estipulado em contrato mensal de prestação de serviços na área de informática, segue abaixo o relatório de manutenções preventivas e corretivas executados no período de $datetime3:"
+
+echo "$TEXTAO14" >> "/home/$USER/.DOC/$datetime3.docx"
+}
 
 # Menu Title
 bktitle="USM: Universal Server Menu $version"
@@ -1658,30 +1664,32 @@ var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Mod
 A '#Atualizar o Sistema' \
 B '#PiHole' \
 C 'Governador de CPU' \
-D 'TRIM Disks' \
-E 'Parar Rsync' \
-F 'Parar RSnapshot' \
-G 'Parar Balance' \
-H 'Parar CoPy' \
-I 'UDP-Cast' \
-J '*Usuários Logados' \
-K '*Logins Anteriores' \
-L 'Relatório Customizado' \
+D 'Parar Rsync' \
+E 'Parar RSnapshot' \
+F 'Parar Balance' \
+G 'Parar CoPy' \
+H 'UDP-Cast' \
+I '*Usuários Logados' \
+J '*Logins Anteriores' \
+K 'Emitir Relatório' \
+L 'Encaminhar .docx' \
+M 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) m11 ;;
 B) menu26 ;;
 C) menu053 ;;
-D) echo "$password" | sudo -S fstrim -va ; m10 ;;
-E) m12 ;;
-F) m13 ;;
-G) m14 ;;
-H) m15 ;;
-I) menu17 ;;
-J) menu18 ;;
-K) menu19 ;;
-L) menu28 ;;
+D) m12 ;;
+E) m13 ;;
+F) m14 ;;
+G) m15 ;;
+H) menu17 ;;
+I) menu18 ;;
+J) menu19 ;;
+K) menu28 ;;
+L) menu29 ;;
+M) menu30 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1705,7 +1713,8 @@ $upgrd" 20 50
       dialog --title 'Relatório' --yesno "Deseja enviar este relatório por e-mail?" 8 40
       [ $? = 0 ] && {
         menu08 "$Recado $Recado2 $datetime $Recado3 $upgrd $Recado4 $datetime2 $Mensagem"
-        menu27 "$datetime : Nesta data o sistema recebeu as atualizações mais recentes. Sem maiores problemas a serem pontuados."
+        menu27 "
+$datetime : Nesta data o sistema recebeu as atualizações mais recentes e está em dia com a segurança digital."
       }
     }
   }
@@ -1834,7 +1843,8 @@ A nova versão é:
 $version2
 
 Atento ás novidades que a nova versão possa ter trago! $Mensagem"
-    menu27 "$datetime : PiHole® atualizado desta data até $datetime2 para a versão mais nova!"
+    menu27 "
+$datetime : PiHole® atualizado desta data até $datetime2 para a versão mais nova!"
     }
 } || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
@@ -1854,7 +1864,8 @@ menu09 pihole-FTL && pihole1=$prcs
     datetime2=$(date +"%d/%m %H:%M") # Data e Hora
     blockedsites=$(picron=$(pihole -c -e); echo "$picron" | awk 'NR==11 {print $4}')
     menu08 "$Recado A lista de bloqueios foi atualizada de $datetime até $datetime2! Agora o sistema bloqueia $blockedsites sites maliciosos. $Mensagem"
-    menu27 "$datetime : A lista de bloqueios foi atualizada desta data até $datetime2! O sistema bloqueia $blockedsites sites maliciosos."
+    menu27 "
+$datetime : A lista de bloqueios foi atualizada desta data até $datetime2! O sistema bloqueia $blockedsites sites maliciosos."
     }
 } || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
@@ -1879,7 +1890,8 @@ menu09 pihole-FTL && pihole1=$prcs
       dialog --title "Informação" --msgbox "O site $validurl foi liberado! Aguarde até que a mudança reverbere na rede local." 8 40
     }
     menu08 "$Recado O site $validurl foi liberado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
-    menu27 "$datetime : Nesta data o site $validurl foi liberado conforme solicitado."
+    menu27 "
+$datetime : Nesta data o site $validurl foi liberado conforme solicitado."
     }
 } || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
@@ -1903,7 +1915,8 @@ menu09 pihole-FTL && pihole1=$prcs
       dialog --title "Informação" --msgbox "O site $validurl foi bloqueado! Aguarde até que a mudança reverbere na rede local." 8 40
     }
     menu08 "$Recado O site $validurl foi bloqueado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
-    menu27 "$datetime : Nesta data o site $validurl foi bloqueado conforme solicitado."
+    menu27 "
+$datetime : Nesta data o site $validurl foi bloqueado conforme solicitado."
     }
 } || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
@@ -1943,13 +1956,48 @@ function menu28 {
   [ $? = 0 ] && {
       cusrelat=$(dialog --title 'Custom' --backtitle "$bktitle" --inputbox "O que deseja reportar?" 8 40 "$datetime : " 2>&1 > /dev/tty)
       menu08 "$Recado $cusrelat $Mensagem"
-      menu27 "$cusrelat"
-      }
-    } || {
+      menu27 "
+$cusrelat"
       m10
-    }
+      }
+  } || {
+    m10
+   }
+}
 
-  
+function menu29 {
+datetime=$(date +"%d/%m %H:%M")
+validmail=$(awk 'NR==1' $FILE3)
+
+TEXTAO15="Boa tarde,
+
+Segue anexo o relatório dos atendimentos, manutenções corretivas e manutenções preventivas realizadas em $datetime3!
+
+Grato,
+José Humberto"
+
+dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.docx para $validmail?" 8 40
+[ $? = 0 ] && {
+  echo "$TEXTAO15" | mutt -s "Relatório de Atendimento - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.docx" -- "$validmail"
+  }
+
+dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar um documento diferente para $validmail?" 8 40
+[ $? = 0 ] && {
+  inputdoc1=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
+  echo "$TEXTAO15" | mutt -s "Relatório de Atendimento - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.docx" -- "$validmail"
+  }
+
+m10
+}
+
+function menu30 {
+dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja APAGAR um relatório.docx?" 8 40
+[ $? = 0 ] && {
+  inputdoc2=$(dialog --title 'Deleção' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
+  rm "/home/$USER/.DOC/$inputdoc2.docx"
+  }
+
+m10
 }
 
 ################################################################################
