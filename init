@@ -26,7 +26,7 @@ FILE2="/etc/.lockall"
 FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
-version="v2.8-rc2"
+version="v3.0"
 
 ################################################################################
 ################################################################################
@@ -191,53 +191,69 @@ esac
 
 function menu24 {
 # Cluster
+checkscript1=$([ -f /home/$USER/Scripts/Cluster ] && echo "sim" || echo "nao")
+[ "$checkscript1" = "sim" ] && {
 script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-[ "$script1" = "Executando" ] && {
-  dialog --title 'Script Cluster Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
+  [ "$script1" = "Executando" ] && {
+    dialog --title 'Script Cluster Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
+  } || {
+    echo "$password" | sudo -S bash /home/$USER/Scripts/Cluster & 1> /dev/null 2> /dev/null
+    dialog --title 'Script Cluster foi iniciado!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
+    }
 } || {
-  echo "$password" | sudo -S bash /home/$USER/Scripts/Cluster & 1> /dev/null 2> /dev/null
+  dialog --title 'ATENÇÃO!' --msgbox "O script Cluster não foi encontrado ou configurado!" 8 40
   }
-
+  
 # Balloon
-script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-[ "$script2" = "Executando" ] && {
-  dialog --title 'Script Balloon Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
+checkscript2=$([ -f /home/$USER/Scripts/Balloon ] && echo "sim" || echo "nao")
+[ "$checkscript2" = "sim" ] && {
+  script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+  [ "$script2" = "Executando" ] && {
+    dialog --title 'Script Balloon Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
+  } || {
+    bash /home/$USER/Scripts/Balloon & 1> /dev/null 2> /dev/null
+    dialog --title 'Script Balloon foi iniciado!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
+    }
 } || {
-  bash /home/$USER/Scripts/Balloon & 1> /dev/null 2> /dev/null
+  dialog --title 'ATENÇÃO!' --msgbox "O script Balloon não foi encontrado ou configurado!" 8 40
   }
-
+  
 [ $? -ne 0 ] && liminal "m3nu05" "menu05"
 liminal "m3nu05" "menu05"
 }
 
 function menu25 {
-noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
-noip2="Serviço de DNS NO-IP!"
-[ "$noip0" = "Executando" ] && {
-  dialog --title "$noip2" --yesno "Deseja reiniciar o NOIP?" 6 40
-  [ $? = 0 ] && {
-    echo "$password" | sudo -S killall noip2
-    sleep 2
-    echo "$password" | sudo -S noip2
-    dialog --title "$noip2" --msgbox "O NOIP foi reiniciado! \n
-Aguarde 1 minuto até o novo IP ser validado." 8 40
-  } || {
-    dialog --title "$noip2" --yesno "Deseja parar o NOIP?" 6 40
+checknoip=$([ -f /usr/local/src/noip-duc-linux.tar.gz ] && echo "sim" || echo "nao")
+[ "$checknoip" = "sim" ] && {
+  noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
+  noip2="Serviço de DNS NO-IP!"
+  [ "$noip0" = "Executando" ] && {
+    dialog --title "$noip2" --yesno "Deseja reiniciar o NOIP?" 6 40
     [ $? = 0 ] && {
       echo "$password" | sudo -S killall noip2
-      dialog --title "$noip2" --msgbox "O NOIP foi parado!" 6 40
+      sleep 2
+      echo "$password" | sudo -S noip2
+      dialog --title "$noip2" --msgbox "O NOIP foi reiniciado! \n
+Aguarde 1 minuto até o novo IP ser validado." 8 40
+    } || {
+      dialog --title "$noip2" --yesno "Deseja parar o NOIP?" 6 40
+      [ $? = 0 ] && {
+        echo "$password" | sudo -S killall noip2
+        dialog --title "$noip2" --msgbox "O NOIP foi parado!" 6 40
+        }
+    } || {
+      liminal "m3nu05" "menu05"
       }
   } || {
-    liminal "m3nu05" "menu05"
-    }
+    dialog --title "$noip2" --yesno "Deseja tentar iniciar o NOIP?" 6 40
+    [ $? = 0 ] && {
+      echo "$password" | sudo -S noip2
+      dialog --title "$noip2" --msgbox "Verifique se o NOIP iniciou no menu 'Status Geral > Sistema'!" 8 40
+      }
+  } 
 } || {
-  dialog --title "$noip2" --yesno "Deseja tentar iniciar o NOIP?" 6 40
-  [ $? = 0 ] && {
-    echo "$password" | sudo -S noip2
-    dialog --title "$noip2" --msgbox "Verifique se o NOIP iniciou no menu 'Status Geral > Sistema'!" 8 40
-    }
+  dialog --title "$noip2" --msgbox "NOIP não foi encontrado ou configurado nesse sistema." 8 40
 }
-
 liminal "m3nu05" "menu05"
 }
 
@@ -534,33 +550,6 @@ function menu19 {
 userlast=$(last)
 dialog --title "Informação" --msgbox "$userlast" 20 60
 menu08 "$Recado $userlast $Mensagem"
-m10
-}
-
-function menu20 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja atualizar o PiHole?" 6 40
-  [ $? = 0 ] && {
-    version1=$(pihole -v)
-    pihole -up
-    version2=$(pihole -v)
-    datetime2=$(date +"%d/%m %H:%M") # Data e Hora
-    menu08 "$Recado PiHole atualizado de $datetime até $datetime2!
-A versão anterior era:
-
-$version1 
-
-A nova versão é:
-
-$version2
-
-Atento ás novidades que a nova versão possa ter trago! $Mensagem"
-    }
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  }
-
 m10
 }
 
@@ -1058,6 +1047,7 @@ bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && ec
 rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+datetime=$(date +"%d/%m %H:%M")
 [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ] || [ "$cp1" = "Executando" ] && {
   dialog --cr-wrap --title 'ERRO AO REINICIAR' --backtitle "$bktitle" --msgbox "Reinício bloqueado! \n
 Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
@@ -1085,6 +1075,7 @@ rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executan
 rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+datetime=$(date +"%d/%m %H:%M")
 [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ] || [ "$cp1" = "Executando" ] && {
   dialog --cr-wrap --title 'ERRO AO DESLIGAR' --backtitle 'ERRO AO TENTAR DESLIGAR.' --msgbox "Desligamento bloqueado! \n
 Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
@@ -1626,7 +1617,8 @@ domainv=$(echo "$password" | sudo -S samba-tool domain level show)
 dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Active Directory & Domain Controller" --msgbox "
 Nome da Máquina: $HOSTNAME \n \n
 Versão do SAMBA: $smbv \n \n
-Nível do Domínio: $domainv \n \n" 0 0
+Nível do Domínio: $domainv \n \n
+" 0 0
 case $? in
   2) dialog --title 'Ajuda com Significados' --msgbox "$TEXTAO13" 0 0 ; menuR ;;
 esac
@@ -1655,7 +1647,7 @@ password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --ti
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
 A '*Atualizar o Sistema' \
-B 'Atualizar PiHole' \
+B 'PiHole' \
 C 'Governador de CPU' \
 D 'TRIM Disks' \
 E 'Parar Rsync' \
@@ -1669,7 +1661,7 @@ X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) m11 ;;
-B) menu20 ;;
+B) menu26 ;;
 C) menu053 ;;
 D) echo "$password" | sudo -S fstrim -va ; m10 ;;
 E) m12 ;;
@@ -1688,6 +1680,7 @@ dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação
 [ $? = 0 ] && {
   dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Verifique se os processos em execução não pararão e/ou se configurações não serão perdidas." 8 40
   [ $? = 0 ] && {
+    datetime=$(date +"%d/%m %H:%M")
     echo "$password" | sudo -S "$pkg1" update
     upgrd=$(apt list --upgradable)
     echo "$password" | sudo -S "$pkg1" upgrade -y
@@ -1778,6 +1771,130 @@ m10
 }
 
 function liminal { [ -f "$FILE" ] && { [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && { $2; } || { $1; }; } || { $2; }; }
+
+function menu26 {
+menu09 pihole-FTL && pihole1=$prcs
+[ "$pihole1" = "Executando" ] && {
+  blockedsites=$(picron=$(pihole -c -e); echo "$picron" | awk 'NR==11 {print $4}')
+  varpi=$(dialog --title 'Servidor de DNS PiHole' --backtitle "$bktitle" --menu "URLs Bloqueadas: \n
+$blockedsites" 0 0 0 \
+  A 'Resumo' \
+  B 'Atualizar PiHole' \
+  C 'Atualizar Gravity' \
+  D 'White List' \
+  E 'Black List' \
+  X 'Voltar' 2>&1 > /dev/tty )
+  case $? in
+    2) dialog --title 'Ajuda' --msgbox "$TEXTAO10" 0 0 ; menu053 ;;
+  esac
+  [ $? -ne 0 ] && liminal "m3nu05" "menu05"
+  case "$varpi" in
+  A) picron=$(pihole -c -e | awk 'NR>=5 && NR<=17 {print}'); dialog --title 'Chronometer' --msgbox "$picron" 0 0 ; menu26 ;;
+  B) menu20 ;;
+  C) menu261 ;;
+  D) menu262 ;;
+  E) menu263 ;;
+  X) m10 ;;
+  esac
+} || {
+  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
+  }
+}
+
+# Atualizar PiHole
+function menu20 {
+menu09 pihole-FTL && pihole1=$prcs
+[ "$pihole1" = "Executando" ] && {
+  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja atualizar o PiHole?" 6 40
+  [ $? = 0 ] && {
+    datetime=$(date +"%d/%m %H:%M")
+    version1=$(pihole -v)
+    pihole -up
+    version2=$(pihole -v)
+    datetime2=$(date +"%d/%m %H:%M") # Data e Hora
+    menu08 "$Recado PiHole atualizado de $datetime até $datetime2!
+A versão anterior era:
+
+$version1 
+
+A nova versão é:
+
+$version2
+
+Atento ás novidades que a nova versão possa ter trago! $Mensagem"
+    }
+} || {
+  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
+  }
+
+menu26
+}
+
+# Atualizar Gravity
+function menu261 {
+menu09 pihole-FTL && pihole1=$prcs
+[ "$pihole1" = "Executando" ] && {
+  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja atualizar o Gravity?" 6 40
+  [ $? = 0 ] && {
+    datetime=$(date +"%d/%m %H:%M")
+    pihole -g
+    datetime2=$(date +"%d/%m %H:%M") # Data e Hora
+    blockedsites=$(picron=$(pihole -c -e); echo "$picron" | awk 'NR==11 {print $4}')
+    menu08 "$Recado A lista de bloqueios foi atualizada de $datetime até $datetime2! Agora o sistema bloqueia $blockedsites sites maliciosos. $Mensagem"
+    }
+} || {
+  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
+  }
+
+menu26
+}
+
+# White List
+function menu262 {
+menu09 pihole-FTL && pihole1=$prcs
+[ "$pihole1" = "Executando" ] && {
+  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja adicionar uma URL á White List?" 6 40
+  [ $? = 0 ] && {
+    datetime=$(date +"%d/%m %H:%M")
+    validurl=$(dialog --title 'PiHole' --backtitle "$bktitle" --inputbox "Insira a URL que será liberada" 0 0 2>&1 > /dev/tty)
+    [ $? -ne 0 ] && menu26
+    [ -z "$validurl" ] && {
+      dialog --title "ERRO" --msgbox "URL não pode ficar em branco!" 8 40
+    } || {
+      echo "$password" | sudo -S pihole --white-regex "$validurl"
+      dialog --title "Informação" --msgbox "O site $validurl foi liberado! Aguarde até que a mudança reverbere na rede local." 8 40
+    }
+    menu08 "$Recado O site $validurl foi liberado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
+    }
+} || {
+  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
+  }
+
+menu26
+}
+
+# Black List
+function menu263 {
+menu09 pihole-FTL && pihole1=$prcs
+[ "$pihole1" = "Executando" ] && {
+  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja adicionar uma URL á Black List?" 6 40
+  [ $? = 0 ] && {
+    validurl=$(dialog --title 'PiHole' --backtitle "$bktitle" --inputbox "Insira a URL que será bloqueada" 0 0 2>&1 > /dev/tty)
+    [ $? -ne 0 ] && menu26
+    [ -z "$validurl" ] && {
+      dialog --title "ERRO" --msgbox "URL não pode ficar em branco!" 8 40
+    } || {
+      echo "$password" | sudo -S pihole --regex "$validurl"
+      dialog --title "Informação" --msgbox "O site $validurl foi bloqueado! Aguarde até que a mudança reverbere na rede local." 8 40
+    }
+    menu08 "$Recado O site $validurl foi bloqueado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
+    }
+} || {
+  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
+  }
+
+menu26
+}
 
 ################################################################################
 #                                                                              #
