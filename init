@@ -9,13 +9,15 @@
 #                                                           ####################
 # ============================================================================ #
 
-# Versionamento: v1.9.4.0
+################################################################################
+# PAINEL DE CONTROLE ###########################################################
+
+# Versionamento: v1.9.4
 # 1.x: Mudanças drásticas, geralmente recursos novos e menus principais.
 # x.9: Mudanças pequenas, implementação de novas ferramentas.
 # rc-1: Correções de bugs de ferramentas ou menus
-#[ $? -ne 0 ] && menu02
 
-# Controle
+# Hashs
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
@@ -24,12 +26,15 @@ FILE2="/etc/.lockall"
 FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
-# Variáveis Globais
-bktitle="USM: Universal Server Menu v2.7.2"
+version="v2.8-rc1"
 
-processname=0; validmail=0; process=0; status=0; pkg=0; hash1=0; password=0
-password2=0; password3=0; report=0; advanced=0; YUM_CMD=0
-APT_CMD=0; datetime=0; datetime2=0; confrel=0
+################################################################################
+################################################################################
+
+# Menu Title
+datetime=$(date +"%d/%m %H:%M")
+bktitle="|| USM: Universal Server Menu $version || Data e Hora: $datetime"
+report=0; datetime2=0; confrel=0
 
 # Checagem de Dependências
 function pkg {
@@ -57,47 +62,38 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 
 # PASSWORD
 function init {
-FILE2="/etc/.lockall"; [ -f "$FILE2" ] && echo "# # # Menu Travado! Saindo. # # #" && exit
-password=$(dialog --backtitle "$bktitle" --title 'Acesso ao USM' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
+[ -f "$FILE2" ] && echo "# # # Menu Travado! Saindo. # # #" && exit
+password=$(dialog --backtitle "$bktitle" --title 'Acesso ao USM' --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
 hash1=$(echo "$password" | md5sum | awk '{print $1}')
 [ -z "$password" ] && {
   clear
-  echo "É necessário digitar sua senha para continuar. Saindo..."
+  echo "É necessário digitar uma senha para continuar. Saindo..."
   echo "Para voltar, digite 'menu'!"
 } || {
   [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && {
-    password=$(dialog --backtitle "$bktitle." --title 'Acesso ao USM' --insecure --passwordbox 'Digite sua senha de Administrador!' 0 0 2>&1 > /dev/tty)
+    password=$(dialog --backtitle "$bktitle." --title 'Acesso ao USM' --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
     menu054
   } || {
     menu054
     }
 }
-
-}
-
-function liminal {
-[ -f "$FILE" ] && {
-  [ "$hash1" = "$hash2" ]  || [ "$hash1" = "$hash3" ] && {
-    $2
-  } || {
-    $1
-    }
-} || {
-  $2
-  }
 
 }
 
 # SISTEMA Normal
 function start {
-datetime=$(date +"%d/%m %H:%M") # Data e Hora
-var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
+uptime=$(uptime | awk {'print $3 $4 $5'})
+var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
+Usuário atual: $USER
+UpTime: $uptime"  0 0 8 \
 A 'Status Geral' \
 B 'Máquinas Virtuais' \
 C 'Processos' \
 D 'Active Directory' \
 E 'Ferramentas' \
 F 'Avançado' \
+G '*Reiniciar' \
+H '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
@@ -107,19 +103,25 @@ C) menu03 ;;
 D) menu04 ;;
 E) menu05 ;;
 F) m10 ;;
+G) menu06 ;;
+H) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
 
 # Invertido
 function st4rt1 {
-datetime=$(date +"%d/%m %H:%M") # Data e Hora
-var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu " "  0 0 8 \
+uptime=$(uptime | awk {'print $3 $4 $5'})
+var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
+Usuário atual: $USER
+UpTime: $uptime"  0 0 8 \
 A 'Status Geral' \
 B 'Máquinas Virtuais' \
 C 'Processos' \
 D 'Active Directory' \
 E 'Ferramentas' \
+F '*Reiniciar' \
+G '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
@@ -128,6 +130,8 @@ B) menu02 ;;
 C) menu03 ;;
 D) menu04 ;;
 E) m3nu05 ;;
+F) menu06 ;;
+G) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
@@ -142,7 +146,10 @@ function teste {
 
 # Normal
 function menu01 {
-var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
+ip=$(hostname -I | awk '{print $1}')
+ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
+var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Local  : $ip
+IP Externo: $ip2" 0 0 0 \
 A '*Sistema' \
 B '*Temperatura' \
 C '*Armazenamento' \
@@ -164,7 +171,10 @@ esac
 
 # Invertido
 function m3nu01 {
-var2=$(dialog --title 'Status' --backtitle "S T A T U S" --menu " " 0 0 0 \
+ip=$(hostname -I | awk '{print $1}')
+ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
+var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Local  : $ip
+IP Externo: $ip2" 0 0 0 \
 A '*Sistema' \
 B '*Temperatura' \
 C '*Armazenamento' \
@@ -202,7 +212,6 @@ liminal "m3nu05" "menu05"
 function menu25 {
 noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
 noip2="Serviço de DNS NO-IP!"
-
 [ "$noip0" = "Executando" ] && {
   dialog --title "$noip2" --yesno "Deseja reiniciar o NOIP?" 6 40
   [ $? = 0 ] && {
@@ -227,26 +236,21 @@ Aguarde 1 minuto até o novo IP ser validado." 8 40
     dialog --title "$noip2" --msgbox "Verifique se o NOIP iniciou no menu 'Status Geral > Sistema'!" 8 40
     }
 }
+
 liminal "m3nu05" "menu05"
 }
 
 # Status de Sistema
 function menu11 {
-ip=$(hostname -I | awk '{print $1}')
-ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
-uptime=$(uptime | awk {'print $3 $4 $5'})
-datetime=$(date +"%d/%m %H:%M")
 governor=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!")
 bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-xorg=$(ls /tmp/.X11-unix | wc -l)
-datetime=$(date +"%d/%m %H:%M")
+#xorg=$(ls /tmp/.X11-unix | wc -l)
 script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
-
 [ $(which drbdadm 2>/dev/null) ] && [ $(which virt-manager 2>/dev/null) ] && {
   aswb="sim"
 } || {
@@ -268,22 +272,13 @@ noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" |
   sysd3=$(systemd-analyze | awk 'NR==1{print $9,$10}')
   }
 
-TEXTMAIL="Nome da Máquina: $HOSTNAME
-Data e Hora Local: $datetime
-
-IP Local  : $ip
-IP Externo: $ip2
-NOIP: $noip0
-
-UpTime: $uptime
-XOrgs em Execução: $xorg
+TEXTMAIL="NOIP: $noip0
+Governador de CPU: $governor
 
 Balance BTRFS: $bbalance
 RSnapshot: $rrsnap
 RSync: $rsync1
 CoPy: $cp1
-
-Governador de CPU: $governor
 
 Cluster: $script1
 Deveria executar? $aswb
@@ -295,14 +290,13 @@ $sysd1
 $sysd2
 Tempo total $sysd3"
 
-dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Informações do Sistema" --msgbox "$TEXTMAIL" 0 0
+dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "$bktitle" --msgbox "$TEXTMAIL" 0 0
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO01" 0 0 ; menu11 ;;
 esac
-
 [ $? -ne 0 ] && liminal "m3nu01" "menu01"
-menu08 "$Recado $TEXTMAIL $TEXTAO01 $Mensagem"
 
+menu08 "$Recado $TEXTMAIL $TEXTAO01 $Mensagem"
 liminal "m3nu01" "menu01"
 }
 
@@ -321,10 +315,9 @@ menu09 mysqld && mysql=$prcs
 menu09 cups1 cups && cups1=$prcs
 menu09 motion && motion1=$prcs
 menu09 dwagent && dwagent1=$prcs
-
 vpn=$(ip a | grep tun 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
 
-menuxx=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Ajuda' --backtitle "Processos Ativos, Parados ou Ausentes" --title 'Processos de Sistema' --menu " "  0 0 0 \
+menuxx=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Ajuda' --backtitle "$bktitle" --title 'Processos de Sistema' --menu " "  0 0 0 \
 A "Samba      : $smb1"  \
 B "Dominio    : $smb2" \
 C "Apache2    : $apache" \
@@ -402,7 +395,6 @@ case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO02" 0 0 ; menu12 ;;
 esac
 [ $? -ne 0 ] && liminal "m3nu01" "menu01"
-
 [ "$sensors1" = "Indisponível!" ] && {
   dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
 } || {
@@ -446,7 +438,7 @@ menusk=$(dialog --help-button --help-label 'Ajuda' --backtitle "Análise de Atri
 "/dev/sdg" "$dumpst7" \
 "/dev/sdh" "$dumpst8" \
 "/dev/sdi" "$dumpst9" \
-"X Voltar" " " 2>&1 > /dev/tty )
+"X Voltar" "" 2>&1 > /dev/tty )
 case $? in
   2) dialog --title "Definições de SMART!" --msgbox "$TEXTAO04" 0 0 ; menu14 ;;
 esac
@@ -483,10 +475,9 @@ menu14
 
 function menu15 {
 menu09 drbd && drbd1=$prcs
-
 [ "$drbd1" = "Executando" ] && {
   sdrbd=$(echo "$password" | sudo -S drbdadm status)
-  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "DRBD" --backtitle "Status do DRBD" --msgbox "$sdrbd" 0 0
+  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "DRBD" --backtitle "$bktitle" --msgbox "$sdrbd" 0 0
   case $? in
     2) dialog --title 'Ajuda' --msgbox "$TEXTAO05" 0 0; menu15 ;;
   esac
@@ -502,10 +493,9 @@ menu01
 function menu16 {
 menu09 corosync && corosync1=$prcs
 menu09 pacemaker && pacemaker1=$prcs
-
 [ "$corosync1" = "Executando" ] && [ "$pacemaker1" = "Executando" ] && {
   spcs=$(echo "$password" | sudo -S pcs status)
-  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "PCS" --backtitle "Status do Pacemaker/Corosync" --msgbox "$spcs" 0 0
+  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "PCS" --backtitle "$bktitle" --msgbox "$spcs" 0 0
   case $? in
     2) dialog --title 'Ajuda' --msgbox "$TEXTAO06" 0 0; menu16 ;;
   esac
@@ -519,7 +509,7 @@ menu01
 }
 
 function menu17 {
-var2=$(dialog --title 'UDPCast' --backtitle "UDP CAST" --menu "Escolha o modo!" 0 0 0 \
+var2=$(dialog --title 'UDPCast' --backtitle "$bktitle" --menu "Escolha o modo!" 0 0 0 \
 A 'Cliente' \
 B 'Servidor' \
 X 'Voltar' 2>&1 > /dev/tty )
@@ -534,7 +524,6 @@ esac
 function menu18 {
 userlog=$(w)
 dialog --title "Informação" --msgbox "$userlog" 20 60
-
 menu08 "$Recado $userlog $Mensagem"
 m10
 }
@@ -542,23 +531,20 @@ m10
 function menu19 {
 userlast=$(last)
 dialog --title "Informação" --msgbox "$userlast" 20 60
-
 menu08 "$Recado $userlast $Mensagem"
 m10
 }
 
 function menu20 {
 menu09 pihole-FTL && pihole1=$prcs
-
 [ "$pihole1" = "Executando" ] && {
-  dialog --backtitle "Servidor de DNS PiHole" --title "PiHole" --yesno "Deseja atualizar o PiHole?" 6 40
+  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja atualizar o PiHole?" 6 40
   [ $? = 0 ] && {
     version1=$(pihole -v)
-    datetime1=$(date +"%d/%m %H:%M") # Data e Hora
     pihole -up
     version2=$(pihole -v)
     datetime2=$(date +"%d/%m %H:%M") # Data e Hora
-    menu08 "$Recado PiHole atualizado de $datetime1 até $datetime2!
+    menu08 "$Recado PiHole atualizado de $datetime até $datetime2!
 A versão anterior era:
 
 $version1 
@@ -578,7 +564,6 @@ m10
 
 function menu21 {
 resultenp=$(ip a | sed -n '/enp/p' |  awk '!/mac/' | awk '{print $2}' | sed 's/.$//' | grep 'enp')
-
 for i in $resultenp; do
   velo=$(echo "$password" | sudo -S ethtool "$i" | grep Speed)
   dialog --title 'Velocidades detectadas:' --msgbox "$i $velo" 8 40
@@ -661,35 +646,32 @@ liminal "st4rt1" "start"
 function menu23 {
 ipneigh1=$(ip neigh)
 dialog --title 'IP Neigh' --msgbox "$ipneigh1" 0 0
-
 menu08 "$Recado $ipneigh1 $Mensagem"
 liminal "m3nu05" "menu05"
 }
 
 # Ferramentas Normal
 function menu05 {
-var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
-A '*SpeedTest' \
-B 'Placas de Rede' \
+var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
+A 'Placas de Rede' \
+B '*Speed Test' \
 C '*Arp-Scan' \
 D '*IP Neigh' \
-E '*WhoIs' \
-F '*TraceRoute' \
+E '*Who Is' \
+F '*Trace Route' \
 G '*Ping DNS' \
 H 'Iniciar Scripts' \
 I 'Re-Iniciar NOIP' \
 J 'Ajustes Relatórios' \
 K 'Relatórios Salvos' \
-L '*Reiniciar' \
-M '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
 esac
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var6" in
-A) menu050 ;;
-B) menu21 ;;
+A) menu21 ;;
+B) menu050 ;;
 C) menu0501 ;;
 D) menu23 ;;
 E) menu051 ;;
@@ -699,72 +681,63 @@ H) menu24 ;;
 I) menu25 ;;
 J) menu054 ;;
 K) menu055 ;;
-L) menu06 ;;
-M) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
 
 # Ferramentas Invertido
 function m3nu05 {
-var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "F E R R A M E N T A S" --menu " " 0 0 0 \
-A '*SpeedTest' \
-B 'Placas de Rede' \
+var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
+A 'Placas de Rede' \
+B '*Speed Test' \
 C '*Arp-Scan' \
-D '*TraceRoute' \
+D '*Trace Route' \
 E 'Iniciar Scripts' \
 F 'Re-Iniciar NOIP' \
 G 'Ajustes Relatórios' \
 H 'Relatórios Salvos' \
-I '*Reiniciar' \
-J '*Desligar' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
 esac
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var6" in
-A) menu050 ;;
-B) menu21 ;;
+A) menu21 ;;
+B) menu050 ;;
 C) menu0501 ;;
 D) menu052 ;;
 E) menu24 ;;
 F) menu25 ;;
 G) menu054 ;;
 H) menu055 ;;
-I) menu06 ;;
-J) menu07 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
 
 # SpeedTest
 function menu050 {
-dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
+dialog --title 'SpeedTest' --backtitle "$bktitle" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 speedy=$(curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -)
-dialog --title 'SpeedTest' --backtitle "Velocimetro Internet!" --msgbox "$speedy" 0 0
-
+dialog --title 'SpeedTest' --backtitle "$bktitle" --msgbox "$speedy" 0 0
 menu08 "$Recado $speedy $Mensagem"
 liminal "m3nu05" "menu05"
 }
 
 # Arp-Scan
 function menu0501 {
-dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
+dialog --title 'Arp-Scan' --backtitle "$bktitle" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 arpscn=$(echo "$password" | sudo -S arp-scan -l)
-dialog --title 'Arp-Scan' --backtitle "Listagem de Tabela ARP da Rede LAN" --msgbox "$arpscn" 0 0
-
+dialog --title 'Arp-Scan' --backtitle "$bktitle" --msgbox "$arpscn" 0 0
 menu08 "$Recado $arpscn $Mensagem"
 liminal "m3nu05" "menu05"
 }
 
 #WhoIS
 function menu051 {
-site=$(dialog --title 'WhoIs' --backtitle "Identificar de Propriedade de um WebSite" --inputbox "Digite o site que deseja localizar informações. Use o seguinte modelo: exemplo.com.br" 10 40 2>&1 > /dev/tty)
+site=$(dialog --title 'WhoIs' --backtitle "$bktitle" --inputbox "Digite o site que deseja localizar informações. Use o seguinte modelo: exemplo.com.br" 10 40 2>&1 > /dev/tty)
 dialog --title "WhoIs" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 wis=$(whois "$site")
 dialog --title "WhoIs" --msgbox "$wis" 0 0
-
 menu08 "$Recado $wis $Mensagem"
 liminal "m3nu05" "menu05"
 }
@@ -777,7 +750,6 @@ A identificação estará concluída quando um (END) surgir no final." 14 40 2>&
 dialog --title "Traceroute" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
 trot=$(traceroute "$site")
 dialog --title "Traceroute" --msgbox "$trot" 0 0
-
 menu08 "$Recado $trot $Mensagem"
 liminal "m3nu05" "menu05"
 }
@@ -786,7 +758,7 @@ liminal "m3nu05" "menu05"
 function menu053 {
 governor1=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!")
 governor2=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors || echo "Indisponível!")
-var3=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "Troca do Governador de CPU" --menu "Governador de CPU Atual: \n
+var3=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "$bktitle" --menu "Governador de CPU Atual: \n
 $governor1" 0 0 0 \
 A 'Conservative' \
 B 'OnDemand' \
@@ -815,9 +787,9 @@ function menu10 {
 governor2=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors)
 govr=$(echo "$password" | sudo -S echo $1 | sudo -S tee /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor 2> /dev/null 1> /dev/null && echo "si" || echo "no")
 [ "$govr" = "si" ] && {
-  dialog --cr-wrap --title "Bem sucedido!" --backtitle "Troca de Governador" --msgbox "Governador trocado com sucesso!" 0 0 ; menu053
+  dialog --cr-wrap --title "Bem sucedido!" --backtitle "$bktitle" --msgbox "Governador trocado com sucesso!" 0 0 ; menu053
 } || {
-  dialog --cr-wrap --title "ERRO" --backtitle "Troca de Governador" --msgbox "Seu sistema não suporta o governador escolhido. Detectamos estes governadores abaixo como suportados: \n \n
+  dialog --cr-wrap --title "ERRO" --backtitle "$bktitle" --msgbox "Seu sistema não suporta o governador escolhido. Detectamos estes governadores abaixo como suportados: \n \n
 > $governor2 < \n \n
 Mais informações em AJUDA!" 0 0 ; menu053
   }
@@ -827,52 +799,52 @@ Mais informações em AJUDA!" 0 0 ; menu053
 function menu054 {
 pong=$(ping google.com -c 1 1> /dev/null 2> /dev/null && echo "ok" || echo "notok")
 [ "$pong" = "notok" ] && {
-  dialog --cr-wrap --title "Erro na Rede" --backtitle "Erro detectado" --msgbox "O sistema não pode se comunicar com a rede local! Verifique sua conexão e tente novamente mais tarde." 8 40
+  dialog --cr-wrap --title "Erro na Rede" --backtitle "$bktitle" --msgbox "O sistema não pode se comunicar com a rede local! Verifique sua conexão e tente novamente mais tarde." 8 40
   liminal "st4rt1" "start"
 } || {
   [ "$report" = "0" ] && {
-    dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja habilitar a emissão de relatórios?" 8 40
+    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja habilitar a emissão de relatórios?" 8 40
     [ $? = 0 ] && {
       [ -f "$FILE3" ] && {
         report="1"
         validmail=$(awk 'NR==1' $FILE3)
-        dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
+        dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
 $validmail" 15 40
           [ $? = 0 ] && {
-            dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos menus com *!" 0 0
+            dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Os relatórios somente funcionam nos menus com *!" 0 0
           } || {
-            validmail=$(dialog --title "Inserir Destinatário" --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados! \n \n
+            validmail=$(dialog --title "Inserir Destinatário" --backtitle "$bktitle" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados! \n \n
 Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@mail.com, user2@mail.com" 15 40 2>&1 > /dev/tty)
              [ -z "$validmail" ] && {
-              dialog --cr-wrap --title "Erro no E-mail!" --backtitle "Erro detectado" --msgbox "Digite um e-mail válido!" 0 0
+              dialog --cr-wrap --title "Erro no E-mail!" --backtitle "$bktitle" --msgbox "Digite um e-mail válido!" 0 0
              } || {
               echo "$validmail" > "/tmp/.email"
               report="1"
-              dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
+              dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
               }
           }
       } || {
-        validmail=$(dialog --title "Inserir Destinatário" --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados! \n \n
+        validmail=$(dialog --title "Inserir Destinatário" --backtitle "$bktitle" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados! \n \n
 Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@mail.com, user2@mail.com" 15 40 2>&1 > /dev/tty)
         [ -z "$validmail" ] && {
-          dialog --cr-wrap --title "Erro no E-mail!" --backtitle "Erro detectado" --msgbox "Digite um e-mail válido!" 0 0
+          dialog --cr-wrap --title "Erro no E-mail!" --backtitle "$bktitle" --msgbox "Digite um e-mail válido!" 0 0
         } || {
           echo "$validmail" > "/tmp/.email"
           report="1"
-          dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
+          dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
           }
       }      
     } || {
       echo "a" > /dev/null
       }
   } || {
-    dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja trocar o e-mail de emissão de relatórios?" 8 40
+    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja trocar o e-mail de emissão de relatórios?" 8 40
     [ $? = 0 ] && {
-      validmail=$(dialog --title " " --backtitle "Definir E-mail" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
+      validmail=$(dialog --title " " --backtitle "$bktitle" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
       echo "$validmail" > "/tmp/.email"
-      dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
+      dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
     } || {
-      dialog --title "Confirmação" --backtitle "Relatórios" --yesno "Deseja desativar a emissão de relatórios?" 8 40
+      dialog --title "Confirmação" --backtitle "$bktitle" --yesno "Deseja desativar a emissão de relatórios?" 8 40
       [ $? = 0 ] && {
         report="0"
       } || {
@@ -888,31 +860,31 @@ liminal "st4rt1" "start"
 
 function menu055 {
 [ "$report" = "0" ] && {
-  dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Relatórios desativados!" 0 0
+  dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Relatórios desativados!" 0 0
 } || {
   [ -f "$FILE4" ] && {
     validrelat=$(cat "$FILE4")
-    dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Um relatório salvo foi encontrado. \n \n
+    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Um relatório salvo foi encontrado. \n \n
 $validrelat \n \n
 Deseja enviá-lo por e-mail?" 20 70
     [ $? = 0 ] && {
       menu08 "$validrelat"
-      dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja apagar o relatório salvo?" 8 20
+      dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja apagar o relatório salvo?" 8 20
       [ $? = 0 ] && {
-        dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "O relatório salvo foi apagado!" 0 0
+        dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "O relatório salvo foi apagado!" 0 0
         rm "$FILE4"
       } || {
         echo "a" > /dev/null
         }
     } || {
-      dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja apagar o relatório salvo?" 8 20
+      dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja apagar o relatório salvo?" 8 20
       [ $? = 0 ] && {
-        dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "O relatório salvo foi apagado!" 0 0
+        dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "O relatório salvo foi apagado!" 0 0
         rm "$FILE4"
         }
       }
   } || {
-    dialog --cr-wrap --title "Informação" --backtitle "Relatórios" --msgbox "Nenhum relatório salvo foi encontrado!" 0 0
+    dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Nenhum relatório salvo foi encontrado!" 0 0
     }
 }
 
@@ -932,8 +904,7 @@ function menu02 {
   menu022 "8p" && vm8=$vms && vm18=$sts
   menu022 "9p" && vm9=$vms && vm19=$sts
   menu022 "10p" && vm10=$vms && vm110=$sts
-
-  menuxy=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Ajuda' --backtitle "Virt-Manager detectado. Bem-Vindo ao Gestor de Máquinas Virtuais!" --title "Gestão de VMs" --menu "Gestão de Máquinas Virtuais"  0 0 0 \
+  menuxy=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Ajuda' --backtitle "Bem-Vindo ao Gestor de Máquinas Virtuais!" --title "Gestão de VMs" --menu "Gestão de Máquinas Virtuais"  0 0 0 \
   Status "Geral" \
   "$vm1" "$vm11" \
   "$vm2" "$vm12" \
@@ -947,14 +918,11 @@ function menu02 {
   "$vm10" "$vm110" \
   Iniciar "Todas!" \
   Parar "Todas!" \
-  "X Voltar" " " 2>&1 > /dev/tty )
-
+  "X Voltar" "" 2>&1 > /dev/tty )
   case $? in
     2) dialog --title "Ajuda" --msgbox "$TEXTAO11" 0 0 ; menu02 ;;
   esac
-  
   [ $? -ne 0 ] && liminal "st4rt1" "start"
-  
   case "$menuxy" in
   Status) menu025 ;;
   "$vm1") chkvm="$vm11"; nmvm="$vm1"; menu021 ;;
@@ -972,7 +940,7 @@ function menu02 {
   "X Voltar") liminal "st4rt1" "start" ;;
   esac
 } || {
-  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DE MÁQUINA VIRTUAL' --msgbox "O VirtManager não foi encontrado neste sistema ou você não possui as permissões para acessá-lo!" 7 50
+  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "$bktitle" --msgbox "O VirtManager não foi encontrado neste sistema ou você não possui as permissões para acessá-lo!" 7 50
   liminal "st4rt1" "start"
 }
 
@@ -1073,7 +1041,7 @@ menu02
 # Status de Máquinas Virtuais
 function menu025 {
 virtmgr0=$(virsh list --all)
-dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Maquinas Virtuais encontradas:" --backtitle "Status do VirtManager" --msgbox "$virtmgr0" 0 0
+dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Maquinas Virtuais encontradas:" --backtitle "$bktitle" --msgbox "$virtmgr0" 0 0
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO12" 0 0 ; menu025 ;;
 esac
@@ -1088,12 +1056,11 @@ bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && ec
 rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-
 [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ] || [ "$cp1" = "Executando" ] && {
-  dialog --cr-wrap --title 'ERRO AO REINICIAR' --backtitle 'ERRO AO TENTAR REINICIAR.' --msgbox "Reinício bloqueado! \n
+  dialog --cr-wrap --title 'ERRO AO REINICIAR' --backtitle "$bktitle" --msgbox "Reinício bloqueado! \n
 Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
 } || {
-  dialog --title 'Reiniciar' --backtitle 'R E I N I C I A R' --yesno 'Deseja reiniciar este sistema?' 0 0
+  dialog --title 'Reiniciar' --backtitle "$bktitle" --yesno 'Deseja reiniciar este sistema?' 0 0
   [ $? = 0 ] && {
     [ "$report" = "1" ] && {
       dialog --title 'Relatório' --yesno "Deseja enviar um relatório por e-mail sobre este reinício?" 8 40
@@ -1107,7 +1074,7 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
   }
 }
 
-liminal "m3nu05" "menu05"
+liminal "st4rt1" "start"
 }
 
 # Desligamento
@@ -1116,7 +1083,6 @@ rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executan
 rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-
 [ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ] || [ "$cp1" = "Executando" ] && {
   dialog --cr-wrap --title 'ERRO AO DESLIGAR' --backtitle 'ERRO AO TENTAR DESLIGAR.' --msgbox "Desligamento bloqueado! \n
 Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
@@ -1135,20 +1101,19 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
   }
 }
 
-liminal "m3nu05" "menu05"
+liminal "st4rt1" "start"
 }
 
 # Encaminhar relatórios por Email!
 function menu08 {
 echo "$1" > "/tmp/.relat"
-
 [ "$report" = "0" ] && {
   [ "$confrel" = "0" ] && {
-    dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Os relatórios não estão ativos. Deseja reativá-los temporariamente?" 8 40
+    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Os relatórios não estão ativos. Deseja reativá-los temporariamente?" 8 40
     [ $? = 0 ] && {
       [ -f "$FILE3" ] && {
         validmail=$(awk 'NR==1' $FILE3)
-        dialog --title 'Confirmação' --backtitle 'Relatórios' --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
+        dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
 $validmail" 15 40
         [ $? = 0 ] && {         
           echo "$1" | mutt -s "Relatório - $HOSTNAME" "$validmail"
@@ -1172,7 +1137,7 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
     }
 } || {
   validmail=$(awk 'NR==1' $FILE3)
-  dialog --title 'Confirmação' --backtitle 'Relatório de Sistema' --yesno "Deseja enviar este relatório para $validmail?" 8 40
+  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar este relatório para $validmail?" 8 40
   [ $? = 0 ] && {
     echo "$1" | mutt -s "Relatório - $HOSTNAME" "$validmail"
     dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
@@ -1190,9 +1155,8 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
 # Controlador de Dominio
 function menu04 {
 menu09 samba-ad-dc && smb2=$prcs
-
 [ "$smb2" = "Executando" ] && {
-  var4=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
+  var4=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
   A 'Gestão de Usuários' \
   B 'Gestão de Grupos' \
   C 'Gestão de Computadores' \
@@ -1200,7 +1164,6 @@ menu09 samba-ad-dc && smb2=$prcs
   X 'Voltar' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && liminal "st4rt1" "start"
   case "$var4" in
-
   A) menu041 ;;
   B) menu042 ;;
   C) menu043 ;;
@@ -1208,14 +1171,14 @@ menu09 samba-ad-dc && smb2=$prcs
   X) liminal "st4rt1" "start" ;;
   esac
 } || {
-  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle 'FERRAMENTAS DO ACTIVE DIRECTORY' --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
+  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "Active Directory & Domain Controller" --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
   }
 
 liminal "st4rt1" "start"
 }
 
 function menu041 {
-var41=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
+var41=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
 A '*Criar Usuário' \
 B '*Exibir todos os Usuários' \
 C 'Procurar Usuário' \
@@ -1246,7 +1209,7 @@ esac
 }
 
 function menu042 {
-var42=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
+var42=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
 A '*Criar Grupo' \
 B '*Exibir todos os Grupos' \
 C 'Procurar Grupo' \
@@ -1265,7 +1228,7 @@ esac
 }
 
 function menu043 {
-var43=$(dialog --title 'Bem-Vindo!' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
+var43=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
 A '*Exibir todos os Computadores' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
@@ -1276,31 +1239,28 @@ esac
 }
 
 function menuA {
-dialog --title 'AD-DC' --backtitle "Listagem de Todos os Usuários existentes." --msgbox "Pressione Enter para visualizar os Usuários! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
+dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --msgbox "Pressione Enter para visualizar os Usuários! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && menu041
 usrlst=$(echo "$password" | sudo -S samba-tool user list)
 echo "$usrlst" | less
-
 menu08 "$Recado $usrlst $Mensagem"
 menu041
 }
 
 function menuB {
-dialog --title 'AD-DC' --backtitle "Listagem de Todos os Computadores existentes." --msgbox "Pressione Enter para visualizar os Computadores! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
+dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --msgbox "Pressione Enter para visualizar os Computadores! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && menu043
 cmplist=$(echo "$password" | sudo -S samba-tool computer list)
 echo "$cmplist" | less
-
 menu08 "$Recado $complist $Mensagem"
 menu043
 }
 
 function menuC {
-dialog --title 'AD-DC' --backtitle "Listagem de Todos os Grupos existentes." --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
+dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && menu042
 grplist=$(echo "$password" | sudo -S samba-tool group list)
 echo "$grplist" | less
-
 menu08 "$Recado $grplist $Mensagem"
 menu042
 }
@@ -1310,19 +1270,16 @@ VALUE1="joao_naves"
 VALUE2="João Naves"
 VALUE3="1234567Ab"
 
-VALUE0=$(dialog --ok-label "Criar"  --backtitle "Criar um novo usuário do Domínio em $HOSTNAME" --title "Adicionar Usuário" --form "Preencha todos os campos! Apague os modelos. \n
+VALUE0=$(dialog --ok-label "Criar"  --backtitle "Active Directory & Domain Controller" --title "Adicionar Usuário" --form "Preencha todos os campos! Apague os modelos. \n
 Navegue com as setas para cima e baixo." 15 50 0 \
 "Usuário: " 1 1 "$VALUE1" 1 10 34 0 \
 "Exibição:" 2 1 "$VALUE2" 2 10 34 0 \
 "Senha:" 3 1 "$VALUE3" 3 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
 [ $? -ne 0 ] && menu041
-
 validusr1=$(echo "$VALUE0" | sed -n 1p)
 validsur1=$(echo "$VALUE0" | sed -n 2p)
 validpss1=$(echo "$VALUE0" | sed -n 3p)
-
 [ -z "$validpss1" ] || [ -z "$validusr1" ] || [ -z "$validsur1" ] && {
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
 } || {
@@ -1366,7 +1323,7 @@ menu041
 }
 
 function menuE {
-validusr=$(dialog --title 'AD-DC' --backtitle "Trocar a senha de usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERROR" --msgbox "Usuário não pode ficar em branco!" 7 25
 } || {
@@ -1391,7 +1348,7 @@ menu041
 }
 
 function menuF {
-validusr=$(dialog --title 'AD-DC' --backtitle "Bloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
 } || {
@@ -1411,7 +1368,7 @@ menu041
 }
 
 function menuG {
-validusr=$(dialog --title 'AD-DC' --backtitle "Desbloquear usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
 } || {
@@ -1431,7 +1388,7 @@ menu041
 }
 
 function menuH {
-validusr=$(dialog --title 'AD-DC' --backtitle "Excluir usuário do Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
 } || {
@@ -1456,7 +1413,7 @@ menu041
 }
 
 function menuI {
-validgrp=$(dialog --title 'AD-DC' --backtitle "Criar um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
+validgrp=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
 } || {
@@ -1476,7 +1433,7 @@ menu042
 }
 
 function menuJ {
-validusr=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome de Usuário" 0 0 2>&1 > /dev/tty)
+validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de Usuário" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
 } || {  
@@ -1506,7 +1463,7 @@ menu041
 }
 
 function menuK {
-validgrp=$(dialog --title 'AD-DC' --backtitle "Exibir Usuários de um grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
+validgrp=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
 } || {
@@ -1528,7 +1485,7 @@ menu042
 }
 
 function menuL {
-validusr=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Usuário" 0 0 2>&1 > /dev/tty)
+validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome do Usuário" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
 } || {
@@ -1558,7 +1515,7 @@ menu041
 }
 
 function menuM {
-validgrp=$(dialog --title 'AD-DC' --backtitle "Excluir grupo do Domínio em $HOSTNAME" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
+validgrp=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
 } || {
@@ -1583,7 +1540,7 @@ menu042
 }
 
 function menuN {
-validusr=$(dialog --title 'AD-DC' --backtitle "Alterar Política de Senha" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
 } || {
@@ -1605,7 +1562,7 @@ menu041
 }
 
 function menuO {
-validusr=$(dialog --title 'AD-DC' --backtitle "Exibir grupos de um usuário em $HOSTNAME" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
+validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
 } || {
@@ -1627,7 +1584,7 @@ menu041
 }
 
 function menuP {
-validusr1=$(dialog --title 'AD-DC' --backtitle "Busca se um usuário existe no Domínio em $HOSTNAME" --inputbox "Insira o nome de usuário. \n
+validusr1=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário. \n
 Exemplo: joao_naves" 8 40 2>&1 > /dev/tty)
 [ -z "$validusr1" ] && {
   dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
@@ -1644,7 +1601,7 @@ menu041
 }
 
 function menuQ {
-validgrp1=$(dialog --title 'AD-DC' --backtitle "Busca se o grupo existe no Domínio em $HOSTNAME" --inputbox "Insira o nome de grupo" 0 0 2>&1 > /dev/tty)
+validgrp1=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de grupo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && menu042
 
 [ -z "$validgrp1" ] && {
@@ -1664,7 +1621,7 @@ menu042
 function menuR {
 smbv=$(samba --version)
 domainv=$(echo "$password" | sudo -S samba-tool domain level show)
-dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Informações do Domínio" --msgbox "
+dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Active Directory & Domain Controller" --msgbox "
 Nome da Máquina: $HOSTNAME \n \n
 Versão do SAMBA: $smbv \n \n
 Nível do Domínio: $domainv \n \n" 0 0
@@ -1702,9 +1659,10 @@ D 'TRIM Disks' \
 E 'Parar Rsync' \
 F 'Parar RSnapshot' \
 G 'Parar Balance' \
-H 'UDP-Cast' \
-I '*Usuários Logados' \
-J '*Logins Anteriores' \
+H 'Parar CoPy' \
+I 'UDP-Cast' \
+J '*Usuários Logados' \
+K '*Logins Anteriores' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
@@ -1715,19 +1673,19 @@ D) echo "$password" | sudo -S fstrim -va ; m10 ;;
 E) m12 ;;
 F) m13 ;;
 G) m14 ;;
-H) menu17 ;;
-I) menu18 ;;
-J) menu19 ;;
+H) m15 ;;
+I) menu17 ;;
+J) menu18 ;;
+K) menu19 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
 
 function m11 {
-dialog --title 'Informação' --yesno "Deseja atualizar o sistema operacional?" 8 40
+dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja atualizar o sistema operacional?" 8 40
 [ $? = 0 ] && {
-  dialog --title 'Informação' --yesno "Tem certeza? Verifique se os processos em execução não pararão e/ou se configurações não serão perdidas." 8 40
+  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Verifique se os processos em execução não pararão e/ou se configurações não serão perdidas." 8 40
   [ $? = 0 ] && {
-    datetime=$(date +"%d/%m %H:%M") # Data e Hora
     echo "$password" | sudo -S "$pkg1" update
     upgrd=$(apt list --upgradable)
     echo "$password" | sudo -S "$pkg1" upgrade -y
@@ -1750,9 +1708,9 @@ m10
 }
 
 function m12 {
-dialog --title 'Informação' --yesno "Deseja parar o processo RSYNC?" 8 40
+dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja parar o processo RSYNC?" 8 40
 [ $? = 0 ] && {
-  dialog --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
+  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
   [ $? = 0 ] && {
     echo "$password" | sudo -S killall rsync
     dialog --title "ATENÇÃO" --msgbox "Verifique se seus backups estão íntegros." 8 40
@@ -1767,9 +1725,9 @@ m10
 }
 
 function m13 {
-dialog --title 'Informação' --yesno "Deseja parar o processo RSNAPSHOT?" 8 40
+dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja parar o processo RSNAPSHOT?" 8 40
 [ $? = 0 ] && {
-  dialog --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
+  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
   [ $? = 0 ] && {
     echo "$password" | sudo -S killall rsnapshot
     dialog --title "ATENÇÃO" --msgbox "Verifique se seus backups estão íntegros." 8 40
@@ -1787,9 +1745,9 @@ function m14 {
 blnc=$(dialog --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --inputbox "Insira o caminho:" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && m10
 [ -z "$blnc" ] && {
-  dialog --title "ERRO" --msgbox "Caminho não pode ficar em branco!" 8 40
+  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title "ERRO" --msgbox "Caminho não pode ficar em branco!" 8 40
 } || {
-  dialog --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --yesno "Tem certeza que deseja parar o Balance em $blnc?" 8 40
+  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --yesno "Tem certeza que deseja parar o Balance em $blnc?" 8 40
   [ $? = 0 ] && {
     echo "$password" | sudo -S btrfs balance cancel "$blnc"
   } || {
@@ -1800,12 +1758,30 @@ blnc=$(dialog --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --input
 m10
 }
 
+function m15 {
+dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja parar o processo CoPy?" 8 40
+[ $? = 0 ] && {
+  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
+  [ $? = 0 ] && {
+    echo "$password" | sudo -S killall cp
+    dialog --title "ATENÇÃO" --msgbox "Verifique se seus backups estão íntegros." 8 40
+  } || {
+    echo "a" > /dev/null
+    }
+} || {
+  echo "a" > /dev/null
+  }
+
+m10
+}
+
+function liminal { [ -f "$FILE" ] && { [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && { $2; } || { $1; }; } || { $2; }; }
+
 ################################################################################
 #                                                                              #
 ################################################################################
 
 # Todos os Textões!
-
 Recado="Relatório gerado pelo sistema de relatórios do $bktitle!
 
 "
@@ -1828,22 +1804,15 @@ Mensagem="
 
 AVISO LEGAL: Esta mensagem, inclusive seus anexos, pode conter informações confidenciais e deve ser resguardado o devido sigilo de seu conteúdo. Caso a tenha recebido indevidamente, por favor apague-a imediatamente e comunique o remetente. Qualquer forma de utilização, reprodução, retransmissão, alteração, distribuição e/ou divulgação de conteúdo desta mensagem ou de parte dele, sem a autorização expressa de seu remetente, é estritamente proibida."
 
-TEXTAO01=" Nome da Máquina: O nome registrado no sistema, hostname.
-Data e Hora Local: Data e Hora de referência para logs e eventos.
+TEXTAO01="
 
-IP Local: Geralmente é o IP Fixado localmente ou no servidor DHCP.
-IP Externo: Se houver acesso externo, monitora qual o IP Externo coletado naquele momento.
-NOIP: Informa se o processo noip2 está em execução, validando o IP Externo. Atualiza a cada 15 minutos.
-
-Uptime: Mostra a quantos dias, horas e/ou minutos o servidor está ligado.
-XOrgs em Execução: Para sistemas sem interface de usuário mas que permitem executar aplicações Xinit.
+NOIP: Informa se o processo NOIP2 está executando, atualizando os IPs externos para acesso de VPNs!
+Governador de CPU: Mostra como está a execução do processador, se em Máximo Desempenho, Economia de Energia ou outro.
 
 Balance BTRFS: Manutenção de rotina do sistema. Se estiver em Execução, o computador NÃO poderá ser reiniciado ou desligado!
 Rsnapshot: Backup incremental automatizado. Se estiver Executando, o computador não poderá ser desligado!
 RSync: Sincronia do Backup em Nuvem ou para um backup RAID 1. Se estiver Executando, o computador não poderá ser reiniciado ou desligado!
 CoPy: Sincronia de pastas locais. Se estiver Executando, o computador não poderá ser reiniciado ou desligado!
-
-Governador de CPU: Mostra como está a execução do processador, se em Máximo Desempenho, Economia de Energia ou outro.
 
 Cluster: Script que controla máquinas virtuais em sistemas clusterizados.
 Deveria executar? Requer virt-manager + DRBD configurados para confirmar.
@@ -1856,7 +1825,9 @@ Na sequência, temos o (kernel) que representa o Linux propriamente dito; e o Us
 que são os aplicativos e ferramentas do Usuário. No final, o tempo total que o sistema
 demorou pra inicializar."
 
-TEXTAO02="A temperatura costuma ter valores atuais, mínimos (low) e máximos (high)
+TEXTAO02="
+
+A temperatura costuma ter valores atuais, mínimos (low) e máximos (high)
 Além disso, há também a temperatura Crítica (Crit.): Se o sistema atingir ela,
 vai desligar instantaneamente por segurança.
 
@@ -1872,13 +1843,13 @@ Resultados que indicam Baterias:
 (BAT0-acpi-xxx) (fam15h_power-pci-xxxx)
 Em Progresso: Novas indicações são adicionadas periodicamente!"
 
-TEXTAO03="Os resultados são de discos acessíveis no sistema. 
+TEXTAO03="
+
+Os resultados são de discos acessíveis no sistema. 
 Se um disco não aparecer aqui, significa que está em estado de erro ou foi ejetado.
 
 As opções são:
 [Sist. Arq.] [Tipo] [Tam.] [Usado] [Disp.] [Uso%] [Montado em]
-
-Aonde:
 
 Sist. Arq.: Os mais importantes são começados com //IP e /dev.
 Tipo: Podem ser EXT4, BTRFS, NTFS, FAT32, etc.
@@ -1934,14 +1905,18 @@ ferramentas de análise, como o HD Regenerator.
 
 As informações acima são referências para análises da saúde dos discos. Atenção ao interpretar os resultados!"
 
-TEXTAO05="De maneira geral o DRBD precisa estar com todas as suas opções indicando:
+TEXTAO05="
+
+De maneira geral o DRBD precisa estar com todas as suas opções indicando:
 
 Disk: UpToDate
 Peer-Disk: UpToDate
 
 Dessa forma os discos estão sincronizados!"
 
-TEXTAO06="De maneira geral o PCS precisa estar com todas as suas opções indicando:
+TEXTAO06="
+
+De maneira geral o PCS precisa estar com todas as suas opções indicando:
 
 Node List: Online [ Primary Secondary ]
 
@@ -1960,7 +1935,9 @@ set postponed = '+[Gmail]/Drafts'
 #set record = '+[Gmail]/Sent Mail'
 set trash = '+[Gmail]/Trash'"
 
-TEXTAO08="A lista abaixo não necessariamente informa todos os processos configurados!
+TEXTAO08="
+
+A lista abaixo não necessariamente informa todos os processos configurados!
 Esteja atento ao que está instalado no sistema. Mesmo aqueles não instalados aparecerão apenas como 'Parado'.
 
 Samba: Se esse servidor compartilha (via smb) arquivos na rede.
@@ -1982,7 +1959,11 @@ Motion: Processo usado pelo Motion, para monitorar WebCams ou ainda sistemas de 
 DWAgent: Se houver um Acesso Remoto com DWService executando nesta máquina.
 VPN Client: Se este Servidor está conectado em uma VPN atuando como cliente."
 
-TEXTAO09="Painel de Ferramentas do Sistema!
+TEXTAO09="
+
+Painel de Ferramentas do Sistema!
+
+Placas de Rede: 
 
 SpeedTest: Calcula as velocidades de Download e Upload de uma
 conexão á internet existente.
@@ -1990,20 +1971,22 @@ conexão á internet existente.
 Arp-Scan: Exibe a tabela ARP da rede, mostrando endereços MAC, IP's e nomes
 dos computadores descobertos.
 
-WhoIs: É utilizado para identificar o proprietário de site ou domínio caso
-este não tenha ocultado seus dados.
-
 TraceRoute: Calcula quantos Hops, saltos, a latência que uma conexão deste
 servidor tem até um site especificado.
 
-Governador de CPU: Ver o menu AJUDA dentro desta opção!
+Iniciar Scripts: Permite iniciar scripts parados: Cluster e/ou Balloon.
 
-Relatórios: Permite enviar por e-mail os resultados dos Menus!
+Re-Iniciar NOIP: Permite parar, iniciar ou reiniciar NOIP.
+
+Ajustes Relatórios: Permite enviar por e-mail os resultados dos Menus!
+Relatórios Salvos: Permite acessar e enviar por e-mails os relatórios salvos!
 
 Reiniciar: Se não houver nada que impeça, o sistema será reiniciado.
 Desligar: Se não houver nada que impeça, o sistema será desligado."
 
-TEXTAO10="Governadores de CPU são formas como a CPU trabalha para otimizar a performance,
+TEXTAO10="
+
+Governadores de CPU são formas como a CPU trabalha para otimizar a performance,
 economizar bateria, etc. Num urgência podem ser usados pra esfriar um processador ou melhorar o desempenho geral.
 
 Cada governador possui uma aplicabilidade, dependendo do momento, da necessidade e muitas vezes o padrão em execução
@@ -2029,7 +2012,9 @@ acordo com a aplicação. Este é o modo que trás o melhor custo-benefício de 
 
 Um governador aplicado passa a operar imediatamente!"
 
-TEXTAO11="Aqui são exibidas apenas as VMs nos estados Executando ou Parado.
+TEXTAO11="
+
+Aqui são exibidas apenas as VMs nos estados Executando ou Parado.
 Caso uma VM não apareça na listagem, verifique o real estado da mesma no menu Status Geral!
 
 Status Geral: Exibe a situação real de todas as VMs configuradas no sistema.
@@ -2042,7 +2027,9 @@ Desligar Todas as VMs: Desligará apenas as VMs em estado de -running- detectada
 Serão ignoradas todas as demais VMs em quaisquer outros estados.
 Para maiores informações ver AJUDA em Status Geral."
 
-TEXTAO12="Name: Nome da máquina virtual [VM] conforme ela foi registrada no virt-manager
+TEXTAO12="
+
+Name: Nome da máquina virtual [VM] conforme ela foi registrada no virt-manager
 
 State é a situação em que a VM se encontra. Os States podem ser:
 
@@ -2058,7 +2045,9 @@ seja do próprio sistema virtualizado ou erro de disco do host.
 
 * = Em qualquer um destes estados a VM pode corromper se for desligada abruptamente!"
 
-TEXTAO13="Nome da Máquina: Nome usado na identificação do Servidor.
+TEXTAO13="
+
+Nome da Máquina: Nome usado na identificação do Servidor.
 
 Versão do SAMBA: Versão atualmente instalada e configurada no sistema.
 É substituída em atualizações do sistema quando há correções de segurança.
@@ -2077,11 +2066,11 @@ Windows Server 2003 - 4.0 e posterior
 * = Nível funcional não está estável o suficiente.
 Caso implementado, melhorias no Kerberos também não serão disponibilizados nesse nível."
 
-TEXTAO14="Custom Scritpz"
-
 ################################################################################
 #                                                                              #
 ################################################################################
+
+# Start
 
 # Checagem Obrigatória de Dependências:
 pkg dialog
