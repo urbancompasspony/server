@@ -1891,7 +1891,7 @@ menu09 pihole-FTL && pihole1=$prcs
     }
     menu08 "$Recado O site $validurl foi liberado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
     menu27 "
-$datetime : Nesta data o site $validurl foi liberado conforme solicitado."
+$datetime : Nesta data o site $validurl foi liberado acesso conforme solicitado."
     }
 } || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
