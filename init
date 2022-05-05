@@ -1897,9 +1897,12 @@ menu26
 }
 
 function menu264 {
+datetime=$(date +"%d/%m %H:%M")
 picron=$(pihole -c -e | awk 'NR>=5 && NR<=17 {print}')
 dialog --title 'Chronometer' --msgbox "$picron" 0 0
-menu08 "$recado $picron $mensagem"
+menu08 "$Recado Status do PiHole em $datetime: 
+
+$picron $Mensagem"
 menu26
 }
 
