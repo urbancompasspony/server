@@ -107,17 +107,19 @@ ip=$(hostname -I | awk '{print $1}')
 ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
 var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Local  : $ip
 IP Externo: $ip2" 0 0 0 \
-A '*Sistema' \
-B '*Temperatura' \
-C '*Armazenamento' \
-D '*S.M.A.R.T.' \
+A 'INXI' \
+B '*Sistema' \
+C '*Temperatura' \
+D '*Armazenamento' \
+E '*S.M.A.R.T.' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
-A) menu11 ;;
-B) menu12 ;;
-C) menu13 ;;
-D) menu14 ;;
+A) inxi -b; read; menu01 ;;
+B) menu11 ;;
+C) menu12 ;;
+D) menu13 ;;
+E) menu14 ;;
 X) start ;;
 esac
 }
@@ -128,15 +130,17 @@ ip=$(hostname -I | awk '{print $1}')
 ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
 var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Local  : $ip
 IP Externo: $ip2" 0 0 0 \
-A '*Sistema' \
-B '*Temperatura' \
-C '*Armazenamento' \
+A 'INXI' \
+B '*Sistema' \
+C '*Temperatura' \
+D '*Armazenamento' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var2" in
-A) menu11 ;;
-B) menu12 ;;
-C) menu13 ;;
+A) inxi -b; read; menu01 ;;
+B) menu11 ;;
+C) menu12 ;;
+D) menu13 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -149,6 +153,7 @@ rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executan
 rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
+xorg1=$(ls /tmp/.X11-unix | wc -l)
 
 [ $(which drbdadm 2>/dev/null) ] && [ $(which virt-manager 2>/dev/null) ] && {
   aswb="sim"
@@ -172,6 +177,7 @@ noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" |
   }
 
 TEXTMAIL="Governador de CPU: $governor
+XOrgs Executando: $xorg1
 
 Balance BTRFS: $bbalance
 RSnapshot: $rrsnap
@@ -468,7 +474,6 @@ liminal "m3nu05" "menu05"
 }
 
 # Ferramentas Normal
- #xorg=$(ls /tmp/.X11-unix | wc -l)
 function menu05 {
 var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
 A 'Placas de Rede' \
@@ -476,11 +481,12 @@ B '*Speed Test' \
 C '*Arp-Scan' \
 D '*IP Neigh' \
 E '*Who Is' \
-F '*Trace Route' \
-G 'Iniciar Navegador' \
-H '*Ping DNS' \
-I 'Definir Relatórios' \
-J 'Relatórios Salvos' \
+F 'rDesktop' \
+G '*Trace Route' \
+H 'Iniciar Navegador' \
+I '*Ping DNS' \
+J 'Definir Relatórios' \
+K 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -492,11 +498,12 @@ B) menu050 ;;
 C) menu0501 ;;
 D) menu23 ;;
 E) menu051 ;;
-F) menu052 ;;
-G) xinit epiphany-browser $* -- :0 vt$XDG_VTNR; menu05 ;;
-H) menu22 ;;
-I) menu054 ;;
-J) menu055 ;;
+F} menu04 ;;
+G) menu052 ;;
+H) xinit epiphany-browser $* -- :1 vt$XDG_VTNR; menu05 ;;
+I) menu22 ;;
+J) menu054 ;;
+K) menu055 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -955,18 +962,10 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
 
 }
 
-################################################################################
-#                                                                              #
-################################################################################
-
-# Controlador de Dominio
 function menu04 {
+  # rdesktop
   liminal "st4rt1" "start"
 }
-
-################################################################################
-#                                                                              #
-################################################################################
 
 function m1x {
 dialog --title 'F.F.A.' --msgbox "Ferramentas e Funções Avançadas" 0 0
@@ -984,20 +983,24 @@ password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --ti
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
 A 'Governador de CPU' \
-B 'Parar Backup' \
-C 'UDP-Cast' \
-D 'Emitir .docx' \
-E 'Encaminhar .docx' \
-F 'Apagar .docx' \
+B 'Ghost' \
+C 'Parar Backup' \
+D 'UDP-Cast' \
+E 'Stress' \
+F 'Emitir .docx' \
+G 'Encaminhar .docx' \
+H 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) menu053 ;;
-B) m122 ;;
-C) menu17 ;;
-D) menu28 ;;
-E) menu29 ;;
-F) menu30 ;;
+B) sudo xinit /home/ubuntu/.Ghost/Ghost $* -- :0 vt$XDG_VTNR; m10 ;;
+C) m122 ;;
+D) menu17 ;;
+E) stress -c 16; m10 ;;
+F) menu28 ;;
+G) menu29 ;;
+H) menu30 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1399,4 +1402,4 @@ seja do próprio sistema virtualizado ou erro de disco do host.
 ################################################################################
 
 # Início do Sistema:
-menu054
+liminal "st4rt1" "start"
