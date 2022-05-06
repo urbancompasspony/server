@@ -2373,6 +2373,7 @@ pkg traceroute
 pkg libatasmart-bin
 pkg mutt
 pkg udpcast
+pkg cifs-utils
 
 # Início do Sistema:
 init
