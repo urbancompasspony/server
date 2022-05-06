@@ -22,7 +22,7 @@ hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 version="v3.0"
-revis="r1.1"
+revis="r1.2"
 
 ################################################################################
 ################################################################################
@@ -1664,28 +1664,30 @@ password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --ti
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
 A 'Atualizar o Sistema' \
-B 'PiHole' \
-C 'Governador de CPU' \
-D 'Parar Backup' \
-E 'UDP-Cast' \
-F '*Usuários Logados' \
-G '*Logins Anteriores' \
-H 'Emitir .docx' \
-I 'Encaminhar .docx' \
-J 'Apagar .docx' \
+B 'Samba - Mount' \
+C 'PiHole' \
+D 'Governador de CPU' \
+E 'Parar Backup' \
+F 'UDP-Cast' \
+G '*Usuários Logados' \
+H '*Logins Anteriores' \
+I 'Emitir .docx' \
+J 'Encaminhar .docx' \
+K 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) m11 ;;
-B) menu26 ;;
-C) menu053 ;;
-D) m122 ;;
-E) menu17 ;;
-F) menu18 ;;
-G) menu19 ;;
-H) menu28 ;;
-I) menu29 ;;
-J) menu30 ;;
+B) menu31 ;;
+C) menu26 ;;
+D) menu053 ;;
+E) m122 ;;
+F) menu17 ;;
+G) menu18 ;;
+H) menu19 ;;
+I) menu28 ;;
+J) menu29 ;;
+K) menu30 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -2024,6 +2026,46 @@ function menu30 {
   dialog --title 'relat.docx' --msgbox "Arquivo não encontrado. Abortando." 8 30
   }
 m10
+}
+
+function menu31 {
+VALUE1="//172.20.0.2/backup"
+VALUE2="/mnt/backup"
+VALUE3="admin"
+VALUE4=""
+VALUE5="WORKGROUP"
+
+VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --backtitle "$bktitle" --title "Mounting" --form "Montagem de Rede" 15 50 0 \
+"PATH: " 1 1 "$VALUE1" 1 10 34 0 \
+"MNT:" 2 1 "$VALUE2" 2 10 34 0 \
+"USER:" 3 1 "$VALUE3" 3 10 34 0 \
+"PASS:" 4 1 "$VALUE4" 4 10 34 0 \
+"DOM:" 5 1 "$VALUE5" 5 10 34 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+case $? in
+  2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0; menu31 ;;
+esac
+path1=$(echo "$VALUE0" | sed -n 1p)
+mntpt1=$(echo "$VALUE0" | sed -n 2p)
+user1=$(echo "$VALUE0" | sed -n 3p)
+pass1=$(echo "$VALUE0" | sed -n 4p)
+dmn1=$(echo "$VALUE0" | sed -n 5p)
+[ -z "$path1" ] || [ -z "$mntpt1" ] || [ -z "$user1" ] || [ -z "$dmn1" ] && {
+  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+  m10
+} || {
+  sudo mount -t cifs -o user="$user1",password="$pass1",domain="$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
+  mntshow2=$(df -hT)
+  dialog --title "Informação" --msgbox "$mntshow2" 30 60
+  m10
+  }
+
+}
+
+function menu32 {
+  sudo umount /mnt/*
+  mntshow3=$(df -hT)
+  dialog --title "Informação" --msgbox "$mntshow3" 30 60
 }
 
 ################################################################################
