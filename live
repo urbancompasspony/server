@@ -469,7 +469,7 @@ VALUE1="//172.20.0.2/backup"
 VALUE2="/mnt/backup"
 VALUE3="admin"
 VALUE4=""
-VALUE5="WORKGROUP"
+VALUE5=",domain=WORKGROUP"
 
 VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --title "Mounting" --form "Montagem de Redes" 15 50 0 \
 "PATH: " 1 1 "$VALUE1" 1 10 34 0 \
@@ -486,11 +486,11 @@ mntpt1=$(echo "$VALUE0" | sed -n 2p)
 user1=$(echo "$VALUE0" | sed -n 3p)
 pass1=$(echo "$VALUE0" | sed -n 4p)
 dmn1=$(echo "$VALUE0" | sed -n 5p)
-[ -z "$path1" ] || [ -z "$mntpt1" ] || [ -z "$user1" ] || [ -z "$dmn1" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+[ -z "$path1" ] || [ -z "$mntpt1" ] || [ -z "$user1" ] || [ -z "$pass1" ] && {
+  dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 8 40
   m10
 } || {
-  sudo mount -t cifs -o user="$user1",password="$pass1",domain="$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
+  sudo mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
   mntshow2=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow2" 30 60
   m10
