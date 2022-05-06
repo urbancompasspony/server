@@ -52,8 +52,9 @@ C 'Máquinas Virtuais' \
 D 'Processos' \
 E 'Ferramentas' \
 F 'Avançado' \
-G '*Reiniciar' \
-H '*Desligar' \
+G 'NMTUI' \
+H '*Reiniciar' \
+I '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
@@ -63,8 +64,9 @@ C) menu02 ;;
 D) menu03 ;;
 E) menu05 ;;
 F) m10 ;;
-G) menu06 ;;
-H) menu07 ;;
+G) nmtui ; start ;;
+H) menu06 ;;
+I) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
@@ -163,27 +165,29 @@ function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
 A 'Samba - Mount' \
 B 'Samba - Umount' \
-C 'Samba Server' \
-D 'Ghost' \
+C 'Ghost (OpenBox)' \
+D 'Samba Server' \
 E 'Governador de CPU' \
 F 'Parar Backup' \
 G 'UDP-Cast' \
-H 'Emitir .docx' \
-I 'Encaminhar .docx' \
-J 'Apagar .docx' \
+H 'TestDisk' \
+I 'Emitir .docx' \
+J 'Encaminhar .docx' \
+K 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) menu19 ;;
 B) menu20 ;;
-C) menu18 ;;
-D) sudo xinit /home/ubuntu/.Ghost/Ghost $* -- :0 vt$XDG_VTNR; m10 ;;
+C) sudo /home/ubuntu/.Ghost/Ghost; m10 ;;
+D) menu18 ;;
 E) menu053 ;;
 F) m122 ;;
 G) menu17 ;;
-H) menu28 ;;
-I) menu29 ;;
-J) menu30 ;;
+H) sudo testdisk ;;
+I) menu28 ;;
+J) menu29 ;;
+K) menu30 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -502,8 +506,7 @@ function menu18 {
 sudo mkdir /mnt/shared
 sudo chmod 777 -R /mnt/shared
 sudo chown ubuntu:sambashare -R /mnt/shared
-sudo systemctl start smbd
-sudo systemctl start nmbd
+sudo systemctl restart smbd nmbd
 dialog --title "Informação" --msgbox "Servidor SAMBA Ligado!" 6 20
 }
 
@@ -511,6 +514,7 @@ function menu20 {
   sudo umount /mnt/*
   mntshow3=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow3" 30 60
+  m10
 }
 
 function menu21 {
@@ -591,7 +595,7 @@ GigaDNS 189.38.95.96: $GIGA_S"
 dialog --title 'Resultados do Ping:' --msgbox "$TEXTAO14" 0 0
 
 menu08 "$Recado $TEXTAO14 $Mensagem"
-liminal "st4rt1" "start"
+liminal "m3nu05" "menu05"
 }
 
 function menu23 {
@@ -1053,8 +1057,9 @@ dmn2=$(echo "$VALUE0" | sed -n 4p)
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
   m10
 } || {
-  xinitar=$(rdesktop -u $user2 -p $pass2 $dom $IP1)
-  xinit "$xinitar" $* -- :3 vt$XDG_VTNR
+  echo "rdesktop -u $user2 -p $pass2 $dom $IP1" > /tmp/.rdesktop
+  chmod +x /tmp/.rdesktop
+  xinit /tmp/.rdesktop $* -- :3 vt$XDG_VTNR
   m10
   }
 }
