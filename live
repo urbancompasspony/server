@@ -619,12 +619,7 @@ Mais informações em AJUDA!" 0 0 ; menu053
 }
 
 function menu054 {
-pong=$(ping google.com -c 1 1> /dev/null 2> /dev/null && echo "ok" || echo "notok")
-[ "$pong" = "notok" ] && {
-  dialog --cr-wrap --title "Erro na Rede" --backtitle "$bktitle" --msgbox "O sistema não pode se comunicar com a rede local! Verifique sua conexão e tente novamente mais tarde." 8 40
-  liminal "st4rt1" "start"
-} || {
-  [ "$report" = "0" ] && {
+[ "$report" = "0" ] && {
     dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja habilitar a emissão de relatórios?" 8 40
     [ $? = 0 ] && {
       [ -f "$FILE3" ] && {
@@ -673,7 +668,6 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
         echo "a" > /dev/null
         }
     }
-  }
 }
 
 liminal "st4rt1" "start"
