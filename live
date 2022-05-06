@@ -29,7 +29,7 @@ datetime3=$(date +"%m-%Y") # Month
 cp "/home/$USER/.DOC/.relat.docx" "/home/$USER/.DOC/$datetime3.docx" 2> /dev/null
 
 TEXTAO14="
-Conforme estipulado em contrato mensal de prestação de serviços na área de informática, segue abaixo o relatório de manutenções preventivas e corretivas executados no período de $datetime3:"
+Conforme previamente acordado, segue abaixo o relatório de suporte, manutenções preventivas e/ou corretivas executadas no período de $datetime3:"
 
 echo "$TEXTAO14" >> "/home/$USER/.DOC/$datetime3.docx"
 }
@@ -41,39 +41,43 @@ report=0; datetime2=0; confrel=0
 # SISTEMA Normal
 function start {
 doc_rel="1" # Relatorio!
+ip=$(hostname -I | awk '{print $1}')
 datetime=$(date +"%d/%m %H:%M")
 uptime=$(uptime | awk {'print $3 $4 $5'})
-var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
+var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "IP Local: $ip
 Data e Hora: $datetime
 UpTime: $uptime"  0 0 0 \
 A 'Iniciar OpenBox' \
-B 'Status Geral' \
-C 'Processos' \
-D 'Ferramentas' \
-E 'Avançado' \
-F 'NMTUI' \
-G '*Reiniciar' \
-H '*Desligar' \
+B 'Iniciar Navegador' \
+C 'Status Geral' \
+D 'Processos' \
+E 'Ferramentas' \
+F 'Avançado' \
+G 'NMTUI' \
+H '*Reiniciar' \
+I '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
-A) startx ;;
-B) menu01 ;;
-C) menu03 ;;
-D) menu05 ;;
-E) m10 ;;
-F) nmtui ; start ;;
-G) menu06 ;;
-H) menu07 ;;
+A) startx ; start ;;
+B) xinit epiphany-browser $* -- :1 vt$XDG_VTNR; start ;;
+C) menu01 ;;
+D) menu03 ;;
+E) menu05 ;;
+F) m10 ;;
+G) nmtui ; start ;;
+H) menu06 ;;
+I) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
 
 # Invertido
 function st4rt1 {
+ip=$(hostname -I | awk '{print $1}')
 datetime=$(date +"%d/%m %H:%M")
 uptime=$(uptime | awk {'print $3 $4 $5'})
-var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
+var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "IP Local: $ip
 Data e Hora: $datetime
 UpTime: $uptime"  0 0 0 \
 A 'Iniciar OpenBox' \
@@ -97,32 +101,29 @@ esac
 
 # Ferramentas Normal
 function menu05 {
-var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
-A 'Iniciar Navegador' \
-B 'rDesktop' \
+var6=$(dialog --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
+A 'rDesktop' \
+B 'Encerrar rDesktop' \
 C 'Placas de Rede' \
-D '*Speed Test' \
-E '*Arp-Scan' \
-F '*IP Neigh' \
-G 'Stress' \
+D 'Stress' \
+E '*Speed Test' \
+F '*Arp-Scan' \
+G '*IP Neigh' \
 H '*Who Is' \
 I '*Trace Route' \
 J '*Ping DNS' \
 K 'Definir Relatórios' \
 L 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
-case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
-esac
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var6" in
-A) xinit epiphany-browser $* -- :1 vt$XDG_VTNR; menu05 ;;
-B) menu04 ;;
+A) menu04 ;;
+B) killall rdesktop ; menu05 ;;
 C) menu21 ;;
-D) menu050 ;;
-E) menu0501 ;;
-F) menu23 ;;
-G) stress -c 16; m10 ;;
+D) stress -c 16; m10 ;;
+E) menu050 ;;
+F) menu0501 ;;
+G) menu23 ;;
 H) menu051 ;;
 I) menu052 ;;
 J) menu22 ;;
@@ -134,7 +135,7 @@ esac
 
 # Ferramentas Invertido
 function m3nu05 {
-var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
+var6=$(dialog --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
 A 'Placas de Rede' \
 B '*Speed Test' \
 C '*Arp-Scan' \
@@ -142,9 +143,6 @@ D '*Trace Route' \
 E 'Definir Relatórios' \
 F 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
-case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
-esac
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var6" in
 A) menu21 ;;
@@ -163,8 +161,6 @@ A 'Samba - Mount' \
 B 'Samba - Umount' \
 C 'Ghost (OpenBox)' \
 D 'Samba Server' \
-E 'Governador de CPU' \
-F 'Parar Backup' \
 G 'UDP-Cast' \
 H 'TestDisk' \
 I 'Emitir .docx' \
@@ -177,10 +173,8 @@ A) menu19 ;;
 B) menu20 ;;
 C) sudo /home/ubuntu/.Ghost/Ghost; m10 ;;
 D) menu18 ;;
-E) menu053 ;;
-F) m122 ;;
 G) menu17 ;;
-H) sudo testdisk ;;
+H) sudo testdisk ; m10 ;;
 I) menu28 ;;
 J) menu29 ;;
 K) menu30 ;;
@@ -190,10 +184,8 @@ esac
 
 # STATUS Normal
 function menu01 {
-ip=$(hostname -I | awk '{print $1}')
 ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
-var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Local  : $ip
-IP Externo: $ip2" 0 0 0 \
+var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Externo: $ip2" 0 0 0 \
 A 'INXI' \
 B '*Sistema' \
 C '*Temperatura' \
@@ -213,10 +205,8 @@ esac
 
 # STATUS Invertido
 function m3nu01 {
-ip=$(hostname -I | awk '{print $1}')
 ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
-var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Local  : $ip
-IP Externo: $ip2" 0 0 0 \
+var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Externo: $ip2" 0 0 0 \
 A 'INXI' \
 B '*Sistema' \
 C '*Temperatura' \
@@ -268,13 +258,11 @@ $sysd1
 $sysd2
 Tempo total $sysd3"
 
-dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "$bktitle" --msgbox "$TEXTMAIL" 0 0
-case $? in
-  2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO01" 0 0 ; menu11 ;;
-esac
+dialog --cr-wrap --title "Informações encontradas" --backtitle "$bktitle" --msgbox "$TEXTMAIL" 0 0
+
 [ $? -ne 0 ] && liminal "m3nu01" "menu01"
 
-menu08 "$Recado $TEXTMAIL $TEXTAO01 $Mensagem"
+menu08 "$Recado $TEXTMAIL $Mensagem"
 liminal "m3nu01" "menu01"
 }
 
@@ -295,7 +283,7 @@ menu09 motion && motion1=$prcs
 menu09 dwagent && dwagent1=$prcs
 vpn=$(ip a | grep tun 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
 
-menuxx=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Ajuda' --backtitle "$bktitle" --title 'Processos de Sistema' --menu " "  0 0 0 \
+menuxx=$(dialog --ok-label 'Ajustar' --backtitle "$bktitle" --title 'Processos de Sistema' --menu " "  0 0 0 \
 A "Samba      : $smb1"  \
 B "Dominio    : $smb2" \
 C "Apache2    : $apache" \
@@ -311,9 +299,7 @@ L "Motion     : $motion1" \
 M "DWAgent    : $dwagent1" \
 N "VPN Client : $vpn" \
 X "Voltar" 2>&1 > /dev/tty )
-case $? in
-  2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO08" 0 0 ; menu03 ;;
-esac
+
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$menuxx" in
 A) status="$smb1"; processname="Samba"; process="smbd"; menu031 ;;
@@ -368,15 +354,13 @@ function menu09 {
 # Status Temperatura
 function menu12 {
 sensors0=$(sensors || echo "Indisponível!")
-dialog --cr-wrap --help-button --help-label 'Ajuda' --backtitle 'Temperatura, Potencia e Rotação de Cooler(s) [Se disponível!]' --msgbox "$sensors0" 0 0
-case $? in
-  2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO02" 0 0 ; menu12 ;;
-esac
+dialog --cr-wrap --backtitle 'Temperatura, Potencia e Rotação de Cooler(s) [Se disponível!]' --msgbox "$sensors0" 0 0
+
 [ $? -ne 0 ] && liminal "m3nu01" "menu01"
 [ "$sensors1" = "Indisponível!" ] && {
   dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
 } || {
-  menu08 "$Recado $sensors0 $TEXTAO02 $Mensagem"
+  menu08 "$Recado $sensors0 $Mensagem"
   }
 
 liminal "m3nu01" "menu01"
@@ -385,13 +369,11 @@ liminal "m3nu01" "menu01"
 # Status de Consumo dos Discos
 function menu13 {
 sdisks=$(df -Th)
-dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Discos encontrados" --backtitle "Status do Armazenamento" --msgbox "$sdisks" 0 0
-case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO03" 0 0; menu13 ;;
-esac
+dialog --cr-wrap --title "Discos encontrados" --backtitle "Status do Armazenamento" --msgbox "$sdisks" 0 0
+
 [ $? -ne 0 ] && liminal "m3nu01" "menu01"
 
-menu08 "$Recado $sdisks $TEXTAO03 $Mensagem"
+menu08 "$Recado $sdisks $Mensagem"
 liminal "m3nu01" "menu01"
 }
 
@@ -406,7 +388,7 @@ menu140 "sdf" && dump6=$skd && dumpst6=$stssd
 menu140 "sdg" && dump7=$skd && dumpst7=$stssd
 menu140 "sdh" && dump8=$skd && dumpst8=$stssd
 menu140 "sdi" && dump9=$skd && dumpst9=$stssd
-menusk=$(dialog --help-button --help-label 'Ajuda' --backtitle "Análise de Atributos SMART!" --title "S.M.A.R.T." --menu ""  0 0 0 \
+menusk=$(dialog --backtitle "Análise de Atributos SMART!" --title "S.M.A.R.T." --menu ""  0 0 0 \
 "/dev/sda" "$dumpst1" \
 "/dev/sdb" "$dumpst2" \
 "/dev/sdc" "$dumpst3" \
@@ -417,9 +399,7 @@ menusk=$(dialog --help-button --help-label 'Ajuda' --backtitle "Análise de Atri
 "/dev/sdh" "$dumpst8" \
 "/dev/sdi" "$dumpst9" \
 "X Voltar" "" 2>&1 > /dev/tty )
-case $? in
-  2) dialog --title "Definições de SMART!" --msgbox "$TEXTAO04" 0 0 ; menu14 ;;
-esac
+
 [ $? -ne 0 ] && {start}
 case "$menusk" in
 "/dev/sda") menu141 "sda" "$dump1" ; menu14 ;;
@@ -447,7 +427,7 @@ stssd=$(ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente
 function menu141 {
 dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0
 
-menu08 "$Recado $2 $TEXTAO04 $Mensagem"
+menu08 "$Recado $2 $Mensagem"
 menu14
 }
 
@@ -499,11 +479,12 @@ dmn1=$(echo "$VALUE0" | sed -n 5p)
 }
 
 function menu18 {
-sudo mkdir /mnt/shared
-sudo chmod 777 -R /mnt/shared
-sudo chown ubuntu:sambashare -R /mnt/shared
-sudo systemctl restart smbd nmbd
-dialog --title "Informação" --msgbox "Servidor SAMBA Ligado!" 6 20
+  sudo mkdir /mnt/shared
+  sudo chmod 777 -R /mnt/shared
+  sudo chown ubuntu:sambashare -R /mnt/shared
+  sudo systemctl restart smbd nmbd
+  dialog --title "Informação" --msgbox "Servidor SAMBA Ligado!" 6 20
+  m10
 }
 
 function menu20 {
@@ -639,48 +620,6 @@ trot=$(traceroute "$site")
 dialog --title "Traceroute" --msgbox "$trot" 0 0
 menu08 "$Recado $trot $Mensagem"
 liminal "m3nu05" "menu05"
-}
-
-# Governador de CPU
-function menu053 {
-governor1=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!")
-governor2=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors || echo "Indisponível!")
-var3=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "$bktitle" --menu "Governador de CPU Atual: \n
-$governor1" 0 0 0 \
-A 'Conservative' \
-B 'OnDemand' \
-C 'UserSpace' \
-D 'PowerSave' \
-E 'Performance' \
-F 'Schedutil' \
-X 'Voltar' 2>&1 > /dev/tty )
-case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO10" 0 0 ; menu053 ;;
-esac
-[ $? -ne 0 ] && liminal "m3nu05" "menu05"
-case "$var3" in
-A) menu10 conservative ;;
-B) menu10 ondemand ;;
-C) menu10 userspace ;;
-D) menu10 powersave ;;
-E) menu10 performance ;;
-F) menu10 schedutil ;;
-X) m10 ;;
-esac
-}
-
-# Governador de CPU 2
-function menu10 {
-governor2=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors)
-govr=$(echo "$password" | sudo -S echo $1 | sudo -S tee /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor 2> /dev/null 1> /dev/null && echo "si" || echo "no")
-[ "$govr" = "si" ] && {
-  dialog --cr-wrap --title "Bem sucedido!" --backtitle "$bktitle" --msgbox "Governador trocado com sucesso!" 0 0 ; menu053
-} || {
-  dialog --cr-wrap --title "ERRO" --backtitle "$bktitle" --msgbox "Seu sistema não suporta o governador escolhido. Detectamos estes governadores abaixo como suportados: \n \n
-> $governor2 < \n \n
-Mais informações em AJUDA!" 0 0 ; menu053
-  }
-
 }
 
 function menu054 {
@@ -914,91 +853,6 @@ password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --ti
 
 }
 
-function m122 {
-var_stop=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
-A 'Parar RSYNC' \
-B 'Parar RSNAPSHOT' \
-C 'Parar BALANCE' \
-D 'Parar COPY' \
-X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var_stop" in
-A) m12 ;;
-B) m13 ;;
-C) m14 ;;
-D) m15 ;;
-X) m10 ;;
-esac
-}
-
-function m12 {
-dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja parar o processo RSYNC?" 8 40
-[ $? = 0 ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
-  [ $? = 0 ] && {
-    echo "$password" | sudo -S killall rsync
-    dialog --title "ATENÇÃO" --msgbox "Verifique se seus backups estão íntegros." 8 40
-  } || {
-    echo "a" > /dev/null
-    }
-} || {
-  echo "a" > /dev/null
-  }
-
-m122
-}
-
-function m13 {
-dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja parar o processo RSNAPSHOT?" 8 40
-[ $? = 0 ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
-  [ $? = 0 ] && {
-    echo "$password" | sudo -S killall rsnapshot
-    dialog --title "ATENÇÃO" --msgbox "Verifique se seus backups estão íntegros." 8 40
-  } || {
-    echo "a" > /dev/null
-    }
-} || {
-  echo "a" > /dev/null
-  }
-
-m122
-}
-
-function m14 { 
-blnc=$(dialog --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --inputbox "Insira o caminho:" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && m10
-[ -z "$blnc" ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title "ERRO" --msgbox "Caminho não pode ficar em branco!" 8 40
-} || {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --yesno "Tem certeza que deseja parar o Balance em $blnc?" 8 40
-  [ $? = 0 ] && {
-    echo "$password" | sudo -S btrfs balance cancel "$blnc"
-  } || {
-    echo "a" > /dev/null
-    }
-}
-
-m122
-}
-
-function m15 {
-dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja parar o processo CoPy?" 8 40
-[ $? = 0 ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
-  [ $? = 0 ] && {
-    echo "$password" | sudo -S killall cp
-    dialog --title "ATENÇÃO" --msgbox "Verifique se seus backups estão íntegros." 8 40
-  } || {
-    echo "a" > /dev/null
-    }
-} || {
-  echo "a" > /dev/null
-  }
-
-m122
-}
-
 function liminal { [ -f "$FILE" ] && { [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && { $2; } || { $1; }; } || { $2; }; }
 
 function menu27 {
@@ -1105,173 +959,6 @@ Recado6="O sistema foi desligado em "
 Mensagem="
 
 AVISO LEGAL: Esta mensagem, inclusive seus anexos, pode conter informações confidenciais e deve ser resguardado o devido sigilo de seu conteúdo. Caso a tenha recebido indevidamente, por favor apague-a imediatamente e comunique o remetente. Qualquer forma de utilização, reprodução, retransmissão, alteração, distribuição e/ou divulgação de conteúdo desta mensagem ou de parte dele, sem a autorização expressa de seu remetente, é estritamente proibida."
-
-TEXTAO01="
-
-Governador de CPU: Mostra como está a execução do processador, se em Máximo Desempenho, Economia de Energia ou outro.
-
-Balance BTRFS: Manutenção de rotina do sistema. Se estiver em Execução, o computador NÃO poderá ser reiniciado ou desligado!
-Rsnapshot: Backup incremental automatizado. Se estiver Executando, o computador não poderá ser desligado!
-RSync: Sincronia do Backup em Nuvem ou para um backup RAID 1. Se estiver Executando, o computador não poderá ser reiniciado ou desligado!
-CoPy: Sincronia de pastas locais. Se estiver Executando, o computador não poderá ser reiniciado ou desligado!
-
-Tempos de Boot: Se o sistema foi instalado como UEFI você pode ver (firmware) e (loader) que são
-respectivamente a leitura da BIOS e depois a primeira leitura do HD identificando as partições.
-Na sequência, temos o (kernel) que representa o Linux propriamente dito; e o UserSpace,
-que são os aplicativos e ferramentas do Usuário. No final, o tempo total que o sistema
-demorou pra inicializar."
-
-TEXTAO02="
-
-A temperatura costuma ter valores atuais, mínimos (low) e máximos (high)
-Além disso, há também a temperatura Crítica (Crit.): Se o sistema atingir ela,
-vai desligar instantaneamente por segurança.
-
-Resultados que indicam temperaturas de CPU:
-(edge) (cpu_thermal-xxx) (asus-isa-xxxx) (Core X) (coretemp-isa-xxxx)
-Resultados que indicam temperaturas de GPU:
-(amdgpu-pci-xxxx) (ISA Adapter)
-Resultados que indicam temperaturas de Chipset:
-(k10temp-pci-xxxx) (acpitz-acpi-xxxx)
-Resultados que indicam rotação de cooler:
-(cpu_cooler) (fan1) (RPM)
-Resultados que indicam Baterias:
-(BAT0-acpi-xxx) (fam15h_power-pci-xxxx)
-Em Progresso: Novas indicações são adicionadas periodicamente!"
-
-TEXTAO03="
-
-Os resultados são de discos acessíveis no sistema. 
-Se um disco não aparecer aqui, significa que está em estado de erro ou foi ejetado.
-
-As opções são:
-[Sist. Arq.] [Tipo] [Tam.] [Usado] [Disp.] [Uso%] [Montado em]
-
-Sist. Arq.: Os mais importantes são começados com //IP e /dev.
-Tipo: Podem ser EXT4, BTRFS, NTFS, FAT32, etc.
-Tam.: Tamanho total do armazenamento.
-Usado: Espaço que já foi utilizado.
-Disp.: Espaço restante.
-Uso%: Porcentagem de uso do disco comparado ao tamanho total.
-Montado em: Local aonde o disco está acessível naquele momento."
-
-TEXTAO04="
-
-As informações S.M.A.R.T. de um HDD ou SSD são variadas mas só
-algumas partes realmente interessam. Nem todos os HDDs e SSDs exibem todas
-essas informações, isso depende do fabricante. As mais importantes são:
-
-01 (0x01) Read Error Rate: Taxa de erro geral durante as leituras do disco.
-Ao lado do atributo 07 (0x07), se estiver muito alto, causará muita lentidão.
-
-05 (0x05) Reallocated Sectors Count: Conhecidos também como BadBlocks, indicam falhas de gravação no disco.
-A longo prazo isso pode resultar em perda do disco dentro de alguns meses.
-
-07 (0x07) Seek Error Rate: Erro das cabeças magnéticas; podem surgir
-por danos ao braço de leitura ou alargamento térmico do disco rígido.
-Normalmente não é preocupante mas ao lado do atributo 01 (0x01) pode causar lentidão.
-
-10 (0x0A) Spin Retry Count: Quantidade de vezes que o HDD tentou inicializar após uma falha interna.
-A médio prazo isso significa falhas graves das cabeças de leitura e o disco poderá parar em alguns meses.
-
-184 (0xB8) End-to-End error (ou IOEDC): Indica erros nos dados que transitam do disco ou SSD para a memória RAM.
-Imediatamente causa muito lentidão de acesso aos dados; com valores altos desse atributo, há perdas de dados.
-
-195 (0xC3) Hardware ECC Recovered: Sozinho não quer dizer muita coisa; porém somado ao resultado do atributo 187 (0xBB)
-abaixo, significa que o disco está perdendo dados mas ainda está se recuperando. Lentidão extrema é prevista.
-
-187 (0xBB) Reported Uncorrectable Errors: Erros incorrigíveis que foram reportados durante o processamento do,
-Hardware ECC do próprio HDD. Valores altos significam disco extremamente lento.
-
-188 (0xBC) Command Timeout: Quantidade de vezes que o HDD ou SSD desistiu de fazer uma leitura.
-Um valor alto indica falha geral da placa lógica do disco.
-
-196 (0xC4) Reallocation Event Count: Quantidade de vezes que o disco copiou dados de um setor ruim para um bom,
-se auto-recuperando. Os valores podem ser altos sem perdas de dados, mas a lentidão será notável.
-
-197 (0xC5) Current Pending Sector Count: Setores que aguardam ser remapeados. Altos valores do atributo 187 (0xBB) ou
-mesmo do atributo 05 (0x05) indicam que o HDD está com setores defeituosos e está com dificuldades de lidar. Lentidão.
-
-198 (0xC6) (Offline) Uncorrectable Sector Count: Costuma indicar erros na superfície dos discos ou ainda uma falha
-mecânica geral da cabeça de leitura dos discos, ou ainda de multiplexadoras de SSDs.
-
-201 (0xC9) Soft Read Error Rate (ou TA Counter Detected): Quantidade de erros causados por software.
-Valores altos indicam a presença de bad sectors (diferente de bad blocks), que podem ser corrigidos com
-ferramentas de análise, como o HD Regenerator.
-
-As informações acima são referências para análises da saúde dos discos. Atenção ao interpretar os resultados!"
-
-TEXTAO08="
-
-A lista abaixo não necessariamente informa todos os processos configurados!
-Esteja atento ao que está instalado no sistema. Mesmo aqueles não instalados aparecerão apenas como 'Parado'.
-
-Samba: Se esse servidor compartilha (via smb) arquivos na rede.
-Dominio: Se há um Dominio ativo neste servidor, o Samba (smb) é substituido pelo processo samba-ad-dc.
-
-Apache2: Usado se houver um Nextcloud neste servidor.
-Lighttpd: Processo usado pelo PiHole se estiver instalado neste servidor.
-
-Spark: Monitor do servidor de banco de dados se houver OpenFire neste servidor.
-MySQL: Monitor do servidor de banco de dados se houver MySQL neste servidor.
-
-CUPS: Servidor de impressão em Rede através dos protocolos HTTP ou SMB.
-Motion: Processo usado pelo Motion, para monitorar WebCams ou ainda sistemas de CFTV.
-DWAgent: Se houver um Acesso Remoto com DWService executando nesta máquina.
-VPN Client: Se este Servidor está conectado em uma VPN atuando como cliente."
-
-TEXTAO09="
-
-Painel de Ferramentas do Sistema!
-
-Placas de Rede: 
-
-SpeedTest: Calcula as velocidades de Download e Upload de uma
-conexão á internet existente.
-
-Arp-Scan: Exibe a tabela ARP da rede, mostrando endereços MAC, IP's e nomes
-dos computadores descobertos.
-
-TraceRoute: Calcula quantos Hops, saltos, a latência que uma conexão deste
-servidor tem até um site especificado.
-
-Iniciar Scripts: Permite iniciar scripts parados: Cluster e/ou Balloon.
-
-Re-Iniciar NOIP: Permite parar, iniciar ou reiniciar NOIP.
-
-Ajustes Relatórios: Permite enviar por e-mail os resultados dos Menus!
-Relatórios Salvos: Permite acessar e enviar por e-mails os relatórios salvos!
-
-Reiniciar: Se não houver nada que impeça, o sistema será reiniciado.
-Desligar: Se não houver nada que impeça, o sistema será desligado."
-
-TEXTAO10="
-
-Governadores de CPU são formas como a CPU trabalha para otimizar a performance,
-economizar bateria, etc. Num urgência podem ser usados pra esfriar um processador ou melhorar o desempenho geral.
-
-Cada governador possui uma aplicabilidade, dependendo do momento, da necessidade e muitas vezes o padrão em execução
-será o ideal para aquele hardware. Os governadores mais comuns com as referidas explicações são:
-
-Conservative: Faz a CPU manter sua frequência no nível mais baixo, porém aumenta a frequência de forma gradual
-conforme o necessário.
-
-OnDemand: Faz a CPU manter sua frequência no nível mais baixo e aumenta a frequência para o máximo
-conforme a necessidade.
-
-UserSpace: Permite que as aplicações da UserSpace controlem a escala de processamento. Situação Atípica.
-
-PowerSave: Ele mantém o clock mais baixo, não importando o que estiver sendo utilizado.
-É o modo de pior desempenho, ideal para economizar baterias e também pode ser usado para esfriar a CPU,
-caso o servidor esteja superaquecendo devido a uma carga de trabalho excepcional.
-
-Performance: Faz a CPU manter sua frequência no nível mais alto, mantendo o clock alto mesmo se o
-computador não estiver em uso. É o modo de melhor desempenho sem Overclock!
-
-Schedutil: Passa a escala de processamento para o Agendador de Tarefas e as prioridades são definidas de
-acordo com a aplicação. Este é o modo que trás o melhor custo-benefício de desempenho e baixo clock.
-
-Um governador aplicado passa a operar imediatamente!"
 
 ################################################################################
 #                                                                              #
