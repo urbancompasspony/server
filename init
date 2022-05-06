@@ -157,8 +157,106 @@ function teste {
   dialog --title "TESTES DE FUNCIONALIDADE" --msgbox "AÇÃO ESPERADA: $1" 20 40
 }
 
+# Ferramentas Normal
+ #xorg=$(ls /tmp/.X11-unix | wc -l)
+function menu05 {
+var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
+A 'Placas de Rede' \
+B '*Speed Test' \
+C '*Arp-Scan' \
+D '*IP Neigh' \
+E '*Who Is' \
+F '*Trace Route' \
+G 'Iniciar Navegador' \
+H '*Ping DNS' \
+I 'Iniciar Scripts' \
+J '*Re-Iniciar NOIP' \
+K 'Definir Relatórios' \
+L 'Relatórios Salvos' \
+X 'Voltar' 2>&1 > /dev/tty )
+case $? in
+  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
+esac
+[ $? -ne 0 ] && liminal "st4rt1" "start"
+case "$var6" in
+A) menu21 ;;
+B) menu050 ;;
+C) menu0501 ;;
+D) menu23 ;;
+E) menu051 ;;
+F) menu052 ;;
+G) [ "$DISPLAY" = "localhost:10.0" ] && { xinit epiphany-browser $* -- :100 vt$XDG_VTNR;} || { epiphany-browser;} ; menu05 ;;
+H) menu22 ;;
+I) menu24 ;;
+J) menu25 ;;
+K) menu054 ;;
+L) menu055 ;;
+X) liminal "st4rt1" "start" ;;
+esac
+}
+
+# Ferramentas Invertido
+function m3nu05 {
+var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
+A 'Placas de Rede' \
+B '*Speed Test' \
+C '*Arp-Scan' \
+D '*Trace Route' \
+E 'Iniciar Scripts' \
+F '*Re-Iniciar NOIP' \
+G 'Definir Relatórios' \
+H 'Relatórios Salvos' \
+X 'Voltar' 2>&1 > /dev/tty )
+case $? in
+  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
+esac
+[ $? -ne 0 ] && liminal "st4rt1" "start"
+case "$var6" in
+A) menu21 ;;
+B) menu050 ;;
+C) menu0501 ;;
+D) menu052 ;;
+E) menu24 ;;
+F) menu25 ;;
+G) menu054 ;;
+H) menu055 ;;
+X) liminal "st4rt1" "start" ;;
+esac
+}
+
+function m10 {
+var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
+A 'Atualizar o Sistema' \
+B 'Samba - Mount' \
+C 'PiHole' \
+D 'Governador de CPU' \
+E 'Parar Backup' \
+F 'UDP-Cast' \
+G '*Usuários Logados' \
+H '*Logins Anteriores' \
+I 'Emitir .docx' \
+J 'Encaminhar .docx' \
+K 'Apagar .docx' \
+X 'Voltar' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && liminal "st4rt1" "start"
+case "$var10" in
+A) m11 ;;
+B) menu31 ;;
+C) menu26 ;;
+D) menu053 ;;
+E) m122 ;;
+F) menu17 ;;
+G) menu18 ;;
+H) menu19 ;;
+I) menu28 ;;
+J) menu29 ;;
+K) menu30 ;;
+X) liminal "st4rt1" "start" ;;
+esac
+}
+
 ##########
-# STATUS # #------------------------------------------------------------------ #
+# INICIO # #------------------------------------------------------------------ #
 ##########
 
 # Normal
@@ -646,7 +744,7 @@ GigaDNS 189.38.95.96: $GIGA_S"
 dialog --title 'Resultados do Ping:' --msgbox "$TEXTAO14" 0 0
 
 menu08 "$Recado $TEXTAO14 $Mensagem"
-liminal "st4rt1" "start"
+liminal "m3nu05" "menu05"
 }
 
 function menu23 {
@@ -654,73 +752,6 @@ ipneigh1=$(ip neigh)
 dialog --title 'IP Neigh' --msgbox "$ipneigh1" 0 0
 menu08 "$Recado $ipneigh1 $Mensagem"
 liminal "m3nu05" "menu05"
-}
-
-# Ferramentas Normal
- #xorg=$(ls /tmp/.X11-unix | wc -l)
-function menu05 {
-var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
-A 'Placas de Rede' \
-B '*Speed Test' \
-C '*Arp-Scan' \
-D '*IP Neigh' \
-E '*Who Is' \
-F '*Trace Route' \
-G 'Iniciar Navegador' \
-H '*Ping DNS' \
-I 'Iniciar Scripts' \
-J '*Re-Iniciar NOIP' \
-K 'Definir Relatórios' \
-L 'Relatórios Salvos' \
-X 'Voltar' 2>&1 > /dev/tty )
-case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
-esac
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var6" in
-A) menu21 ;;
-B) menu050 ;;
-C) menu0501 ;;
-D) menu23 ;;
-E) menu051 ;;
-F) menu052 ;;
-G) [ "$DISPLAY" = "localhost:10.0" ] && { xinit epiphany-browser $* -- :100 vt$XDG_VTNR;} || { epiphany-browser;} ; menu05 ;;
-H) menu22 ;;
-I) menu24 ;;
-J) menu25 ;;
-K) menu054 ;;
-L) menu055 ;;
-X) liminal "st4rt1" "start" ;;
-esac
-}
-
-# Ferramentas Invertido
-function m3nu05 {
-var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
-A 'Placas de Rede' \
-B '*Speed Test' \
-C '*Arp-Scan' \
-D '*Trace Route' \
-E 'Iniciar Scripts' \
-F '*Re-Iniciar NOIP' \
-G 'Definir Relatórios' \
-H 'Relatórios Salvos' \
-X 'Voltar' 2>&1 > /dev/tty )
-case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
-esac
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var6" in
-A) menu21 ;;
-B) menu050 ;;
-C) menu0501 ;;
-D) menu052 ;;
-E) menu24 ;;
-F) menu25 ;;
-G) menu054 ;;
-H) menu055 ;;
-X) liminal "st4rt1" "start" ;;
-esac
 }
 
 # SpeedTest
@@ -1659,37 +1690,6 @@ password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --ti
   dialog --title 'Acesso Proibido' --msgbox "Permissão Incorreta" 0 0
   }
 
-}
-
-function m10 {
-var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
-A 'Atualizar o Sistema' \
-B 'Samba - Mount' \
-C 'PiHole' \
-D 'Governador de CPU' \
-E 'Parar Backup' \
-F 'UDP-Cast' \
-G '*Usuários Logados' \
-H '*Logins Anteriores' \
-I 'Emitir .docx' \
-J 'Encaminhar .docx' \
-K 'Apagar .docx' \
-X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var10" in
-A) m11 ;;
-B) menu31 ;;
-C) menu26 ;;
-D) menu053 ;;
-E) m122 ;;
-F) menu17 ;;
-G) menu18 ;;
-H) menu19 ;;
-I) menu28 ;;
-J) menu29 ;;
-K) menu30 ;;
-X) liminal "st4rt1" "start" ;;
-esac
 }
 
 function m11 {
