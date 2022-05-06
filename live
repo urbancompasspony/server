@@ -1,15 +1,5 @@
 #!/bin/bash
 
-# ============================================================================ #
-#########################                                                      #
-# Universal Server Menu # ==================================================== #
-#########################                                                      #
-#                                                           ####################
-# ========================================================= # By José Humberto #
-#                                                           ####################
-# ============================================================================ #
-
-################################################################################
 # PAINEL DE CONTROLE ###########################################################
 
 # Versionamento: v1.9.4
@@ -56,23 +46,25 @@ uptime=$(uptime | awk {'print $3 $4 $5'})
 var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
 Data e Hora: $datetime
 UpTime: $uptime"  0 0 0 \
-A 'Status Geral' \
-B 'Máquinas Virtuais' \
-C 'Processos' \
-D 'Ferramentas' \
-E 'Avançado' \
-F '*Reiniciar' \
-G '*Desligar' \
+A 'OpenBox' \
+B 'Status Geral' \
+C 'Máquinas Virtuais' \
+D 'Processos' \
+E 'Ferramentas' \
+F 'Avançado' \
+G '*Reiniciar' \
+H '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
-A) menu01 ;;
-B) menu02 ;;
-C) menu03 ;;
-D) menu05 ;;
-E) m10 ;;
-F) menu06 ;;
-G) menu07 ;;
+A) startx ;;
+B) menu01 ;;
+C) menu02 ;;
+D) menu03 ;;
+E) menu05 ;;
+F) m10 ;;
+G) menu06 ;;
+H) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
@@ -84,27 +76,25 @@ uptime=$(uptime | awk {'print $3 $4 $5'})
 var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
 Data e Hora: $datetime
 UpTime: $uptime"  0 0 0 \
-A 'Status Geral' \
-B 'Máquinas Virtuais' \
-C 'Processos' \
-D 'Ferramentas' \
-E '*Reiniciar' \
-F '*Desligar' \
+A 'Iniciar OpenBox' \
+B 'Status Geral' \
+C 'Máquinas Virtuais' \
+D 'Processos' \
+E 'Ferramentas' \
+F '*Reiniciar' \
+G '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
-A) m3nu01 ;;
-B) menu02 ;;
-C) menu03 ;;
-D) m3nu05 ;;
-E) menu06 ;;
-F) menu07 ;;
+A) startx ;;
+B) m3nu01 ;;
+C) menu02 ;;
+D) menu03 ;;
+E) m3nu05 ;;
+F) menu06 ;;
+G) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
-}
-
-function teste {
-  dialog --title "TESTES DE FUNCIONALIDADE" --msgbox "AÇÃO ESPERADA: $1" 20 40
 }
 
 ##########
@@ -503,7 +493,7 @@ C) menu0501 ;;
 D) menu23 ;;
 E) menu051 ;;
 F) menu052 ;;
-G) [ "$DISPLAY" = "localhost:10.0" ] && { xinit epiphany-browser $* -- :100 vt$XDG_VTNR;} || { epiphany-browser;} ; menu05 ;;
+G) xinit epiphany-browser $* -- :0 vt$XDG_VTNR; menu05 ;;
 H) menu22 ;;
 I) menu054 ;;
 J) menu055 ;;
