@@ -2054,7 +2054,7 @@ dmn1=$(echo "$VALUE0" | sed -n 5p)
   dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 8 40
   m10
 } || {
-  sudo mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
+  echo "$password" | sudo -S mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
   mntshow2=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow2" 30 60
   m10
@@ -2063,7 +2063,7 @@ dmn1=$(echo "$VALUE0" | sed -n 5p)
 }
 
 function menu32 {
-  sudo umount /mnt/*
+  echo "$password" | sudo -S umount /mnt/*
   mntshow3=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow3" 30 60
 }
