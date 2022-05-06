@@ -29,7 +29,6 @@ revis="r1.1"
 
 # Docs
 FILE="/home/$USER/.lockinit"
-FILE2="/etc/.lockall"
 FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
@@ -49,50 +48,6 @@ echo "$TEXTAO14" >> "/home/$USER/.DOC/$datetime3.docx"
 # Menu Title
 bktitle="USM: Universal Server Menu $version"
 report=0; datetime2=0; confrel=0
-
-# Checagem de Dependências
-function pkg {
-APT_CMD=$(which apt 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
-YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
-
-[ "$APT_CMD" = "sim" ] && {
-  pkg1="apt"
-  REQUIRED_PKG="$1"
-  PKG_OK=$(dpkg-query -W 1> /dev/null 2> /dev/null $REQUIRED_PKG && echo "sim" || echo "nao")
-  [ "$PKG_OK" = "nao" ] && {
-    echo "$REQUIRED_PKG não encontrado. Instalando..."
-    echo "Digite sua senha!"
-    sudo apt update; sudo apt install $REQUIRED_PKG -y
-    mkdir -p ~/.mutt/cache/headers && mkdir ~/.mutt/cache/bodies && touch ~/.mutt/certificates && touch ~/.mutt/muttrc
-    echo -e "$TEXTAO07" > ~/.mutt/muttrc
-  } || {
-    echo "ok" > /dev/null
-    }
-} || {
-  echo "Sistema desconhecido."
-  }
-
-}
-
-# PASSWORD
-function init {
-[ -f "$FILE2" ] && echo "# # # Menu Travado! Saindo. # # #" && exit
-password=$(dialog --backtitle "$bktitle" --title "Acesso ao USM - $revis" --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
-hash1=$(echo "$password" | md5sum | awk '{print $1}')
-[ -z "$password" ] && {
-  clear
-  echo "É necessário digitar uma senha para continuar. Saindo..."
-  echo "Para voltar, digite 'menu'!"
-} || {
-  [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && {
-    password=$(dialog --backtitle "$bktitle." --title "Acesso ao USM - $revis" --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
-    menu054
-  } || {
-    menu054
-    }
-}
-
-}
 
 # SISTEMA Normal
 function start {
@@ -2172,18 +2127,6 @@ Node List: Online [ Primary Secondary ]
 Full List of Resources: Todos os resources precisam estar ativos, definidos como
 Primary e/ou Secondary, dependendo do Nó que está sendo analisado."
 
-TEXTAO07="set from = 'srvlinux.report@gmail.com'
-set realname = '$HOSTNAME'
-set imap_user = 'srvlinux.report@gmail.com'
-set imap_pass = 'objkhaxxwmofspvk'
-set smtp_url = 'smtps://srvlinux.report@smtp.gmail.com:465'
-set smtp_pass = 'objkhaxxwmofspvk'
-set folder = 'imaps://imap.gmail.com/'
-set spoolfile = '+INBOX'
-set postponed = '+[Gmail]/Drafts'
-#set record = '+[Gmail]/Sent Mail'
-set trash = '+[Gmail]/Trash'"
-
 TEXTAO08="
 
 A lista abaixo não necessariamente informa todos os processos configurados!
@@ -2319,18 +2262,5 @@ Caso implementado, melhorias no Kerberos também não serão disponibilizados ne
 #                                                                              #
 ################################################################################
 
-# Start
-
-# Checagem Obrigatória de Dependências:
-pkg dialog
-pkg curl
-pkg lm-sensors
-pkg whois
-pkg arp-scan
-pkg traceroute
-pkg libatasmart-bin
-pkg mutt
-pkg udpcast
-
 # Início do Sistema:
-init
+menu054
