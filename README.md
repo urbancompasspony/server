@@ -1,5 +1,8 @@
 # Universal Server Menu
 
+The default code is "init", that is mentioned below.
+The "live" version is resourceless and is used when booting a LIVE USB.
+
 # What is it?
 
 For now only in Brazillian Portuguese!
