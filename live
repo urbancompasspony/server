@@ -35,7 +35,6 @@ FILE4="/tmp/.relat"
 doc_rel="0"
 datetime3=$(date +"%m-%Y") # Month
 
-[ -d /home/$USER/.DOC ] || { mkdir "/home/$USER/.DOC" 2> /dev/null; }
 [ -f /home/$USER/.DOC/$datetime3 ] || {
 cp "/home/$USER/.DOC/.relat.docx" "/home/$USER/.DOC/$datetime3.docx" 2> /dev/null
 
@@ -60,22 +59,20 @@ UpTime: $uptime"  0 0 0 \
 A 'Status Geral' \
 B 'Máquinas Virtuais' \
 C 'Processos' \
-D 'Active Directory' \
-E 'Ferramentas' \
-F 'Avançado' \
-G '*Reiniciar' \
-H '*Desligar' \
+D 'Ferramentas' \
+E 'Avançado' \
+F '*Reiniciar' \
+G '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
 A) menu01 ;;
 B) menu02 ;;
 C) menu03 ;;
-D) menu04 ;;
-E) menu05 ;;
-F) m10 ;;
-G) menu06 ;;
-H) menu07 ;;
+D) menu05 ;;
+E) m10 ;;
+F) menu06 ;;
+G) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
@@ -90,20 +87,18 @@ UpTime: $uptime"  0 0 0 \
 A 'Status Geral' \
 B 'Máquinas Virtuais' \
 C 'Processos' \
-D 'Active Directory' \
-E 'Ferramentas' \
-F '*Reiniciar' \
-G '*Desligar' \
+D 'Ferramentas' \
+E '*Reiniciar' \
+F '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
 A) m3nu01 ;;
 B) menu02 ;;
 C) menu03 ;;
-D) menu04 ;;
-E) m3nu05 ;;
-F) menu06 ;;
-G) menu07 ;;
+D) m3nu05 ;;
+E) menu06 ;;
+F) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
@@ -126,8 +121,6 @@ A '*Sistema' \
 B '*Temperatura' \
 C '*Armazenamento' \
 D '*S.M.A.R.T.' \
-E '*Cluster: DRBD' \
-F '*Cluster: PCS' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
@@ -135,8 +128,6 @@ A) menu11 ;;
 B) menu12 ;;
 C) menu13 ;;
 D) menu14 ;;
-E) menu15 ;;
-F) menu16 ;;
 X) start ;;
 esac
 }
@@ -160,74 +151,6 @@ X) liminal "st4rt1" "start" ;;
 esac
 }
 
-function menu24 {
-# Cluster
-checkscript1=$([ -f /home/$USER/Scripts/Cluster ] && echo "sim" || echo "nao")
-[ "$checkscript1" = "sim" ] && {
-script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-  [ "$script1" = "Executando" ] && {
-    dialog --title 'Script Cluster Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
-  } || {
-    echo "$password" | sudo -S bash /home/$USER/Scripts/Cluster & 1> /dev/null 2> /dev/null
-    dialog --title 'Script Cluster foi iniciado!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
-    }
-} || {
-  dialog --title 'ATENÇÃO!' --msgbox "O script Cluster não foi encontrado ou configurado!" 8 40
-  }
-  
-# Balloon
-checkscript2=$([ -f /home/$USER/Scripts/Balloon ] && echo "sim" || echo "nao")
-[ "$checkscript2" = "sim" ] && {
-  script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-  [ "$script2" = "Executando" ] && {
-    dialog --title 'Script Balloon Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
-  } || {
-    bash /home/$USER/Scripts/Balloon & 1> /dev/null 2> /dev/null
-    dialog --title 'Script Balloon foi iniciado!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
-    }
-} || {
-  dialog --title 'ATENÇÃO!' --msgbox "O script Balloon não foi encontrado ou configurado!" 8 40
-  }
-  
-[ $? -ne 0 ] && liminal "m3nu05" "menu05"
-liminal "m3nu05" "menu05"
-}
-
-function menu25 {
-checknoip=$([ -f /usr/local/src/noip-duc-linux.tar.gz ] && echo "sim" || echo "nao")
-[ "$checknoip" = "sim" ] && {
-  noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
-  noip2="Serviço de DNS NO-IP!"
-  [ "$noip0" = "Executando" ] && {
-    dialog --title "$noip2" --yesno "Deseja reiniciar o NOIP?" 6 40
-    [ $? = 0 ] && {
-      echo "$password" | sudo -S killall noip2
-      sleep 2
-      echo "$password" | sudo -S noip2
-      dialog --title "$noip2" --msgbox "O NOIP foi reiniciado! \n
-Aguarde 1 minuto até o novo IP ser validado." 8 40
-    } || {
-      dialog --title "$noip2" --yesno "Deseja parar o NOIP?" 6 40
-      [ $? = 0 ] && {
-        echo "$password" | sudo -S killall noip2
-        dialog --title "$noip2" --msgbox "O NOIP foi parado!" 6 40
-        }
-    } || {
-      liminal "m3nu05" "menu05"
-      }
-  } || {
-    dialog --title "$noip2" --yesno "Deseja tentar iniciar o NOIP?" 6 40
-    [ $? = 0 ] && {
-      echo "$password" | sudo -S noip2
-      dialog --title "$noip2" --msgbox "Verifique se o NOIP iniciou no menu 'Status Geral > Sistema'!" 8 40
-      }
-  } 
-} || {
-  dialog --title "$noip2" --msgbox "NOIP não foi encontrado ou configurado nesse sistema." 8 40
-}
-liminal "m3nu05" "menu05"
-}
-
 # Status de Sistema
 function menu11 {
 governor=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!")
@@ -235,8 +158,6 @@ bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && ec
 rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
 
 [ $(which drbdadm 2>/dev/null) ] && [ $(which virt-manager 2>/dev/null) ] && {
@@ -260,18 +181,12 @@ noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" |
   sysd3=$(systemd-analyze | awk 'NR==1{print $9,$10}')
   }
 
-TEXTMAIL="NOIP: $noip0
-Governador de CPU: $governor
+TEXTMAIL="Governador de CPU: $governor
 
 Balance BTRFS: $bbalance
 RSnapshot: $rrsnap
 RSync: $rsync1
 CoPy: $cp1
-
-Cluster: $script1
-Deveria executar? $aswb
-Balloon: $script2
-Deveria executar? $aswd
 
 Tempos de Boot:
 $sysd1
@@ -461,41 +376,6 @@ menu08 "$Recado $2 $TEXTAO04 $Mensagem"
 menu14
 }
 
-function menu15 {
-menu09 drbd && drbd1=$prcs
-[ "$drbd1" = "Executando" ] && {
-  sdrbd=$(echo "$password" | sudo -S drbdadm status)
-  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "DRBD" --backtitle "$bktitle" --msgbox "$sdrbd" 0 0
-  case $? in
-    2) dialog --title 'Ajuda' --msgbox "$TEXTAO05" 0 0; menu15 ;;
-  esac
-  [ $? -ne 0 ] && {start}
-  menu08 "$Recado $sdrbd $TEXTAO05 $Mensagem"
-} || {
-  dialog --title "ERROR" --msgbox "O DRBD não está em execução ou não foi localizado neste sistema!" 8 40
-  }
-
-menu01
-}
-
-function menu16 {
-menu09 corosync && corosync1=$prcs
-menu09 pacemaker && pacemaker1=$prcs
-[ "$corosync1" = "Executando" ] && [ "$pacemaker1" = "Executando" ] && {
-  spcs=$(echo "$password" | sudo -S pcs status)
-  dialog --cr-wrap --help-button --help-label 'Ajuda' --title "PCS" --backtitle "$bktitle" --msgbox "$spcs" 0 0
-  case $? in
-    2) dialog --title 'Ajuda' --msgbox "$TEXTAO06" 0 0; menu16 ;;
-  esac
-  [ $? -ne 0 ] && {start}
-  menu08 "$Recado $spcs $TEXTAO06 $Mensagem"
-} || {
-  dialog --title "ERROR" --msgbox "O Pacemaker/Corosync não estão em execução ou não foram localizados neste sistema!" 8 40
-  }
-
-menu01
-}
-
 function menu17 {
 var2=$(dialog --title 'UDPCast' --backtitle "$bktitle" --menu "Escolha o modo!" 0 0 0 \
 A 'Cliente' \
@@ -507,20 +387,6 @@ A) echo "Modo Cliente. Para sair, precione CTRL + C!" ; udp-receiver --file=/dev
 B) echo "Modo Servidor. Para sair, precione CTRL + C!" ; udp-sender --file=/dev/zero ;;
 X) m10 ;;
 esac
-}
-
-function menu18 {
-userlog=$(w)
-dialog --title "Informação" --msgbox "$userlog" 20 60
-menu08 "$Recado $userlog $Mensagem"
-m10
-}
-
-function menu19 {
-userlast=$(last)
-dialog --title "Informação" --msgbox "$userlast" 20 60
-menu08 "$Recado $userlast $Mensagem"
-m10
 }
 
 function menu21 {
@@ -623,10 +489,8 @@ E '*Who Is' \
 F '*Trace Route' \
 G 'Iniciar Navegador' \
 H '*Ping DNS' \
-I 'Iniciar Scripts' \
-J '*Re-Iniciar NOIP' \
-K 'Definir Relatórios' \
-L 'Relatórios Salvos' \
+I 'Definir Relatórios' \
+J 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -641,10 +505,8 @@ E) menu051 ;;
 F) menu052 ;;
 G) [ "$DISPLAY" = "localhost:10.0" ] && { xinit epiphany-browser $* -- :100 vt$XDG_VTNR;} || { epiphany-browser;} ; menu05 ;;
 H) menu22 ;;
-I) menu24 ;;
-J) menu25 ;;
-K) menu054 ;;
-L) menu055 ;;
+I) menu054 ;;
+J) menu055 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -656,10 +518,8 @@ A 'Placas de Rede' \
 B '*Speed Test' \
 C '*Arp-Scan' \
 D '*Trace Route' \
-E 'Iniciar Scripts' \
-F '*Re-Iniciar NOIP' \
-G 'Definir Relatórios' \
-H 'Relatórios Salvos' \
+E 'Definir Relatórios' \
+F 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -670,10 +530,8 @@ A) menu21 ;;
 B) menu050 ;;
 C) menu0501 ;;
 D) menu052 ;;
-E) menu24 ;;
-F) menu25 ;;
-G) menu054 ;;
-H) menu055 ;;
+E) menu054 ;;
+F) menu055 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1119,484 +977,7 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
 
 # Controlador de Dominio
 function menu04 {
-menu09 samba-ad-dc && smb2=$prcs
-[ "$smb2" = "Executando" ] && {
-  var4=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
-  A 'Gestão de Usuários' \
-  B 'Gestão de Grupos' \
-  C 'Gestão de Computadores' \
-  D 'Informações do Domínio' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && liminal "st4rt1" "start"
-  case "$var4" in
-  A) menu041 ;;
-  B) menu042 ;;
-  C) menu043 ;;
-  D) menuR ;;
-  X) liminal "st4rt1" "start" ;;
-  esac
-} || {
-  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "Active Directory & Domain Controller" --msgbox "O Controlador de Domínio não foi encontrado neste sistema ou você não tem as permissões adequadas para acessar as ferramentas!" 7 50
-  }
-
-liminal "st4rt1" "start"
-}
-
-function menu041 {
-var41=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
-A '*Criar Usuário' \
-B '*Exibir todos os Usuários' \
-C 'Procurar Usuário' \
-D '*Exibir Grupos de Usuário' \
-E '*Adicionar Usuário a um Grupo' \
-F '*Remover Usuário de um Grupo' \
-G '*Bloquear Usuário' \
-H '*Desbloquear Usuário' \
-I '*Alterar Senha de um Usuário' \
-J '*Alterar Politica de um Usuário' \
-K '*Excluir Usuário' \
-X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var41" in
-A) menuD ;;
-B) menuA ;;
-C) menuP ;;
-D) menuO ;;
-E) menuJ ;;
-F) menuL ;;
-G) menuF ;;
-H) menuG ;;
-I) menuE ;;
-J) menuN ;;
-K) menuH ;;
-X) menu04 ;;
-esac
-}
-
-function menu042 {
-var42=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
-A '*Criar Grupo' \
-B '*Exibir todos os Grupos' \
-C 'Procurar Grupo' \
-D '*Exibir Usuários de um Grupo' \
-E '*Excluir um Grupo' \
-X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var42" in
-A) menuI ;;
-B) menuC ;;
-C) menuQ ;;
-D) menuK ;;
-E) menuM ;;
-X) menu04 ;;
-esac
-}
-
-function menu043 {
-var43=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --menu " " 0 0 0 \
-A '*Exibir todos os Computadores' \
-X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var43" in
-A) menuB ;;
-X) menu04 ;;
-esac
-}
-
-function menuA {
-dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --msgbox "Pressione Enter para visualizar os Usuários! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
-[ $? -ne 0 ] && menu041
-usrlst=$(echo "$password" | sudo -S samba-tool user list)
-echo "$usrlst" | less
-menu08 "$Recado $usrlst $Mensagem"
-menu041
-}
-
-function menuB {
-dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --msgbox "Pressione Enter para visualizar os Computadores! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
-[ $? -ne 0 ] && menu043
-cmplist=$(echo "$password" | sudo -S samba-tool computer list)
-echo "$cmplist" | less
-menu08 "$Recado $complist $Mensagem"
-menu043
-}
-
-function menuC {
-dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
-[ $? -ne 0 ] && menu042
-grplist=$(echo "$password" | sudo -S samba-tool group list)
-echo "$grplist" | less
-menu08 "$Recado $grplist $Mensagem"
-menu042
-}
-
-function menuD {
-VALUE1="joao_naves"
-VALUE2="João Naves"
-VALUE3="1234567Ab"
-
-VALUE0=$(dialog --ok-label "Criar"  --backtitle "Active Directory & Domain Controller" --title "Adicionar Usuário" --form "Preencha todos os campos! Apague os modelos. \n
-Navegue com as setas para cima e baixo." 15 50 0 \
-"Usuário: " 1 1 "$VALUE1" 1 10 34 0 \
-"Exibição:" 2 1 "$VALUE2" 2 10 34 0 \
-"Senha:" 3 1 "$VALUE3" 3 10 34 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && menu041
-validusr1=$(echo "$VALUE0" | sed -n 1p)
-validsur1=$(echo "$VALUE0" | sed -n 2p)
-validpss1=$(echo "$VALUE0" | sed -n 3p)
-[ -z "$validpss1" ] || [ -z "$validusr1" ] || [ -z "$validsur1" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-} || {
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
-  [ "$repeated" = "$validusr1" ] && {
-    dialog --title "Informação" --msgbox "O usuário $validusr1 já existe!" 8 40
-  } || {
-    dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "$validusr1 deve trocar a senha ao logar? \n
-Esta opção só pode ser definida agora. Se escolher Não, deverá usar o RSAT caso mude de ideia." 8 40
-    [ $? = 0 ] && {
-      echo "$password" | sudo -S sudo samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1" --must-change-at-next-login
-      dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr nunca expira?" 0 0
-      [ $? = 0 ] && {
-        echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr1" --noexpiry
-        dialog --title "Informação" --msgbox "A senha de $validusr1 não expira!" 8 40
-        dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
-        menu08 "$Recado
-Usuário $validusr1 criado e configurado com sucesso!
-$Mensagem"
-      } || {
-        echo "a" > /dev/null
-        }
-    } || {
-      echo "$password" | sudo -S sudo samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1"
-      dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr nunca expira?" 0 0
-      [ $? = 0 ] && {
-        echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr1" --noexpiry
-        dialog --title "Informação" --msgbox "A senha de $validusr1 não expira!" 8 40
-        dialog --title "Informação" --msgbox "Usuário $validusr1 criado e configurado com sucesso!" 8 40
-        menu08 "$Recado
-Usuário $validusr1 criado e configurado com sucesso!
-$Mensagem"
-      } || {
-        echo "a" > /dev/null
-        }
-    }
-  }
-}
-
-menu041
-}
-
-function menuE {
-validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERROR" --msgbox "Usuário não pode ficar em branco!" 7 25
-} || {
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  [ "$repeated" = "$validusr" ] && {
-    validpss=$(dialog --title 'AD-DC' --backtitle "Trocar a senha de usuário do Domínio em $HOSTNAME" --insecure --passwordbox 'Crie uma nova senha para o usuário' 0 0 2>&1 > /dev/tty )
-    [ -z "$validpss" ] && {
-      dialog --title "ERROR" --msgbox "Senha não pode ficar em branco!" 7 25
-    } || {
-      echo "$password" | sudo -S samba-tool user setpassword "$validusr" --newpassword="$validpss"
-      dialog --title "Informação" --msgbox "Senha de $validusr trocada com sucesso!" 8 40
-        menu08 "$Recado
-Usuário $validusr teve a senha trocada com sucesso!
-$Mensagem"
-      }
-  } || {
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    }
-}
-
-menu041
-}
-
-function menuF {
-validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-} || {
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  [ "$repeated" = "$validusr" ] && {
-    echo "$password" | sudo -S samba-tool user disable "$validusr"
-    dialog --title "Informação" --msgbox "Usuário $validusr bloqueado com sucesso!" 7 25
-    menu08 "$Recado
-Usuário $validusr bloqueado com sucesso!
-$Mensagem"
-  } || {
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    }
-}
-
-menu041
-}
-
-function menuG {
-validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-} || {
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  [ "$repeated" = "$validusr" ] && {
-    echo "$password" | sudo -S samba-tool user enable "$validusr"
-    dialog --title "Informação" --msgbox "Usuário $validusr desbloqueado com sucesso!" 7 25
-    menu08 "$Recado
-Usuário $validusr desbloqueado com sucesso!
-$Mensagem"
-  } || {
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    }
-}
-
-menu041
-}
-
-function menuH {
-validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-} || {
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  [ "$repeated" = "$validusr" ] && {
-    dialog --title 'Confirmação' --backtitle 'Exclusão de Usuário' --yesno 'Deseja excluir este usuário?' 0 0
-    [ $? = 0 ] && {
-      echo "$password" | sudo -S samba-tool user delete "$validusr"
-      dialog --title "Informação" --msgbox "Usuário $validusr excluído com sucesso!" 7 25
-    menu08 "$Recado
-Usuário $validusr excluído com sucesso!
-$Mensagem"
-    } || {
-      echo "a" > /dev/null
-      }
-  } || {
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-  }
-}
-
-menu041
-}
-
-function menuI {
-validgrp=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp" ] && {
-  dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-} || {
-  repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
-  [ "$repeated" = "$validgrp" ] && {
-    dialog --title "Informação" --msgbox "O grupo $validgrp já existe!" 6 20
-  } || {
-    echo "$password" | sudo -S samba-tool group add "$validgrp"
-    dialog --title "Informação" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
-    menu08 "$Recado
-Grupo $validgrp bloqueado com sucesso!
-$Mensagem"
-    }
-}
-
-menu042
-}
-
-function menuJ {
-validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de Usuário" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-} || {  
-  validgrp=$(dialog --title 'AD-DC' --backtitle "Adicionar Usuário a um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ -z "$validgrp" ] && {
-    dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-  } || {
-    repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-    [ "$repeated" = "$validusr" ] && {
-    repeated2=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
-      [ "$repeated2" = "$validgrp" ] && {
-        echo "$password" | sudo -S samba-tool group addmembers "$validgrp" "$validusr"
-        dialog --title "Informação" --msgbox "O usuário $validusr foi adicionado ao grupo $validgrp!" 8 40
-        menu08 "$Recado
-Grupo $validusr adicionado ao grupo $validgrp com sucesso!
-$Mensagem"
-      } || {
-        dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
-        }
-    } || {
-      dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-      }
-  } 
-}
-
-menu041
-}
-
-function menuK {
-validgrp=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp" ] && {
-  dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-} || {
-  repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
-  [ "$repeated" = "$validgrp" ] && {
-    dialog --title 'AD-DC' --backtitle "Listagem de Membros" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
-    usrgrps=$(echo "$password" | sudo -S samba-tool group listmembers "$validgrp")
-    echo "$usrgrps" | less
-    menu08 "$Recado
-Grupo $validgrp possui os seguintes membros:
-$usrgrps
-$Mensagem"
-  } || {
-    dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
-  }
-}
-
-menu042
-}
-
-function menuL {
-validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome do Usuário" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-} || {
-  validgrp=$(dialog --title 'AD-DC' --backtitle "Remover Usuário de um Grupo em $HOSTNAME" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ -z "$validgrp" ] && {
-    dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-  } || {
-    repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-    [ "$repeated" = "$validusr" ] && {
-      repeated2=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
-      [ "$repeated2" = "$validgrp" ] && {
-        echo "$password" | sudo -S samba-tool group removemembers "$validgrp" "$validusr"
-        dialog --title "Informação" --msgbox "O usuário $validusr foi removido do grupo $validgrp!" 8 40
-        menu08 "$Recado
-Usuário $validusr foi removido do grupo $validgrp!
-$Mensagem"
-      } || {
-        dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
-      }
-    } || {
-      dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-      }
-  }
-}
-
-menu041
-}
-
-function menuM {
-validgrp=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp" ] && {
-  dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-} || {
-  repeated=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp")
-  [ "$repeated" = "$validgrp" ] && {  
-    dialog --title 'Confirmação' --backtitle 'Exclusão de Grupo' --yesno "Deseja excluir o grupo $validgrp?" 0 0
-    [ $? = 0 ] && {
-      echo "$password" | sudo -S samba-tool group delete "$validgrp"
-      dialog --title "Informação" --msgbox "Grupo $validgrp excluído com sucesso!" 7 25
-      menu08 "$Recado
-Usuário $validgrp foi excluído com sucesso!
-$Mensagem"
-    } || {
-      echo "a" > /dev/null
-      }
-  } || {
-    dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
-  }
-}
-
-menu042
-}
-
-function menuN {
-validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-} || {
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  [ "$repeated" = "$validusr" ] && {
-    dialog --title 'Politica de Senha' --backtitle 'Configuração de Senha' --yesno "A senha de $validusr não deve mais expirar?" 0 0
-    [ $? = 0 ] && {
-      echo "$password" | sudo -S sudo samba-tool user setexpiry "$validusr" --noexpiry
-      dialog --title "Informação" --msgbox "A senha de $validusr não expira!" 8 40
-    } || {
-      echo "a" > /dev/null
-      }
-  } || {
-    dialog --title "ERROR" --msgbox "Usuário inválido!" 7 25
-    }
-}
-
-menu041
-}
-
-function menuO {
-validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-} || {
-  repeated=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr")
-  [ "$repeated" = "$validusr" ] && {
-    dialog --title 'AD-DC' --backtitle "Listagem de Grupos" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
-    grpsusr=$(echo "$password" | sudo -S samba-tool user getgroups "$validusr")
-    echo "$grpsusr" | less
-    menu08 "$Recado
-Usuário $validusr está nos seguintes grupos:
-$grpsusr
-$Mensagem"
-  } || {
-    dialog --title "ERRO" --msgbox "Usuário inválido!" 8 40
-    }
-}
-
-menu041
-}
-
-function menuP {
-validusr1=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de usuário. \n
-Exemplo: joao_naves" 8 40 2>&1 > /dev/tty)
-[ -z "$validusr1" ] && {
-  dialog --title "ERRO" --msgbox "Usuário não pode ficar em branco!" 8 40
-} || {
-  repeated2=$(echo "$password" | sudo -S samba-tool user list | grep "$validusr1")
-  [ "$repeated2" = "$validusr1" ] && {
-    dialog --title "Informação" --msgbox "O usuário $validusr1 já foi cadastrado!" 8 40
-  } || {
-    dialog --title "Informação" --msgbox "O usuário $validusr1 não foi encontrado." 8 40
-    }
-}
-
-menu041
-}
-
-function menuQ {
-validgrp1=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Controller" --inputbox "Insira o nome de grupo" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && menu042
-
-[ -z "$validgrp1" ] && {
-  dialog --title "ERRO" --msgbox "Grupo não pode ficar em branco!" 8 40
-} || {
-  repeated3=$(echo "$password" | sudo -S samba-tool group list | grep "$validgrp1")
-  [ "$repeated3" = "$validgrp1" ] && {
-    dialog --title "Informação" --msgbox "O grupo $validgrp1 já foi cadastrado!" 8 40
-  } || {
-    dialog --title "Informação" --msgbox "O grupo $validgrp1 não foi encontrado." 8 40
-    }
-}
-
-menu042
-}
-
-function menuR {
-smbv=$(samba --version)
-domainv=$(echo "$password" | sudo -S samba-tool domain level show)
-dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encontradas" --backtitle "Active Directory & Domain Controller" --msgbox "
-Nome da Máquina: $HOSTNAME \n \n
-Versão do SAMBA: $smbv \n \n
-Nível do Domínio: $domainv \n \n
-" 0 0
-case $? in
-  2) dialog --title 'Ajuda com Significados' --msgbox "$TEXTAO13" 0 0 ; menuR ;;
-esac
-
-menu08 "$Recado $domainv $Mensagem"
-menu04
+  liminal "st4rt1" "start"
 }
 
 ################################################################################
@@ -1618,60 +999,23 @@ password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --ti
 
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
-A 'Atualizar o Sistema' \
-B 'PiHole' \
-C 'Governador de CPU' \
-D 'Parar Backup' \
-E 'UDP-Cast' \
-F '*Usuários Logados' \
-G '*Logins Anteriores' \
-H 'Emitir .docx' \
-I 'Encaminhar .docx' \
-J 'Apagar .docx' \
+A 'Governador de CPU' \
+B 'Parar Backup' \
+C 'UDP-Cast' \
+D 'Emitir .docx' \
+E 'Encaminhar .docx' \
+F 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
-A) m11 ;;
-B) menu26 ;;
-C) menu053 ;;
-D) m122 ;;
-E) menu17 ;;
-F) menu18 ;;
-G) menu19 ;;
-H) menu28 ;;
-I) menu29 ;;
-J) menu30 ;;
+A) menu053 ;;
+B) m122 ;;
+C) menu17 ;;
+D) menu28 ;;
+E) menu29 ;;
+F) menu30 ;;
 X) liminal "st4rt1" "start" ;;
 esac
-}
-
-function m11 {
-dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja atualizar o sistema operacional?" 8 40
-[ $? = 0 ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza disso? Verifique se os processos em execução não pararão e/ou se configurações não serão perdidas." 8 40
-  [ $? = 0 ] && {
-    datetime=$(date +"%d/%m %H:%M")
-    echo "$password" | sudo -S "$pkg1" update
-    upgrd=$(apt list --upgradable)
-    echo "$password" | sudo -S "$pkg1" upgrade -y
-    echo "$password" | sudo -S "$pkg1" autoremove -y
-    datetime2=$(date +"%d/%m %H:%M") # Data e Hord
-    echo "# # # Fim! Aperte Enter para continuar. # # #" ; read
-    dialog --title "Informação" --msgbox "Verifique se os processos em execução não pararam e/ou se configurações não foram perdidas." 8 40
-    [ "$report" = "1" ] && {
-      dialog --title "Relatório" --msgbox "Os pacotes a seguir foram atualizados: \n
-$upgrd" 20 50
-      dialog --title 'Relatório' --yesno "Deseja enviar este relatório por e-mail?" 8 40
-      [ $? = 0 ] && {
-        menu08 "$Recado $Recado2 $datetime $Recado3 $upgrd $Recado4 $datetime2 $Mensagem"
-        menu27 "
-$datetime : Nesta data o sistema recebeu as atualizações mais recentes e está em dia com a segurança digital."
-      }
-    }
-  }
-}
-
-m10
 }
 
 function m122 {
@@ -1760,148 +1104,6 @@ m122
 }
 
 function liminal { [ -f "$FILE" ] && { [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && { $2; } || { $1; }; } || { $2; }; }
-
-function menu26 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  blockedsites=$(picron=$(pihole -c -e); echo "$picron" | awk 'NR==11 {print $4}')
-  varpi=$(dialog --title 'Servidor de DNS PiHole' --backtitle "$bktitle" --menu "URLs Bloqueadas: \n
-$blockedsites" 0 0 0 \
-  A '*Resumo' \
-  B '*Atualizar PiHole' \
-  C '*Atualizar Gravity' \
-  D '*White List' \
-  E '*Black List' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title 'Ajuda' --msgbox "$TEXTAO10" 0 0 ; menu053 ;;
-  esac
-  [ $? -ne 0 ] && liminal "m3nu05" "menu05"
-  case "$varpi" in
-  A) menu264 ;;
-  B) menu20 ;;
-  C) menu261 ;;
-  D) menu262 ;;
-  E) menu263 ;;
-  X) m10 ;;
-  esac
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  }
-}
-
-# Atualizar PiHole
-function menu20 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja atualizar o PiHole?" 6 40
-  [ $? = 0 ] && {
-    datetime=$(date +"%d/%m %H:%M")
-    version1=$(pihole -v)
-    pihole -up
-    version2=$(pihole -v)
-    datetime2=$(date +"%d/%m %H:%M") # Data e Hora
-    menu08 "$Recado PiHole atualizado de $datetime até $datetime2!
-A versão anterior era:
-
-$version1 
-
-A nova versão é:
-
-$version2
-
-Atento ás novidades que a nova versão possa ter trago! $Mensagem"
-    menu27 "
-$datetime : PiHole® atualizado desta data até $datetime2 para a versão mais nova!"
-    }
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  }
-
-menu26
-}
-
-# Atualizar Gravity
-function menu261 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja atualizar o Gravity?" 6 40
-  [ $? = 0 ] && {
-    datetime=$(date +"%d/%m %H:%M")
-    pihole -g
-    datetime2=$(date +"%d/%m %H:%M") # Data e Hora
-    blockedsites=$(picron=$(pihole -c -e); echo "$picron" | awk 'NR==11 {print $4}')
-    menu08 "$Recado A lista de bloqueios foi atualizada de $datetime até $datetime2! Agora o sistema bloqueia $blockedsites sites maliciosos. $Mensagem"
-    menu27 "
-$datetime : A lista de bloqueios foi atualizada desta data até $datetime2! O sistema bloqueia $blockedsites sites maliciosos."
-    }
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  }
-
-menu26
-}
-
-# White List
-function menu262 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja adicionar uma URL á White List?" 6 40
-  [ $? = 0 ] && {
-    datetime=$(date +"%d/%m %H:%M")
-    validurl=$(dialog --title 'PiHole' --backtitle "$bktitle" --inputbox "Insira a URL que será liberada" 0 0 2>&1 > /dev/tty)
-    [ $? -ne 0 ] && menu26
-    [ -z "$validurl" ] && {
-      dialog --title "ERRO" --msgbox "URL não pode ficar em branco!" 8 40
-    } || {
-      echo "$password" | sudo -S pihole --white-wild "$validurl"
-      dialog --title "Informação" --msgbox "O site $validurl foi liberado! Aguarde até que a mudança reverbere na rede local." 8 40
-    }
-    menu08 "$Recado O site $validurl foi liberado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
-    menu27 "
-$datetime : Nesta data o site $validurl foi liberado acesso conforme solicitado."
-    }
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  }
-
-menu26
-}
-
-# Black List
-function menu263 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja adicionar uma URL á Black List?" 6 40
-  [ $? = 0 ] && {
-    validurl=$(dialog --title 'PiHole' --backtitle "$bktitle" --inputbox "Insira a URL que será bloqueada" 0 0 2>&1 > /dev/tty)
-    [ $? -ne 0 ] && menu26
-    [ -z "$validurl" ] && {
-      dialog --title "ERRO" --msgbox "URL não pode ficar em branco!" 8 40
-    } || {
-      echo "$password" | sudo -S pihole --wild "$validurl"
-      dialog --title "Informação" --msgbox "O site $validurl foi bloqueado! Aguarde até que a mudança reverbere na rede local." 8 40
-    }
-    menu08 "$Recado O site $validurl foi bloqueado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
-    menu27 "
-$datetime : Nesta data o site $validurl foi bloqueado conforme solicitado."
-    }
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  }
-
-menu26
-}
-
-function menu264 {
-datetime=$(date +"%d/%m %H:%M")
-picron=$(pihole -c -e | awk 'NR>=5 && NR<=17 {print}')
-dialog --title 'Chronometer' --msgbox "$picron" 0 0
-menu08 "$Recado Status do PiHole em $datetime: 
-
-$picron $Mensagem"
-menu26
-}
 
 function menu27 {
 [ -f "/home/$USER/.DOC/.relat.docx" ] && {
@@ -2010,18 +1212,12 @@ AVISO LEGAL: Esta mensagem, inclusive seus anexos, pode conter informações con
 
 TEXTAO01="
 
-NOIP: Informa se o processo NOIP2 está executando, atualizando os IPs externos para acesso de VPNs!
 Governador de CPU: Mostra como está a execução do processador, se em Máximo Desempenho, Economia de Energia ou outro.
 
 Balance BTRFS: Manutenção de rotina do sistema. Se estiver em Execução, o computador NÃO poderá ser reiniciado ou desligado!
 Rsnapshot: Backup incremental automatizado. Se estiver Executando, o computador não poderá ser desligado!
 RSync: Sincronia do Backup em Nuvem ou para um backup RAID 1. Se estiver Executando, o computador não poderá ser reiniciado ou desligado!
 CoPy: Sincronia de pastas locais. Se estiver Executando, o computador não poderá ser reiniciado ou desligado!
-
-Cluster: Script que controla máquinas virtuais em sistemas clusterizados.
-Deveria executar? Requer virt-manager + DRBD configurados para confirmar.
-Balloon: Script que controla a memória RAM de máquinas virtuais.
-Deveria executar? Requer virt-manager configurado para confirmar.
 
 Tempos de Boot: Se o sistema foi instalado como UEFI você pode ver (firmware) e (loader) que são
 respectivamente a leitura da BIOS e depois a primeira leitura do HD identificando as partições.
@@ -2109,24 +1305,6 @@ ferramentas de análise, como o HD Regenerator.
 
 As informações acima são referências para análises da saúde dos discos. Atenção ao interpretar os resultados!"
 
-TEXTAO05="
-
-De maneira geral o DRBD precisa estar com todas as suas opções indicando:
-
-Disk: UpToDate
-Peer-Disk: UpToDate
-
-Dessa forma os discos estão sincronizados!"
-
-TEXTAO06="
-
-De maneira geral o PCS precisa estar com todas as suas opções indicando:
-
-Node List: Online [ Primary Secondary ]
-
-Full List of Resources: Todos os resources precisam estar ativos, definidos como
-Primary e/ou Secondary, dependendo do Nó que está sendo analisado."
-
 TEXTAO08="
 
 A lista abaixo não necessariamente informa todos os processos configurados!
@@ -2137,11 +1315,6 @@ Dominio: Se há um Dominio ativo neste servidor, o Samba (smb) é substituido pe
 
 Apache2: Usado se houver um Nextcloud neste servidor.
 Lighttpd: Processo usado pelo PiHole se estiver instalado neste servidor.
-PiHole: Processo próprio do PiHole se estiver instalado neste servidor.
-
-DRBD: Essencial se este é um servidor Cluster.
-Corosync: Essencial se este é um servidor Cluster.
-Pacemaker: Essencial se este é um servidor Cluster.
 
 Spark: Monitor do servidor de banco de dados se houver OpenFire neste servidor.
 MySQL: Monitor do servidor de banco de dados se houver MySQL neste servidor.
@@ -2236,27 +1409,6 @@ crashed: Significa que a VM travou e parou de responder abruptamente por algum e
 seja do próprio sistema virtualizado ou erro de disco do host.
 
 * = Em qualquer um destes estados a VM pode corromper se for desligada abruptamente!"
-
-TEXTAO13="
-
-Nome da Máquina: Nome usado na identificação do Servidor.
-
-Versão do SAMBA: Versão atualmente instalada e configurada no sistema.
-É substituída em atualizações do sistema quando há correções de segurança.
-
-Nível do Domínio: O nível funcional do domínio representa o quão semelhante o
-SAMBA está comparado ao Windows Server. Atualmente os níveis funcionais suportados são:
-
-Nível Funcional - Versão disponível do SAMBA:
-
-Windows Server 2012_R2* - 4.4 e posterior
-Windows Server 2012* - 4.4 e posterior
-Windows Server 2008_R2 - 4.0 e posterior
-Windows Server 2008 - 4.0 e posterior
-Windows Server 2003 - 4.0 e posterior
-
-* = Nível funcional não está estável o suficiente.
-Caso implementado, melhorias no Kerberos também não serão disponibilizados nesse nível."
 
 ################################################################################
 #                                                                              #
