@@ -498,7 +498,7 @@ B) menu050 ;;
 C) menu0501 ;;
 D) menu23 ;;
 E) menu051 ;;
-F} menu04 ;;
+F) menu04 ;;
 G) menu052 ;;
 H) xinit epiphany-browser $* -- :1 vt$XDG_VTNR; menu05 ;;
 I) menu22 ;;
