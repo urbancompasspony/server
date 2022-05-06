@@ -12,7 +12,7 @@ hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 version="v1.0"
-revis="r0.1"
+revis="r0.3"
 
 ################################################################################
 ################################################################################
@@ -471,22 +471,21 @@ VALUE3="admin"
 VALUE4=""
 VALUE5="WORKGROUP"
 
-VALUE0=$(dialog --help-button --help-label 'MNTs' --ok-label "Montar"  --backtitle "" --title " " --form " " 15 50 0 \
+VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --title "Mounting" --form "Montagem de Redes" 15 50 0 \
 "PATH: " 1 1 "$VALUE1" 1 10 34 0 \
 "MNT:" 2 1 "$VALUE2" 2 10 34 0 \
 "USER:" 3 1 "$VALUE3" 3 10 34 0 \
 "PASS:" 4 1 "$VALUE4" 4 10 34 0 \
 "DOM:" 5 1 "$VALUE5" 5 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && m10
+case $? in
+  2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0 ; menu19 ;;
+esac
 path1=$(echo "$VALUE0" | sed -n 1p)
 mntpt1=$(echo "$VALUE0" | sed -n 2p)
 user1=$(echo "$VALUE0" | sed -n 3p)
 pass1=$(echo "$VALUE0" | sed -n 4p)
 dmn1=$(echo "$VALUE0" | sed -n 5p)
-case $? in
-  2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0 ; menu053 ;;
-esac
 [ -z "$path1" ] || [ -z "$mntpt1" ] || [ -z "$user1" ] || [ -z "$dmn1" ] && {
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
   m10
