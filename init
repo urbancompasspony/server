@@ -1,4 +1,4 @@
-#!/bin/bash
+\#!/bin/bash
 
 # ============================================================================ #
 #########################                                                      #
@@ -22,7 +22,7 @@ hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 version="v3.0"
-revis="r1.0"
+revis="r1.1"
 
 ################################################################################
 ################################################################################
@@ -283,7 +283,6 @@ cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo 
 script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 noip0=$(ps aux | grep "noip2" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
-#xorg=$(ls /tmp/.X11-unix | wc -l)
 
 [ $(which drbdadm 2>/dev/null) ] && [ $(which virt-manager 2>/dev/null) ] && {
   aswb="sim"
@@ -658,6 +657,7 @@ liminal "m3nu05" "menu05"
 }
 
 # Ferramentas Normal
+ #xorg=$(ls /tmp/.X11-unix | wc -l)
 function menu05 {
 var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
 A 'Placas de Rede' \
@@ -666,11 +666,12 @@ C '*Arp-Scan' \
 D '*IP Neigh' \
 E '*Who Is' \
 F '*Trace Route' \
-G '*Ping DNS' \
-H 'Iniciar Scripts' \
-I '*Re-Iniciar NOIP' \
-J 'Ajustes Relatórios' \
-K 'Relatórios Salvos' \
+G 'Iniciar Navegador' \
+H '*Ping DNS' \
+I 'Iniciar Scripts' \
+J '*Re-Iniciar NOIP' \
+K 'Definir Relatórios' \
+L 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
@@ -683,11 +684,12 @@ C) menu0501 ;;
 D) menu23 ;;
 E) menu051 ;;
 F) menu052 ;;
-G) menu22 ;;
-H) menu24 ;;
-I) menu25 ;;
-J) menu054 ;;
-K) menu055 ;;
+G) [ "$DISPLAY" = "localhost:10.0" ] && { xinit epiphany-browser $* -- :100 vt$XDG_VTNR;} || { epiphany-browser;} ; menu05 ;;
+H) menu22 ;;
+I) menu24 ;;
+J) menu25 ;;
+K) menu054 ;;
+L) menu055 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -701,7 +703,7 @@ C '*Arp-Scan' \
 D '*Trace Route' \
 E 'Iniciar Scripts' \
 F '*Re-Iniciar NOIP' \
-G 'Ajustes Relatórios' \
+G 'Definir Relatórios' \
 H 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
@@ -1661,35 +1663,29 @@ password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --ti
 
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
-A '#Atualizar o Sistema' \
-B '#PiHole' \
+A 'Atualizar o Sistema' \
+B 'PiHole' \
 C 'Governador de CPU' \
-D 'Parar Rsync' \
-E 'Parar RSnapshot' \
-F 'Parar Balance' \
-G 'Parar CoPy' \
-H 'UDP-Cast' \
-I '*Usuários Logados' \
-J '*Logins Anteriores' \
-K 'Emitir Relatório' \
-L 'Encaminhar .docx' \
-M 'Apagar .docx' \
+D 'Parar Backup' \
+E 'UDP-Cast' \
+F '*Usuários Logados' \
+G '*Logins Anteriores' \
+H 'Emitir .docx' \
+I 'Encaminhar .docx' \
+J 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) m11 ;;
 B) menu26 ;;
 C) menu053 ;;
-D) m12 ;;
-E) m13 ;;
-F) m14 ;;
-G) m15 ;;
-H) menu17 ;;
-I) menu18 ;;
-J) menu19 ;;
-K) menu28 ;;
-L) menu29 ;;
-M) menu30 ;;
+D) m122 ;;
+E) menu17 ;;
+F) menu18 ;;
+G) menu19 ;;
+H) menu28 ;;
+I) menu29 ;;
+J) menu30 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1723,6 +1719,23 @@ $datetime : Nesta data o sistema recebeu as atualizações mais recentes e está
 m10
 }
 
+function m122 {
+var_stop=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
+A 'Parar RSYNC' \
+B 'Parar RSNAPSHOT' \
+C 'Parar BALANCE' \
+D 'Parar COPY' \
+X 'Voltar' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && liminal "st4rt1" "start"
+case "$var_stop" in
+A) m12 ;;
+B) m13 ;;
+C) m14 ;;
+D) m15 ;;
+X) m10 ;;
+esac
+}
+
 function m12 {
 dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja parar o processo RSYNC?" 8 40
 [ $? = 0 ] && {
@@ -1737,7 +1750,7 @@ dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação
   echo "a" > /dev/null
   }
 
-m10
+m122
 }
 
 function m13 {
@@ -1754,7 +1767,7 @@ dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação
   echo "a" > /dev/null
   }
 
-m10
+m122
 }
 
 function m14 { 
@@ -1771,7 +1784,7 @@ blnc=$(dialog --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --input
     }
 }
 
-m10
+m122
 }
 
 function m15 {
@@ -1788,7 +1801,7 @@ dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação
   echo "a" > /dev/null
   }
 
-m10
+m122
 }
 
 function liminal { [ -f "$FILE" ] && { [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && { $2; } || { $1; }; } || { $2; }; }
@@ -1936,67 +1949,80 @@ menu26
 }
 
 function menu27 {
-[ "$doc_rel"="1" ] && {
-  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar o relatório para $datetime3.docx?" 8 40
-  [ $? = 0 ] && {
-    [ -f "/home/$USER/.DOC/$datetime3.docx" ] && {
-      echo "$1" >> "/home/$USER/.DOC/$datetime3.docx"
+[ -f "/home/$USER/.DOC/.relat.docx" ] && {
+  [ "$doc_rel"="1" ] && {
+    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar o relatório para $datetime3.docx?" 8 40
+    [ $? = 0 ] && {
+        echo "$1" >> "/home/$USER/.DOC/$datetime3.docx"
+        }
+      } || {
+        m10
       }
-    } || {
-      m10
+  } || {
+    dialog --title 'relat.docx' --msgbox "Arquivo não encontrado. Abortando." 8 30
+    m10
     }
 }
 
-}
-
 function menu28 {
-[ "$doc_rel"="1" ] && {
-  datetime=$(date +"%d/%m %H:%M")
-  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja criar um relatório customizado?" 8 40
-  [ $? = 0 ] && {
-      cusrelat=$(dialog --title 'Custom' --backtitle "$bktitle" --inputbox "O que deseja reportar?" 8 40 "$datetime : " 2>&1 > /dev/tty)
-      menu08 "$Recado $cusrelat $Mensagem"
-      menu27 "
+[ -f "/home/$USER/.DOC/.relat.docx" ] && {
+  [ "$doc_rel"="1" ] && {
+    datetime=$(date +"%d/%m %H:%M")
+    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja criar um relatório customizado?" 8 40
+    [ $? = 0 ] && {
+        cusrelat=$(dialog --title 'Custom' --backtitle "$bktitle" --inputbox "O que deseja reportar?" 8 40 "$datetime : " 2>&1 > /dev/tty)
+        menu08 "$Recado $cusrelat $Mensagem"
+        menu27 "
 $cusrelat"
+        m10
+        }
+    } || {
       m10
-      }
+     }
   } || {
+    dialog --title 'relat.docx' --msgbox "Arquivo não encontrado. Abortando." 8 30
     m10
-   }
+    }
 }
 
 function menu29 {
-datetime=$(date +"%d/%m %H:%M")
-validmail=$(awk 'NR==1' $FILE3)
+[ -f "/home/$USER/.DOC/.relat.docx" ] && {
+  datetime=$(date +"%d/%m %H:%M")
+  validmail=$(awk 'NR==1' $FILE3)
 
-TEXTAO15="Boa tarde,
+  TEXTAO15="Boa tarde,
 
 Segue anexo o relatório dos atendimentos, manutenções corretivas e manutenções preventivas realizadas em $datetime3!
 
 Grato,
 José Humberto"
 
-dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.docx para $validmail?" 8 40
-[ $? = 0 ] && {
-  echo "$TEXTAO15" | mutt -s "Relatório de Atendimento - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.docx" -- "$validmail"
-  }
+  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.docx para $validmail?" 8 40
+  [ $? = 0 ] && {
+    echo "$TEXTAO15" | mutt -s "Relatório de Atendimento - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.docx" -- "$validmail"
+    }
 
-dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar um documento diferente para $validmail?" 8 40
-[ $? = 0 ] && {
-  inputdoc1=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-  echo "$TEXTAO15" | mutt -s "Relatório de Atendimento - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.docx" -- "$validmail"
+  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar um documento diferente para $validmail?" 8 40
+  [ $? = 0 ] && {
+    inputdoc1=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
+    echo "$TEXTAO15" | mutt -s "Relatório de Atendimento - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.docx" -- "$validmail"
+    }
+} || {
+  dialog --title 'relat.docx' --msgbox "Arquivo não encontrado. Abortando." 8 30
   }
-
 m10
 }
 
 function menu30 {
-dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja APAGAR um relatório.docx?" 8 40
-[ $? = 0 ] && {
-  inputdoc2=$(dialog --title 'Deleção' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-  rm "/home/$USER/.DOC/$inputdoc2.docx"
+[ -f "/home/$USER/.DOC/.relat.docx" ] && {
+  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja APAGAR um relatório.docx?" 8 40
+  [ $? = 0 ] && {
+    inputdoc2=$(dialog --title 'Deleção' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
+    rm "/home/$USER/.DOC/$inputdoc2.docx"
+    }
+} || {
+  dialog --title 'relat.docx' --msgbox "Arquivo não encontrado. Abortando." 8 30
   }
-
 m10
 }
 
