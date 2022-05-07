@@ -11,8 +11,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v1.1"
-revis="r0.4"
+version="v1.0"
+revis="r0.3"
 
 ################################################################################
 ################################################################################
@@ -171,10 +171,10 @@ X 'Voltar' 2>&1 > /dev/tty )
 case "$var10" in
 A) menu19 ;;
 B) menu20 ;;
-C) sudo /home/ubuntu/.Ghost/Ghost; m10 ;;
+C) echo "ubuntu" | sudo -S /home/ubuntu/.Ghost/Ghost; m10 ;;
 D) menu18 ;;
 G) menu17 ;;
-H) sudo testdisk ; m10 ;;
+H) echo "ubuntu" | sudo -S testdisk ; m10 ;;
 I) menu28 ;;
 J) menu29 ;;
 K) menu30 ;;
@@ -324,12 +324,12 @@ function menu031 {
 [ "$status" = "Executando" ] && {
   dialog --title "$processname" --yesno "Deseja reiniciar o processo $processname ?" 6 40
   [ $? = 0 ] && {
-    echo "$password" | sudo -S systemctl restart "$process"
+    echo "ubuntu" | sudo -S systemctl restart "$process"
     dialog --title "$processname" --msgbox "O processo $processname foi reiniciado!" 6 40
   } || {
     dialog --title "$processname" --yesno "Deseja parar o processo $processname ?" 6 40
     [ $? = 0 ] && {
-      echo "$password" | sudo -S systemctl stop "$process"
+      echo "ubuntu" | sudo -S systemctl stop "$process"
       dialog --title "$processname" --msgbox "O processo $processname foi parado!" 6 40
       }
   } || {
@@ -338,7 +338,7 @@ function menu031 {
 } || {
   dialog --title "$processname" --yesno "Deseja tentar iniciar o processo $processname ?" 6 40
   [ $? = 0 ] && {
-    echo "$password" | sudo -S systemctl start "$process"
+    echo "ubuntu" | sudo -S systemctl start "$process"
     dialog --title "$processname" --msgbox "Verifique se o $processname iniciou." 6 40
     }
 }
@@ -348,7 +348,7 @@ menu03
 
 # Status de Processos
 function menu09 {
-  prcs=$(echo "$password" | sudo -S systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente")
+  prcs=$(echo "ubuntu" | sudo -S systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente")
 }
 
 # Status Temperatura
@@ -418,7 +418,7 @@ esac
 function menu140 {
 stssd=$(ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente")
 [ "$stssd" = "Presente" ] && {
-  skd=$(echo "$password" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}')
+  skd=$(echo "ubuntu" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}')
 } || {
   skd=$(echo "Disco ausente!")
   }
@@ -470,7 +470,7 @@ dmn1=$(echo "$VALUE0" | sed -n 5p)
   dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 8 40
   m10
 } || {
-  sudo mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
+  echo "ubuntu" | sudo -S mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
   mntshow2=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow2" 30 60
   m10
@@ -482,9 +482,9 @@ function menu18 {
   sahred=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o caminho que deseja compartilhar ou criar:" 10 40 2>&1 > /dev/tty)
   sahred2=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o nome que deseja usar no compartilhamento:" 10 40 2>&1 > /dev/tty)
   [ -z "$sahred" ] || [ -z "$sahred2" ] && { dialog --title "Informação" --msgbox "Nao deixe em branco! Saindo..." 6 20; m10; }
-  [ -d "$sahred" ] || { sudo mkdir "$sahred"; }
+  [ -d "$sahred" ] || { echo "ubuntu" | sudo -S mkdir "$sahred"; }
 
-sudo echo "[$sahred2]
+echo "ubuntu" | sudo -S echo "[$sahred2]
 path = $sahred
 valid users = ubuntu
 admin users = ubuntu
@@ -497,15 +497,15 @@ directory mask = 0777
 force directory mode = 0777
 " >> /etc/samba/smb.conf
 
-  sudo chmod 777 -R "$sahred"
-  #sudo chown ubuntu:sambashare -R /mnt/shared
-  sudo systemctl restart smbd nmbd
+  echo "ubuntu" | sudo -S chmod 777 -R "$sahred"
+  #echo "ubuntu" | sudo -S chown ubuntu:sambashare -R /mnt/shared
+  echo "ubuntu" | sudo -S systemctl restart smbd nmbd
   dialog --title "Informação" --msgbox "Servidor SAMBA Ligado!" 6 20
   m10
 }
 
 function menu20 {
-  sudo umount /mnt/*
+  echo "ubuntu" | sudo -S umount /mnt/*
   mntshow3=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow3" 30 60
   m10
@@ -514,7 +514,7 @@ function menu20 {
 function menu21 {
 resultenp=$(ip a | sed -n '/enp/p' |  awk '!/mac/' | awk '{print $2}' | sed 's/.$//' | grep 'enp')
 for i in $resultenp; do
-  velo=$(echo "$password" | sudo -S ethtool "$i" | grep Speed)
+  velo=$(echo "ubuntu" | sudo -S ethtool "$i" | grep Speed)
   dialog --title 'Velocidades detectadas:' --msgbox "$i $velo" 8 40
 done
 
@@ -611,7 +611,7 @@ liminal "m3nu05" "menu05"
 # Arp-Scan
 function menu0501 {
 dialog --title 'Arp-Scan' --backtitle "$bktitle" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
-arpscn=$(echo "$password" | sudo -S arp-scan -l)
+arpscn=$(echo "ubuntu" | sudo -S arp-scan -l)
 dialog --title 'Arp-Scan' --backtitle "$bktitle" --msgbox "$arpscn" 0 0
 menu08 "$Recado $arpscn $Mensagem"
 liminal "m3nu05" "menu05"
@@ -748,7 +748,7 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
         echo "a" > /dev/null
         }
     }
-  echo "$password" | sudo -S reboot
+  echo "ubuntu" | sudo -S reboot
   }
 }
 
@@ -776,7 +776,7 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
         echo "a" > /dev/null
         }
     }
-  echo "$password" | sudo -S shutdown -h now
+  echo "ubuntu" | sudo -S shutdown -h now
   }
 }
 
