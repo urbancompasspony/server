@@ -25,6 +25,8 @@ FILE4="/tmp/.relat"
 doc_rel="0"
 datetime3=$(date +"%m-%Y") # Month
 
+[ -f /home/$USER/.custom ] || { touch /home/$USER/.custom; chmod +x /home/$USER/.custom; } 
+
 [ -f /home/$USER/.DOC/$datetime3 ] || {
 cp "/home/$USER/.DOC/.relat.docx" "/home/$USER/.DOC/$datetime3.docx" 2> /dev/null
 
@@ -50,24 +52,26 @@ UpTime: $uptime"  0 0 0 \
 A 'Status Geral' \
 B 'Iniciar OpenBox' \
 C 'Iniciar Palemoon' \
-D 'Processos' \
-E 'Ferramentas' \
-F 'Avançado' \
-G 'NMTUI' \
-H '*Reiniciar' \
-I '*Desligar' \
+D 'Execução...' \
+E 'Processos' \
+F 'Ferramentas' \
+G 'Avançado' \
+H 'NMTUI' \
+I '*Reiniciar' \
+J '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
 A) menu01 ;;
 B) startx ; start ;;
 C) xinit /home/$USER/.palemoon/palefull $* -- :1 vt$XDG_VTNR; start ;;
-D) menu03 ;;
-E) menu05 ;;
-F) m10 ;;
-G) nmtui ; start ;;
-H) menu06 ;;
-I) menu07 ;;
+D) custom1=$(cat /home/$USER/.custom); xinit "$custom1" $* -- :4 vt$XDG_VTNR; start ;;
+E) menu03 ;;
+F) menu05 ;;
+G) m10 ;;
+H) nmtui ; start ;;
+I) menu06 ;;
+J) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
@@ -194,7 +198,7 @@ E '*S.M.A.R.T.' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
-A) inxi -b; read; menu01 ;;
+A) inxi1 ;;
 B) menu11 ;;
 C) menu12 ;;
 D) menu13 ;;
@@ -214,7 +218,7 @@ D '*Armazenamento' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var2" in
-A) inxi -b; read; menu01 ;;
+A) inxi1 ;;
 B) menu11 ;;
 C) menu12 ;;
 D) menu13 ;;
@@ -263,6 +267,13 @@ dialog --cr-wrap --title "Informações encontradas" --backtitle "$bktitle" --ms
 [ $? -ne 0 ] && liminal "m3nu01" "menu01"
 
 menu08 "$Recado $TEXTMAIL $Mensagem"
+liminal "m3nu01" "menu01"
+}
+
+function inxi1 {
+desov=$(inxi -b)
+dialog --cr-wrap --title "Informações encontradas" --backtitle "$bktitle" --msgbox "$desov" 0 0
+menu08 "$Recado $desov $Mensagem"
 liminal "m3nu01" "menu01"
 }
 
@@ -459,6 +470,7 @@ VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --title "M
 "DOM:" 5 1 "$VALUE5" 5 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 case $? in
+  1) m10 ;;
   2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0 ; menu19 ;;
 esac
 path1=$(echo "$VALUE0" | sed -n 1p)
@@ -468,13 +480,19 @@ pass1=$(echo "$VALUE0" | sed -n 4p)
 dmn1=$(echo "$VALUE0" | sed -n 5p)
 [ -z "$path1" ] || [ -z "$mntpt1" ] || [ -z "$user1" ] || [ -z "$pass1" ] && {
   dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 8 40
-  m10
+  menu19
 } || {
+  [ grep -qs "$mntpt1" /proc/mounts ] && {
+    dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 30 60
+    menu19
+    } || {
   echo "ubuntu" | sudo -S mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
   mntshow2=$(df -hT)
-  dialog --title "Informação" --msgbox "$mntshow2" 30 60
+  dialog --title "Caminho montado!" --msgbox "$mntshow2" 30 60
   m10
   }
+
+}
 
 }
 
@@ -484,21 +502,20 @@ function menu18 {
   [ -z "$sahred" ] || [ -z "$sahred2" ] && { dialog --title "Informação" --msgbox "Nao deixe em branco! Saindo..." 6 20; m10; }
   [ -d "$sahred" ] || { echo "ubuntu" | sudo -S mkdir "$sahred"; }
 
-echo "ubuntu" | sudo -S echo "[$sahred2]
+echo "ubuntu" | sudo -S bash -c "echo '[$sahred2]
 path = $sahred
 valid users = ubuntu
 admin users = ubuntu
 guest ok = no
 writable = yes
-browsable = no
+browsable = yes
 create mask = 0777
 force create mode = 0777
 directory mask = 0777
 force directory mode = 0777
-" >> /etc/samba/smb.conf
+' >> /etc/samba/smb.conf"
 
   echo "ubuntu" | sudo -S chmod 777 -R "$sahred"
-  #echo "ubuntu" | sudo -S chown ubuntu:sambashare -R /mnt/shared
   echo "ubuntu" | sudo -S systemctl restart smbd nmbd
   dialog --title "Informação" --msgbox "Servidor SAMBA Ligado!" 6 20
   m10
@@ -848,12 +865,12 @@ dmn2=$(echo "$VALUE0" | sed -n 4p)
 
 [ -z "$IP1" ] || [ -z "$user2" ] || [ -z "$pass2" ] || [ -z "$dmn2" ] && {
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-  m10
+  menu05
 } || {
   echo "rdesktop -u $user2 -p $pass2 $dom $IP1" > /tmp/.rdesktop
   chmod +x /tmp/.rdesktop
   xinit /tmp/.rdesktop $* -- :3 vt$XDG_VTNR
-  m10
+  menu05
   }
 }
 
