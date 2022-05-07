@@ -11,8 +11,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v1.0"
-revis="r0.3"
+version="v1.1"
+revis="r0.4"
 
 ################################################################################
 ################################################################################
@@ -47,9 +47,9 @@ uptime=$(uptime | awk {'print $3 $4 $5'})
 var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "IP Local: $ip
 Data e Hora: $datetime
 UpTime: $uptime"  0 0 0 \
-A 'Iniciar OpenBox' \
-B 'Iniciar Navegador' \
-C 'Status Geral' \
+A 'Status Geral' \
+B 'Iniciar OpenBox' \
+C 'Iniciar Palemoon' \
 D 'Processos' \
 E 'Ferramentas' \
 F 'Avançado' \
@@ -59,9 +59,9 @@ I '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
-A) startx ; start ;;
-B) xinit epiphany-browser $* -- :1 vt$XDG_VTNR; start ;;
-C) menu01 ;;
+A) menu01 ;;
+B) startx ; start ;;
+C) xinit /home/$USER/.palemoon/palefull $* -- :1 vt$XDG_VTNR; start ;;
 D) menu03 ;;
 E) menu05 ;;
 F) m10 ;;
@@ -80,8 +80,8 @@ uptime=$(uptime | awk {'print $3 $4 $5'})
 var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "IP Local: $ip
 Data e Hora: $datetime
 UpTime: $uptime"  0 0 0 \
-A 'Iniciar OpenBox' \
-B 'Status Geral' \
+A 'Status Geral' \
+B 'Iniciar OpenBox' \
 C 'Processos' \
 D 'Ferramentas' \
 E '*Reiniciar' \
@@ -89,8 +89,8 @@ F '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
-A) startx ;;
-B) m3nu01 ;;
+A) m3nu01 ;;
+B) startx ;;
 C) menu03 ;;
 D) m3nu05 ;;
 E) menu06 ;;
@@ -479,9 +479,26 @@ dmn1=$(echo "$VALUE0" | sed -n 5p)
 }
 
 function menu18 {
-  sudo mkdir /mnt/shared
-  sudo chmod 777 -R /mnt/shared
-  sudo chown ubuntu:sambashare -R /mnt/shared
+  sahred=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o caminho que deseja compartilhar ou criar:" 10 40 2>&1 > /dev/tty)
+  sahred2=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o nome que deseja usar no compartilhamento:" 10 40 2>&1 > /dev/tty)
+  [ -z "$sahred" ] || [ -z "$sahred2" ] && { dialog --title "Informação" --msgbox "Nao deixe em branco! Saindo..." 6 20; m10; }
+  [ -d "$sahred" ] || { sudo mkdir "$sahred"; }
+
+sudo echo "[$sahred2]
+path = $sahred
+valid users = ubuntu
+admin users = ubuntu
+guest ok = no
+writable = yes
+browsable = no
+create mask = 0777
+force create mode = 0777
+directory mask = 0777
+force directory mode = 0777
+" >> /etc/samba/smb.conf
+
+  sudo chmod 777 -R "$sahred"
+  #sudo chown ubuntu:sambashare -R /mnt/shared
   sudo systemctl restart smbd nmbd
   dialog --title "Informação" --msgbox "Servidor SAMBA Ligado!" 6 20
   m10
