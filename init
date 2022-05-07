@@ -2043,6 +2043,7 @@ VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --backtitl
 "DOM:" 5 1 "$VALUE5" 5 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 case $? in
+  1) m10 ;;
   2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0; menu31 ;;
 esac
 path1=$(echo "$VALUE0" | sed -n 1p)
