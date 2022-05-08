@@ -234,7 +234,7 @@ E 'Parar Backup' \
 F 'UDP-Cast' \
 G '*Usuários Logados' \
 H '*Logins Anteriores' \
-I 'Emitir .docx' \
+I 'Rel. Manual' \
 J 'Encaminhar .docx' \
 K 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
