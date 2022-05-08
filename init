@@ -21,8 +21,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v3.0"
-revis="r2.0"
+version="v3.1"
+revis="r0.0"
 
 ################################################################################
 ################################################################################
@@ -227,11 +227,11 @@ esac
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
 A 'Atualizar o Sistema' \
-B 'Samba - Mount' \
+B 'Samba - Client' \
 C 'PiHole' \
 D 'Governador de CPU' \
 E 'Parar Backup' \
-F 'UDP-Cast' \
+F 'UDPCast' \
 G '*Usuários Logados' \
 H '*Logins Anteriores' \
 I 'Rel. Manual' \
