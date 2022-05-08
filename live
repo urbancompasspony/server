@@ -198,8 +198,11 @@ esac
 
 # STATUS Normal
 function menu01 {
+bat0="Inexistente!"; [ -f /sys/class/power_supply/BAT0/capacity ] && { bat0=$(cat /sys/class/power_supply/BAT0/capacity); }
+bat1="Inexistente!"; [ -f /sys/class/power_supply/BAT1/capacity ] && { bat1=$(cat /sys/class/power_supply/BAT0/capacity); }
 ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
-var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Externo: $ip2" 0 0 0 \
+var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Externo: $ip2 \n
+Bateria: $bat0%" 0 0 0 \
 A '*INXI' \
 B '*Sistema' \
 C '*Temperatura' \
