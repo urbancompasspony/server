@@ -164,7 +164,7 @@ var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Mod
 A 'Samba - Mount' \
 B 'Samba - Umount' \
 C 'Ghost (OpenBox)' \
-D 'Samba Server' \
+D 'Samba - Server' \
 G 'UDP-Cast' \
 H 'TestDisk' \
 I 'Emitir .docx' \
@@ -494,7 +494,7 @@ echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
 }
 
 function menu18 {
-sahred=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o caminho que deseja compartilhar ou criar:" 10 40 2>&1 > /dev/tty)
+sahred1=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o caminho que deseja compartilhar ou criar:" 10 40 2>&1 > /dev/tty)
 sahred2=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o nome que deseja usar no compartilhamento:" 10 40 2>&1 > /dev/tty)
 
 case $? in
@@ -502,17 +502,15 @@ case $? in
   2) mntshow2=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow2" 0 0 ; menu19 ;;
 esac
 
-[ -z "$sahred" ] || [ -z "$sahred2" ] && { dialog --title "Informação" --msgbox "Nao deixe em branco!" 10 25; menu18; }
+[ -z "$sahred1" ] || [ -z "$sahred2" ] && { dialog --title "Informação" --msgbox "Nao deixe em branco!" 6 20; menu18; }
 
-echa2=$(cat "/etc/samba/smb.conf" | grep "$sahred2" 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
-echa3=$(cat "/etc/samba/smb.conf" | grep "$sahred1" 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
-[ "$echa2" = "sim" ] || [ "$echa3" = "sim" ] && {
-  dialog --title "Informação" --msgbox "Caminho ou nome em uso. Escolha outro." 7 30
-  menu18
-} || { [ -d "$sahred" ] || { echo "ubuntu" | sudo -S mkdir "$sahred"; }; }
+echa2=$(cat "/etc/samba/smb.conf" | grep "$sahred1" 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+echa3=$(cat "/etc/samba/smb.conf" | grep "$sahred2" 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+
+[ "$echa2" = "sim" ] || [ "$echa3" = "sim" ] && { dialog --title "Informação" --msgbox "Esta pasta ou este nome já foi compartilhado! Escolha outro." 7 30; menu18; }
 
 echo "ubuntu" | sudo -S bash -c "echo '[$sahred2]
-path = $sahred
+path = $sahred1
 valid users = ubuntu
 admin users = ubuntu
 guest ok = no
@@ -524,7 +522,8 @@ directory mask = 0777
 force directory mode = 0777
 ' >> /etc/samba/smb.conf"
 
-  echo "ubuntu" | sudo -S chmod 777 -R "$sahred"
+  [ -d "$sahred1" ] || { echo "ubuntu" | sudo -S mkdir "$sahred1"; }
+  echo "ubuntu" | sudo -S chmod 777 -R "$sahred1"
   echo "ubuntu" | sudo -S systemctl restart smbd nmbd
   dialog --title "Informação" --msgbox "Caminho compartilhado!" 6 20
   m10
