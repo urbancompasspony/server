@@ -443,7 +443,7 @@ menu09 corosync && corosync1=$prcs
 menu09 pacemaker && pacemaker1=$prcs
 menu09 openfire && spark=$prcs
 menu09 mysqld && mysql=$prcs
-menu09 cups1 cups && cups1=$prcs
+menu09 cups && cups1=$prcs
 menu09 motion && motion1=$prcs
 menu09 dwagent && dwagent1=$prcs
 vpn=$(ip a | grep tun 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
@@ -482,7 +482,7 @@ J) status="$mysql"; processname="MySQL"; process="mysql"; menu031 ;;
 K) status="$cups1"; processname="CUPS"; process="cups"; menu031 ;;
 L) status="$motion1"; processname="Motion"; process="motion"; menu031 ;;
 M) status="$dwagent1"; processname="DWAgent"; process="dwagent"; menu031 ;;
-N) status="$vpn"; processname="VPN Client"; process="openvpn"; menu031 ;;
+N) status="$vpn"; processname="VPN Client"; process="openvpn"; menu03 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -2070,7 +2070,7 @@ echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
 }
 
 function menu32 {
-  echo "$password" | sudo -S umount /mnt/*
+  echo "$password" | sudo -S umount -a -t cifs -l
   mntshow3=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow3" 30 60
 }
