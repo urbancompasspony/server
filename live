@@ -381,9 +381,7 @@ liminal "m3nu01" "menu01"
 function menu13 {
 sdisks=$(df -Th)
 dialog --cr-wrap --title "Discos encontrados" --backtitle "Status do Armazenamento" --msgbox "$sdisks" 0 0
-
 [ $? -ne 0 ] && liminal "m3nu01" "menu01"
-
 menu08 "$Recado $sdisks $Mensagem"
 liminal "m3nu01" "menu01"
 }
@@ -410,7 +408,6 @@ menusk=$(dialog --backtitle "Análise de Atributos SMART!" --title "S.M.A.R.T." 
 "/dev/sdh" "$dumpst8" \
 "/dev/sdi" "$dumpst9" \
 "X Voltar" "" 2>&1 > /dev/tty )
-
 [ $? -ne 0 ] && {start}
 case "$menusk" in
 "/dev/sda") menu141 "sda" "$dump1" ; menu14 ;;
@@ -437,7 +434,6 @@ stssd=$(ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente
 
 function menu141 {
 dialog --cr-wrap --backtitle /dev/$1 --msgbox "$2" 0 0
-
 menu08 "$Recado $2 $Mensagem"
 menu14
 }
@@ -462,45 +458,58 @@ VALUE3="admin"
 VALUE4=""
 VALUE5=",domain=WORKGROUP"
 
-VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --title "Mounting" --form "Montagem de Redes" 15 50 0 \
+VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --title "Mounting" --form "Pastas de Redes" 15 50 0 \
 "PATH: " 1 1 "$VALUE1" 1 10 34 0 \
 "MNT:" 2 1 "$VALUE2" 2 10 34 0 \
 "USER:" 3 1 "$VALUE3" 3 10 34 0 \
 "PASS:" 4 1 "$VALUE4" 4 10 34 0 \
 "DOM:" 5 1 "$VALUE5" 5 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
 case $? in
   1) m10 ;;
   2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0 ; menu19 ;;
 esac
+
 path1=$(echo "$VALUE0" | sed -n 1p)
 mntpt1=$(echo "$VALUE0" | sed -n 2p)
 user1=$(echo "$VALUE0" | sed -n 3p)
 pass1=$(echo "$VALUE0" | sed -n 4p)
 dmn1=$(echo "$VALUE0" | sed -n 5p)
+
 [ -z "$path1" ] || [ -z "$mntpt1" ] || [ -z "$user1" ] || [ -z "$pass1" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 8 40
+  dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 7 30; menu19; }
+
+echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
+[ "$echa1" = "sim" ] && {
+  dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 7 30
   menu19
 } || {
-  [ grep -qs "$mntpt1" /proc/mounts ] && {
-    dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 30 60
-    menu19
-    } || {
   echo "ubuntu" | sudo -S mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
   mntshow2=$(df -hT)
-  dialog --title "Caminho montado!" --msgbox "$mntshow2" 30 60
+  dialog --title "Caminho montado!" --msgbox "$mntshow2" 25 60
   m10
   }
 
 }
 
-}
-
 function menu18 {
-  sahred=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o caminho que deseja compartilhar ou criar:" 10 40 2>&1 > /dev/tty)
-  sahred2=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o nome que deseja usar no compartilhamento:" 10 40 2>&1 > /dev/tty)
-  [ -z "$sahred" ] || [ -z "$sahred2" ] && { dialog --title "Informação" --msgbox "Nao deixe em branco! Saindo..." 6 20; m10; }
-  [ -d "$sahred" ] || { echo "ubuntu" | sudo -S mkdir "$sahred"; }
+sahred=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o caminho que deseja compartilhar ou criar:" 10 40 2>&1 > /dev/tty)
+sahred2=$(dialog --title 'SAMBA' --backtitle "$bktitle" --inputbox "Digite o nome que deseja usar no compartilhamento:" 10 40 2>&1 > /dev/tty)
+
+case $? in
+  1) m10 ;;
+  2) mntshow2=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow2" 0 0 ; menu19 ;;
+esac
+
+[ -z "$sahred" ] || [ -z "$sahred2" ] && { dialog --title "Informação" --msgbox "Nao deixe em branco!" 10 25; menu18; }
+
+echa2=$(cat "/etc/samba/smb.conf" | grep "$sahred2" 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+echa3=$(cat "/etc/samba/smb.conf" | grep "$sahred1" 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+[ "$echa2" = "sim" ] || [ "$echa3" = "sim" ] && {
+  dialog --title "Informação" --msgbox "Caminho ou nome em uso. Escolha outro." 7 30
+  menu18
+} || { [ -d "$sahred" ] || { echo "ubuntu" | sudo -S mkdir "$sahred"; }; }
 
 echo "ubuntu" | sudo -S bash -c "echo '[$sahred2]
 path = $sahred
@@ -517,14 +526,14 @@ force directory mode = 0777
 
   echo "ubuntu" | sudo -S chmod 777 -R "$sahred"
   echo "ubuntu" | sudo -S systemctl restart smbd nmbd
-  dialog --title "Informação" --msgbox "Servidor SAMBA Ligado!" 6 20
+  dialog --title "Informação" --msgbox "Caminho compartilhado!" 6 20
   m10
 }
 
 function menu20 {
   echo "ubuntu" | sudo -S umount /mnt/*
   mntshow3=$(df -hT)
-  dialog --title "Informação" --msgbox "$mntshow3" 30 60
+  dialog --title "Informação" --msgbox "$mntshow3" 25 60
   m10
 }
 
@@ -878,7 +887,7 @@ function m1x {
 dialog --title 'F.F.A.' --msgbox "Ferramentas e Funções Avançadas" 0 0
 password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha' 0 0 2>&1 > /dev/tty)
 
-[ "$password3" = "1345278" ] && {
+[ "$password3" = "ubuntu" ] && {
   dialog --title 'Porteiro:' --msgbox "Clift Claft Still, a Porta se Abriu!" 6 40
   m10
 } || {
