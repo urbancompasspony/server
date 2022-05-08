@@ -297,7 +297,7 @@ menu09 apache2 && apache=$prcs
 menu09 cups && cups1=$prcs
 menu09 dwagent && dwagent1=$prcs
 vpn=$(ip a | grep tun 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
-motion1=$(ps aux | grep "motion" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+motion1=$(ps aux | grep "motion" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
 menuxx=$(dialog --ok-label 'Ajustar' --backtitle "$bktitle" --title 'Processos de Sistema' --menu " "  0 0 0 \
 A "Samba      : $smb1"  \
 B "Apache2    : $apache" \
@@ -518,7 +518,7 @@ force directory mode = 0777
 }
 
 function menu20 {
-  echo "ubuntu" | sudo -S umount /mnt/*
+  echo "ubuntu" | sudo -S umount -a -t cifs -l
   echo "ubuntu" | sudo -S systemctl stop smbd nmbd
   mntshow3=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow3" 25 60
