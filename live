@@ -53,12 +53,11 @@ A 'Status Geral' \
 B 'Iniciar Palemoon' \
 C 'Iniciar OpenBox' \
 D 'Ghost (OpenBox)' \
-E 'Execução...' \
-F '...Execução' \
+E 'Executar...' \
+F '...Executar' \
 G 'Processos' \
 H 'Ferramentas' \
-I 'Avançado' \
-J 'LAN/WiFi' \
+I 'Configurações' \
 K '*Reiniciar' \
 L '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
@@ -73,7 +72,6 @@ F) custom2=$(dialog --title 'Call Xinit' --backtitle "$bktitle" --inputbox "Digi
 G) menu03 ;;
 H) menu05 ;;
 I) m10 ;;
-J) nmtui ; start ;;
 K) menu06 ;;
 L) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
@@ -111,17 +109,17 @@ esac
 function menu05 {
 var6=$(dialog --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
 A 'rDesktop' \
-B 'Encerrar rDesktop' \
-C 'Placas de Rede' \
-D 'Stress' \
-E '*Speed Test' \
-F '*Arp-Scan' \
-G '*IP Neigh' \
-H '*Who Is' \
-I '*Trace Route' \
-J '*Ping DNS' \
-K 'Definir Relatórios' \
-L 'Relatórios Salvos' \
+B 'X rDesktop' \
+C 'Hard. Rede' \
+D 'Stress CPU' \
+E 'UDPCast' \
+F 'TestDisk' \
+G '*SpeedTest' \
+H '*Arp-Scan' \
+I '*IP Neigh' \
+J '*WhoIs' \
+K '*TraceRoute' \
+L '*Ping DNS' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var6" in
@@ -129,14 +127,14 @@ A) menu04 ;;
 B) killall rdesktop ; menu05 ;;
 C) menu21 ;;
 D) stress -c 16; m10 ;;
-E) menu050 ;;
-F) menu0501 ;;
-G) menu23 ;;
-H) menu051 ;;
-I) menu052 ;;
-J) menu22 ;;
-K) menu054 ;;
-L) menu055 ;;
+E) menu17 ;;
+F) echo "ubuntu" | sudo -S testdisk ; menu05 ;;
+G) menu050 ;;
+H) menu0501 ;;
+I) menu23 ;;
+J) menu051 ;;
+K) menu052 ;;
+L) menu22 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -164,26 +162,36 @@ esac
 }
 
 function m10 {
-var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
-A 'Samba - Client' \
-B 'Samba - Umount' \
-C 'Samba - Server' \
-D 'UDPCast' \
-E 'TestDisk' \
-F 'Rel. Manual' \
-G 'Encaminhar .docx' \
-H 'Apagar .docx' \
+var10=$(dialog --backtitle "$bktitle" --title 'Configurações' --menu "" 0 0 0 \
+A 'Samba Client' \
+B 'Samba Server' \
+C 'X Samba' \
+D 'Motion' \
+E 'X Motion' \
+F 'LAN/WiFi' \
+G 'Audio' \
+H 'Brilho de Tela' \
+I 'Ligar/Desl. Relatórios' \
+J 'Rel. Manual' \
+K 'Relatórios Salvos' \
+L 'Encaminhar .docx' \
+M 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) menu19 ;;
-B) menu20 ;;
-C) menu18 ;;
-D) menu17 ;;
-E) echo "ubuntu" | sudo -S testdisk ; m10 ;;
-F) menu28 ;;
-G) menu29 ;;
-H) menu30 ;;
+B) menu18 ;;
+C) menu20 ;;
+D) echo "ubuntu" | sudo -S motion 1> /dev/null 2> /dev/null & m10 ;;
+E) echo "ubuntu" | sudo -S killall motion; m10 ;;
+F) nmtui ; m10 ;;
+G) alsamixer ; m10 ;;
+H) custom3=$(dialog --title 'Brilho de Tela' --backtitle "$bktitle" --inputbox "Digite um valor de 0 a 255:" 10 15 2>&1 > /dev/tty); [ -z "$custom3" ] || { echo "ubuntu" | sudo -S brightnessctl set "$custom3"; }; m10 ;;
+I) menu054 ;;
+J) menu28 ;;
+K) menu055 ;;
+L) menu29 ;;
+M) menu30 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -273,8 +281,8 @@ liminal "m3nu01" "menu01"
 }
 
 function inxi1 {
-desov=$(inxi -b)
-dialog --cr-wrap --title "Informações encontradas" --backtitle "$bktitle" --msgbox "$desov" 0 0
+desov=$(echo "ubuntu" | sudo -S inxi -F)
+dialog --cr-wrap --title "Informações encontradas:" --backtitle "$bktitle" --msgbox "$desov" 0 0
 menu08 "$Recado $desov $Mensagem"
 liminal "m3nu01" "menu01"
 }
@@ -298,37 +306,21 @@ vpn=$(ip a | grep tun 1> /dev/null && echo "Executando" || echo "Parado ou Ausen
 
 menuxx=$(dialog --ok-label 'Ajustar' --backtitle "$bktitle" --title 'Processos de Sistema' --menu " "  0 0 0 \
 A "Samba      : $smb1"  \
-B "Dominio    : $smb2" \
-C "Apache2    : $apache" \
-D "Lighttpd   : $lighttp" \
-E "PiHole     : $pihole" \
-F "DRBD       : $drbd1" \
-G "Corosync   : $corosync1" \
-H "Pacemaker  : $pacemaker1" \
-I "Spark      : $spark" \
-J "MySQL      : $mysql" \
-K "CUPS       : $cups1" \
-L "Motion     : $motion1" \
-M "DWAgent    : $dwagent1" \
-N "VPN Client : $vpn" \
+B "Apache2    : $apache" \
+C "CUPS       : $cups1" \
+D "Motion     : $motion1" \
+E "DWAgent    : $dwagent1" \
+F "VPN Client : $vpn" \
 X "Voltar" 2>&1 > /dev/tty )
 
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$menuxx" in
 A) status="$smb1"; processname="Samba"; process="smbd"; menu031 ;;
-B) status="$smb2"; processname="Dominio"; process="samba-ad-dc"; menu031 ;;
-C) status="$apache"; processname="Apache2"; process="apache2"; menu031 ;;
-D) status="$lighttp"; processname="Lighttp"; process="lighttp"; menu031 ;;
-E) status="$pihole"; processname="PiHole"; process="pihole-FTL"; menu031 ;;
-F) dialog --title 'Operação Não Permitida!' --msgbox "Utilize o gerenciamento padrão para lidar com o DRBD" 8 40; menu031 ;;
-G) dialog --title 'Operação Não Permitida!' --msgbox "Utilize o gerenciamento padrão para lidar com o Corosync" 8 40; menu031 ;;
-H) dialog --title 'Operação Não Permitida!' --msgbox "Utilize o gerenciamento padrão para lidar com o Pacemaker" 8 40; menu031 ;;
-I) status="$spark"; processname="Spark"; process="openfire"; menu031 ;;
-J) status="$mysql"; processname="MySQL"; process="mysql"; menu031 ;;
-K) status="$cups1"; processname="CUPS"; process="cups"; menu031 ;;
-L) status="$motion1"; processname="Motion"; process="motion"; menu031 ;;
-M) status="$dwagent1"; processname="DWAgent"; process="dwagent"; menu031 ;;
-N) status="$vpn"; processname="VPN Client"; process="openvpn"; menu031 ;;
+B) status="$apache"; processname="Apache2"; process="apache2"; menu031 ;;
+C) status="$cups1"; processname="CUPS"; process="cups"; menu031 ;;
+D) status="$motion1"; processname="Motion"; process="motion"; menu031 ;;
+E) status="$dwagent1"; processname="DWAgent"; process="dwagent"; menu031 ;;
+F) status="$vpn"; processname="VPN Client"; process="openvpn"; menu031 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -442,14 +434,14 @@ menu14
 
 function menu17 {
 var2=$(dialog --title 'UDPCast' --backtitle "$bktitle" --menu "Escolha o modo!" 0 0 0 \
-A 'Cliente' \
-B 'Servidor' \
+A 'Client' \
+B 'Server' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && {start}
 case "$var2" in
 A) echo "Modo Cliente. Para sair, precione CTRL + C!" ; udp-receiver --file=/dev/null ;;
 B) echo "Modo Servidor. Para sair, precione CTRL + C!" ; udp-sender --file=/dev/zero ;;
-X) m10 ;;
+X) menu05 ;;
 esac
 }
 
@@ -533,6 +525,7 @@ force directory mode = 0777
 
 function menu20 {
   echo "ubuntu" | sudo -S umount /mnt/*
+  echo "ubuntu" | sudo -S systemctl stop smbd nmbd
   mntshow3=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow3" 25 60
   m10
@@ -718,7 +711,8 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
     }
 }
 
-liminal "st4rt1" "start"
+m10
+#liminal "st4rt1" "start"
 }
 
 function menu055 {
@@ -751,7 +745,8 @@ Deseja enviá-lo por e-mail?" 20 70
     }
 }
 
-liminal "m3nu05" "menu05"
+m10
+#liminal "m3nu05" "menu05"
 }
 
 # Reinicio
