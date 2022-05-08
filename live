@@ -50,30 +50,32 @@ var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "IP Local: 
 Data e Hora: $datetime
 UpTime: $uptime"  0 0 0 \
 A 'Status Geral' \
-B 'Iniciar OpenBox' \
-C 'Iniciar Palemoon' \
-D 'Execução...' \
-E '...Execução' \
-F 'Processos' \
-G 'Ferramentas' \
-H 'Avançado' \
-I 'LAN/WiFi' \
-J '*Reiniciar' \
-K '*Desligar' \
+B 'Iniciar Palemoon' \
+C 'Iniciar OpenBox' \
+D 'Ghost (OpenBox)' \
+E 'Execução...' \
+F '...Execução' \
+G 'Processos' \
+H 'Ferramentas' \
+I 'Avançado' \
+J 'LAN/WiFi' \
+K '*Reiniciar' \
+L '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
 A) menu01 ;;
-B) startx ; start ;;
-C) xinit /home/$USER/.palemoon/palefull $* -- :1 vt$XDG_VTNR; start ;;
-D) custom1=$(cat /home/$USER/.custom); xinit "$custom1" $* -- :4 vt$XDG_VTNR; start ;;
-E) custom2=$(dialog --title 'Call Xinit' --backtitle "$bktitle" --inputbox "Digite um binário que use interface de usuário:" 10 30 2>&1 > /dev/tty); xinit "$custom2" $* -- :4 vt$XDG_VTNR; start ;;
-F) menu03 ;;
-G) menu05 ;;
-H) m10 ;;
-I) nmtui ; start ;;
-J) menu06 ;;
-K) menu07 ;;
+B) xinit /home/$USER/.palemoon/palefull $* -- :1 vt$XDG_VTNR; start ;;
+C) startx ; start ;;
+D) echo "ubuntu" | sudo -S /home/ubuntu/.Ghost/Ghost; m10 ;;
+E) custom1=$(cat /home/$USER/.custom); xinit "$custom1" $* -- :4 vt$XDG_VTNR; start ;;
+F) custom2=$(dialog --title 'Call Xinit' --backtitle "$bktitle" --inputbox "Digite um binário que use interface de usuário:" 10 30 2>&1 > /dev/tty); xinit "$custom2" $* -- :4 vt$XDG_VTNR; start ;;
+G) menu03 ;;
+H) menu05 ;;
+I) m10 ;;
+J) nmtui ; start ;;
+K) menu06 ;;
+L) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
@@ -163,27 +165,25 @@ esac
 
 function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
-A 'Samba - Mount' \
+A 'Samba - Client' \
 B 'Samba - Umount' \
-C 'Ghost (OpenBox)' \
-D 'Samba - Server' \
-G 'UDP-Cast' \
-H 'TestDisk' \
-I 'Emitir .docx' \
-J 'Encaminhar .docx' \
-K 'Apagar .docx' \
+C 'Samba - Server' \
+D 'UDPCast' \
+E 'TestDisk' \
+F 'Rel. Manual' \
+G 'Encaminhar .docx' \
+H 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) menu19 ;;
 B) menu20 ;;
-C) echo "ubuntu" | sudo -S /home/ubuntu/.Ghost/Ghost; m10 ;;
-D) menu18 ;;
-G) menu17 ;;
-H) echo "ubuntu" | sudo -S testdisk ; m10 ;;
-I) menu28 ;;
-J) menu29 ;;
-K) menu30 ;;
+C) menu18 ;;
+D) menu17 ;;
+E) echo "ubuntu" | sudo -S testdisk ; m10 ;;
+F) menu28 ;;
+G) menu29 ;;
+H) menu30 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -192,7 +192,7 @@ esac
 function menu01 {
 ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
 var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Externo: $ip2" 0 0 0 \
-A 'INXI' \
+A '*INXI' \
 B '*Sistema' \
 C '*Temperatura' \
 D '*Armazenamento' \
@@ -213,7 +213,7 @@ esac
 function m3nu01 {
 ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
 var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Externo: $ip2" 0 0 0 \
-A 'INXI' \
+A '*INXI' \
 B '*Sistema' \
 C '*Temperatura' \
 D '*Armazenamento' \
