@@ -1157,7 +1157,7 @@ echo "$1" > "/tmp/.relat"
         dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
 $validmail" 15 40
         [ $? = 0 ] && {         
-          echo "$1" | mutt -s "Relatório - $HOSTNAME" "$validmail"
+          echo "$1" | mutt -s "Diagnóstico - $HOSTNAME" "$validmail"
           dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
         } || {
           dialog --title "Relatório" --msgbox "O atual relatório foi salvo! \n
@@ -1180,7 +1180,7 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
   validmail=$(awk 'NR==1' $FILE3)
   dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar este relatório para $validmail?" 8 40
   [ $? = 0 ] && {
-    echo "$1" | mutt -s "Relatório - $HOSTNAME" "$validmail"
+    echo "$1" | mutt -s "Diagnóstico - $HOSTNAME" "$validmail"
     dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
   } || {
     echo "a" > /dev/null
