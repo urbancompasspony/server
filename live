@@ -31,7 +31,7 @@ datetime3=$(date +"%m-%Y") # Month
 cp "/home/$USER/.DOC/.relat.docx" "/home/$USER/.DOC/$datetime3.docx" 2> /dev/null
 
 TEXTAO14="
-Conforme previamente acordado, segue abaixo o relatório de suporte, manutenções preventivas e/ou corretivas executadas no período de $datetime3:"
+Conforme estipulado em contrato mensal de prestação de serviços na área de informática, segue abaixo o relatório de suporte, manutenções preventivas e corretivas executados no período de $datetime3:"
 
 echo "$TEXTAO14" >> "/home/$USER/.DOC/$datetime3.docx"
 }
@@ -53,12 +53,13 @@ A 'Status Geral' \
 B 'Iniciar OpenBox' \
 C 'Iniciar Palemoon' \
 D 'Execução...' \
-E 'Processos' \
-F 'Ferramentas' \
-G 'Avançado' \
-H 'NMTUI' \
-I '*Reiniciar' \
-J '*Desligar' \
+E '...Execução' \
+F 'Processos' \
+G 'Ferramentas' \
+H 'Avançado' \
+I 'LAN/WiFi' \
+J '*Reiniciar' \
+K '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
@@ -66,12 +67,13 @@ A) menu01 ;;
 B) startx ; start ;;
 C) xinit /home/$USER/.palemoon/palefull $* -- :1 vt$XDG_VTNR; start ;;
 D) custom1=$(cat /home/$USER/.custom); xinit "$custom1" $* -- :4 vt$XDG_VTNR; start ;;
-E) menu03 ;;
-F) menu05 ;;
-G) m10 ;;
-H) nmtui ; start ;;
-I) menu06 ;;
-J) menu07 ;;
+E) custom2=$(dialog --title 'Call Xinit' --backtitle "$bktitle" --inputbox "Digite um binário que use interface de usuário:" 10 30 2>&1 > /dev/tty); xinit "$custom2" $* -- :4 vt$XDG_VTNR; start ;;
+F) menu03 ;;
+G) menu05 ;;
+H) m10 ;;
+I) nmtui ; start ;;
+J) menu06 ;;
+K) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
@@ -820,7 +822,7 @@ echo "$1" > "/tmp/.relat"
         dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
 $validmail" 15 40
         [ $? = 0 ] && {         
-          echo "$1" | mutt -s "Relatório - $HOSTNAME" "$validmail"
+          echo "$1" | mutt -s "Diagnóstico - $HOSTNAME" "$validmail"
           dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
         } || {
           dialog --title "Relatório" --msgbox "O atual relatório foi salvo! \n
@@ -843,7 +845,7 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
   validmail=$(awk 'NR==1' $FILE3)
   dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar este relatório para $validmail?" 8 40
   [ $? = 0 ] && {
-    echo "$1" | mutt -s "Relatório - $HOSTNAME" "$validmail"
+    echo "$1" | mutt -s "Diagnóstico - $HOSTNAME" "$validmail"
     dialog --title "Relatório" --msgbox "Relatório enviado com sucesso!" 6 40
   } || {
     echo "a" > /dev/null
@@ -941,20 +943,20 @@ function menu29 {
 
   TEXTAO15="Boa tarde,
 
-Segue anexo o relatório dos atendimentos, manutenções corretivas e manutenções preventivas realizadas em $datetime3!
+Segue em anexo o Relatório de Atendimentos, com os chamados, manutenções preventivas e manutenções corretivas executadas no período de $datetime3.
 
 Grato,
 José Humberto"
 
   dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.docx para $validmail?" 8 40
   [ $? = 0 ] && {
-    echo "$TEXTAO15" | mutt -s "Relatório de Atendimento - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.docx" -- "$validmail"
+    echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.docx" -- "$validmail"
     }
 
   dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar um documento diferente para $validmail?" 8 40
   [ $? = 0 ] && {
     inputdoc1=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-    echo "$TEXTAO15" | mutt -s "Relatório de Atendimento - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.docx" -- "$validmail"
+    echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.docx" -- "$validmail"
     }
 } || {
   dialog --title 'relat.docx' --msgbox "Arquivo não encontrado. Abortando." 8 30
@@ -980,7 +982,7 @@ m10
 ################################################################################
 
 # Todos os Textões!
-Recado="Relatório do sistema $HOSTNAME gerado pela interface de relatórios do $bktitle!
+Recado="Diagnóstico do sistema $HOSTNAME, gerado automaticamente pelo $bktitle!
 
 "
 
