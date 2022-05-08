@@ -11,8 +11,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v1.0"
-revis="r0.3"
+version="v1.5"
+revis="r0.5"
 
 ################################################################################
 ################################################################################
@@ -202,7 +202,7 @@ bat0="Inexistente!"; [ -f /sys/class/power_supply/BAT0/capacity ] && { bat0=$(ca
 bat1="Inexistente!"; [ -f /sys/class/power_supply/BAT1/capacity ] && { bat1=$(cat /sys/class/power_supply/BAT0/capacity); }
 ip2=$(dig @resolver4.opendns.com myip.opendns.com +short)
 var2=$(dialog --title 'Status' --backtitle "$bktitle" --menu "IP Externo: $ip2 \n
-Bateria: $bat0%" 0 0 0 \
+Bateria: $bat0 %" 0 0 0 \
 A '*INXI' \
 B '*Sistema' \
 C '*Temperatura' \
