@@ -22,7 +22,7 @@ hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 version="v3.1"
-revis="r0.0"
+revis="r0.1"
 
 ################################################################################
 ################################################################################
@@ -228,29 +228,31 @@ function m10 {
 var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
 A 'Atualizar o Sistema' \
 B 'Samba - Client' \
-C 'PiHole' \
-D 'Governador de CPU' \
-E 'Parar Backup' \
-F 'UDPCast' \
-G '*Usuários Logados' \
-H '*Logins Anteriores' \
-I 'Rel. Manual' \
-J 'Encaminhar .docx' \
-K 'Apagar .docx' \
+C 'X Samba' \
+D 'PiHole' \
+E 'Governador de CPU' \
+F 'Parar Backup' \
+G 'UDPCast' \
+H '*Usuários Logados' \
+I '*Logins Anteriores' \
+J 'Rel. Manual' \
+K 'Encaminhar .docx' \
+L 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
 A) m11 ;;
 B) menu31 ;;
-C) menu26 ;;
-D) menu053 ;;
-E) m122 ;;
-F) menu17 ;;
-G) menu18 ;;
-H) menu19 ;;
-I) menu28 ;;
-J) menu29 ;;
-K) menu30 ;;
+C) menu32 ;;
+D) menu26 ;;
+E) menu053 ;;
+F) m122 ;;
+G) menu17 ;;
+H) menu18 ;;
+I) menu19 ;;
+J) menu28 ;;
+K) menu29 ;;
+L) menu30 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1834,6 +1836,7 @@ $blockedsites" 0 0 0 \
   esac
 } || {
   dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
+  m10
   }
 }
 
