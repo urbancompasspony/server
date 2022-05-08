@@ -22,7 +22,7 @@ hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 version="v3.0"
-revis="r1.2"
+revis="r2.0"
 
 ################################################################################
 ################################################################################
@@ -2042,25 +2042,31 @@ VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --backtitl
 "PASS:" 4 1 "$VALUE4" 4 10 34 0 \
 "DOM:" 5 1 "$VALUE5" 5 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
 case $? in
   1) m10 ;;
   2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0; menu31 ;;
 esac
+
 path1=$(echo "$VALUE0" | sed -n 1p)
 mntpt1=$(echo "$VALUE0" | sed -n 2p)
 user1=$(echo "$VALUE0" | sed -n 3p)
 pass1=$(echo "$VALUE0" | sed -n 4p)
 dmn1=$(echo "$VALUE0" | sed -n 5p)
+
 [ -z "$path1" ] || [ -z "$mntpt1" ] || [ -z "$user1" ] || [ -z "$pass1" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 8 40
-  m10
+  dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 7 30; m10; }
+
+echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
+[ "$echa1" = "sim" ] && {
+  dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 7 30
+  menu31
 } || {
   echo "$password" | sudo -S mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
   mntshow2=$(df -hT)
-  dialog --title "Informação" --msgbox "$mntshow2" 30 60
+  dialog --title "Caminho montado!" --msgbox "$mntshow2" 30 60
   m10
   }
-
 }
 
 function menu32 {
