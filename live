@@ -11,8 +11,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v1.5"
-revis="r0.5"
+version="v1.0"
+revis="r0.3"
 
 ################################################################################
 ################################################################################
@@ -293,20 +293,11 @@ liminal "m3nu01" "menu01"
 # Processos de Sistema
 function menu03 {
 menu09 smbd && smb1=$prcs
-menu09 samba-ad-dc && smb2=$prcs
 menu09 apache2 && apache=$prcs
-menu09 lighttpd && lighttp=$prcs
-menu09 pihole-FTL && pihole=$prcs
-menu09 drbd && drbd1=$prcs
-menu09 corosync && corosync1=$prcs
-menu09 pacemaker && pacemaker1=$prcs
-menu09 openfire && spark=$prcs
-menu09 mysqld && mysql=$prcs
-menu09 cups1 cups && cups1=$prcs
-menu09 motion && motion1=$prcs
+menu09 cups && cups1=$prcs
 menu09 dwagent && dwagent1=$prcs
 vpn=$(ip a | grep tun 1> /dev/null && echo "Executando" || echo "Parado ou Ausente")
-
+motion1=$(ps aux | grep "motion" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
 menuxx=$(dialog --ok-label 'Ajustar' --backtitle "$bktitle" --title 'Processos de Sistema' --menu " "  0 0 0 \
 A "Samba      : $smb1"  \
 B "Apache2    : $apache" \
@@ -323,7 +314,7 @@ B) status="$apache"; processname="Apache2"; process="apache2"; menu031 ;;
 C) status="$cups1"; processname="CUPS"; process="cups"; menu031 ;;
 D) status="$motion1"; processname="Motion"; process="motion"; menu031 ;;
 E) status="$dwagent1"; processname="DWAgent"; process="dwagent"; menu031 ;;
-F) status="$vpn"; processname="VPN Client"; process="openvpn"; menu031 ;;
+F) status="$vpn"; processname="VPN Client"; process="openvpn"; menu03 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
