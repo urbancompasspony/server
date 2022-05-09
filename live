@@ -14,6 +14,8 @@ hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 version="v1.0"
 revis="r0.3"
 
+password0="ubuntu"
+
 ################################################################################
 ################################################################################
 
@@ -50,14 +52,15 @@ var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "IP Local: 
 Data e Hora: $datetime
 UpTime: $uptime"  0 0 0 \
 A 'Status Geral' \
-B 'Iniciar Palemoon' \
-C 'Iniciar OpenBox' \
-D 'Ghost (OpenBox)' \
-E 'Executar...' \
-F '...Executar' \
-G 'Processos' \
-H 'Ferramentas' \
-I 'Configurações' \
+B 'Palemoon' \
+C 'OpenBox' \
+D 'Ghost (GUI)' \
+E 'Ghost Explorer (GUI)' \
+F 'Executar...' \
+G '...Executar' \
+H 'Processos' \
+I 'Ferramentas' \
+J 'Configurações' \
 K '*Reiniciar' \
 L '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
@@ -66,12 +69,13 @@ case "$var1" in
 A) menu01 ;;
 B) xinit /home/$USER/.palemoon/palefull $* -- :1 vt$XDG_VTNR; start ;;
 C) startx ; start ;;
-D) echo "ubuntu" | sudo -S /home/ubuntu/.Ghost/Ghost; m10 ;;
-E) custom1=$(cat /home/$USER/.custom); xinit "$custom1" $* -- :4 vt$XDG_VTNR; start ;;
-F) custom2=$(dialog --title 'Call Xinit' --backtitle "$bktitle" --inputbox "Digite um binário que use interface de usuário:" 10 30 2>&1 > /dev/tty); xinit "$custom2" $* -- :4 vt$XDG_VTNR; start ;;
-G) menu03 ;;
-H) menu05 ;;
-I) m10 ;;
+D) echo "$password0" | sudo -S /home/$USER/.Ghost/Ghost; start ;;
+E) wine /home/$USER/.Ghost/Outros/GhostExplorer.Exe; start ;;
+F) custom1=$(cat /home/$USER/.custom); xinit "$custom1" $* -- :4 vt$XDG_VTNR; start ;;
+G) custom2=$(dialog --title 'Call Xinit' --backtitle "$bktitle" --inputbox "Digite um binário que use interface de usuário:" 10 30 2>&1 > /dev/tty); xinit "$custom2" $* -- :4 vt$XDG_VTNR; start ;;
+H) menu03 ;;
+I) menu05 ;;
+J) m10 ;;
 K) menu06 ;;
 L) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
@@ -128,7 +132,7 @@ B) killall rdesktop ; menu05 ;;
 C) menu21 ;;
 D) stress -c 16; m10 ;;
 E) menu17 ;;
-F) echo "ubuntu" | sudo -S testdisk ; menu05 ;;
+F) echo "$password0" | sudo -S testdisk ; menu05 ;;
 G) menu050 ;;
 H) menu0501 ;;
 I) menu23 ;;
@@ -182,11 +186,11 @@ case "$var10" in
 A) menu19 ;;
 B) menu18 ;;
 C) menu20 ;;
-D) echo "ubuntu" | sudo -S motion 1> /dev/null 2> /dev/null & m10 ;;
-E) echo "ubuntu" | sudo -S killall motion; m10 ;;
+D) echo "$password0" | sudo -S motion 1> /dev/null 2> /dev/null & m10 ;;
+E) echo "$password0" | sudo -S killall motion; m10 ;;
 F) nmtui ; m10 ;;
 G) alsamixer ; m10 ;;
-H) custom3=$(dialog --title 'Brilho de Tela' --backtitle "$bktitle" --inputbox "Digite um valor de 0 a 255:" 10 15 2>&1 > /dev/tty); [ -z "$custom3" ] || { echo "ubuntu" | sudo -S brightnessctl set "$custom3"; }; m10 ;;
+H) custom3=$(dialog --title 'Brilho de Tela' --backtitle "$bktitle" --inputbox "Digite um valor de 0 a 255:" 10 15 2>&1 > /dev/tty); [ -z "$custom3" ] || { echo "$password0" | sudo -S brightnessctl set "$custom3"; }; m10 ;;
 I) menu054 ;;
 J) menu28 ;;
 K) menu055 ;;
@@ -284,7 +288,7 @@ liminal "m3nu01" "menu01"
 }
 
 function inxi1 {
-desov=$(echo "ubuntu" | sudo -S inxi -F)
+desov=$(inxi -F)
 dialog --cr-wrap --title "Informações encontradas:" --backtitle "$bktitle" --msgbox "$desov" 0 0
 menu08 "$Recado $desov $Mensagem"
 liminal "m3nu01" "menu01"
@@ -323,12 +327,12 @@ function menu031 {
 [ "$status" = "Executando" ] && {
   dialog --title "$processname" --yesno "Deseja reiniciar o processo $processname ?" 6 40
   [ $? = 0 ] && {
-    echo "ubuntu" | sudo -S systemctl restart "$process"
+    echo "$password0" | sudo -S systemctl restart "$process"
     dialog --title "$processname" --msgbox "O processo $processname foi reiniciado!" 6 40
   } || {
     dialog --title "$processname" --yesno "Deseja parar o processo $processname ?" 6 40
     [ $? = 0 ] && {
-      echo "ubuntu" | sudo -S systemctl stop "$process"
+      echo "$password0" | sudo -S systemctl stop "$process"
       dialog --title "$processname" --msgbox "O processo $processname foi parado!" 6 40
       }
   } || {
@@ -337,7 +341,7 @@ function menu031 {
 } || {
   dialog --title "$processname" --yesno "Deseja tentar iniciar o processo $processname ?" 6 40
   [ $? = 0 ] && {
-    echo "ubuntu" | sudo -S systemctl start "$process"
+    echo "$password0" | sudo -S systemctl start "$process"
     dialog --title "$processname" --msgbox "Verifique se o $processname iniciou." 6 40
     }
 }
@@ -347,7 +351,7 @@ menu03
 
 # Status de Processos
 function menu09 {
-  prcs=$(echo "ubuntu" | sudo -S systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente")
+  prcs=$(echo "$password0" | sudo -S systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente")
 }
 
 # Status Temperatura
@@ -414,7 +418,7 @@ esac
 function menu140 {
 stssd=$(ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente")
 [ "$stssd" = "Presente" ] && {
-  skd=$(echo "ubuntu" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}')
+  skd=$(echo "$password0" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}')
 } || {
   skd=$(echo "Disco ausente!")
   }
@@ -473,7 +477,7 @@ echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
   dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 7 30
   menu19
 } || {
-  echo "ubuntu" | sudo -S mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
+  echo "$password0" | sudo -S mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
   mntshow2=$(df -hT)
   dialog --title "Caminho montado!" --msgbox "$mntshow2" 25 60
   m10
@@ -497,10 +501,10 @@ echa3=$(cat "/etc/samba/smb.conf" | grep "$sahred2" 1> /dev/null 2> /dev/null &&
 
 [ "$echa2" = "sim" ] || [ "$echa3" = "sim" ] && { dialog --title "Informação" --msgbox "Esta pasta ou este nome já foi compartilhado! Escolha outro." 7 30; menu18; }
 
-echo "ubuntu" | sudo -S bash -c "echo '[$sahred2]
+echo "$password0" | sudo -S bash -c "echo '[$sahred2]
 path = $sahred1
-valid users = ubuntu
-admin users = ubuntu
+valid users = $password0
+admin users = $password0
 guest ok = no
 writable = yes
 browsable = yes
@@ -510,16 +514,16 @@ directory mask = 0777
 force directory mode = 0777
 ' >> /etc/samba/smb.conf"
 
-  [ -d "$sahred1" ] || { echo "ubuntu" | sudo -S mkdir "$sahred1"; }
-  echo "ubuntu" | sudo -S chmod 777 -R "$sahred1"
-  echo "ubuntu" | sudo -S systemctl restart smbd nmbd
+  [ -d "$sahred1" ] || { echo "$password0" | sudo -S mkdir "$sahred1"; }
+  echo "$password0" | sudo -S chmod 777 -R "$sahred1"
+  echo "$password0" | sudo -S systemctl restart smbd nmbd
   dialog --title "Informação" --msgbox "Caminho compartilhado!" 6 20
   m10
 }
 
 function menu20 {
-  echo "ubuntu" | sudo -S umount -a -t cifs -l
-  echo "ubuntu" | sudo -S systemctl stop smbd nmbd
+  echo "$password0" | sudo -S umount -a -t cifs -l
+  echo "$password0" | sudo -S systemctl stop smbd nmbd
   mntshow3=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow3" 25 60
   m10
@@ -528,7 +532,7 @@ function menu20 {
 function menu21 {
 resultenp=$(ip a | sed -n '/enp/p' |  awk '!/mac/' | awk '{print $2}' | sed 's/.$//' | grep 'enp')
 for i in $resultenp; do
-  velo=$(echo "ubuntu" | sudo -S ethtool "$i" | grep Speed)
+  velo=$(echo "$password0" | sudo -S ethtool "$i" | grep Speed)
   dialog --title 'Velocidades detectadas:' --msgbox "$i $velo" 8 40
 done
 
@@ -625,7 +629,7 @@ liminal "m3nu05" "menu05"
 # Arp-Scan
 function menu0501 {
 dialog --title 'Arp-Scan' --backtitle "$bktitle" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
-arpscn=$(echo "ubuntu" | sudo -S arp-scan -l)
+arpscn=$(echo "$password0" | sudo -S arp-scan -l)
 dialog --title 'Arp-Scan' --backtitle "$bktitle" --msgbox "$arpscn" 0 0
 menu08 "$Recado $arpscn $Mensagem"
 liminal "m3nu05" "menu05"
@@ -764,7 +768,7 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
         echo "a" > /dev/null
         }
     }
-  echo "ubuntu" | sudo -S reboot
+  echo "$password0" | sudo -S reboot
   }
 }
 
@@ -792,7 +796,7 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
         echo "a" > /dev/null
         }
     }
-  echo "ubuntu" | sudo -S shutdown -h now
+  echo "$password0" | sudo -S shutdown -h now
   }
 }
 
@@ -877,7 +881,7 @@ function m1x {
 dialog --title 'F.F.A.' --msgbox "Ferramentas e Funções Avançadas" 0 0
 password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha' 0 0 2>&1 > /dev/tty)
 
-[ "$password3" = "ubuntu" ] && {
+[ "$password3" = "$password0" ] && {
   dialog --title 'Porteiro:' --msgbox "Clift Claft Still, a Porta se Abriu!" 6 40
   m10
 } || {
