@@ -1491,7 +1491,7 @@ validusr=$(dialog --title 'AD-DC' --backtitle "Active Directory & Domain Control
         echo "$password" | sudo -S samba-tool group addmembers "$validgrp" "$validusr"
         dialog --title "Informação" --msgbox "O usuário $validusr foi adicionado ao grupo $validgrp!" 8 40
         menu08 "$Recado
-Grupo $validusr adicionado ao grupo $validgrp com sucesso!
+Usuario $validusr adicionado ao grupo $validgrp com sucesso!
 $Mensagem"
       } || {
         dialog --title "ERROR" --msgbox "Grupo inválido!" 7 25
