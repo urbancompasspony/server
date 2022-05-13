@@ -1,7 +1,7 @@
 # Universal Server Menu
 
 The default code is "init", that is mentioned below.
-The "live" version is resourceless and is used when booting a LIVE USB.
+The "live" and "live-root" versions has less resources and is used when booting only in LIVE USBs.
 
 # What is it?
 
