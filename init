@@ -21,8 +21,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v3.1"
-revis="r0.1"
+version="v3.2"
+revis="r0.5"
 
 ################################################################################
 ################################################################################
@@ -273,6 +273,7 @@ C '*Armazenamento' \
 D '*S.M.A.R.T.' \
 E '*Cluster: DRBD' \
 F '*Cluster: PCS' \
+G '*Smart UPS' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
@@ -282,6 +283,7 @@ C) menu13 ;;
 D) menu14 ;;
 E) menu15 ;;
 F) menu16 ;;
+G) menu33 ;;
 X) start ;;
 esac
 }
@@ -295,12 +297,14 @@ IP Externo: $ip2" 0 0 0 \
 A '*Sistema' \
 B '*Temperatura' \
 C '*Armazenamento' \
+D '*Smart UPS' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var2" in
 A) menu11 ;;
 B) menu12 ;;
 C) menu13 ;;
+D) menu33 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -2076,6 +2080,20 @@ function menu32 {
   echo "$password" | sudo -S umount -a -t cifs -l
   mntshow3=$(df -hT)
   dialog --title "Informação" --msgbox "$mntshow3" 30 60
+}
+
+function menu33 {
+[ -f /home/$USER/SMS/SMSPowerView.tmp ] && {
+  rm /tmp/.powerview
+  /home/administrador/SMS/powerview -c | tee -a /tmp/.powerview
+  sed '/^$/d' /tmp/.powerview
+  RelatPV=$(cat /tmp/.powerview)
+  menu08 "$Recado $RelatPV $Mensagem"
+} || {
+  dialog --title "Informação" --msgbox "Gerenciador de Nobreak não foi encontrado ou configurado!" 7 40
+}
+
+liminal "m3nu01" "menu01"
 }
 
 ################################################################################
