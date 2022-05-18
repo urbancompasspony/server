@@ -1211,7 +1211,7 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
 function menu004 {
 menu09 samba-ad-dc && smb2=$prcs
 [ "$smb2" = "Executando" ] && {
-  echo "$password" | sudo -S samba-tool dbcheck --cross-ncs --fix > /tmp/.smbadtmp; read
+  echo "$password" | sudo -S samba-tool dbcheck --cross-ncs --fix | tee /tmp/.smbadtmp; read
   tmpad=$(cat /tmp/.smbadtmp)
   menu08 "$Recado $tmpad $Mensagem"
 } || {
