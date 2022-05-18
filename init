@@ -22,7 +22,7 @@ hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 version="v3.3"
-revis="r0.1"
+revis="r0.5"
 
 ################################################################################
 ################################################################################
@@ -1211,6 +1211,7 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
 function menu004 {
 menu09 samba-ad-dc && smb2=$prcs
 [ "$smb2" = "Executando" ] && {
+  clear
   echo "$password" | sudo -S samba-tool dbcheck --cross-ncs --fix | tee /tmp/.smbadtmp; read
   tmpad=$(cat /tmp/.smbadtmp)
   menu08 "$Recado $tmpad $Mensagem"
