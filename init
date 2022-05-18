@@ -21,8 +21,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v3.1"
-revis="r0.1"
+version="v3.3"
+revis="r0.0"
 
 ################################################################################
 ################################################################################
@@ -171,7 +171,7 @@ G 'Iniciar Navegador' \
 H '*Ping DNS' \
 I 'Iniciar Scripts' \
 J '*Re-Iniciar NOIP' \
-K 'Definir Relatórios' \
+K 'Config. Relatórios' \
 L 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
@@ -204,7 +204,7 @@ C '*Arp-Scan' \
 D '*Trace Route' \
 E 'Iniciar Scripts' \
 F '*Re-Iniciar NOIP' \
-G 'Definir Relatórios' \
+G 'Config. Relatórios' \
 H 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
@@ -225,19 +225,20 @@ esac
 }
 
 function m10 {
-var10=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
+var10=$(dialog --backtitle "Ferramentas e Funções Avançadas" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
 A 'Atualizar o Sistema' \
 B 'Samba - Client' \
 C 'X Samba' \
 D 'PiHole' \
-E 'Governador de CPU' \
-F 'Parar Backup' \
-G 'UDPCast' \
-H '*Usuários Logados' \
-I '*Logins Anteriores' \
-J 'Rel. Manual' \
-K 'Encaminhar .docx' \
-L 'Apagar .docx' \
+E 'Manut. Banco AD&DC' \
+F 'Trocar Gov. de CPU' \
+G 'Menu de Backups' \
+H 'UDPCast' \
+I '*Usuários Logados' \
+J '*Logins Anteriores' \
+K 'Diagnóstico Manual' \
+L 'Encaminhar .docx' \
+M 'Apagar .docx' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
@@ -245,14 +246,15 @@ A) m11 ;;
 B) menu31 ;;
 C) menu32 ;;
 D) menu26 ;;
-E) menu053 ;;
-F) m122 ;;
-G) menu17 ;;
-H) menu18 ;;
-I) menu19 ;;
-J) menu28 ;;
-K) menu29 ;;
-L) menu30 ;;
+E) menu004 ;;
+F) menu053 ;;
+G) m122 ;;
+H) menu17 ;;
+I) menu18 ;;
+J) menu19 ;;
+K) menu28 ;;
+L) menu29 ;;
+M) menu30 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -724,8 +726,12 @@ gauge1 "79"
 Algar_S=$(ping1 "200.225.197.37")
 gauge1 "85"
 GIGA_P=$(ping1 "189.38.95.95")
-gauge1 "96"
+gauge1 "88"
 GIGA_S=$(ping1 "189.38.95.96")
+gauge1 "93"
+CLARO_P=$(ping1 "181.213.132.2")
+gauge1 "98"
+CLARO_S=$(ping1 "181.213.132.3")
 gauge1 "100"
 
 TEXTAO14="Google 8.8.4.4: $Google_P
@@ -745,7 +751,9 @@ Cloudflare 1.0.0.1: $Cloudflare_S
 Algar 200.225.197.34: $Algar_P
 Algar 200.225.197.37: $Algar_S
 GigaDNS 189.38.95.95: $GIGA_P
-GigaDNS 189.38.95.96: $GIGA_S"
+GigaDNS 189.38.95.96: $GIGA_S
+Claro 181.213.132.2: $CLARO_P
+Claro 181.213.132.3: $CLARO_S"
 
 dialog --title 'Resultados do Ping:' --msgbox "$TEXTAO14" 0 0
 
@@ -849,12 +857,12 @@ pong=$(ping google.com -c 1 1> /dev/null 2> /dev/null && echo "ok" || echo "noto
   liminal "st4rt1" "start"
 } || {
   [ "$report" = "0" ] && {
-    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja habilitar a emissão de relatórios?" 8 40
+    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja habilitar a emissão de relatórios de diagnóstico?" 8 40
     [ $? = 0 ] && {
       [ -f "$FILE3" ] && {
         report="1"
         validmail=$(awk 'NR==1' $FILE3)
-        dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
+        dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para envio dos relatórios? \n \n
 $validmail" 15 40
           [ $? = 0 ] && {
             dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Os relatórios somente funcionam nos menus com *!" 0 0
@@ -884,13 +892,13 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
       echo "a" > /dev/null
       }
   } || {
-    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja trocar o e-mail de emissão de relatórios?" 8 40
+    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja trocar o e-mail de emissão de relatórios de diagnóstico?" 8 40
     [ $? = 0 ] && {
       validmail=$(dialog --title " " --backtitle "$bktitle" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
       echo "$validmail" > "/tmp/.email"
       dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
     } || {
-      dialog --title "Confirmação" --backtitle "$bktitle" --yesno "Deseja desativar a emissão de relatórios?" 8 40
+      dialog --title "Confirmação" --backtitle "$bktitle" --yesno "Deseja desativar a emissão de relatórios de diagnóstico?" 8 40
       [ $? = 0 ] && {
         report="0"
       } || {
@@ -1160,7 +1168,7 @@ echo "$1" > "/tmp/.relat"
     [ $? = 0 ] && {
       [ -f "$FILE3" ] && {
         validmail=$(awk 'NR==1' $FILE3)
-        dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para emissão de relatórios? \n \n
+        dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja reutilizar este(s) e-mail(s) anteriormente utilizado(s) para envio dos relatórios? \n \n
 $validmail" 15 40
         [ $? = 0 ] && {         
           echo "$1" | mutt -s "Diagnóstico - $HOSTNAME" "$validmail"
@@ -1198,6 +1206,18 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
 ################################################################################
 #                                                                              #
 ################################################################################
+
+# Manut. Banco Samba AD-DC
+function menu004 {
+menu09 samba-ad-dc && smb2=$prcs
+[ "$smb2" = "Executando" ] && {
+  echo "$password" | sudo -S samba-tool dbcheck --cross-ncs --fix
+} || {
+  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "Active Directory & Domain Controller" --msgbox "O Controlador de Domínio não foi encontrado neste sistema!" 7 40
+  }
+
+m10
+}
 
 # Controlador de Dominio
 function menu04 {
@@ -1977,7 +1997,7 @@ function menu28 {
 [ -f "/home/$USER/.DOC/.relat.docx" ] && {
   [ "$doc_rel"="1" ] && {
     datetime=$(date +"%d/%m %H:%M")
-    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja criar um relatório customizado?" 8 40
+    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja criar um diagnóstico customizado?" 8 40
     [ $? = 0 ] && {
         cusrelat=$(dialog --title 'Custom' --backtitle "$bktitle" --inputbox "O que deseja reportar?" 8 40 "$datetime : " 2>&1 > /dev/tty)
         menu08 "$Recado $cusrelat $Mensagem"
