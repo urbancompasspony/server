@@ -21,8 +21,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v3.3"
-revis="r0.0"
+version="v3.1"
+revis="r0.1"
 
 ################################################################################
 ################################################################################
@@ -1211,7 +1211,9 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
 function menu004 {
 menu09 samba-ad-dc && smb2=$prcs
 [ "$smb2" = "Executando" ] && {
-  echo "$password" | sudo -S samba-tool dbcheck --cross-ncs --fix
+  echo "$password" | sudo -S samba-tool dbcheck --cross-ncs --fix > /tmp/.smbadtmp; read
+  tmpad=$(cat /tmp/.smbadtmp)
+  menu08 "$Recado $tmpad $Mensagem"
 } || {
   dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "Active Directory & Domain Controller" --msgbox "O Controlador de Domínio não foi encontrado neste sistema!" 7 40
   }
