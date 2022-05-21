@@ -12,7 +12,7 @@ hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 version="v1.0"
-revis="r0.3"
+revis="r0.5"
 
 password0="root"
 
@@ -116,14 +116,15 @@ A 'rDesktop' \
 B 'X rDesktop' \
 C 'Hard. Rede' \
 D 'Stress CPU' \
-E 'UDPCast' \
-F 'TestDisk' \
-G '*SpeedTest' \
-H '*Arp-Scan' \
-I '*IP Neigh' \
-J '*WhoIs' \
-K '*TraceRoute' \
-L '*Ping DNS' \
+E 'Hiberfil.sys' \
+F 'UDPCast' \
+G 'TestDisk' \
+H '*SpeedTest' \
+I '*Arp-Scan' \
+J '*IP Neigh' \
+K '*WhoIs' \
+L '*TraceRoute' \
+M '*Ping DNS' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var6" in
@@ -131,14 +132,15 @@ A) menu04 ;;
 B) killall rdesktop ; menu05 ;;
 C) menu21 ;;
 D) stress -c 16; m10 ;;
-E) menu17 ;;
-F) echo "$password0" | sudo -S testdisk ; menu05 ;;
-G) menu050 ;;
-H) menu0501 ;;
-I) menu23 ;;
-J) menu051 ;;
-K) menu052 ;;
-L) menu22 ;;
+E) menu31 ;;
+F) menu17 ;;
+G) echo "$password0" | sudo -S testdisk ; menu05 ;;
+H) menu050 ;;
+I) menu0501 ;;
+J) menu23 ;;
+K) menu051 ;;
+L) menu052 ;;
+M) menu22 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -968,6 +970,14 @@ function menu30 {
   dialog --title 'relat.docx' --msgbox "Arquivo não encontrado. Abortando." 8 30
   }
 m10
+}
+
+function menu31 {
+diskX=$(dialog --title 'Hiberfile.sys' --backtitle "$bktitle" --inputbox "Insira o dispositivo:" 0 0 "/dev/sda1" 2>&1 > /dev/tty)
+echo "$password0" | sudo -S ntfsfix -b -d "$diskX"
+echo "$password0" | sudo -S mkdir /mnt/tempX
+echo "$password0" | sudo -S mount -t ntfs-3g -o remove_hiberfile "$diskX" "/mnt/tempX"
+liminal "m3nu05" "menu05"
 }
 
 ################################################################################
