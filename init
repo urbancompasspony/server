@@ -2425,6 +2425,8 @@ pkg libatasmart-bin
 pkg mutt
 pkg udpcast
 pkg cifs-utils
+pkg msmtp-mta
+pkg msmtp
 
 # Início do Sistema:
 init
