@@ -2426,6 +2426,7 @@ pkg mutt
 pkg udpcast
 pkg cifs-utils
 pkg msmtp
+pkg msmtp-mta
 
 # Início do Sistema:
 init
