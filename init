@@ -1212,7 +1212,7 @@ function menu004 {
 menu09 samba-ad-dc && smb2=$prcs
 [ "$smb2" = "Executando" ] && {
   clear
-  echo "$password" | sudo -S samba-tool dbcheck --cross-ncs --fix | tee /tmp/.smbadtmp; read
+  sudo samba-tool dbcheck --cross-ncs --fix | tee /tmp/.smbadtmp; read
   tmpad=$(cat /tmp/.smbadtmp)
   menu08 "$Recado $tmpad $Mensagem"
 } || {
