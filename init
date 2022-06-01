@@ -21,8 +21,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v3.4"
-revis="r0.1"
+version="v3.5"
+revis="r0.0"
 
 ################################################################################
 ################################################################################
@@ -34,7 +34,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 doc_rel="0"
-datetime3=$(date +"%m-%Y") # Month
+datetime3=$(date +"%m-%Y") # Month for Emails
 
 [ -d /home/$USER/.DOC ] || { mkdir "/home/$USER/.DOC" 2> /dev/null; }
 [ -f /home/$USER/.DOC/$datetime3.docx ] || {
@@ -2021,22 +2021,27 @@ function menu29 {
 datetime=$(date +"%d/%m %H:%M")
 validmail=$(awk 'NR==1' $FILE3)
 
-TEXTAO15="Boa tarde,
+dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.docx para $validmail?" 8 40
+[ $? = 0 ] && {
+  TEXTAO15="Boa tarde,
 
 Segue em anexo o Relatório de Atendimentos, com os chamados, manutenções preventivas e manutenções corretivas executadas no período de $datetime3.
 
 Grato,
 José Humberto"
-
-dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.docx para $validmail?" 8 40
-[ $? = 0 ] && {
   echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.docx" -- "$validmail"
   }
 
 dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar um documento diferente para $validmail?" 8 40
 [ $? = 0 ] && {
   inputdoc1=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-  echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.docx" -- "$validmail"
+  TEXTAO151="Boa tarde,
+
+Segue em anexo o Relatório de Atendimentos, com os chamados, manutenções preventivas e manutenções corretivas executadas no período de $inputdoc1.
+
+Grato,
+José Humberto"
+  echo "$TEXTAO151" | mutt -s "Relatório de Atendimentos - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.docx" -- "$validmail"
   }
 
 m10
