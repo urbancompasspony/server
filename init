@@ -21,8 +21,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v3.3"
-revis="r0.5"
+version="v3.4"
+revis="r0.1"
 
 ################################################################################
 ################################################################################
@@ -2018,30 +2018,27 @@ $cusrelat"
 }
 
 function menu29 {
-[ -f "/home/$USER/.DOC/$datetime3" ] && {
-  datetime=$(date +"%d/%m %H:%M")
-  validmail=$(awk 'NR==1' $FILE3)
+datetime=$(date +"%d/%m %H:%M")
+validmail=$(awk 'NR==1' $FILE3)
 
-  TEXTAO15="Boa tarde,
+TEXTAO15="Boa tarde,
 
 Segue em anexo o Relatório de Atendimentos, com os chamados, manutenções preventivas e manutenções corretivas executadas no período de $datetime3.
 
 Grato,
 José Humberto"
 
-  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.docx para $validmail?" 8 40
-  [ $? = 0 ] && {
-    echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.docx" -- "$validmail"
-    }
-
-  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar um documento diferente para $validmail?" 8 40
-  [ $? = 0 ] && {
-    inputdoc1=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-    echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.docx" -- "$validmail"
-    }
-} || {
-  dialog --title "$datetime3.docx" --msgbox "Arquivo não encontrado. Abortando." 8 30
+dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.docx para $validmail?" 8 40
+[ $? = 0 ] && {
+  echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.docx" -- "$validmail"
   }
+
+dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar um documento diferente para $validmail?" 8 40
+[ $? = 0 ] && {
+  inputdoc1=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
+  echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.docx" -- "$validmail"
+  }
+
 m10
 }
 
