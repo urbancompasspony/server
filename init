@@ -34,7 +34,7 @@ FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
 doc_rel="0"
-datetime3=$(date +"%m-%Y") # Month for Emails
+datetime3=$(date +"%m-%Y") # Month for Docs!
 
 [ -d /home/$USER/.DOC ] || { mkdir "/home/$USER/.DOC" 2> /dev/null; }
 [ -f /home/$USER/.DOC/$datetime3.docx ] || {
@@ -62,7 +62,7 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
   [ "$PKG_OK" = "nao" ] && {
     echo "$REQUIRED_PKG não encontrado. Instalando..."
     echo "Digite sua senha!"
-    sudo apt update; sudo apt install $REQUIRED_PKG -y
+    sudo apt update; sudo apt install $REQUIRED_PKG $2 -y
     mkdir -p ~/.mutt/cache/headers && mkdir ~/.mutt/cache/bodies && touch ~/.mutt/certificates && touch ~/.mutt/muttrc
     echo -e "$TEXTAO07" > ~/.mutt/muttrc
   } || {
@@ -237,8 +237,10 @@ H 'UDPCast' \
 I '*Usuários Logados' \
 J '*Logins Anteriores' \
 K 'Diagnóstico Manual' \
-L 'Encaminhar .docx' \
-M 'Apagar .docx' \
+L 'Finalizar .docx > .PDF' \
+M 'Encaminhar .PDF' \
+N 'Apagar .docx' \
+O 'Apagar .PDF' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
@@ -253,8 +255,10 @@ H) menu17 ;;
 I) menu18 ;;
 J) menu19 ;;
 K) menu28 ;;
-L) menu29 ;;
-M) menu30 ;;
+L) menu291 ;;
+M) menu29 ;;
+N) menu30 ;;
+O) menu301 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -2021,7 +2025,7 @@ function menu29 {
 datetime=$(date +"%d/%m %H:%M")
 validmail=$(awk 'NR==1' $FILE3)
 
-dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.docx para $validmail?" 8 40
+dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.pdf para $validmail?" 8 40
 [ $? = 0 ] && {
   TEXTAO15="Boa tarde,
 
@@ -2029,7 +2033,7 @@ Segue em anexo o Relatório de Atendimentos, com os chamados, manutenções prev
 
 Grato,
 José Humberto"
-  echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.docx" -- "$validmail"
+  echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.pdf" -- "$validmail"
   }
 
 dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar um documento diferente para $validmail?" 8 40
@@ -2041,22 +2045,44 @@ Segue em anexo o Relatório de Atendimentos, com os chamados, manutenções prev
 
 Grato,
 José Humberto"
-  echo "$TEXTAO151" | mutt -s "Relatório de Atendimentos - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.docx" -- "$validmail"
+  echo "$TEXTAO151" | mutt -s "Relatório de Atendimentos - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.pdf" -- "$validmail"
+  }
+
+m10
+}
+
+function menu291 {
+[ -f "/home/$USER/.DOC/$datetime3.pdf" ] && {
+  dialog --title 'relat.pdf' --msgbox "Arquivo já existe!" 8 30
+} || {
+  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja finalizar um documento de .docx para .pdf?" 8 40
+  [ $? = 0 ] && {
+    inputdoc2=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
+    cd "/home/$USER/.DOC/"
+    soffice --convert-to "pdf" "/home/$USER/.DOC/$inputdoc2.docx" "/home/$USER/.DOC/$inputdoc2.pdf"
+    }
   }
 
 m10
 }
 
 function menu30 {
-[ -f "/home/$USER/.DOC/$datetime3" ] && {
-  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja APAGAR um relatório.docx?" 8 40
-  [ $? = 0 ] && {
-    inputdoc2=$(dialog --title 'Deleção' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-    rm "/home/$USER/.DOC/$inputdoc2.docx"
-    }
-} || {
-  dialog --title 'relat.docx' --msgbox "Arquivo não encontrado. Abortando." 8 30
+dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja APAGAR um relatório.docx?" 8 40
+[ $? = 0 ] && {
+  inputdoc3=$(dialog --title 'Deleção' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
+  rm "/home/$USER/.DOC/$inputdoc3.docx"
   }
+
+m10
+}
+
+function menu301 {
+dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja APAGAR um relatório.PDF?" 8 40
+[ $? = 0 ] && {
+  inputdoc4=$(dialog --title 'Deleção' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
+  rm "/home/$USER/.DOC/$inputdoc4.pdf"
+  }
+
 m10
 }
 
@@ -2429,6 +2455,7 @@ pkg udpcast
 pkg cifs-utils
 pkg msmtp
 pkg msmtp-mta
+pkg libreoffice --no-install-recommends
 
 # Início do Sistema:
 init
