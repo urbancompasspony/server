@@ -104,23 +104,25 @@ Data e Hora: $datetime
 UpTime: $uptime"  0 0 0 \
 A 'Status Geral' \
 B 'Máquinas Virtuais' \
-C 'Processos' \
-D 'Active Directory' \
-E 'Ferramentas' \
-F 'Avançado' \
-G '*Reiniciar' \
-H '*Desligar' \
+C 'Docker' \
+D 'Processos' \
+E 'Active Directory' \
+F 'Ferramentas' \
+G 'Avançado' \
+H '*Reiniciar' \
+I '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
 A) menu01 ;;
 B) menu02 ;;
-C) menu03 ;;
-D) menu04 ;;
-E) menu05 ;;
-F) m10 ;;
-G) menu06 ;;
-H) menu07 ;;
+C) curl -sSL https://docker.linuxuniverse.com.br | bash ;;
+D) menu03 ;;
+E) menu04 ;;
+F) menu05 ;;
+G) m10 ;;
+H) menu06 ;;
+I) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
@@ -134,21 +136,23 @@ Data e Hora: $datetime
 UpTime: $uptime"  0 0 0 \
 A 'Status Geral' \
 B 'Máquinas Virtuais' \
-C 'Processos' \
-D 'Active Directory' \
-E 'Ferramentas' \
-F '*Reiniciar' \
-G '*Desligar' \
+C 'Docker' \
+D 'Processos' \
+E 'Active Directory' \
+F 'Ferramentas' \
+G '*Reiniciar' \
+H '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var1" in
 A) m3nu01 ;;
 B) menu02 ;;
-C) menu03 ;;
-D) menu04 ;;
-E) m3nu05 ;;
-F) menu06 ;;
-G) menu07 ;;
+C) curl -sSL https://docker.linuxuniverse.com.br | bash ;;
+D) menu03 ;;
+E) menu04 ;;
+F) m3nu05 ;;
+G) menu06 ;;
+H) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
