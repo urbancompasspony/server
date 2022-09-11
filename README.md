@@ -35,6 +35,6 @@ The main menu starts with a prompt for password.
 You can put your sudo password, to enable administrator tools and resources, but with a Secret Password you can access the secret menu!
 After putting password, you will be prompted to enable or not the report over e-mail.
 
-# Secret Menu
+# New Docker Menu and Orchestration
 
-WIP too
+Used to controll some containers made with Docker
