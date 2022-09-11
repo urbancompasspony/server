@@ -99,7 +99,7 @@ function menu01 {
   "X Voltar" "" 2>&1 > /dev/tty )
 
   case $? in
-    2) dialog --title "Ajuda" --msgbox "$TEXTAO1" 0 0 ; menu01 ;;
+    2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; menu01 ;;
   esac
 
   [ $? -ne 0 ] && exit
@@ -172,3 +172,5 @@ menu01
 
 # Exit on Error
 exit 1
+
+#dialog --title "Ajuda" --msgbox "$TEXTAO1" 0 0 ; menu01 ;;
