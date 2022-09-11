@@ -1,105 +1,156 @@
 #!/bin/bash
 
-function menu00 {
-  prcs=$(systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente")
-}
-
 function menu01 {
-menu00 docker && dockersts=$prcs
 
-[ "$dockersts" = "Executando" ] && {
-  clear
-  menu02
+[ $(which docker 2>/dev/null) ] && {
+
+  mysqld0=$(docker inspect mysql | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
+  mysqld1=$(docker inspect mysql | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
+  [ "$mysqld0" = "running" ] && {
+    dmysql="Executando"
+    } || {
+      [ "$mysqld1" = "exited" ] && {
+        dmysql="Parado"
+        } || {
+          dmysql="- - -"
+          }
+  }
+  piholed0=$(docker inspect pihole | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
+  piholed1=$(docker inspect pihole | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
+  [ "$piholed0" = "running" ] && {
+    dpihole="Executando"
+    } || {
+      [ "$piholed1" = "exited" ] && {
+        dpihole="Parado"
+        } || {
+          dpihole="- - -"
+          }
+  }
+  
+  dominiod0=$(docker inspect dominio | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
+  dominiod1=$(docker inspect dominio | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
+  [ "$dominiod0" = "running" ] && {
+    ddominio="Executando"
+    } || {
+      [ "$dominiod1" = "exited" ] && {
+        ddominio="Parado"
+        } || {
+          ddominio="- - -"
+          }
+  }
+  
+  pentestd0=$(docker inspect pentest | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
+  pentestd1=$(docker inspect pentest | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
+  [ "$pentestd0" = "running" ] && {
+    dpentest="Executando"
+    } || {
+      [ "$pentestd1" = "exited" ] && {
+        dpentest="Parado"
+        } || {
+          dpentest="- - -"
+          }
+  }
+
+  backupd0=$(docker inspect backup | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
+  backupd1=$(docker inspect backup | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
+  [ "$backupd0" = "running" ] && {
+    dbackup="Executando"
+    } || {
+      [ "$backupd1" = "exited" ] && {
+        dbackup="Parado"
+        } || {
+          dbackup="- - -"
+          }
+  }
+
+  nextcloudd0=$(docker inspect nextcloud | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
+  nextcloudd1=$(docker inspect nextcloud | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
+  [ "$nextcloudd0" = "running" ] && {
+    dnextcloud="Executando"
+    } || {
+      [ "$nextcloudd1" = "exited" ] && {
+        dnextcloud="Parado"
+        } || {
+          dnextcloud="- - -"
+          }
+  }
+  
+  unifid0=$(docker inspect unifi | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
+  unifid1=$(docker inspect unifi | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
+  [ "$unifid0" = "running" ] && {
+    dunifi="Executando"
+    } || {
+      [ "$unifid1" = "exited" ] && {
+        dunifi="Parado"
+        } || {
+          dunifi="- - -"
+          }
+  }
+
+  menuxy=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Ajuda' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de Containers" --menu " " 0 0 0 \
+  Status "Geral" \
+  "PiHole" "$dpihole" \
+  "Dominio" "$ddominio" \
+  "Pentest" "$dpentest" \
+  "Backup" "$dbackup" \
+  "Nextcloud" "$dnextcloud" \
+  "MySQL" "$dmysql" \
+  "Unifi" "$dunifi" \
+  "X Voltar" "" 2>&1 > /dev/tty )
+
+  case $? in
+    2) dialog --title "Ajuda" --msgbox "$TEXTAO1" 0 0 ; menu01 ;;
+  esac
+
+  [ $? -ne 0 ] && exit
+  
+  case "$menuxy" in
+  Status) docker ps -a ; read ; menu01 ;;
+  PiHole) chkcnt="$dpihole"; nmcnt="pihole"; menu02 ;;
+  Dominio) chkcnt="$ddominio"; nmcnt="dominio"; menu02 ;;
+  Pentest) chkcnt="$dpentest"; nmcnt="pentest"; menu02 ;;
+  Backup) chkcnt="$dbackup"; nmcnt="backup"; menu02 ;;
+  Nextcloud) chkcnt="$dnextcloud"; nmcnt="nextcloud"; menu02 ;;
+  MySQL) chkcnt="$dmysql"; nmcnt="mysql"; menu02 ;;
+  Unifi) chkcnt="$dunifi"; nmcnt="unifi"; menu02 ;;
+  "X Voltar") exit ;;
+  esac
 } || {
   dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "Docker" --msgbox "O Docker não está configurado neste sistema!" 7 40
   }
-menuX
+
 }
 
 function menu02 {
-[ $(which virt-manager 2>/dev/null) ] && {
-  menu022 "1p" && vm1=$vms && vm11=$sts
-  menu022 "2p" && vm2=$vms && vm12=$sts
-  menu022 "3p" && vm3=$vms && vm13=$sts
-  menu022 "4p" && vm4=$vms && vm14=$sts
-  menu022 "5p" && vm5=$vms && vm15=$sts
-  menu022 "6p" && vm6=$vms && vm16=$sts
-  menu022 "7p" && vm7=$vms && vm17=$sts
-  menu022 "8p" && vm8=$vms && vm18=$sts
-  menu022 "9p" && vm9=$vms && vm19=$sts
-  menu022 "10p" && vm10=$vms && vm110=$sts
-  menuxy=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Ajuda' --backtitle "Bem-Vindo ao Gestor de Máquinas Virtuais!" --title "Gestão de VMs" --menu "Gestão de Máquinas Virtuais"  0 0 0 \
-  Status "Geral" \
-  "$vm1" "$vm11" \
-  "$vm2" "$vm12" \
-  "$vm3" "$vm13" \
-  "$vm4" "$vm14" \
-  "$vm5" "$vm15" \
-  "$vm6" "$vm16" \
-  "$vm7" "$vm17" \
-  "$vm8" "$vm18" \
-  "$vm9" "$vm19" \
-  "$vm10" "$vm110" \
-  Iniciar "Todas!" \
-  Parar "Todas!" \
-  "X Voltar" "" 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title "Ajuda" --msgbox "$TEXTAO11" 0 0 ; menu02 ;;
-  esac
-  [ $? -ne 0 ] && liminal "st4rt1" "start"
-  case "$menuxy" in
-  Status) menu025 ;;
-  "$vm1") chkvm="$vm11"; nmvm="$vm1"; menu021 ;;
-  "$vm2") chkvm="$vm12"; nmvm="$vm2"; menu021 ;;
-  "$vm3") chkvm="$vm13"; nmvm="$vm3"; menu021 ;;
-  "$vm4") chkvm="$vm14"; nmvm="$vm4"; menu021 ;;
-  "$vm5") chkvm="$vm15"; nmvm="$vm5"; menu021 ;;
-  "$vm6") chkvm="$vm16"; nmvm="$vm6"; menu021 ;;
-  "$vm7") chkvm="$vm17"; nmvm="$vm7"; menu021 ;;
-  "$vm8") chkvm="$vm18"; nmvm="$vm8"; menu021 ;;
-  "$vm9") chkvm="$vm19"; nmvm="$vm9"; menu021 ;;
-  "$vm10") chkvm="$vm110"; nmvm="$vm10"; menu021 ;;
-  Iniciar) menu023 ;;
-  Parar) menu024 ;;
-  "X Voltar") liminal "st4rt1" "start" ;;
-  esac
-} || {
-  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "$bktitle" --msgbox "O VirtManager não foi encontrado neste sistema ou você não possui as permissões para acessá-lo!" 7 50
-  liminal "st4rt1" "start"
-}
-
-}
-
-function menu021 {
-[ "$chkvm" = "Executando" ] && {
-  dialog --title "$nmvm" --yesno "Deseja reiniciar a VM $nmvm?" 6 40
+[ "$chkcnt" = "Executando" ] && {
+  dialog --title "$nmcnt" --yesno "Deseja reiniciar o container $nmcnt?" 6 40
   [ $? = 0 ] && {
-    virsh reboot "$nmvm"
-    dialog --title "$nmvm" --msgbox "A VM $nmvm foi reiniciada!" 6 40
+    docker restart "$nmcnt"
+    dialog --title "$nmcnt" --msgbox "O container $nmcnt foi reiniciado!" 6 40
   } || {
-    dialog --title "$nmvm" --yesno "Deseja desligar a VM $nmvm?" 6 40
+    dialog --title "$nmcnt" --yesno "Deseja desligar o container $nmcnt?" 6 40
     [ $? = 0 ] && {
-      virsh shutdown "$nmvm"
-      dialog --title "$nmvm" --msgbox "A VM $nmvm foi desligada!" 6 40
+      docker stop "$nmcnt"
+      dialog --title "$nmcnt" --msgbox "O container $nmcnt foi desligado!" 6 40
     } || {
-      dialog --title "$nmvm" --yesno "Deseja desligar FORÇADAMENTE a VM $nmvm?" 6 40
+      dialog --title "$nmcnt" --yesno "Deseja desligar FORÇADAMENTE o container $nmcnt?" 6 40
       [ $? = 0 ] && {
-        virsh destroy "$nmvm"
-        dialog --title "$nmvm" --msgbox "A VM $nmvm foi desligada de forma forçada!" 6 40
+        docker kill "$nmcnt"
+        dialog --title "$nmcnt" --msgbox "O container $nmcnt foi desligado de forma forçada!" 6 40
       } || {
         echo "a" > /dev/null
         }
     }
   }
 } || {
-  [ "$chkvm" = "- - -" ] && {
-    dialog --title "$nmvm" --msgbox "A VM $nmvm não existe!" 6 40
+  [ "$chkcnt" = "- - -" ] && {
+    dialog --title "$nmcnt" --msgbox "O container $nmcnt não existe!" 6 40
   } || {
-    [ "$chkvm" = "Parado" ] && {
-      dialog --title "$nmvm" --yesno "Deseja tentar ligar a VM $nmvm?" 6 40
+    [ "$chkcnt" = "Parado" ] && {
+      dialog --title "$nmcnt" --yesno "Deseja tentar ligar o container $nmcnt?" 6 40
       [ $? = 0 ] && {
-        virsh start "$nmvm"
-        dialog --title "$nmvm" --msgbox "Verifique se a VM $nmvm iniciou!" 6 40
+        docker start "$nmcnt"
+        dialog --title "$nmcnt" --msgbox "Verifique se o container $nmcnt iniciou!" 6 40
       } || {
         echo "a" > /dev/null
         }
@@ -107,75 +158,17 @@ function menu021 {
   }
 }
 
-menu02
-}
-
-# Status das VMs
-function menu022 {
-vms=$(virsh list | grep running | sed -n "$1" | awk '{print $2}')
-[ "$vms" = "" ] && {
-  vms=$(virsh list --all | grep "shut off" | sed -n "$1" | awk '{print $2}')
-  sts=$(echo "Parado")
-  [ "$vms" = "" ] && {
-    vms=$(echo "- - -")
-    sts=$(echo "- - -")
-  } || {
-    echo " " > /dev/null
-    }
-} || {
-  sts=$(echo "Executando")
-  }
-
-}
-
-function menu023 {
-dialog --title 'Confirmação' --backtitle 'Confirmação de Início de Todas as VMs!' --yesno "Deseja inicializar todas as VMs?" 0 0
-[ $? -ne 0 ] && menu02
-
-[ $? = 0 ] && {
-  for i in $(virsh list --all | grep "shut off" | awk '{print $2}')
-  do
-    virsh start $i
-    dialog --title 'Status:' --msgbox "VM $i Iniciada!" 0 0
-  done
-} || {
-  echo "a" > /dev/null
-  }
-
-menu02
-}
-
-function menu024 {
-dialog --title 'Confirmação' --backtitle 'Confirmação de Desligamento de Todas as VMs!' --yesno "Deseja desligar todas as VMs?" 0 0
-[ $? -ne 0 ] && menu02
-
-[ $? = 0 ] && {
-  for i in $(virsh list | grep running | awk '{print $2}')
-  do
-    virsh shutdown $i
-    dialog --title 'Status:' --msgbox "VM $1 desligada!" 0 0
-  done
-} || {
-  echo "a" > /dev/null
-  }
-
-menu02
-}
-
-# Status de Máquinas Virtuais
-function menu025 {
-virtmgr0=$(virsh list --all)
-dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Maquinas Virtuais encontradas:" --backtitle "$bktitle" --msgbox "$virtmgr0" 0 0
-case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO12" 0 0 ; menu025 ;;
-esac
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-
-menu02
+menu01
 }
 
 function menuX {
   curl -sSL https://linite.linuxuniverse.com.br | sudo bash
 }
 
+TEXTAO1="Menu de Ajuda. Em construção."
+
+# Start
 menu01
+
+# Exit on Error
+exit 1
