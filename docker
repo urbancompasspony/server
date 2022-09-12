@@ -86,6 +86,18 @@ function menu01 {
           dunifi="- - -"
           }
   }
+  
+  sambad0=$(docker inspect samba | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
+  sambad1=$(docker inspect samba | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
+  [ "$sambad0" = "running" ] && {
+    dsamba="Executando"
+    } || {
+      [ "$sambad1" = "exited" ] && {
+        dsamba="Parado"
+        } || {
+          dsamba="- - -"
+          }
+  }
 
   menuxy=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Ajuda' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de Containers" --menu "Hostname: $HOSTNAME" 0 0 0 \
   Status "Geral" \
@@ -96,6 +108,7 @@ function menu01 {
   "Nextcloud" "$dnextcloud" \
   "MySQL" "$dmysql" \
   "Unifi" "$dunifi" \
+  "Samba" "$dsamba" \
   "X Voltar" "" 2>&1 > /dev/tty )
 
   case $? in
@@ -113,6 +126,7 @@ function menu01 {
   Nextcloud) chkcnt="$dnextcloud"; nmcnt="nextcloud"; menu02 ;;
   MySQL) chkcnt="$dmysql"; nmcnt="mysql"; menu02 ;;
   Unifi) chkcnt="$dunifi"; nmcnt="unifi"; menu02 ;;
+  Samba) chkcnt="$dsamba"; nmcnt="samba"; menu02 ;;
   "X Voltar") exit ;;
   esac
 } || {
