@@ -23,7 +23,7 @@ G) gg ;;
 H) hh ;;
 I) ii ;;
 J) jj ;;
-X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash && break ;;
+X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
 esac
 }
 
