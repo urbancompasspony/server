@@ -99,7 +99,7 @@ function menu01 {
           }
   }
 
-  menuxy=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Orchestra' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de Containers" --menu "Hostname: $HOSTNAME" 0 0 0 \
+  menuxy=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Orquestra' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de Containers" --menu "Hostname: $HOSTNAME" 0 0 0 \
   Status "Geral" \
   "PiHole" "$dpihole" \
   "Dominio" "$ddominio" \
