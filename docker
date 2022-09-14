@@ -109,7 +109,7 @@ function menu01 {
   "MySQL" "$dmysql" \
   "Unifi" "$dunifi" \
   "Samba" "$dsamba" \
-  "X Voltar" "" 2>&1 > /dev/tty )
+  "X Sair" "" 2>&1 > /dev/tty )
 
   case $? in
     2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; menu01 ;;
