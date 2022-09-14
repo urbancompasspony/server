@@ -1,5 +1,5 @@
 function start {
-var0=$(dialog --title 'Orchestration' --backtitle "Docker" --menu " " 0 0 0 \
+var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
 A 'PiHole' \
 B 'Dominio' \
 C 'UniFi' \
