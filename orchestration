@@ -10,7 +10,7 @@ G 'RClone' \
 H 'CUPS' \
 I '' \
 J '' \
-X 'SAIR' 2>&1 > /dev/tty )
+X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole | bash ;;
