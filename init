@@ -2447,7 +2447,8 @@ Caso implementado, melhorias no Kerberos também não serão disponibilizados ne
 # Start
 
 # Checagem Obrigatória de Dependências:
-pkg dialog
+apt install dialog
+
 pkg curl
 pkg lm-sensors
 pkg whois
