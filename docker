@@ -176,7 +176,7 @@ menu01
 }
 
 function menuX {
-  curl -sSL https://linite.linuxuniverse.com.br | sudo bash
+  curl -sSL https://docker.linuxuniverse.com.br | sudo bash
 }
 
 TEXTAO1="Menu de Ajuda. Em construção."
