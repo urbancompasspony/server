@@ -112,7 +112,7 @@ function menu01 {
   "X Sair" "" 2>&1 > /dev/tty )
 
   case $? in
-    2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; menu01 ;;
+    2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; menu01 ;;
   esac
 
   [ $? -ne 0 ] && exit
