@@ -1,34 +1,31 @@
-#!/bin/bash
-
 function start {
+var0=$(dialog --title 'Orchestration' --backtitle "Docker" --menu " " 0 0 0 \
+A 'PiHole' \
+B '' \
+C '' \
+D '' \
+E '' \
+F '' \
+G '' \
+H '' \
+I '' \
+J '' \
+X 'SAIR' 2>&1 > /dev/tty )
 
-VALUE1=""
-VALUE2=""
-VALUE3=""
-VALUE4="-d WORKGROUP"
-VALUE5=""
+case "$var0" in
+A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole | bash ;;
+B) bb ;;
+C) cc ;;
+D) dd ;;
+E) ee ;;
+F) ff ;;
+G) gg ;;
+H) hh ;;
+I) ii ;;
+J) jj ;;
+X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash && break ;;
+esac
 
-VALUE0=$(dialog --ok-label "Conectar" --title " " --form "Conexão RDP" 15 50 0 \
-"IP: " 1 1 "$VALUE1" 1 10 34 0 \
-"USER:" 2 1 "$VALUE2" 2 10 34 0 \
-"PASS:" 3 1 "$VALUE3" 3 10 34 0 \
-"DOM:" 4 1 "$VALUE4" 4 10 34 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && m10
-IP1=$(echo "$VALUE0" | sed -n 1p)
-user2=$(echo "$VALUE0" | sed -n 2p)
-pass2=$(echo "$VALUE0" | sed -n 3p)
-dmn2=$(echo "$VALUE0" | sed -n 4p)
-
-[ -z "$IP1" ] || [ -z "$user2" ] || [ -z "$pass2" ] || [ -z "$dmn2" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-  exit
-} || {
-  echo "rdesktop -u $user2 -p $pass2 $dom $IP1" > /tmp/.rdesktop
-  chmod +x /tmp/.rdesktop
-  /tmp/.rdesktop
-  exit
-  }
 }
 
 start
