@@ -8,21 +8,17 @@ E 'NextCloud' \
 F 'SAMBA' \
 G 'RClone' \
 H 'CUPS' \
-I '' \
-J '' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
-A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole | bash ;;
-B) bb ;;
-C) cc ;;
-D) dd ;;
-E) ee ;;
-F) ff ;;
-G) gg ;;
-H) hh ;;
-I) ii ;;
-J) jj ;;
+A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole | bash ; start ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/02-domain | bash ; start ;;
+C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/03-unifi | bash ; start ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1-mysql | bash ; start ;;
+E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud | bash ; start ;;
+F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/05-samba | bash ; start ;;
+G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/06-backup | bash ; start ;;
+H) echo "WIP" ; start ;;
 X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
 esac
 }
