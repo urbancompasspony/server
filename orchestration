@@ -1,13 +1,13 @@
 function start {
 var0=$(dialog --title 'Orchestration' --backtitle "Docker" --menu " " 0 0 0 \
 A 'PiHole' \
-B '' \
-C '' \
-D '' \
-E '' \
-F '' \
-G '' \
-H '' \
+B 'Dominio' \
+C 'UniFi' \
+D 'MySQL' \
+E 'NextCloud' \
+F 'SAMBA' \
+G 'RClone' \
+H 'CUPS' \
 I '' \
 J '' \
 X 'SAIR' 2>&1 > /dev/tty )
@@ -25,7 +25,6 @@ I) ii ;;
 J) jj ;;
 X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash && break ;;
 esac
-
 }
 
 start
