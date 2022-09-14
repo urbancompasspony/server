@@ -118,7 +118,7 @@ function menu01 {
   [ $? -ne 0 ] && exit
   
   case "$menuxy" in
-  Status) docker ps -a ; read ; menu01 ;;
+  Status) docker ps -a ; sleep 3 ; read ; menu01 ;;
   PiHole) chkcnt="$dpihole"; nmcnt="pihole"; menu02 ;;
   Dominio) chkcnt="$ddominio"; nmcnt="dominio"; menu02 ;;
   Pentest) chkcnt="$dpentest"; nmcnt="pentest"; menu02 ;;
