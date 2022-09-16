@@ -5,8 +5,8 @@ B 'Dominio' \
 C 'UniFi' \
 D 'MySQL' \
 E 'NextCloud' \
-F 'SAMBA' \
-G 'RClone' \
+F 'Backup' \
+G 'SAMBA' \
 H 'CUPS' \
 X 'Voltar' 2>&1 > /dev/tty )
 
