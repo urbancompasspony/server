@@ -8,6 +8,7 @@ E 'NextCloud' \
 F 'Backup' \
 G 'SAMBA' \
 H 'CUPS' \
+I 'Pentest' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -18,7 +19,8 @@ D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud | bash ; start ;;
 F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/05-backup | bash ; start ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba | bash ; start ;;
-H) echo "WIP" ; start ;;
+H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | bash ; start ;;
+I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | bash ; start ;;
 X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
 esac
 }
