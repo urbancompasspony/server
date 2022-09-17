@@ -213,7 +213,8 @@ function menuX {
 }
 
 function menu03 {
-  IPLocal=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $1)
+  IPLocal=$(docker inspect $1 | grep '"IPAddress"' | tail -n 1 | awk '{print $2}')
+  #IPLocal=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $1)
 }
 
 TEXTAO1="Menu de Ajuda. Em construção."
