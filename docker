@@ -3,112 +3,145 @@
 function menu01 {
 
 [ $(which docker 2>/dev/null) ] && {
-
-  mysqld0=$(docker inspect mysql | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
-  mysqld1=$(docker inspect mysql | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
-  [ "$mysqld0" = "running" ] && {
-    dmysql="Executando"
-    } || {
-      [ "$mysqld1" = "exited" ] && {
-        dmysql="Parado"
-        } || {
-          dmysql="- - -"
-          }
-  }
+  
   piholed0=$(docker inspect pihole | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
   piholed1=$(docker inspect pihole | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
   [ "$piholed0" = "running" ] && {
+    menu03 "pihole"
+    ippihole=$IPLocal
     dpihole="Executando"
     } || {
       [ "$piholed1" = "exited" ] && {
         dpihole="Parado"
+        ippihole=$dpihole
         } || {
           dpihole="- - -"
+          ippihole=$dpihole
           }
   }
   
   dominiod0=$(docker inspect dominio | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
   dominiod1=$(docker inspect dominio | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
   [ "$dominiod0" = "running" ] && {
+    menu03 "dominio"
+    ipdominio=$IPLocal
     ddominio="Executando"
     } || {
       [ "$dominiod1" = "exited" ] && {
         ddominio="Parado"
+        ipdominio=$ddominio
         } || {
           ddominio="- - -"
+          ipdominio=$ddominio
           }
   }
   
   pentestd0=$(docker inspect pentest | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
   pentestd1=$(docker inspect pentest | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
   [ "$pentestd0" = "running" ] && {
+    menu03 "pentest"
+    ippentest=$IPLocal
     dpentest="Executando"
     } || {
       [ "$pentestd1" = "exited" ] && {
         dpentest="Parado"
+        ippentest=$dpentest
         } || {
           dpentest="- - -"
+          ippentest=$dpentest
           }
   }
 
   backupd0=$(docker inspect backup | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
   backupd1=$(docker inspect backup | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
   [ "$backupd0" = "running" ] && {
+    menu03 "backup"
+    ipbackup=$IPLocal
     dbackup="Executando"
     } || {
       [ "$backupd1" = "exited" ] && {
         dbackup="Parado"
+        ipbackup=$dbackup
         } || {
           dbackup="- - -"
+          ipbackup=$dbackup
           }
   }
 
   nextcloudd0=$(docker inspect nextcloud | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
   nextcloudd1=$(docker inspect nextcloud | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
   [ "$nextcloudd0" = "running" ] && {
+    menu03 "nextcloud"
+    ipnextcloud=$IPLocal
     dnextcloud="Executando"
     } || {
       [ "$nextcloudd1" = "exited" ] && {
         dnextcloud="Parado"
+        ipnextcloud=$dnextcloud
         } || {
           dnextcloud="- - -"
+          ipnextcloud=$dnextcloud
           }
   }
-  
+
+  mysqld0=$(docker inspect mysql | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
+  mysqld1=$(docker inspect mysql | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
+  [ "$mysqld0" = "running" ] && {
+    menu03 "mysql"
+    ipmysql=$IPLocal
+    dmysql="Executando"
+    } || {
+      [ "$mysqld1" = "exited" ] && {
+        dmysql="Parado"
+        ipmysql=$dmysql
+        } || {
+          dmysql="- - -"
+          ipmysql=$dmysql
+          }
+  }
+
   unifid0=$(docker inspect unifi | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
   unifid1=$(docker inspect unifi | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
   [ "$unifid0" = "running" ] && {
+    menu03 "unifi"
+    ipunifi=$IPLocal
     dunifi="Executando"
     } || {
       [ "$unifid1" = "exited" ] && {
         dunifi="Parado"
+        ipunifi=$dunifi
         } || {
           dunifi="- - -"
+          ipunifi=$dunifi
           }
   }
   
   sambad0=$(docker inspect samba | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
   sambad1=$(docker inspect samba | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
   [ "$sambad0" = "running" ] && {
+    menu03 "samba"
+    ipsamba=$IPLocal
     dsamba="Executando"
     } || {
       [ "$sambad1" = "exited" ] && {
         dsamba="Parado"
+        ipsamba="$dsamba"
         } || {
           dsamba="- - -"
+          ipsamba="$dsamba"
           }
   }
 
   menuxy=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Orquestra' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de Containers" --menu "Hostname: $HOSTNAME" 0 0 0 \
   Status "Geral" \
-  "PiHole" "$dpihole" \
-  "Dominio" "$ddominio" \
-  "Pentest" "$dpentest" \
-  "Backup" "$dbackup" \
-  "Nextcloud" "$dnextcloud" \
-  "MySQL" "$dmysql" \
-  "Unifi" "$dunifi" \
-  "Samba" "$dsamba" \
+  "PiHole" "$ippihole" \
+  "Dominio" "$ipdominio" \
+  "Pentest" "$ippentest" \
+  "Backup" "$ipbackup" \
+  "Nextcloud" "$ipnextcloud" \
+  "MySQL" "$ipmysql" \
+  "Unifi" "$ipunifi" \
+  "Samba" "$ipsamba" \
   "X Sair" "" 2>&1 > /dev/tty )
 
   case $? in
@@ -177,6 +210,10 @@ menu01
 
 function menuX {
   curl -sSL https://docker.linuxuniverse.com.br | sudo bash
+}
+
+function menu03 {
+  IPLocal=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $1)
 }
 
 TEXTAO1="Menu de Ajuda. Em construção."
