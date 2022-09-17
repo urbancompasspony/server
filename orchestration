@@ -48,15 +48,15 @@ I 'Pentest' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
-A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole | bash ; start ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/02-domain | bash ; start ;;
-C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/03-unifi | bash ; start ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1-mysql | bash ; start ;;
-E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud | bash ; start ;;
-F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/05-backup | bash ; start ;;
-G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba | bash ; start ;;
-H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | bash ; start ;;
-I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | bash ; start ;;
+A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole | sudo bash ; start ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/02-domain | sudo bash ; start ;;
+C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/03-unifi | sudo bash ; start ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1-mysql | sudo bash ; start ;;
+E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud | sudo bash ; start ;;
+F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/05-backup | sudo bash ; start ;;
+G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba | sudo bash ; start ;;
+H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | sudo bash ; start ;;
+I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | sudo bash ; start ;;
 X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
 esac
 }
