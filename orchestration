@@ -61,5 +61,4 @@ X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompassp
 esac
 }
 
-check
 start
