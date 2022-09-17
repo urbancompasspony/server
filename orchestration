@@ -32,6 +32,7 @@ function check {
   } || {
     echo "Rede Container configurada."
     }
+}
 
 function start {
 var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
