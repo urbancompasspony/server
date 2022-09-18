@@ -132,7 +132,7 @@ function menu01 {
           }
   }
 
-  menuxy=$(dialog --ok-label 'Ajustar' --help-button --help-label 'Orquestra' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de Containers" --menu "Hostname: $HOSTNAME" 0 0 0 \
+  menuxy=$(dialog --ok-label 'Ajustar' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de Containers" --menu "Hostname: $HOSTNAME" 0 0 0 \
   Status "Geral" \
   "PiHole" "$ippihole" \
   "Dominio" "$ipdominio" \
@@ -145,7 +145,7 @@ function menu01 {
   "X Sair" "" 2>&1 > /dev/tty )
 
   case $? in
-    2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; menu01 ;;
+    2) menu01 ;;
   esac
 
   [ $? -ne 0 ] && exit
