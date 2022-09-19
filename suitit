@@ -17,7 +17,7 @@ C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/lini
 D) start ;;
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
 F) start ;;
-X) echo "Saindo..." && break ;;
+X) echo "Saindo..." ;;
 esac
 }
 
