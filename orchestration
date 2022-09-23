@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export var1; export var2
+
 function check {
   [ $(docker network ls | grep macvlan | awk '{print $2}') ] && { 
     lantest="sim" 
@@ -8,30 +10,54 @@ function check {
     }
  
   [ "$lantest" = "nao" ] && {
-    dialog --title "MACVLAN" --yesno "Deseja criar a rede macvlan para container?" 6 40
+    dialog --title "MACVLAN" --yesno "Deseja criar uma rede macvlan?" 6 40
     [ $? = 0 ] && {
     
-      iplan=$(hostname -I | awk '{print $1}')
-      
-      [ $(ls /sys/class/net | grep enp) ] && {
-        rede=$(ls /sys/class/net | grep enp)
-        docker network create -d macvlan --subnet="$iplan"/24 --gateway="$iplan" -o parent="$rede" macvlan
-      } || {
-        [ $(ls /sys/class/net | grep eth) ] && {
-          rede=$(ls /sys/class/net | grep eth)
-          docker network create -d macvlan --subnet="$iplan"/24 --gateway="$iplan" -o parent="$rede" macvlan
-        } || {
-          echo "ATENÇÃO: Placa não identificada!"
-          }
-        }
+    gateway0=$(route -n | grep 'UG[ \t]' | awk '{print $2}')
+    rede0=$(ls /sys/class/net | grep enp) 
+    
+    ip a
+    
+    echo ""
+    echo "#########################################"
+    echo "# Configurações pré-carregadas!         #"
+    echo "# Pressione ENTER ao acabar a consulta. #"
+    echo "#########################################"
+    echo ""
+    
+    read
+    
+    VALUE1="$gateway0/24"; VALUE2="$gateway0"; VALUE3="$rede0"
 
+    VALUE0=$(dialog --ok-label "Criar" --title "Nova Rede Bridge" --form "Subnet = x.x.0.0/24" 10 40 0 \
+"Subnet  :" 1 1 "$VALUE1" 1 10 20 0 \
+"Gateway :" 2 1 "$VALUE2" 2 10 20 0 \
+"Interfc :" 3 1 "$VALUE3" 3 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    [ $? -ne 0 ] && exit
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    var2=$(echo "$VALUE0" | sed -n 2p)
+    var3=$(echo "$VALUE0" | sed -n 3p)
+    
+    [ -z "$var1" ] || [ -z "$var2" ] && {
+      dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+      check
     } || {
-      echo "ATENÇÃO: Não há macvlan para os containers!"
+      sudo docker network create -d macvlan --subnet="$var1" --gateway="$var2" -o parent="$var3" macvlan
+      start
       }
+
+      } || {
+        echo "ATENÇÃO: Não há macvlan para os containers!"
+        sleep 3
+        start
+        }
       
-  } || {
-    echo "Rede Container configurada."
-    }
+    } || {
+      start
+      }
+
 }
 
 function start {
@@ -61,4 +87,5 @@ X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompassp
 esac
 }
 
-start
+# Start
+check
