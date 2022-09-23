@@ -1,0 +1,156 @@
+#!/bin/bash
+
+function check {
+echo "check 03"
+  [ $(which docker 2>/dev/null) ] && {  
+    menu022 "1p" && contA=$cont0 && contP=$sts
+    menu022 "2p" && contB=$cont0 && contQ=$sts
+    menu022 "3p" && contC=$cont0 && contR=$sts
+    menu022 "4p" && contD=$cont0 && contS=$sts
+    menu022 "5p" && contE=$cont0 && contT=$sts
+    menu022 "6p" && contF=$cont0 && contU=$sts
+    menu022 "7p" && contG=$cont0 && contV=$sts
+    menu022 "8p" && contH=$cont0 && contW=$sts
+    menu022 "9p" && contI=$cont0 && contX=$sts
+    menu022 "10p" && contJ=$cont0 && contY=$sts
+    menu022 "11p" && contK=$cont0 && contZ=$sts
+    menu022 "12p" && contL=$cont0 && contAA=$sts
+    menu022 "13p" && contM=$cont0 && contAB=$sts
+    menu022 "14p" && contN=$cont0 && contAC=$sts
+    menu022 "15p" && contO=$cont0 && contAD=$sts
+  } || {
+    dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "$bktitle" --msgbox "O Docker não foi encontrado neste sistema ou você não possui as permissões de acesso!" 7 50
+  }
+}
+
+function menu01 {
+echo "menu01 04"
+  menuxy=$(dialog --ok-label 'Ajustar' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de VMs" --menu "Gestão de Containers"  0 0 0 \
+  "$contA" "$contP" \
+  "$contB" "$contQ" \
+  "$contC" "$contR" \
+  "$contD" "$contS" \
+  "$contE" "$contT" \
+  "$contF" "$contU" \
+  "$contG" "$contV" \
+  "$contH" "$contW" \
+  "$contI" "$contX" \
+  "$contJ" "$contY" \
+  "$contK" "$contZ" \
+  "$contL" "$contAA" \
+  "$contM" "$contAB" \
+  "$contN" "$contAC" \
+  "$contO" "$contAD" \
+  "X Voltar" "" 2>&1 > /dev/tty )
+
+  [ $? -ne 0 ] && exit
+  
+  case "$menuxy" in
+  "$contA") chkcnt="$contP"; nmcnt="$contA"; menu02 ;;
+  "$contB") chkcnt="$contQ"; nmcnt="$contB"; menu02 ;;
+  "$contC") chkcnt="$contR"; nmcnt="$contC"; menu02 ;;
+  "$contD") chkcnt="$contS"; nmcnt="$contD"; menu02 ;;
+  "$contE") chkcnt="$contT"; nmcnt="$contE"; menu02 ;;
+  "$contF") chkcnt="$contU"; nmcnt="$contF"; menu02 ;;
+  "$contG") chkcnt="$contV"; nmcnt="$contG"; menu02 ;;
+  "$contH") chkcnt="$contW"; nmcnt="$contH"; menu02 ;;
+  "$contI") chkcnt="$contX"; nmcnt="$contI"; menu02 ;;
+  "$contJ") chkcnt="$contY"; nmcnt="$contJ"; menu02 ;;
+  "$contK") chkcnt="$contZ"; nmcnt="$contK"; menu02 ;;
+  "$contL") chkcnt="$contAA"; nmcnt="$contL"; menu02 ;;
+  "$contM") chkcnt="$contAB"; nmcnt="$contM"; menu02 ;;
+  "$contN") chkcnt="$contAC"; nmcnt="$contN"; menu02 ;;
+  "$contO") chkcnt="$contAD"; nmcnt="$contO"; menu02 ;;
+  "X Voltar") exit ;;
+  esac
+}
+
+function menu02 {
+echo "menu02 05"
+
+[ "$chkcnt" = "Executando" ] && {
+  dialog --title "$nmcnt" --yesno "Deseja reiniciar o container $nmcnt?" 6 40
+  [ $? = 0 ] && {
+    docker restart "$nmcnt"
+    dialog --title "$nmcnt" --msgbox "O container $nmcnt foi reiniciado!" 6 40
+  } || {
+    dialog --title "$nmcnt" --yesno "Deseja desligar o container $nmcnt?" 6 40
+    [ $? = 0 ] && {
+      docker stop "$nmcnt"
+      dialog --title "$nmcnt" --msgbox "O container $nmcnt foi desligado!" 6 40
+    } || {
+      dialog --title "$nmcnt" --yesno "Deseja desligar FORÇADAMENTE o container $nmcnt?" 6 40
+      [ $? = 0 ] && {
+        docker kill "$nmcnt"
+        dialog --title "$nmcnt" --msgbox "O container $nmcnt foi desligado de forma forçada!" 6 40
+      } || {
+        echo "a" > /dev/null
+        }
+    }
+  }
+} || {
+  [ "$chkcnt" = "- - -" ] && {
+    dialog --title "$nmcnt" --msgbox "O container $nmcnt não existe!" 6 40
+  } || {
+    [ "$chkcnt" = "Parado" ] && {
+      dialog --title "$nmcnt" --yesno "Deseja tentar ligar o container $nmcnt?" 6 40
+      [ $? = 0 ] && {
+        docker start "$nmcnt"
+        dialog --title "$nmcnt" --msgbox "Verifique se o container $nmcnt iniciou!" 6 40
+      } || {
+        echo "a" > /dev/null
+        }
+    }
+  }
+}
+
+menu01
+}
+
+function menu022 {
+echo "menu022 06"
+
+  testcont=$(docker ps -aq --no-trunc | sed -n "$1")
+  
+  [ "$testcont" = "" ] || {
+echo "menu022 07 $testcont"
+
+    cont0=$(docker inspect --format='{{.Name}}' "$testcont" | cut -c2-)
+    [ "$cont0" = "" ] && {
+    cont0="None"
+    sts="- - -"
+
+    } || {
+    cont1=$(docker inspect $cont0 | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
+    cont2=$(docker inspect $cont0 | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
+echo "menu022 08"
+      [ "$cont1" = "running" ] && {
+        sts="Executando"
+      } || {
+        [ "$cont2" = "exited" ] && {
+          sts="Parado"
+        } || {
+          sts="- - -"
+          }
+        }
+      }
+      
+    } && {
+    echo "a" > /dev/null
+    }
+  
+  } && {
+  cont0="None"
+  sts="- - -"
+  
+echo "menu022 10 $testcont"
+  }
+
+
+echo "check 01"
+check
+echo "menu01 02"
+menu01
+
+echo "exit 11"
+exit 1
