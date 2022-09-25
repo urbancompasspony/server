@@ -1,26 +1,24 @@
 #!/bin/bash
 
-export cont0; export sts; export contA; export contB; export contC; export contD; export contE; export contF; export contG; export contH; export contI; export contJ
-export contK; export contL; export contM; export contN; export contO; export contP; export contQ; export contR; export contS; export contT; export contU; export contV
-export contW; export contX; export contY; export contZ; export contAA; export contAB; export contAC; export contAD
+
 
 function check {
   [ $(which docker 2>/dev/null) ] && {  
-    menu022 "1p" && contA=$cont0 && contP=$sts
-    menu022 "2p" && contB=$cont0 && contQ=$sts
-    menu022 "3p" && contC=$cont0 && contR=$sts
-    menu022 "4p" && contD=$cont0 && contS=$sts
-    menu022 "5p" && contE=$cont0 && contT=$sts
-    menu022 "6p" && contF=$cont0 && contU=$sts
-    menu022 "7p" && contG=$cont0 && contV=$sts
-    menu022 "8p" && contH=$cont0 && contW=$sts
-    menu022 "9p" && contI=$cont0 && contX=$sts
-    menu022 "10p" && contJ=$cont0 && contY=$sts
-    menu022 "11p" && contK=$cont0 && contZ=$sts
-    menu022 "12p" && contL=$cont0 && contAA=$sts
-    menu022 "13p" && contM=$cont0 && contAB=$sts
-    menu022 "14p" && contN=$cont0 && contAC=$sts
-    menu022 "15p" && contO=$cont0 && contAD=$sts
+    menu022 "1p" && nomeA=$cont0 && contA=$sts && IPLocalA=$IPLocal
+    menu022 "2p" && nomeB=$cont0 && contB=$sts && IPLocalB=$IPLocal
+    menu022 "3p" && nomeC=$cont0 && contC=$sts && IPLocalC=$IPLocal
+    menu022 "4p" && nomeD=$cont0 && contD=$sts && IPLocalD=$IPLocal
+    menu022 "5p" && nomeE=$cont0 && contE=$sts && IPLocalE=$IPLocal
+    menu022 "6p" && nomeF=$cont0 && contF=$sts && IPLocalF=$IPLocal
+    menu022 "7p" && nomeG=$cont0 && contG=$sts && IPLocalG=$IPLocal
+    menu022 "8p" && nomeH=$cont0 && contH=$sts && IPLocalH=$IPLocal
+    menu022 "9p" && nomeI=$cont0 && contI=$sts && IPLocalI=$IPLocal
+    menu022 "10p" && nomeJ=$cont0 && contJ=$sts && IPLocalJ=$IPLocal
+    menu022 "11p" && nomeK=$cont0 && contK=$sts && IPLocalK=$IPLocal
+    menu022 "12p" && nomeL=$cont0 && contL=$sts && IPLocalL=$IPLocal
+    menu022 "13p" && nomeM=$cont0 && contM=$sts && IPLocalM=$IPLocal
+    menu022 "14p" && nomeN=$cont0 && contN=$sts && IPLocalN=$IPLocal
+    menu022 "15p" && nomeO=$cont0 && contO=$sts && IPLocalO=$IPLocal
   } || {
     dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "$bktitle" --msgbox "O Docker não foi encontrado neste sistema ou você não possui as permissões de acesso!" 7 50
   }
@@ -28,41 +26,41 @@ function check {
 
 function menu01 {
   menuxy=$(dialog --ok-label 'Ajustar' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de VMs" --menu "Gestão de Containers"  0 0 0 \
-"$contA" "$contP" \
-"$contB" "$contQ" \
-"$contC" "$contR" \
-"$contD" "$contS" \
-"$contE" "$contT" \
-"$contF" "$contU" \
-"$contG" "$contV" \
-"$contH" "$contW" \
-"$contI" "$contX" \
-"$contJ" "$contY" \
-"$contK" "$contZ" \
-"$contL" "$contAA" \
-"$contM" "$contAB" \
-"$contN" "$contAC" \
-"$contO" "$contAD" \
+"$nomeA" "$IPLocalA" \
+"$nomeB" "$IPLocalB" \
+"$nomeC" "$IPLocalC" \
+"$nomeD" "$IPLocalD" \
+"$nomeE" "$IPLocalE" \
+"$nomeF" "$IPLocalF" \
+"$nomeG" "$IPLocalG" \
+"$nomeH" "$IPLocalH" \
+"$nomeI" "$IPLocalI" \
+"$nomeJ" "$IPLocalJ" \
+"$nomeK" "$IPLocalK" \
+"$nomeL" "$IPLocalL" \
+"$nomeM" "$IPLocalM" \
+"$nomeN" "$IPLocalN" \
+"$nomeO" "$IPLocalO" \
 "X Voltar" "" 2>&1 > /dev/tty )
 
   [ $? -ne 0 ] && exit
   
   case "$menuxy" in
-  "$contA") chkcnt="$contP"; nmcnt="$contA"; menu02 ;;
-  "$contB") chkcnt="$contQ"; nmcnt="$contB"; menu02 ;;
-  "$contC") chkcnt="$contR"; nmcnt="$contC"; menu02 ;;
-  "$contD") chkcnt="$contS"; nmcnt="$contD"; menu02 ;;
-  "$contE") chkcnt="$contT"; nmcnt="$contE"; menu02 ;;
-  "$contF") chkcnt="$contU"; nmcnt="$contF"; menu02 ;;
-  "$contG") chkcnt="$contV"; nmcnt="$contG"; menu02 ;;
-  "$contH") chkcnt="$contW"; nmcnt="$contH"; menu02 ;;
-  "$contI") chkcnt="$contX"; nmcnt="$contI"; menu02 ;;
-  "$contJ") chkcnt="$contY"; nmcnt="$contJ"; menu02 ;;
-  "$contK") chkcnt="$contZ"; nmcnt="$contK"; menu02 ;;
-  "$contL") chkcnt="$contAA"; nmcnt="$contL"; menu02 ;;
-  "$contM") chkcnt="$contAB"; nmcnt="$contM"; menu02 ;;
-  "$contN") chkcnt="$contAC"; nmcnt="$contN"; menu02 ;;
-  "$contO") chkcnt="$contAD"; nmcnt="$contO"; menu02 ;;
+  "$nomeA") chkcnt="$contA"; nmcnt="$nomeA"; menu02 ;;
+  "$nomeB") chkcnt="$contB"; nmcnt="$nomeB"; menu02 ;;
+  "$nomeC") chkcnt="$contC"; nmcnt="$nomeC"; menu02 ;;
+  "$nomeD") chkcnt="$contD"; nmcnt="$nomeD"; menu02 ;;
+  "$nomeE") chkcnt="$contE"; nmcnt="$nomeE"; menu02 ;;
+  "$nomeF") chkcnt="$contF"; nmcnt="$nomeF"; menu02 ;;
+  "$nomeG") chkcnt="$contG"; nmcnt="$nomeG"; menu02 ;;
+  "$nomeH") chkcnt="$contH"; nmcnt="$nomeH"; menu02 ;;
+  "$nomeI") chkcnt="$contI"; nmcnt="$nomeI"; menu02 ;;
+  "$nomeJ") chkcnt="$contJ"; nmcnt="$nomeJ"; menu02 ;;
+  "$nomeK") chkcnt="$contK"; nmcnt="$nomeK"; menu02 ;;
+  "$nomeL") chkcnt="$contL"; nmcnt="$nomeL"; menu02 ;;
+  "$nomeM") chkcnt="$contM"; nmcnt="$nomeM"; menu02 ;;
+  "$nomeN") chkcnt="$contN"; nmcnt="$nomeN"; menu02 ;;
+  "$nomeO") chkcnt="$contO"; nmcnt="$nomeO"; menu02 ;;
   "X Voltar") exit ;;
   esac
 }
@@ -108,28 +106,30 @@ menu01
 }
 
 function menu022 {
+
   # Default
   cont0="None"
   sts="- - -"
+  IPLocal="- - -"
 
   testcont=$(docker ps -aq --no-trunc | sed -n "$1")
   
   [ "$testcont" = "" ] || {
     cont0=$(docker inspect --format='{{.Name}}' "$testcont" | cut -c2-)
     [ "$cont0" = "" ] && {
-    cont0="None"
-    sts="- - -"
+    echo "0" > /dev/null
     } || {
     cont1=$(docker inspect $cont0 | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
     cont2=$(docker inspect $cont0 | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
       [ "$cont1" = "running" ] && {
+        menu03 "$cont0"
         sts="Executando"
       } || {
         [ "$cont2" = "exited" ] && {
+          IPLocal="- - -"
           sts="Parado"
         } || {
-        cont0="None"
-          sts="- - -"
+          echo "0" > /dev/null
         }
       }
     }    
