@@ -23,7 +23,7 @@ function check {
 }
 
 function menu01 {
-  menuxy=$(dialog --ok-label 'Ajustar' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de VMs" --menu "Gestão de Containers"  0 0 0 \
+  menuxy=$(dialog --ok-label 'Ajustar' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de Containers" --menu " "  0 0 0 \
 "$nomeA" "$IPLocalA" \
 "$nomeB" "$IPLocalB" \
 "$nomeC" "$IPLocalC" \
