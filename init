@@ -21,8 +21,8 @@
 hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
-version="v3.5"
-revis="r0.0"
+version="v4.0"
+revis="r0.1"
 
 ################################################################################
 ################################################################################
@@ -235,16 +235,17 @@ B 'Samba - Client' \
 C 'X Samba' \
 D 'PiHole' \
 E 'Manut. Banco AD&DC' \
-F 'Trocar Gov. de CPU' \
-G 'Menu de Backups' \
-H 'UDPCast' \
-I '*Usuários Logados' \
-J '*Logins Anteriores' \
-K 'Diagnóstico Manual' \
-L 'Finalizar .docx > .PDF' \
-M 'Encaminhar .PDF' \
-N 'Apagar .docx' \
-O 'Apagar .PDF' \
+F 'Manutenção NextCloud' \
+G 'Trocar Gov. de CPU' \
+H 'Menu de Backups' \
+I 'UDPCast' \
+J '*Usuários Logados' \
+K '*Logins Anteriores' \
+L 'Diagnóstico Manual' \
+M 'Finalizar .docx > .PDF' \
+N 'Encaminhar .PDF' \
+O 'Apagar .docx' \
+P 'Apagar .PDF' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && liminal "st4rt1" "start"
 case "$var10" in
@@ -253,16 +254,17 @@ B) menu31 ;;
 C) menu32 ;;
 D) menu26 ;;
 E) menu004 ;;
-F) menu053 ;;
-G) m122 ;;
-H) menu17 ;;
-I) menu18 ;;
-J) menu19 ;;
-K) menu28 ;;
-L) menu291 ;;
-M) menu29 ;;
-N) menu30 ;;
-O) menu301 ;;
+F) menu34 ;;
+G) menu053 ;;
+H) m122 ;;
+I) menu17 ;;
+J) menu18 ;;
+K) menu19 ;;
+L) menu28 ;;
+M) menu291 ;;
+N) menu29 ;;
+O) menu30 ;;
+P) menu301 ;;
 X) liminal "st4rt1" "start" ;;
 esac
 }
@@ -1220,7 +1222,7 @@ function menu004 {
 menu09 samba-ad-dc && smb2=$prcs
 [ "$smb2" = "Executando" ] && {
   clear
-  sudo samba-tool dbcheck --cross-ncs --fix | tee /tmp/.smbadtmp; read
+  echo "$password" | sudo -S samba-tool dbcheck --cross-ncs --fix | tee /tmp/.smbadtmp; read
   tmpad=$(cat /tmp/.smbadtmp)
   menu08 "$Recado $tmpad $Mensagem"
 } || {
@@ -2149,6 +2151,18 @@ function menu33 {
 }
 
 liminal "m3nu01" "menu01"
+}
+
+function menu34 {
+menu09 mysql && mysql=$prcs
+[ "$mysql" = "Executando" ] && {
+  clear
+  echo "$password" | sudo -S mysql -u administrador -p -D nextcloud -e "DELETE FROM oc_file_locks WHERE 1"; echo "Pressione Enter para finalizar!"; read
+} || {
+  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "NextCloud & MySQL" --msgbox "O serviço MySQL não foi encontrado neste sistema!" 7 40
+  }
+
+m10
 }
 
 ################################################################################
