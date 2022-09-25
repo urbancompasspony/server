@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 function check {
   [ $(which docker 2>/dev/null) ] && {  
     menu022 "1p" && nomeA=$cont0 && contA=$sts && IPLocalA=$IPLocal
