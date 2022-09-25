@@ -8,6 +8,7 @@ C 'Linite' \
 D 'Podman' \
 E 'Orchestration: Docker' \
 F 'Orchestration: Podman' \
+G 'BASHRC' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -17,6 +18,7 @@ C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/lini
 D) start ;;
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
 F) start ;;
+G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/bashrc | bash ;;
 X) echo "Saindo..." ;;
 esac
 }
