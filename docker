@@ -136,6 +136,10 @@ function menu022 {
   }  
 }
 
+function menu03 {
+  IPLocal=$(docker inspect $1 | grep '"IPAddress"' | tail -n 1 | awk '{print $2}')
+}
+
 check
 menu01
 
