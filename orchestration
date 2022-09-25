@@ -62,15 +62,17 @@ function check {
 
 function start {
 var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
-A 'PiHole' \
-B 'Dominio' \
-C 'UniFi' \
-D 'MySQL' \
-E 'NextCloud' \
-F 'Backup' \
-G 'SAMBA' \
-H 'CUPS' \
-I 'Pentest' \
+A '01 PiHole' \
+B '02 Dominio' \
+C '03 UniFi' \
+D '041 MySQL' \
+E '042 NextCloud' \
+F '05 Backup' \
+G '06 SAMBA' \
+H '09 Pentest' \
+I '10 CUPS' \
+J '11 LAN Cache' \
+K '12 MinhaReceita' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -81,8 +83,10 @@ D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud | sudo bash ; start ;;
 F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/05-backup | sudo bash ; start ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba | sudo bash ; start ;;
-H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | sudo bash ; start ;;
-I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | sudo bash ; start ;;
+H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | sudo bash ; start ;;
+I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | sudo bash ; start ;;
+J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache | sudo bash ; start ;;
+K) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/12-minhareceita | sudo bash ; start ;;
 X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
 esac
 }
