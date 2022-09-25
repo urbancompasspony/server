@@ -1,7 +1,10 @@
 #!/bin/bash
 
+export cont0; export sts; export contA; export contB; export contC; export contD; export contE; export contF; export contG; export contH; export contI; export contJ
+export contK; export contL; export contM; export contN; export contO; export contP; export contQ; export contR; export contS; export contT; export contU; export contV
+export contW; export contX; export contY; export contZ; export contAA; export contAB; export contAC; export contAD
+
 function check {
-echo "check 03"
   [ $(which docker 2>/dev/null) ] && {  
     menu022 "1p" && contA=$cont0 && contP=$sts
     menu022 "2p" && contB=$cont0 && contQ=$sts
@@ -24,24 +27,23 @@ echo "check 03"
 }
 
 function menu01 {
-echo "menu01 04"
   menuxy=$(dialog --ok-label 'Ajustar' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de VMs" --menu "Gestão de Containers"  0 0 0 \
-  "$contA" "$contP" \
-  "$contB" "$contQ" \
-  "$contC" "$contR" \
-  "$contD" "$contS" \
-  "$contE" "$contT" \
-  "$contF" "$contU" \
-  "$contG" "$contV" \
-  "$contH" "$contW" \
-  "$contI" "$contX" \
-  "$contJ" "$contY" \
-  "$contK" "$contZ" \
-  "$contL" "$contAA" \
-  "$contM" "$contAB" \
-  "$contN" "$contAC" \
-  "$contO" "$contAD" \
-  "X Voltar" "" 2>&1 > /dev/tty )
+"$contA" "$contP" \
+"$contB" "$contQ" \
+"$contC" "$contR" \
+"$contD" "$contS" \
+"$contE" "$contT" \
+"$contF" "$contU" \
+"$contG" "$contV" \
+"$contH" "$contW" \
+"$contI" "$contX" \
+"$contJ" "$contY" \
+"$contK" "$contZ" \
+"$contL" "$contAA" \
+"$contM" "$contAB" \
+"$contN" "$contAC" \
+"$contO" "$contAD" \
+"X Voltar" "" 2>&1 > /dev/tty )
 
   [ $? -ne 0 ] && exit
   
@@ -66,8 +68,6 @@ echo "menu01 04"
 }
 
 function menu02 {
-echo "menu02 05"
-
 [ "$chkcnt" = "Executando" ] && {
   dialog --title "$nmcnt" --yesno "Deseja reiniciar o container $nmcnt?" 6 40
   [ $? = 0 ] && {
@@ -108,49 +108,35 @@ menu01
 }
 
 function menu022 {
-echo "menu022 06"
+  # Default
+  cont0="None"
+  sts="- - -"
 
   testcont=$(docker ps -aq --no-trunc | sed -n "$1")
   
   [ "$testcont" = "" ] || {
-echo "menu022 07 $testcont"
-
     cont0=$(docker inspect --format='{{.Name}}' "$testcont" | cut -c2-)
     [ "$cont0" = "" ] && {
     cont0="None"
     sts="- - -"
-
     } || {
     cont1=$(docker inspect $cont0 | grep running | awk {'print $2'} | cut -c 2,3,4,5,6,7,8)
     cont2=$(docker inspect $cont0 | grep exited | awk {'print $2'} | cut -c 2,3,4,5,6,7)
-echo "menu022 08"
       [ "$cont1" = "running" ] && {
         sts="Executando"
       } || {
         [ "$cont2" = "exited" ] && {
           sts="Parado"
         } || {
+        cont0="None"
           sts="- - -"
-          }
         }
       }
-      
-    } && {
-    echo "a" > /dev/null
-    }
-  
-  } && {
-  cont0="None"
-  sts="- - -"
-  
-echo "menu022 10 $testcont"
-  }
+    }    
+  }  
+}
 
-
-echo "check 01"
 check
-echo "menu01 02"
 menu01
 
-echo "exit 11"
 exit 1
