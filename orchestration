@@ -74,9 +74,8 @@ I '08 AutoExport SAMBA' \
 J '09 Pentest' \
 K '10 CUPS' \
 L '11 LAN Cache' \
-M '12 MinhaReceita' \
+M '12 OracleDB XE' \
 N '13 RSnapShots' \
-O '14 OracleDB XE' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -92,9 +91,8 @@ I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/08.1
 J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | sudo bash ; start ;;
 K) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | sudo bash ; start ;;
 L) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache | sudo bash ; start ;;
-M) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/12-minhareceita | sudo bash ; start ;;
+M) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/12-oracle_xe | sudo bash ; start ;;
 N) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/13-rsnapshot | sudo bash ; start ;;
-O) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/14-oracle_xe | sudo bash ; start ;;
 X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
 esac
 }
