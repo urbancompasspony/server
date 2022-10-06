@@ -69,13 +69,14 @@ D '041 MySQL' \
 E '042 NextCloud' \
 F '05 Backup' \
 G '06 SAMBA' \
-H '07 AutoMigrate ADDC' \
-I '08 AutoExport SAMBA' \
-J '09 Pentest' \
-K '10 CUPS' \
-L '11 LAN Cache' \
-M '12 OracleDB XE' \
-N '13 RSnapShots' \
+H '07.1 AutoMigrate ADDC - Keep Local' \
+I '07.2 AutoMigrate ADDC - Backup Only' \
+J '08 AutoExport SAMBA Shared Server' \
+K '09 Pentest' \
+L '10 CUPS' \
+M '11 LAN Cache' \
+N '12 OracleDB XE' \
+O '13 RSnapShots' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -86,13 +87,14 @@ D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud | sudo bash ; start ;;
 F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/05-backup | sudo bash ; start ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba | sudo bash ; start ;;
-H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/07-AutoMigrateADDC.sh | sudo bash ; start ;;
-I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/08.1-AutoExport_Samba.sh | sudo bash ; start ;;
-J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | sudo bash ; start ;;
-K) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | sudo bash ; start ;;
-L) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache | sudo bash ; start ;;
-M) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/12-oracle_xe | sudo bash ; start ;;
-N) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/13-rsnapshot | sudo bash ; start ;;
+H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/07.1-AutoMigrateADDC.sh | sudo bash ; start ;;
+I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/07.2-AutoMigrateADDC.sh | sudo bash ; start ;;
+J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/08.1-AutoExport_Samba.sh | sudo bash ; start ;;
+K) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | sudo bash ; start ;;
+L) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | sudo bash ; start ;;
+M) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache | sudo bash ; start ;;
+N) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/12-oracle_xe | sudo bash ; start ;;
+O) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/13-rsnapshot | sudo bash ; start ;;
 X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
 esac
 }
