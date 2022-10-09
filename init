@@ -116,9 +116,9 @@ X 'SAIR' 2>&1 > /dev/tty )
 case "$var1" in
 A) menu01 ;;
 B) menu02 ;;
-C) curl -sSL https://docker.linuxuniverse.com.br | bash ;;
+C) curl -sSL https://docker.linuxuniverse.com.br | bash ; start ;;
 D) menu03 ;;
-E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/domain/main/domain | sudo bash ;;
+E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/domain/main/domain | sudo bash ; start ;;
 F) menu05 ;;
 G) m10 ;;
 H) menu06 ;;
@@ -147,9 +147,9 @@ X 'SAIR' 2>&1 > /dev/tty )
 case "$var1" in
 A) m3nu01 ;;
 B) menu02 ;;
-C) curl -sSL https://docker.linuxuniverse.com.br | bash ;;
+C) curl -sSL https://docker.linuxuniverse.com.br | bash ; st4rt1 ;;
 D) menu03 ;;
-E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/domain/main/domain | sudo bash ;;
+E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/domain/main/domain | sudo bash ; st4rt1 ;;
 F) m3nu05 ;;
 G) menu06 ;;
 H) menu07 ;;
