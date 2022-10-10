@@ -69,22 +69,21 @@ var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orqu
 5 '042 NextCloud' \
 6 '05 Backup' \
 7 '06 SAMBA' \
-8 '07.1 AutoMigrate ADDC' \
-9 '07.2 AutoMigrate ADDC - Backup Only' \
-10 '08 AutoExport SAMBA Shared Server' \
-11 '09 Pentest' \
-12 '10 CUPS' \
-13 '11 LAN Cache' \
-14 '12 OracleDB XE' \
-15 '13 RSnapShots' \
-16 '14 Yacht' \
-17 '15 Kuma' \
-18 '16 LocalSpeedtest' \
-19 '17 YoutubeDL' \
-20 '18 Transmission' \
-21 '19 HomeAssistant' \
-22 '20.1 KeepAliveD' \
-23 '20.2 KeepAliveD' \
+8 '07 AutoMigrate ADDC' \
+9 '08 AutoExport SAMBA Shared Server' \
+10 '09 Pentest' \
+11 '10 CUPS' \
+12 '11 LAN Cache' \
+13 '12 OracleDB XE' \
+14 '13 RSnapShots' \
+15 '14 Yacht' \
+16 '15 Kuma' \
+17 '16 LocalSpeedtest' \
+18 '17 YoutubeDL' \
+19 '18 Transmission' \
+20 '19 HomeAssistant' \
+21 '20.1 KeepAliveD' \
+22 '20.2 KeepAliveD' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -96,21 +95,20 @@ case "$var0" in
 6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/05-backup | sudo bash ; start ;;
 7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba | sudo bash ; start ;;
 8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/07.1-AutoMigrateADDC.sh | sudo bash ; start ;;
-9) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/07.2-AutoMigrateADDC.sh | sudo bash ; start ;;
-10) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/08.1-AutoExport_Samba.sh | sudo bash ; start ;;
-11) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | sudo bash ; start ;;
-12) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | sudo bash ; start ;;
-13) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache | sudo bash ; start ;;
-14) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/12-oracle_xe | sudo bash ; start ;;
-15) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/13-rsnapshot | sudo bash ; start ;;
-16) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/14-yacht | sudo bash ; start ;;
-17) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/15-kuma | sudo bash ; start ;;
-18) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/16-speedtest | sudo bash ; start ;;
-19) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/17-youtubedl | sudo bash ; start ;;
-20) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/18-transmission | sudo bash ; start ;;
-21) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/19-homeassistant | sudo bash ; start ;;
-22) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/20.1-keepalived | sudo bash ; start ;;
-23) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/20.2-keepalived | sudo bash ; start ;;
+9) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/08.1-AutoExport_Samba.sh | sudo bash ; start ;;
+10) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | sudo bash ; start ;;
+11) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | sudo bash ; start ;;
+12) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache | sudo bash ; start ;;
+13) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/12-oracle_xe | sudo bash ; start ;;
+14) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/13-rsnapshot | sudo bash ; start ;;
+15) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/14-yacht | sudo bash ; start ;;
+16) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/15-kuma | sudo bash ; start ;;
+17) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/16-speedtest | sudo bash ; start ;;
+18) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/17-youtubedl | sudo bash ; start ;;
+19) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/18-transmission | sudo bash ; start ;;
+20) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/19-homeassistant | sudo bash ; start ;;
+21) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/20.1-keepalived | sudo bash ; start ;;
+22) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/20.2-keepalived | sudo bash ; start ;;
 X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
 esac
 }
