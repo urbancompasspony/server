@@ -77,6 +77,11 @@ L '10 CUPS' \
 M '11 LAN Cache' \
 N '12 OracleDB XE' \
 O '13 RSnapShots' \
+P '14 Yacht' \
+Q '15 Kuma' \
+R '16 'LocalSpeedtest' \
+S '17 YoutubeDL' \
+T '18 Transmission' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -95,6 +100,11 @@ L) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-c
 M) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache | sudo bash ; start ;;
 N) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/12-oracle_xe | sudo bash ; start ;;
 O) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/13-rsnapshot | sudo bash ; start ;;
+P) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/14-yacht | sudo bash ; start ;;
+Q) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/15-kuma | sudo bash ; start ;;
+R) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/16-speedtest | sudo bash ; start ;;
+S) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/17-youtubedl | sudo bash ; start ;;
+T) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/18-transmission | sudo bash ; start ;;
 X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
 esac
 }
