@@ -82,6 +82,7 @@ Q '15 Kuma' \
 R '16 'LocalSpeedtest' \
 S '17 YoutubeDL' \
 T '18 Transmission' \
+U '19 HomeAssistant' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -105,6 +106,7 @@ Q) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/15-k
 R) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/16-speedtest | sudo bash ; start ;;
 S) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/17-youtubedl | sudo bash ; start ;;
 T) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/18-transmission | sudo bash ; start ;;
+U) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/19-homeassistant | sudo bash ; start ;;
 X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
 esac
 }
