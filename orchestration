@@ -62,54 +62,117 @@ function check {
 
 function start {
 var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
-1 '01 PiHole' \
-2 '02 Dominio' \
-3 '03 UniFi' \
-4 '041 MySQL' \
-5 '042 NextCloud' \
-6 '05 Backup' \
-7 '06 SAMBA' \
-8 '07 AutoMigrate ADDC' \
-9 '08 AutoExport SAMBA Shared Server' \
-10 '09 Pentest' \
-11 '10 CUPS' \
-12 '11 LAN Cache' \
-13 '12 OracleDB XE' \
-14 '13 RSnapShots' \
-15 '14 Yacht' \
-16 '15 Kuma' \
-17 '16 LocalSpeedtest' \
-18 '17 YoutubeDL' \
-19 '18 Transmission' \
-20 '19 HomeAssistant' \
-21 '20.1 KeepAliveD' \
-22 '20.2 KeepAliveD' \
+1 'Essentials' \
+2 'Tools' \
+3 'Servers' \
+4 'Others' \
+5 'Docker Managers' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole | sudo bash ; start ;;
-2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/02-domain | sudo bash ; start ;;
-3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/03-unifi | sudo bash ; start ;;
-4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1-mysql | sudo bash ; start ;;
-5) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud | sudo bash ; start ;;
-6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/05-backup | sudo bash ; start ;;
-7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba | sudo bash ; start ;;
-8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/07.1-AutoMigrateADDC.sh | sudo bash ; start ;;
-9) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/08.1-AutoExport_Samba.sh | sudo bash ; start ;;
-10) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest | sudo bash ; start ;;
-11) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups | sudo bash ; start ;;
-12) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache | sudo bash ; start ;;
-13) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/12-oracle_xe | sudo bash ; start ;;
-14) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/13-rsnapshot | sudo bash ; start ;;
-15) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/14-yacht | sudo bash ; start ;;
-16) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/15-kuma | sudo bash ; start ;;
-17) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/16-speedtest | sudo bash ; start ;;
-18) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/17-youtubedl | sudo bash ; start ;;
-19) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/18-transmission | sudo bash ; start ;;
-20) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/19-homeassistant | sudo bash ; start ;;
-21) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/20.1-keepalived | sudo bash ; start ;;
-22) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/20.2-keepalived | sudo bash ; start ;;
-X) echo "Saindo..." && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash && break ;;
+1) essentials ; start ;;
+2) tools ; start ;;
+3) servers ; start ;;
+4) others ; start ;;
+5) managers ; start ;;
+X) echo "Saindo..." && wget https://raw.githubusercontent.com/urbancompasspony/server/main/docker -O /tmp/docker; bash /tmp/docker && exit ;;
+esac
+}
+
+function essentials {
+var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+1 'PiHole' \
+2 'Dominio' \
+3 'MySQL' \
+4 'NextCloud' \
+5 'Backup' \
+6 'SAMBA' \
+7 'Pentest' \
+8 'RSnapShots' \
+X 'Voltar' 2>&1 > /dev/tty )
+
+case "$var0" in
+1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole -O /tmp/pihole; echo $password sudo -S bash /tmp/pihole ;;
+2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/02-domain -O /tmp/domain; echo $password sudo -S bash /tmp/domain ;;
+3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1-mysql -O /tmp/mysql; echo $password sudo -S bash /tmp/mysql ;;
+4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud -O /tmp/nextcloud; echo $password sudo -S bash /tmp/nextcloud ;;
+5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/05-backup -O /tmp/backup; echo $password sudo -S bash /tmp/backup ;;
+6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba -O /tmp/samba; echo $password sudo -S bash /tmp/samba ;;
+7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest -O /tmp/pentest; echo $password sudo -S bash /tmp/pentest ;;
+8) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/13-rsnapshot -O /tmp/rsnapshot; echo $password sudo -S bash /tmp/rsnapshot ;;
+X) start ;;
+esac
+}
+
+function tools {
+var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+1 'AutoMigrate ADDC' \
+2 'AutoExport SAMBA' \
+3 'LocalSpeedtest' \
+X 'Voltar' 2>&1 > /dev/tty )
+
+case "$var0" in
+1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; echo $password sudo -S bash /tmp/migrateaddc ;;
+2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/08.1-AutoExport_Samba.sh -O /tmp/migratesamba; echo $password sudo -S bash /tmp/migratesamba ;;
+3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/16-speedtest -O /tmp/speedtest; echo $password sudo -S bash /tmp/speedtest ;;
+X) start ;;
+esac
+}
+
+function servers {
+var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+1 'LAN Cache' \
+2 'OracleDB XE' \
+3 'YoutubeDL' \
+4 'Transmission' \
+5 'KeepAliveD 1' \
+6 'KeepAliveD 2' \
+7 'FileBrowser' \
+X 'Voltar' 2>&1 > /dev/tty )
+
+case "$var0" in
+1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache -O /tmp/lancache; echo $password sudo -S bash /tmp/lancache ;;
+2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/12-oracle_xe -O /tmp/oracle; echo $password sudo -S bash /tmp/oracle ;;
+3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/17-youtubedl -O /tmp/youtube; echo $password sudo -S bash /tmp/youtube ;;
+4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/18-transmission -O /tmp/transmission; echo $password sudo -S bash /tmp/transmission ;;
+5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/20.1-keepalived -O /tmp/keep1; echo $password sudo -S bash /tmp/keep1 ;;
+6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/20.2-keepalived -O /tmp/keep2; echo $password sudo -S bash /tmp/keep2 ;;
+7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/22-filebrowser -O /tmp/filebrowser; echo $password sudo -S bash /tmp/filebrowser ;;
+X) start ;;
+esac
+}
+
+function others {
+var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+1 'UniFi' \
+2 'CUPS' \
+3 'HomeAssistant' \
+X 'Voltar' 2>&1 > /dev/tty )
+
+case "$var0" in
+1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/03-unifi -O /tmp/unifi; echo $password sudo -S bash /tmp/unifi ;;
+2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups -O /tmp/cups; echo $password sudo -S bash /tmp/cups ;;
+3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/19-homeassistant -O /tmp/home; echo $password sudo -S bash /tmp/home ;;
+X) start ;;
+esac
+}
+
+function managers {
+var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+1 'Yacht' \
+2 'Kuma' \
+3 'Rancher' \
+4 'Portainer' \
+5 'Pottava' \
+X 'Voltar' 2>&1 > /dev/tty )
+
+case "$var0" in
+1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/14-yacht -O /tmp/yacht; echo $password sudo -S bash /tmp/yacht ;;
+2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/15-kuma -O /tmp/kuma; echo $password sudo -S bash /tmp/kuma ;;
+3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/21-rancher -O /tmp/rancher; echo $password sudo -S bash /tmp/rancher ;;
+4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/22-portainer -O /tmp/portainer; echo $password sudo -S bash /tmp/portainer ;;
+5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/23-pottava -O /tmp/pottava; echo $password sudo -S bash /tmp/pottava ;;
+X) start ;;
 esac
 }
 
