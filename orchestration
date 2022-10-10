@@ -69,7 +69,7 @@ var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orqu
 5 '042 NextCloud' \
 6 '05 Backup' \
 7 '06 SAMBA' \
-8 '07.1 AutoMigrate ADDC - Keep Local' \
+8 '07.1 AutoMigrate ADDC' \
 9 '07.2 AutoMigrate ADDC - Backup Only' \
 10 '08 AutoExport SAMBA Shared Server' \
 11 '09 Pentest' \
