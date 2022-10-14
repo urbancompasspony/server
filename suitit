@@ -3,22 +3,24 @@
 function start {
 var0=$(dialog --title 'System Manager' --backtitle "Sistema Automatizado de Orquestração de Sistemas!" --menu " " 0 0 0 \
 A 'Init' \
-B 'Docker' \
-C 'Linite' \
-D 'Podman' \
-E 'Orchestration: Docker' \
-F 'Orchestration: Podman' \
-G 'BASHRC' \
+B 'Tools' \
+C 'Docker' \
+D 'Linite' \
+E 'Podman' \
+F 'Orchestration: Docker' \
+G 'Orchestration: Podman' \
+H 'BASHRC' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/init | sudo bash ; start ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash ; start ;;
-C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
-D) start ;;
-E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
-F) start ;;
-G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/bashrc | bash ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/tools | sudo bash ; start ;;
+C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash ; start ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
+E) start ;;
+F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
+G) start ;;
+H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/bashrc | bash ;;
 X) echo "Saindo..." ;;
 esac
 }
