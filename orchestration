@@ -2,6 +2,9 @@
 
 export var1; export var2
 
+mTITLE="Docker Orchestration"
+bkTTITLE="Sistema Automatizado de Orquestração de Containers"
+
 function check {
   [ $(docker network ls | grep macvlan | awk '{print $2}') ] && { 
     lantest="sim" 
@@ -61,7 +64,7 @@ function check {
 }
 
 function start {
-var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Essentials' \
 2 'Tools' \
 3 'Servers' \
@@ -80,7 +83,7 @@ esac
 }
 
 function essentials {
-var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole' \
 2 'Dominio' \
 3 'MySQL' \
@@ -105,22 +108,26 @@ esac
 }
 
 function tools {
-var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'AutoMigrate ADDC' \
 2 'AutoExport SAMBA' \
-3 'LocalSpeedtest' \
+3 'Backup ADDC' \
+4 'Backup SAMBA' \
+5 'LocalSpeedtest' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
 2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
-3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/16-speedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
+4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
+5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/16-speedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 X) start ;;
 esac
 }
 
 function servers {
-var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'LAN Cache' \
 2 'OracleDB XE' \
 3 'YoutubeDL' \
@@ -143,7 +150,7 @@ esac
 }
 
 function others {
-var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'UniFi' \
 2 'CUPS' \
 3 'HomeAssistant' \
@@ -158,7 +165,7 @@ esac
 }
 
 function managers {
-var0=$(dialog --title 'Docker Manager' --backtitle "Sistema Automatizado de Orquestração de Containers" --menu " " 0 0 0 \
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Yacht' \
 2 'Kuma' \
 3 'Rancher' \
