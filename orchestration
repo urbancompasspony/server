@@ -56,7 +56,6 @@ function check {
         sleep 3
         start
         }
-      
     } || {
       start
       }
@@ -88,10 +87,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'Dominio' \
 3 'MySQL' \
 4 'NextCloud' \
-5 'Backup' \
-6 'SAMBA' \
-7 'Pentest' \
-8 'RSnapShots' \
+5 'SAMBA' \
+6 'Pentest' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -99,10 +96,8 @@ case "$var0" in
 2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
 3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
 4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/05-backup -O /tmp/backup; sudo bash /tmp/backup ;;
-6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
-7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-8) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/13-rsnapshot -O /tmp/rsnapshot; sudo bash /tmp/rsnapshot ;;
+5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
+6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 X) start ;;
 esac
 }
@@ -135,6 +130,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'KeepAliveD 1' \
 6 'KeepAliveD 2' \
 7 'FileBrowser' \
+8 'UniFi' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -145,21 +141,20 @@ case "$var0" in
 5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/20.1-keepalived -O /tmp/keep1; sudo bash /tmp/keep1 ;;
 6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/20.2-keepalived -O /tmp/keep2; sudo bash /tmp/keep2 ;;
 7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/22-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
+8) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
 X) start ;;
 esac
 }
 
 function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'UniFi' \
-2 'CUPS' \
-3 'HomeAssistant' \
+1 'CUPS' \
+2 'HomeAssistant' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
-2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/19-homeassistant -O /tmp/home; sudo bash /tmp/home ;;
+1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
+2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/19-homeassistant -O /tmp/home; sudo bash /tmp/home ;;
 X) start ;;
 esac
 }
