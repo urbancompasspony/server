@@ -6,6 +6,7 @@ A 'Linite' \
 B 'Server Manager' \
 C 'Orchestra' \
 D 'Docker' \
+E 'Tools' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -13,9 +14,10 @@ A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/lini
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/1ni1t | sudo bash ; start ;;
 C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
 D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; start ;;
+E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
 
-apt install dialog
+apt install dialog curl
 start
