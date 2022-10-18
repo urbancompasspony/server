@@ -19,5 +19,5 @@ X) echo "Saindo..." ;;
 esac
 }
 
-apt install dialog curl -y
+sudo apt install dialog curl -y
 start
