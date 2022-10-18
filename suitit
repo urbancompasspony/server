@@ -6,21 +6,15 @@ A 'Init' \
 B 'Tools' \
 C 'Docker' \
 D 'Linite' \
-E 'Podman' \
-F 'Orchestration: Docker' \
-G 'Orchestration: Podman' \
-H 'BASHRC' \
+F 'Orchestration' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/init | sudo bash ; start ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/tools | sudo bash ; start ;;
-C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash ; start ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
+C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; start ;;
 D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
-E) start ;;
-F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
-G) start ;;
-H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/bashrc | bash ;;
+F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
