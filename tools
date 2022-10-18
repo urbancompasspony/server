@@ -55,5 +55,5 @@ X) echo "Saindo..." ;;
 esac
 }
 
-apt install dialog cifs-utils smbclient
+sudo apt install dialog cifs-utils smbclient -y
 start
