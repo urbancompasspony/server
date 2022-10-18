@@ -3,7 +3,7 @@
 function start {
 var0=$(dialog --title 'System Manager' --backtitle "Sistema Automatizado de Orquestração de Sistemas!" --menu " " 0 0 0 \
 A 'Linite' \
-B 'Init' \
+B 'Server Manager' \
 C 'Orchestra' \
 D 'Docker' \
 X 'Sair' 2>&1 > /dev/tty )
