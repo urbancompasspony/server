@@ -77,7 +77,7 @@ case "$var0" in
 3) servers ; start ;;
 4) others ; start ;;
 5) managers ; start ;;
-X) echo "Saindo..." && wget https://raw.githubusercontent.com/urbancompasspony/server/main/docker -O /tmp/docker; bash /tmp/docker && exit ;;
+X) exit ;;
 esac
 }
 
