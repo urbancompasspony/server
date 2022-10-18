@@ -2,19 +2,17 @@
 
 function start {
 var0=$(dialog --title 'System Manager' --backtitle "Sistema Automatizado de Orquestração de Sistemas!" --menu " " 0 0 0 \
-A 'Init' \
-B 'Tools' \
-C 'Docker' \
-D 'Linite' \
-F 'Orchestration' \
+A 'Linite' \
+B 'Init' \
+C 'Orchestra' \
+D 'Docker' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
-A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/init | sudo bash ; start ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; start ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
-F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
+A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/init | sudo bash ; start ;;
+C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
