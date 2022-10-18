@@ -23,6 +23,10 @@ revis="r0.1"
 ################################################################################
 ################################################################################
 
+# For Ubuntu 22.04!
+export NEEDRESTART_MODE=a
+export DEBIAN_FRONTEND=noninteractive
+
 # Docs
 FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
