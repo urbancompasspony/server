@@ -19,6 +19,7 @@ function check {
     menu022 "15p" && nomeO=$cont0 && contO=$sts && IPLocalO=$IPLocal
   } || {
     dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "$bktitle" --msgbox "O Docker não foi encontrado neste sistema ou você não possui as permissões de acesso!" 7 50
+    exit
   }
 }
 
