@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Início:
-[ "$EUID" -ne 0 ] || {
-  echo "NÃO execute esse script como Root! Saindo..."
-  exit
-  }
-
 function sambaclient {
 VALUE1="//172.20.0.2/backup"
 VALUE2="/mnt/backup"
