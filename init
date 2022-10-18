@@ -17,10 +17,6 @@
 # x.9: Mudanças pequenas, implementação de novas ferramentas.
 # rc-1: Correções de bugs de ferramentas ou menus
 
-# Hashs
-hash2="576200e78f0ab25b437dc7372ae920d9"
-hash3="9ae7c2a8e120dssssa4915cba5a15e17"
-
 version="v4.0"
 revis="r0.1"
 
@@ -28,8 +24,6 @@ revis="r0.1"
 ################################################################################
 
 # Docs
-FILE="/home/$USER/.lockinit"
-FILE2="/etc/.lockall"
 FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
 
@@ -76,56 +70,9 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 
 # PASSWORD
 function init {
-[ -f "$FILE2" ] && echo "# # # Menu Travado! Saindo. # # #" && exit
-password=$(dialog --backtitle "$bktitle" --title "Acesso ao USM - $revis" --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
-hash1=$(echo "$password" | md5sum | awk '{print $1}')
-[ -z "$password" ] && {
-  clear
-  echo "É necessário digitar uma senha para continuar. Saindo..."
-  echo "Para voltar, digite 'menu'!"
-} || {
-  [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && {
-    password=$(dialog --backtitle "$bktitle." --title "Acesso ao USM - $revis" --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
     menu054
-  } || {
-    menu054
-    }
 }
 
-}
-
-# SISTEMA Normal
-function start {
-doc_rel="1" # Relatorio!
-datetime=$(date +"%d/%m %H:%M")
-uptime=$(uptime | awk {'print $3 $4 $5'})
-var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
-Data e Hora: $datetime
-UpTime: $uptime"  0 0 0 \
-A 'Status Geral' \
-B 'Máquinas Virtuais' \
-C 'Processos' \
-D 'Active Directory' \
-E 'Ferramentas' \
-F 'Avançado' \
-G '*Reiniciar' \
-H '*Desligar' \
-X 'SAIR' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var1" in
-A) menu01 ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/virtual_machine/main/vmachine | sudo bash ; start ;;
-C) menu03 ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/domain/main/domain | bash ; start ;;
-E) menu05 ;;
-F) m10 ;;
-G) menu06 ;;
-H) menu07 ;;
-X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
-esac
-}
-
-# Invertido
 function st4rt1 {
 datetime=$(date +"%d/%m %H:%M")
 uptime=$(uptime | awk {'print $3 $4 $5'})
@@ -140,12 +87,12 @@ E 'Ferramentas' \
 F '*Reiniciar' \
 G '*Desligar' \
 X 'SAIR' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && liminal "st4rt1" "start"
+[ $? -ne 0 ] && st4rt1
 case "$var1" in
 A) m3nu01 ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/virtual_machine/main/vmachine | sudo bash ; st4rt1 ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | sudo bash ; st4rt1 ;;
 C) menu03 ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/domain/main/domain | bash ; st4rt1 ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | sudo bash ; st4rt1 ;;
 E) m3nu05 ;;
 F) menu06 ;;
 G) menu07 ;;
@@ -153,45 +100,6 @@ X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
 }
 
-# Ferramentas Normal
- #xorg=$(ls /tmp/.X11-unix | wc -l)
-function menu05 {
-var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
-A 'Placas de Rede' \
-B '*Speed Test' \
-C '*Arp-Scan' \
-D '*IP Neigh' \
-E '*Who Is' \
-F '*Trace Route' \
-G 'Iniciar Navegador' \
-H '*Ping DNS' \
-I 'Iniciar Scripts' \
-J '*Re-Iniciar NOIP' \
-K 'Config. Relatórios' \
-L 'Relatórios Salvos' \
-X 'Voltar' 2>&1 > /dev/tty )
-case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
-esac
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var6" in
-A) menu21 ;;
-B) menu050 ;;
-C) menu0501 ;;
-D) menu23 ;;
-E) menu051 ;;
-F) menu052 ;;
-G) [ "$DISPLAY" = "localhost:10.0" ] && { xinit epiphany-browser $* -- :100 vt$XDG_VTNR;} || { epiphany-browser;} ; menu05 ;;
-H) menu22 ;;
-I) menu24 ;;
-J) menu25 ;;
-K) menu054 ;;
-L) menu055 ;;
-X) liminal "st4rt1" "start" ;;
-esac
-}
-
-# Ferramentas Invertido
 function m3nu05 {
 var6=$(dialog --help-button --help-label 'Ajuda' --title 'Ferramentas' --backtitle "$bktitle" --menu " " 0 0 0 \
 A 'Placas de Rede' \
@@ -204,9 +112,9 @@ G 'Config. Relatórios' \
 H 'Relatórios Salvos' \
 X 'Voltar' 2>&1 > /dev/tty )
 case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; liminal "m3nu05" "menu05" ;;
+  2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; m3nu05 ;;
 esac
-[ $? -ne 0 ] && liminal "st4rt1" "start"
+[ $? -ne 0 ] && st4rt1
 case "$var6" in
 A) menu21 ;;
 B) menu050 ;;
@@ -216,48 +124,7 @@ E) menu24 ;;
 F) menu25 ;;
 G) menu054 ;;
 H) menu055 ;;
-X) liminal "st4rt1" "start" ;;
-esac
-}
-
-function m10 {
-var10=$(dialog --backtitle "Ferramentas e Funções Avançadas" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
-A 'Atualizar o Sistema' \
-B 'Samba - Client' \
-C 'X Samba' \
-D 'PiHole' \
-E 'Manut. Banco AD&DC' \
-F 'Manutenção NextCloud' \
-G 'Trocar Gov. de CPU' \
-H 'Menu de Backups' \
-I 'UDPCast' \
-J '*Usuários Logados' \
-K '*Logins Anteriores' \
-L 'Diagnóstico Manual' \
-M 'Finalizar .docx > .PDF' \
-N 'Encaminhar .PDF' \
-O 'Apagar .docx' \
-P 'Apagar .PDF' \
-X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var10" in
-A) m11 ;;
-B) menu31 ;;
-C) menu32 ;;
-D) menu26 ;;
-E) menu004 ;;
-F) menu34 ;;
-G) menu053 ;;
-H) m122 ;;
-I) menu17 ;;
-J) menu18 ;;
-K) menu19 ;;
-L) menu28 ;;
-M) menu291 ;;
-N) menu29 ;;
-O) menu30 ;;
-P) menu301 ;;
-X) liminal "st4rt1" "start" ;;
+X) st4rt1 ;;
 esac
 }
 
@@ -279,7 +146,7 @@ E '*Cluster: DRBD' \
 F '*Cluster: PCS' \
 G '*Smart UPS' \
 X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && start
+[ $? -ne 0 ] && st4rt1
 case "$var2" in
 A) menu11 ;;
 B) menu12 ;;
@@ -288,7 +155,7 @@ D) menu14 ;;
 E) menu15 ;;
 F) menu16 ;;
 G) menu33 ;;
-X) start ;;
+X) st4rt1 ;;
 esac
 }
 
@@ -303,13 +170,13 @@ B '*Temperatura' \
 C '*Armazenamento' \
 D '*Smart UPS' \
 X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && liminal "st4rt1" "start"
+[ $? -ne 0 ] && st4rt1
 case "$var2" in
 A) menu11 ;;
 B) menu12 ;;
 C) menu13 ;;
 D) menu33 ;;
-X) liminal "st4rt1" "start" ;;
+X) st4rt1 ;;
 esac
 }
 
@@ -321,7 +188,7 @@ script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executand
   [ "$script1" = "Executando" ] && {
     dialog --title 'Script Cluster Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
   } || {
-    echo "$password" | sudo -S bash /home/$USER/Scripts/Cluster & 1> /dev/null 2> /dev/null
+    sudo bash /home/$USER/Scripts/Cluster & 1> /dev/null 2> /dev/null
     dialog --title 'Script Cluster foi iniciado!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
     }
 } || {
@@ -342,8 +209,8 @@ checkscript2=$([ -f /home/$USER/Scripts/Balloon ] && echo "sim" || echo "nao")
   dialog --title 'ATENÇÃO!' --msgbox "O script Balloon não foi encontrado ou configurado!" 8 40
   }
   
-[ $? -ne 0 ] && liminal "m3nu05" "menu05"
-liminal "m3nu05" "menu05"
+[ $? -ne 0 ] && m3nu05
+m3nu05
 }
 
 function menu25 {
@@ -354,31 +221,31 @@ checknoip=$([ -f /usr/local/src/noip-duc-linux.tar.gz ] && echo "sim" || echo "n
   [ "$noip0" = "Executando" ] && {
     dialog --title "$noip2" --yesno "Deseja reiniciar o NOIP?" 6 40
     [ $? = 0 ] && {
-      echo "$password" | sudo -S killall noip2
+      sudo killall noip2
       sleep 2
-      echo "$password" | sudo -S noip2
+      sudo noip2
       dialog --title "$noip2" --msgbox "O NOIP foi reiniciado! \n
 Aguarde 1 minuto até o novo IP ser validado." 8 40
     } || {
       dialog --title "$noip2" --yesno "Deseja parar o NOIP?" 6 40
       [ $? = 0 ] && {
-        echo "$password" | sudo -S killall noip2
+        sudo killall noip2
         dialog --title "$noip2" --msgbox "O NOIP foi parado!" 6 40
         }
     } || {
-      liminal "m3nu05" "menu05"
+      m3nu05
       }
   } || {
     dialog --title "$noip2" --yesno "Deseja tentar iniciar o NOIP?" 6 40
     [ $? = 0 ] && {
-      echo "$password" | sudo -S noip2
+      sudo noip2
       dialog --title "$noip2" --msgbox "Verifique se o NOIP iniciou no menu 'Status Geral > Sistema'!" 8 40
       }
   } 
 } || {
   dialog --title "$noip2" --msgbox "NOIP não foi encontrado ou configurado nesse sistema." 8 40
 }
-liminal "m3nu05" "menu05"
+m3nu05
 }
 
 # Status de Sistema
@@ -435,10 +302,10 @@ dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Informações encon
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO01" 0 0 ; menu11 ;;
 esac
-[ $? -ne 0 ] && liminal "m3nu01" "menu01"
+[ $? -ne 0 ] && m3nu01
 
 menu08 "$Recado $TEXTMAIL $TEXTAO01 $Mensagem"
-liminal "m3nu01" "menu01"
+m3nu01
 }
 
 # Processos de Sistema
@@ -477,7 +344,7 @@ X "Voltar" 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO08" 0 0 ; menu03 ;;
 esac
-[ $? -ne 0 ] && liminal "st4rt1" "start"
+[ $? -ne 0 ] && st4rt1
 case "$menuxx" in
 A) status="$smb1"; processname="Samba"; process="smbd"; menu031 ;;
 B) status="$smb2"; processname="Dominio"; process="samba-ad-dc"; menu031 ;;
@@ -493,7 +360,7 @@ K) status="$cups1"; processname="CUPS"; process="cups"; menu031 ;;
 L) status="$motion1"; processname="Motion"; process="motion"; menu031 ;;
 M) status="$dwagent1"; processname="DWAgent"; process="dwagent"; menu031 ;;
 N) status="$vpn"; processname="VPN Client"; process="openvpn"; menu03 ;;
-X) liminal "st4rt1" "start" ;;
+X) st4rt1 ;;
 esac
 }
 
@@ -501,12 +368,12 @@ function menu031 {
 [ "$status" = "Executando" ] && {
   dialog --title "$processname" --yesno "Deseja reiniciar o processo $processname ?" 6 40
   [ $? = 0 ] && {
-    echo "$password" | sudo -S systemctl restart "$process"
+    sudo systemctl restart "$process"
     dialog --title "$processname" --msgbox "O processo $processname foi reiniciado!" 6 40
   } || {
     dialog --title "$processname" --yesno "Deseja parar o processo $processname ?" 6 40
     [ $? = 0 ] && {
-      echo "$password" | sudo -S systemctl stop "$process"
+      sudo systemctl stop "$process"
       dialog --title "$processname" --msgbox "O processo $processname foi parado!" 6 40
       }
   } || {
@@ -515,7 +382,7 @@ function menu031 {
 } || {
   dialog --title "$processname" --yesno "Deseja tentar iniciar o processo $processname ?" 6 40
   [ $? = 0 ] && {
-    echo "$password" | sudo -S systemctl start "$process"
+    sudo systemctl start "$process"
     dialog --title "$processname" --msgbox "Verifique se o $processname iniciou." 6 40
     }
 }
@@ -525,7 +392,7 @@ menu03
 
 # Status de Processos
 function menu09 {
-  prcs=$(echo "$password" | sudo -S systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente")
+  prcs=$(sudo systemctl is-active --quiet $1 && echo "Executando" || echo "Parado ou Ausente")
 }
 
 # Status Temperatura
@@ -535,14 +402,14 @@ dialog --cr-wrap --help-button --help-label 'Ajuda' --backtitle 'Temperatura, Po
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO02" 0 0 ; menu12 ;;
 esac
-[ $? -ne 0 ] && liminal "m3nu01" "menu01"
+[ $? -ne 0 ] && m3nu01
 [ "$sensors1" = "Indisponível!" ] && {
   dialog --title "Erro ao emitir relatório" --msgbox "Sistema incompatível!" 0 0
 } || {
   menu08 "$Recado $sensors0 $TEXTAO02 $Mensagem"
   }
 
-liminal "m3nu01" "menu01"
+m3nu01
 }
 
 # Status de Consumo dos Discos
@@ -552,10 +419,10 @@ dialog --cr-wrap --help-button --help-label 'Ajuda' --title "Discos encontrados"
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO03" 0 0; menu13 ;;
 esac
-[ $? -ne 0 ] && liminal "m3nu01" "menu01"
+[ $? -ne 0 ] && m3nu01
 
 menu08 "$Recado $sdisks $TEXTAO03 $Mensagem"
-liminal "m3nu01" "menu01"
+m3nu01
 }
 
 # LibATASmart-bin!
@@ -583,7 +450,7 @@ menusk=$(dialog --help-button --help-label 'Ajuda' --backtitle "Análise de Atri
 case $? in
   2) dialog --title "Definições de SMART!" --msgbox "$TEXTAO04" 0 0 ; menu14 ;;
 esac
-[ $? -ne 0 ] && {start}
+[ $? -ne 0 ] && {st4rt1}
 case "$menusk" in
 "/dev/sda") menu141 "sda" "$dump1" ; menu14 ;;
 "/dev/sdb") menu141 "sdb" "$dump2" ; menu14 ;;
@@ -601,7 +468,7 @@ esac
 function menu140 {
 stssd=$(ls /dev/$1 1> /dev/null 2> /dev/null && echo "Presente" || echo "Ausente")
 [ "$stssd" = "Presente" ] && {
-  skd=$(echo "$password" | sudo -S skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}')
+  skd=$(sudo skdump /dev/$1 | grep -A40 -P 'ID#' | awk '{print $1,$2,$6}')
 } || {
   skd=$(echo "Disco ausente!")
   }
@@ -617,12 +484,12 @@ menu14
 function menu15 {
 menu09 drbd && drbd1=$prcs
 [ "$drbd1" = "Executando" ] && {
-  sdrbd=$(echo "$password" | sudo -S drbdadm status)
+  sdrbd=$(sudo drbdadm status)
   dialog --cr-wrap --help-button --help-label 'Ajuda' --title "DRBD" --backtitle "$bktitle" --msgbox "$sdrbd" 0 0
   case $? in
     2) dialog --title 'Ajuda' --msgbox "$TEXTAO05" 0 0; menu15 ;;
   esac
-  [ $? -ne 0 ] && {start}
+  [ $? -ne 0 ] && {st4rt1}
   menu08 "$Recado $sdrbd $TEXTAO05 $Mensagem"
 } || {
   dialog --title "ERROR" --msgbox "O DRBD não está em execução ou não foi localizado neste sistema!" 8 40
@@ -635,12 +502,12 @@ function menu16 {
 menu09 corosync && corosync1=$prcs
 menu09 pacemaker && pacemaker1=$prcs
 [ "$corosync1" = "Executando" ] && [ "$pacemaker1" = "Executando" ] && {
-  spcs=$(echo "$password" | sudo -S pcs status)
+  spcs=$(sudo pcs status)
   dialog --cr-wrap --help-button --help-label 'Ajuda' --title "PCS" --backtitle "$bktitle" --msgbox "$spcs" 0 0
   case $? in
     2) dialog --title 'Ajuda' --msgbox "$TEXTAO06" 0 0; menu16 ;;
   esac
-  [ $? -ne 0 ] && {start}
+  [ $? -ne 0 ] && {st4rt1}
   menu08 "$Recado $spcs $TEXTAO06 $Mensagem"
 } || {
   dialog --title "ERROR" --msgbox "O Pacemaker/Corosync não estão em execução ou não foram localizados neste sistema!" 8 40
@@ -649,41 +516,14 @@ menu09 pacemaker && pacemaker1=$prcs
 menu01
 }
 
-function menu17 {
-var2=$(dialog --title 'UDPCast' --backtitle "$bktitle" --menu "Escolha o modo!" 0 0 0 \
-A 'Cliente' \
-B 'Servidor' \
-X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && {start}
-case "$var2" in
-A) echo "Modo Cliente. Para sair, precione CTRL + C!" ; udp-receiver --file=/dev/null ;;
-B) echo "Modo Servidor. Para sair, precione CTRL + C!" ; udp-sender --file=/dev/zero ;;
-X) m10 ;;
-esac
-}
-
-function menu18 {
-userlog=$(w)
-dialog --title "Informação" --msgbox "$userlog" 20 60
-menu08 "$Recado $userlog $Mensagem"
-m10
-}
-
-function menu19 {
-userlast=$(last)
-dialog --title "Informação" --msgbox "$userlast" 20 60
-menu08 "$Recado $userlast $Mensagem"
-m10
-}
-
 function menu21 {
 resultenp=$(ip a | sed -n '/enp/p' |  awk '!/mac/' | awk '{print $2}' | sed 's/.$//' | grep 'enp')
 for i in $resultenp; do
-  velo=$(echo "$password" | sudo -S ethtool "$i" | grep Speed)
+  velo=$(sudo ethtool "$i" | grep Speed)
   dialog --title 'Velocidades detectadas:' --msgbox "$i $velo" 8 40
 done
 
-liminal "m3nu05" "menu05"
+m3nu05
 }
 
 function ping1 {
@@ -760,14 +600,14 @@ Claro 181.213.132.3: $CLARO_S"
 dialog --title 'Resultados do Ping:' --msgbox "$TEXTAO14" 0 0
 
 menu08 "$Recado $TEXTAO14 $Mensagem"
-liminal "m3nu05" "menu05"
+m3nu05
 }
 
 function menu23 {
 ipneigh1=$(ip neigh)
 dialog --title 'IP Neigh' --msgbox "$ipneigh1" 0 0
 menu08 "$Recado $ipneigh1 $Mensagem"
-liminal "m3nu05" "menu05"
+m3nu05
 }
 
 # SpeedTest
@@ -776,16 +616,16 @@ dialog --title 'SpeedTest' --backtitle "$bktitle" --msgbox "Pressione Enter para
 speedy=$(curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -)
 dialog --title 'SpeedTest' --backtitle "$bktitle" --msgbox "$speedy" 0 0
 menu08 "$Recado $speedy $Mensagem"
-liminal "m3nu05" "menu05"
+m3nu05
 }
 
 # Arp-Scan
 function menu0501 {
 dialog --title 'Arp-Scan' --backtitle "$bktitle" --msgbox "Pressione Enter para iniciar o teste e aguarde!" 0 0
-arpscn=$(echo "$password" | sudo -S arp-scan -l)
+arpscn=$(sudo arp-scan -l)
 dialog --title 'Arp-Scan' --backtitle "$bktitle" --msgbox "$arpscn" 0 0
 menu08 "$Recado $arpscn $Mensagem"
-liminal "m3nu05" "menu05"
+m3nu05
 }
 
 #WhoIS
@@ -795,7 +635,7 @@ dialog --title "WhoIs" --msgbox "Pressione Enter para iniciar o teste e aguarde!
 wis=$(whois "$site")
 dialog --title "WhoIs" --msgbox "$wis" 0 0
 menu08 "$Recado $wis $Mensagem"
-liminal "m3nu05" "menu05"
+m3nu05
 }
 
 # Traceroute
@@ -807,41 +647,13 @@ dialog --title "Traceroute" --msgbox "Pressione Enter para iniciar o teste e agu
 trot=$(traceroute "$site")
 dialog --title "Traceroute" --msgbox "$trot" 0 0
 menu08 "$Recado $trot $Mensagem"
-liminal "m3nu05" "menu05"
-}
-
-# Governador de CPU
-function menu053 {
-governor1=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor || echo "Indisponível!")
-governor2=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors || echo "Indisponível!")
-var3=$(dialog --help-button --help-label 'Ajuda' --title 'Governador de CPU' --backtitle "$bktitle" --menu "Governador de CPU Atual: \n
-$governor1" 0 0 0 \
-A 'Conservative' \
-B 'OnDemand' \
-C 'UserSpace' \
-D 'PowerSave' \
-E 'Performance' \
-F 'Schedutil' \
-X 'Voltar' 2>&1 > /dev/tty )
-case $? in
-  2) dialog --title 'Ajuda' --msgbox "$TEXTAO10" 0 0 ; menu053 ;;
-esac
-[ $? -ne 0 ] && liminal "m3nu05" "menu05"
-case "$var3" in
-A) menu10 conservative ;;
-B) menu10 ondemand ;;
-C) menu10 userspace ;;
-D) menu10 powersave ;;
-E) menu10 performance ;;
-F) menu10 schedutil ;;
-X) m10 ;;
-esac
+m3nu05
 }
 
 # Governador de CPU 2
 function menu10 {
 governor2=$(cat /sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors)
-govr=$(echo "$password" | sudo -S echo $1 | sudo -S tee /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor 2> /dev/null 1> /dev/null && echo "si" || echo "no")
+govr=$(sudo echo $1 | sudo -S tee /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor 2> /dev/null 1> /dev/null && echo "si" || echo "no")
 [ "$govr" = "si" ] && {
   dialog --cr-wrap --title "Bem sucedido!" --backtitle "$bktitle" --msgbox "Governador trocado com sucesso!" 0 0 ; menu053
 } || {
@@ -856,7 +668,7 @@ function menu054 {
 pong=$(ping google.com -c 1 1> /dev/null 2> /dev/null && echo "ok" || echo "notok")
 [ "$pong" = "notok" ] && {
   dialog --cr-wrap --title "Erro na Rede" --backtitle "$bktitle" --msgbox "O sistema não pode se comunicar com a rede local! Verifique sua conexão e tente novamente mais tarde." 8 40
-  liminal "st4rt1" "start"
+  st4rt1
 } || {
   [ "$report" = "0" ] && {
     dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja habilitar a emissão de relatórios de diagnóstico?" 8 40
@@ -910,7 +722,7 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
   }
 }
 
-liminal "st4rt1" "start"
+st4rt1
 }
 
 function menu055 {
@@ -943,7 +755,7 @@ Deseja enviá-lo por e-mail?" 20 70
     }
 }
 
-liminal "m3nu05" "menu05"
+m3nu05
 }
 
 # Reinicio
@@ -967,11 +779,11 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
         echo "a" > /dev/null
         }
     }
-  echo "$password" | sudo -S reboot
+  sudo reboot
   }
 }
 
-liminal "st4rt1" "start"
+st4rt1
 }
 
 # Desligamento
@@ -995,11 +807,11 @@ Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
         echo "a" > /dev/null
         }
     }
-  echo "$password" | sudo -S shutdown -h now
+  sudo shutdown -h now
   }
 }
 
-liminal "st4rt1" "start"
+st4rt1
 }
 
 # Encaminhar relatórios por Email!
@@ -1046,442 +858,6 @@ Depois vá em 'Ferramentas > Relatórios Salvos' tentar reenviar este relatório
 
 }
 
-# Manut. Banco Samba AD-DC
-function menu004 {
-menu09 samba-ad-dc && smb2=$prcs
-[ "$smb2" = "Executando" ] && {
-  clear
-  echo "$password" | sudo -S samba-tool dbcheck --cross-ncs --fix | tee /tmp/.smbadtmp; read
-  tmpad=$(cat /tmp/.smbadtmp)
-  menu08 "$Recado $tmpad $Mensagem"
-} || {
-  dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "Active Directory & Domain Controller" --msgbox "O Controlador de Domínio não foi encontrado neste sistema!" 7 40
-  }
-
-m10
-}
-
-function m1x {
-dialog --title 'F.F.A.' --msgbox "Ferramentas e Funções Avançadas" 0 0
-password3=$(dialog --backtitle "F.F.A.: Ferramentas e Funções Avançadas" --title 'Acesso Restrito' --insecure --passwordbox 'Digite a senha' 0 0 2>&1 > /dev/tty)
-
-[ "$password3" = "1345278" ] && {
-  dialog --title 'Porteiro:' --msgbox "Clift Claft Still, a Porta se Abriu!" 6 40
-  m10
-} || {
-  dialog --title 'Acesso Proibido' --msgbox "Permissão Incorreta" 0 0
-  }
-
-}
-
-function m11 {
-dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja atualizar o sistema operacional?" 8 40
-[ $? = 0 ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza disso? Verifique se os processos em execução não pararão e/ou se configurações não serão perdidas." 8 40
-  [ $? = 0 ] && {
-    datetime=$(date +"%d/%m %H:%M")
-    echo "$password" | sudo -S "$pkg1" update
-    upgrd=$(apt list --upgradable)
-    echo "$password" | sudo -S "$pkg1" upgrade -y
-    echo "$password" | sudo -S "$pkg1" autoremove -y
-    datetime2=$(date +"%d/%m %H:%M") # Data e Hord
-    echo "# # # Fim! Aperte Enter para continuar. # # #" ; read
-    dialog --title "Informação" --msgbox "Verifique se os processos em execução não pararam e/ou se configurações não foram perdidas." 8 40
-    [ "$report" = "1" ] && {
-      dialog --title "Relatório" --msgbox "Os pacotes a seguir foram atualizados: \n
-$upgrd" 20 50
-      dialog --title 'Relatório' --yesno "Deseja enviar este relatório por e-mail?" 8 40
-      [ $? = 0 ] && {
-        menu08 "$Recado $Recado2 $datetime $Recado3 $upgrd $Recado4 $datetime2 $Mensagem"
-        menu27 "
-$datetime : Nesta data o sistema recebeu as atualizações mais recentes e está em dia com a segurança digital."
-      }
-    }
-  }
-}
-
-m10
-}
-
-function m122 {
-var_stop=$(dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Atenção' --menu "Funções Avançadas" 0 0 0 \
-A 'Parar RSYNC' \
-B 'Parar RSNAPSHOT' \
-C 'Parar BALANCE' \
-D 'Parar COPY' \
-X 'Voltar' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && liminal "st4rt1" "start"
-case "$var_stop" in
-A) m12 ;;
-B) m13 ;;
-C) m14 ;;
-D) m15 ;;
-X) m10 ;;
-esac
-}
-
-function m12 {
-dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja parar o processo RSYNC?" 8 40
-[ $? = 0 ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
-  [ $? = 0 ] && {
-    echo "$password" | sudo -S killall rsync
-    dialog --title "ATENÇÃO" --msgbox "Verifique se seus backups estão íntegros." 8 40
-  } || {
-    echo "a" > /dev/null
-    }
-} || {
-  echo "a" > /dev/null
-  }
-
-m122
-}
-
-function m13 {
-dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja parar o processo RSNAPSHOT?" 8 40
-[ $? = 0 ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
-  [ $? = 0 ] && {
-    echo "$password" | sudo -S killall rsnapshot
-    dialog --title "ATENÇÃO" --msgbox "Verifique se seus backups estão íntegros." 8 40
-  } || {
-    echo "a" > /dev/null
-    }
-} || {
-  echo "a" > /dev/null
-  }
-
-m122
-}
-
-function m14 { 
-blnc=$(dialog --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --inputbox "Insira o caminho:" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && m10
-[ -z "$blnc" ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title "ERRO" --msgbox "Caminho não pode ficar em branco!" 8 40
-} || {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Balance' --backtitle "Parar Balance em $HOSTNAME" --yesno "Tem certeza que deseja parar o Balance em $blnc?" 8 40
-  [ $? = 0 ] && {
-    echo "$password" | sudo -S btrfs balance cancel "$blnc"
-  } || {
-    echo "a" > /dev/null
-    }
-}
-
-m122
-}
-
-function m15 {
-dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Deseja parar o processo CoPy?" 8 40
-[ $? = 0 ] && {
-  dialog --backtitle "Ferramentas e Funções Avançadas - Utilize com Moderação" --title 'Informação' --yesno "Tem certeza? Backups poderão não ser completados ou até corromper!" 8 40
-  [ $? = 0 ] && {
-    echo "$password" | sudo -S killall cp
-    dialog --title "ATENÇÃO" --msgbox "Verifique se seus backups estão íntegros." 8 40
-  } || {
-    echo "a" > /dev/null
-    }
-} || {
-  echo "a" > /dev/null
-  }
-
-m122
-}
-
-function liminal { [ -f "$FILE" ] && { [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && { $2; } || { $1; }; } || { $2; }; }
-
-function menu26 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  blockedsites=$(picron=$(pihole -c -e); echo "$picron" | awk 'NR==11 {print $4}')
-  varpi=$(dialog --title 'Servidor de DNS PiHole' --backtitle "$bktitle" --menu "URLs Bloqueadas: \n
-$blockedsites" 0 0 0 \
-  A '*Resumo' \
-  B '*Atualizar PiHole' \
-  C '*Atualizar Gravity' \
-  D '*White List' \
-  E '*Black List' \
-  X 'Voltar' 2>&1 > /dev/tty )
-  case $? in
-    2) dialog --title 'Ajuda' --msgbox "$TEXTAO10" 0 0 ; menu053 ;;
-  esac
-  [ $? -ne 0 ] && liminal "m3nu05" "menu05"
-  case "$varpi" in
-  A) menu264 ;;
-  B) menu20 ;;
-  C) menu261 ;;
-  D) menu262 ;;
-  E) menu263 ;;
-  X) m10 ;;
-  esac
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  m10
-  }
-}
-
-# Atualizar PiHole
-function menu20 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja atualizar o PiHole?" 6 40
-  [ $? = 0 ] && {
-    datetime=$(date +"%d/%m %H:%M")
-    version1=$(pihole -v)
-    pihole -up
-    version2=$(pihole -v)
-    datetime2=$(date +"%d/%m %H:%M") # Data e Hora
-    menu08 "$Recado PiHole atualizado de $datetime até $datetime2!
-A versão anterior era:
-
-$version1 
-
-A nova versão é:
-
-$version2
-
-Atento ás novidades que a nova versão possa ter trago! $Mensagem"
-    menu27 "
-$datetime : PiHole® atualizado desta data até $datetime2 para a versão mais nova!"
-    }
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  }
-
-menu26
-}
-
-# Atualizar Gravity
-function menu261 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja atualizar o Gravity?" 6 40
-  [ $? = 0 ] && {
-    datetime=$(date +"%d/%m %H:%M")
-    pihole -g
-    datetime2=$(date +"%d/%m %H:%M") # Data e Hora
-    blockedsites=$(picron=$(pihole -c -e); echo "$picron" | awk 'NR==11 {print $4}')
-    menu08 "$Recado A lista de bloqueios foi atualizada de $datetime até $datetime2! Agora o sistema bloqueia $blockedsites sites maliciosos. $Mensagem"
-    menu27 "
-$datetime : A lista de bloqueios foi atualizada desta data até $datetime2! O sistema bloqueia $blockedsites sites maliciosos."
-    }
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  }
-
-menu26
-}
-
-# White List
-function menu262 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja adicionar uma URL á White List?" 6 40
-  [ $? = 0 ] && {
-    datetime=$(date +"%d/%m %H:%M")
-    validurl=$(dialog --title 'PiHole' --backtitle "$bktitle" --inputbox "Insira a URL que será liberada" 0 0 2>&1 > /dev/tty)
-    [ $? -ne 0 ] && menu26
-    [ -z "$validurl" ] && {
-      dialog --title "ERRO" --msgbox "URL não pode ficar em branco!" 8 40
-    } || {
-      echo "$password" | sudo -S pihole --white-wild "$validurl"
-      dialog --title "Informação" --msgbox "O site $validurl foi liberado! Aguarde até que a mudança reverbere na rede local." 8 40
-    }
-    menu08 "$Recado O site $validurl foi liberado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
-    menu27 "
-$datetime : Nesta data o site $validurl foi liberado acesso conforme solicitado."
-    }
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  }
-
-menu26
-}
-
-# Black List
-function menu263 {
-menu09 pihole-FTL && pihole1=$prcs
-[ "$pihole1" = "Executando" ] && {
-  dialog --backtitle "$bktitle" --title "PiHole" --yesno "Deseja adicionar uma URL á Black List?" 6 40
-  [ $? = 0 ] && {
-    validurl=$(dialog --title 'PiHole' --backtitle "$bktitle" --inputbox "Insira a URL que será bloqueada" 0 0 2>&1 > /dev/tty)
-    [ $? -ne 0 ] && menu26
-    [ -z "$validurl" ] && {
-      dialog --title "ERRO" --msgbox "URL não pode ficar em branco!" 8 40
-    } || {
-      echo "$password" | sudo -S pihole --wild "$validurl"
-      dialog --title "Informação" --msgbox "O site $validurl foi bloqueado! Aguarde até que a mudança reverbere na rede local." 8 40
-    }
-    menu08 "$Recado O site $validurl foi bloqueado em $datetime! Aguarde até que a mudança reverbere na rede local. $Mensagem"
-    menu27 "
-$datetime : Nesta data o site $validurl foi bloqueado conforme solicitado."
-    }
-} || {
-  dialog --title "Informação" --msgbox "PiHole não localizado neste sistema!" 8 40
-  }
-
-menu26
-}
-
-function menu264 {
-datetime=$(date +"%d/%m %H:%M")
-picron=$(pihole -c -e | awk 'NR>=5 && NR<=17 {print}')
-dialog --title 'Chronometer' --msgbox "$picron" 0 0
-menu08 "$Recado Status do PiHole em $datetime: 
-
-$picron $Mensagem"
-menu26
-}
-
-function menu27 {
-[ -f "/home/$USER/.DOC/.relat.docx" ] && {
-  [ "$doc_rel"="1" ] && {
-    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar o relatório para $datetime3.docx?" 8 40
-    [ $? = 0 ] && {
-        echo "$1" >> "/home/$USER/.DOC/$datetime3.docx"
-        }
-      } || {
-        m10
-      }
-  } || {
-    dialog --title 'relat.docx' --msgbox "Arquivo não encontrado. Abortando." 8 30
-    m10
-    }
-}
-
-function menu28 {
-[ -f "/home/$USER/.DOC/.relat.docx" ] && {
-  [ "$doc_rel"="1" ] && {
-    datetime=$(date +"%d/%m %H:%M")
-    dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja criar um diagnóstico customizado?" 8 40
-    [ $? = 0 ] && {
-        cusrelat=$(dialog --title 'Custom' --backtitle "$bktitle" --inputbox "O que deseja reportar?" 8 40 "$datetime : " 2>&1 > /dev/tty)
-        menu08 "$Recado $cusrelat $Mensagem"
-        menu27 "
-$cusrelat"
-        m10
-        }
-    } || {
-      m10
-     }
-  } || {
-    dialog --title 'relat.docx' --msgbox "Arquivo não encontrado. Abortando." 8 30
-    m10
-    }
-}
-
-function menu29 {
-datetime=$(date +"%d/%m %H:%M")
-validmail=$(awk 'NR==1' $FILE3)
-
-dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar $datetime3.pdf para $validmail?" 8 40
-[ $? = 0 ] && {
-  TEXTAO15="Boa tarde,
-
-Segue em anexo o Relatório de Atendimentos, com os chamados, manutenções preventivas e manutenções corretivas executadas no período de $datetime3.
-
-Grato,
-José Humberto"
-  echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.pdf" -- "$validmail"
-  }
-
-dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar um documento diferente para $validmail?" 8 40
-[ $? = 0 ] && {
-  inputdoc1=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-  TEXTAO151="Boa tarde,
-
-Segue em anexo o Relatório de Atendimentos, com os chamados, manutenções preventivas e manutenções corretivas executadas no período de $inputdoc1.
-
-Grato,
-José Humberto"
-  echo "$TEXTAO151" | mutt -s "Relatório de Atendimentos - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.pdf" -- "$validmail"
-  }
-
-m10
-}
-
-function menu291 {
-[ -f "/home/$USER/.DOC/$datetime3.pdf" ] && {
-  dialog --title 'relat.pdf' --msgbox "Arquivo já existe!" 8 30
-} || {
-  dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja finalizar um documento de .docx para .pdf?" 8 40
-  [ $? = 0 ] && {
-    inputdoc2=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-    cd "/home/$USER/.DOC/"
-    soffice --convert-to "pdf" "/home/$USER/.DOC/$inputdoc2.docx" "/home/$USER/.DOC/$inputdoc2.pdf"
-    }
-  }
-
-m10
-}
-
-function menu30 {
-dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja APAGAR um relatório.docx?" 8 40
-[ $? = 0 ] && {
-  inputdoc3=$(dialog --title 'Deleção' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-  rm "/home/$USER/.DOC/$inputdoc3.docx"
-  }
-
-m10
-}
-
-function menu301 {
-dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja APAGAR um relatório.PDF?" 8 40
-[ $? = 0 ] && {
-  inputdoc4=$(dialog --title 'Deleção' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-  rm "/home/$USER/.DOC/$inputdoc4.pdf"
-  }
-
-m10
-}
-
-function menu31 {
-VALUE1="//172.20.0.2/backup"
-VALUE2="/mnt/backup"
-VALUE3="admin"
-VALUE4=""
-VALUE5=",domain=WORKGROUP"
-
-VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --backtitle "$bktitle" --title "Mounting" --form "Montagem de Rede" 15 50 0 \
-"PATH: " 1 1 "$VALUE1" 1 10 34 0 \
-"MNT:" 2 1 "$VALUE2" 2 10 34 0 \
-"USER:" 3 1 "$VALUE3" 3 10 34 0 \
-"PASS:" 4 1 "$VALUE4" 4 10 34 0 \
-"DOM:" 5 1 "$VALUE5" 5 10 34 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-case $? in
-  1) m10 ;;
-  2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0; menu31 ;;
-esac
-
-path1=$(echo "$VALUE0" | sed -n 1p)
-mntpt1=$(echo "$VALUE0" | sed -n 2p)
-user1=$(echo "$VALUE0" | sed -n 3p)
-pass1=$(echo "$VALUE0" | sed -n 4p)
-dmn1=$(echo "$VALUE0" | sed -n 5p)
-
-[ -z "$path1" ] || [ -z "$mntpt1" ] || [ -z "$user1" ] || [ -z "$pass1" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 7 30; m10; }
-
-echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
-[ "$echa1" = "sim" ] && {
-  dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 7 30
-  menu31
-} || {
-  echo "$password" | sudo -S mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
-  mntshow2=$(df -hT)
-  dialog --title "Caminho montado!" --msgbox "$mntshow2" 30 60
-  m10
-  }
-}
-
-function menu32 {
-  echo "$password" | sudo -S umount -a -t cifs -l
-  mntshow3=$(df -hT)
-  dialog --title "Informação" --msgbox "$mntshow3" 30 60
-}
-
 function menu33 {
 [ -f /home/$USER/SMS/SMSPowerView.tmp ] && {
   rm /tmp/.powerview
@@ -1493,14 +869,14 @@ function menu33 {
   dialog --title "Informação" --msgbox "Gerenciador de Nobreak não foi encontrado ou configurado!" 7 40
 }
 
-liminal "m3nu01" "menu01"
+m3nu01
 }
 
 function menu34 {
 menu09 mysql && mysql=$prcs
 [ "$mysql" = "Executando" ] && {
   clear
-  echo "$password" | sudo -S mysql -u administrador -p -D nextcloud -e "DELETE FROM oc_file_locks WHERE 1"; echo "Pressione Enter para finalizar!"; read
+  sudo mysql -u administrador -p -D nextcloud -e "DELETE FROM oc_file_locks WHERE 1"; echo "Pressione Enter para finalizar!"; read
 } || {
   dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "NextCloud & MySQL" --msgbox "O serviço MySQL não foi encontrado neste sistema!" 7 40
   }
