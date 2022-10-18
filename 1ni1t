@@ -30,14 +30,14 @@ FILE4="/tmp/.relat"
 doc_rel="0"
 datetime3=$(date +"%m-%Y") # Month for Docs!
 
-[ -d /home/$USER/.DOC ] || { mkdir "/home/$USER/.DOC" 2> /dev/null; }
-[ -f /home/$USER/.DOC/$datetime3.docx ] || {
-cp "/home/$USER/.DOC/.relat.docx" "/home/$USER/.DOC/$datetime3.docx" 2> /dev/null
+[ -d /home/administrador/.DOC ] || { mkdir "/home/administrador/.DOC" 2> /dev/null; }
+[ -f /home/administrador/.DOC/$datetime3.docx ] || {
+cp "/home/administrador/.DOC/.relat.docx" "/home/administrador/.DOC/$datetime3.docx" 2> /dev/null
 
 TEXTAO14="
 Conforme estipulado em contrato mensal de prestação de serviços na área de informática, segue abaixo o relatório de suporte, manutenções preventivas e corretivas executados no período de $datetime3:"
 
-echo "$TEXTAO14" >> "/home/$USER/.DOC/$datetime3.docx"
+echo "$TEXTAO14" >> "/home/administrador/.DOC/$datetime3.docx"
 }
 
 # Menu Title
@@ -237,13 +237,13 @@ esac
 
 function menu24 {
 # Cluster
-checkscript1=$([ -f /home/$USER/Scripts/Cluster ] && echo "sim" || echo "nao")
+checkscript1=$([ -f /home/administrador/Scripts/Cluster ] && echo "sim" || echo "nao")
 [ "$checkscript1" = "sim" ] && {
 script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
   [ "$script1" = "Executando" ] && {
     dialog --title 'Script Cluster Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
   } || {
-    sudo bash /home/$USER/Scripts/Cluster & 1> /dev/null 2> /dev/null
+    sudo bash /home/administrador/Scripts/Cluster & 1> /dev/null 2> /dev/null
     dialog --title 'Script Cluster foi iniciado!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
     }
 } || {
@@ -251,13 +251,13 @@ script1=$(ps aux | grep "Cluster" | grep -v grep 1> /dev/null && echo "Executand
   }
   
 # Balloon
-checkscript2=$([ -f /home/$USER/Scripts/Balloon ] && echo "sim" || echo "nao")
+checkscript2=$([ -f /home/administrador/Scripts/Balloon ] && echo "sim" || echo "nao")
 [ "$checkscript2" = "sim" ] && {
   script2=$(ps aux | grep "Balloon" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
   [ "$script2" = "Executando" ] && {
     dialog --title 'Script Balloon Em Execução!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
   } || {
-    bash /home/$USER/Scripts/Balloon & 1> /dev/null 2> /dev/null
+    bash /home/administrador/Scripts/Balloon & 1> /dev/null 2> /dev/null
     dialog --title 'Script Balloon foi iniciado!' --msgbox "Confirme no menu 'Status Geral > Sistema'!" 8 40
     }
 } || {
@@ -1256,11 +1256,11 @@ menu26
 }
 
 function menu27 {
-[ -f "/home/$USER/.DOC/.relat.docx" ] && {
+[ -f "/home/administrador/.DOC/.relat.docx" ] && {
   [ "$doc_rel"="1" ] && {
     dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar o relatório para $datetime3.docx?" 8 40
     [ $? = 0 ] && {
-        echo "$1" >> "/home/$USER/.DOC/$datetime3.docx"
+        echo "$1" >> "/home/administrador/.DOC/$datetime3.docx"
         }
       } || {
         m10
@@ -1272,7 +1272,7 @@ function menu27 {
 }
 
 function menu28 {
-[ -f "/home/$USER/.DOC/.relat.docx" ] && {
+[ -f "/home/administrador/.DOC/.relat.docx" ] && {
   [ "$doc_rel"="1" ] && {
     datetime=$(date +"%d/%m %H:%M")
     dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja criar um diagnóstico customizado?" 8 40
@@ -1304,7 +1304,7 @@ Segue em anexo o Relatório de Atendimentos, com os chamados, manutenções prev
 
 Grato,
 José Humberto"
-  echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $datetime3" -a "/home/$USER/.DOC/$datetime3.pdf" -- "$validmail"
+  echo "$TEXTAO15" | mutt -s "Relatório de Atendimentos - Período $datetime3" -a "/home/administrador/.DOC/$datetime3.pdf" -- "$validmail"
   }
 
 dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja enviar um documento diferente para $validmail?" 8 40
@@ -1316,21 +1316,21 @@ Segue em anexo o Relatório de Atendimentos, com os chamados, manutenções prev
 
 Grato,
 José Humberto"
-  echo "$TEXTAO151" | mutt -s "Relatório de Atendimentos - Período $inputdoc1" -a "/home/$USER/.DOC/$inputdoc1.pdf" -- "$validmail"
+  echo "$TEXTAO151" | mutt -s "Relatório de Atendimentos - Período $inputdoc1" -a "/home/administrador/.DOC/$inputdoc1.pdf" -- "$validmail"
   }
 
 m10
 }
 
 function menu291 {
-[ -f "/home/$USER/.DOC/$datetime3.pdf" ] && {
+[ -f "/home/administrador/.DOC/$datetime3.pdf" ] && {
   dialog --title 'relat.pdf' --msgbox "Arquivo já existe!" 8 30
 } || {
   dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja finalizar um documento de .docx para .pdf?" 8 40
   [ $? = 0 ] && {
     inputdoc2=$(dialog --title 'Relatório' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-    cd "/home/$USER/.DOC/"
-    soffice --convert-to "pdf" "/home/$USER/.DOC/$inputdoc2.docx" "/home/$USER/.DOC/$inputdoc2.pdf"
+    cd "/home/administrador/.DOC/"
+    soffice --convert-to "pdf" "/home/administrador/.DOC/$inputdoc2.docx" "/home/administrador/.DOC/$inputdoc2.pdf"
     }
   }
 
@@ -1341,7 +1341,7 @@ function menu30 {
 dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja APAGAR um relatório.docx?" 8 40
 [ $? = 0 ] && {
   inputdoc3=$(dialog --title 'Deleção' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-  rm "/home/$USER/.DOC/$inputdoc3.docx"
+  rm "/home/administrador/.DOC/$inputdoc3.docx"
   }
 
 m10
@@ -1351,7 +1351,7 @@ function menu301 {
 dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja APAGAR um relatório.PDF?" 8 40
 [ $? = 0 ] && {
   inputdoc4=$(dialog --title 'Deleção' --backtitle "$bktitle" --inputbox "Insira a data-nome do relatório: " 0 0 "$datetime3" 2>&1 > /dev/tty)
-  rm "/home/$USER/.DOC/$inputdoc4.pdf"
+  rm "/home/administrador/.DOC/$inputdoc4.pdf"
   }
 
 m10
@@ -1405,7 +1405,7 @@ function menu32 {
 }
 
 function menu33 {
-[ -f /home/$USER/SMS/SMSPowerView.tmp ] && {
+[ -f /home/administrador/SMS/SMSPowerView.tmp ] && {
   rm /tmp/.powerview
   /home/administrador/SMS/powerview -c | tee -a /tmp/.powerview
   sed '/^$/d' /tmp/.powerview > /tmp/.powerview2
