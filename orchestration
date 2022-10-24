@@ -154,11 +154,13 @@ function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'CUPS' \
 2 'HomeAssistant' \
+3 'Menu for LUCS' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
 2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/19-homeassistant -O /tmp/home; sudo bash /tmp/home ;;
+3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/24-apache -O /tmp/apache; sudo bash /tmp/apache ;;
 X) start ;;
 esac
 }
