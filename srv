@@ -10,6 +10,7 @@ B 'Server Manager' \
 C 'Orchestra' \
 D 'Docker' \
 E 'Tools' \
+F 'Bashrc' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -18,9 +19,16 @@ B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/1ni1
 C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
 D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; start ;;
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
+F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
 
 sudo apt install dialog curl -y
+
+[ "$EUID" -ne 0 ] || {
+  echo "Não execute esse script como Root! Saindo..."
+  exit
+  }
+
 start
