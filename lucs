@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <title>Linux Universe Cloud Storage - Links!</title>
-   </head>
 
-   <font size="+4">
-      <body>
-         <h2>Linux Universe Cloud Storage</h2>
-            <p>
-               <a href="https://cs.linuxuniverse.com.br/index.php/s/TfaCyiZooC86mAb">Recover - Externo</a>
-<br>
-               <a href="http://172.20.0.33/index.php/s/TfaCyiZooC86mAb">Recover - Interno</a>
-<br><br>
-               <a href="https://cs.linuxuniverse.com.br/index.php/s/KX2wMWoadDGypGS">VPN - Externo</a>
-<br>
-               <a href="http://172.20.0.33/index.php/s/TfaCyiZooC86mAb">VPN - Interno</a>
-<br><br>
-               <a href="https://cs.linuxuniverse.com.br/index.php/s/aqPo2mP3fHbiR6q">Softwares - Externo</a>
-<br>
-               <a href="http://172.20.0.33/index.php/s/TfaCyiZooC86mAb">Softwares - Interno</a>
-            </p>
-      </body>
-   </font>
-</html>
+<head><title>Linux Universe Cloud Storage - Links!</title></head><font size="+2">
+<body>
+
+<h2>Linux Universe Cloud Storage</h2>
+
+<b>Recover!</b><br>
+<a href="https://cs.linuxuniverse.com.br/index.php/s/TfaCyiZooC86mAb">Web</a> /
+<a href="http://172.20.0.33/index.php/s/TfaCyiZooC86mAb">LocalHost</a><br><br>
+
+<b>VPN's</b><br>
+<a href="https://cs.linuxuniverse.com.br/index.php/s/KX2wMWoadDGypGS">Web</a> /
+<a href="http://172.20.0.33/index.php/s/KX2wMWoadDGypGS">LocalHost</a><br><br>
+
+<b>Softwares and Others</b><br>
+<a href="https://cs.linuxuniverse.com.br/index.php/s/X5ko4wfoGxcmJLY">Web</a> /
+<a href="http://172.20.0.33/index.php/s/X5ko4wfoGxcmJLY">LocalHost</a><br><br>
+
+<b>For Windows Install:</b><br><br>
+irm christitus.com/win | iex<br><br>
+
+</body>
+</font></html>
