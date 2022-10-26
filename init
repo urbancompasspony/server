@@ -105,10 +105,11 @@ esac
 }
 
 function domaincontroller {
-[ $(which docker 2>/dev/null) ] && {
-  docker exec -it dominio bash
-} || {
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | sudo bash
+  [ $(which docker 2>/dev/null) ] && {
+    docker exec -it dominio bash
+  } || {
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | sudo bash
+  }
 }
 
 function m3nu05 {
