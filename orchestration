@@ -89,19 +89,21 @@ function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole' \
 2 'Dominio' \
-3 'MySQL' \
-4 'NextCloud' \
-5 'SAMBA' \
-6 'Pentest' \
+3 'A MySQL' \
+4 'B Collabora' \
+5 'C NextCloud' \
+6 'SAMBA' \
+7 'Pentest' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
 2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
 3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
-4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
-6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.3-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
+7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 X) start ;;
 esac
 }
