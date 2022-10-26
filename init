@@ -96,12 +96,19 @@ case "$var1" in
 A) m3nu01 ;;
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | sudo bash ; st4rt1 ;;
 C) menu03 ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | sudo bash ; st4rt1 ;;
+D) domaincontroller ; st4rt1 ;;
 E) m3nu05 ;;
 F) menu06 ;;
 G) menu07 ;;
 X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
 esac
+}
+
+function domaincontroller {
+[ $(which docker 2>/dev/null) ] && {
+  docker exec -it dominio bash
+} || {
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | sudo bash
 }
 
 function m3nu05 {
