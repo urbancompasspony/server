@@ -27,6 +27,10 @@ revis="r0.1"
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
+# Hashs
+hash2="576200e78f0ab25b437dc7372ae920d9"
+hash3="9ae7c2a8e120dssssa4915cba5a15e17"
+
 # Docs
 FILE3="/tmp/.email"
 FILE4="/tmp/.relat"
@@ -74,7 +78,19 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 
 # PASSWORD
 function init {
-  menu054
+password=$(dialog --backtitle "$bktitle" --title "Acesso ao USM - $revis" --insecure --passwordbox "Digite a senha de $USER!" 0 0 2>&1 > /dev/tty)
+hash1=$(echo "$password" | md5sum | awk '{print $1}')
+[ -z "$password" ] && {
+  clear
+  echo "É necessário digitar uma senha para continuar."
+} || {
+  [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && {
+    menu054
+  } || {
+    menu054
+    }
+}
+
 }
 
 # SISTEMA Normal
