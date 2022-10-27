@@ -214,28 +214,28 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) ;;
-2) ;;
-3) ;;
-4) ;;
-5) ;;
-6) ;;
-7);;
-8);;
-9);;
-10);;
-11);;
-12);;
-13);;
-14);;
-15);;
-16);;
-17);;
-18);;
-19);;
-20);;
-21);;
-22);;
+1) docker pull pihole/pihole:latest ;;
+2) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/domain; } || { docker pull urbancompasspony/domain-arm; } ;;
+3) docker pull mysql:8; docker pull nextcloud; docker pull collabora/code ;;
+4) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/migrate-samba; } || { docker pull urbancompasspony/migrate-samba-arm; } ;;
+5) echo "Not Found" ;;
+6) docker pull openspeedtest/latest ;;
+7) docker pull lancachenet/monolithic:latest ;;
+8) echo "Not Found" ;;
+9) docker pull nbr23/youtube-dl-server:latest ;;
+10) echo "Not Found" ;;
+11) echo "Not Found" ;;
+12) echo "Not Found" ;;
+13) echo "Not Found" ;;
+14) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
+15) echo "Not Found" ;;
+16) echo "Not Found" ;;
+17) docker pull httpd:2.4 ;;
+18) docker pull selfhostedpro/yacht ;;
+19) docker pull louislam/uptime-kuma:1 ;;
+20) docker pull rancher/server:stable ;;
+21) docker pull portainer/portainer-ce ;;
+22) docker pull pottava/docker-webui ;;
 X) start ;;
 esac
 }
