@@ -11,7 +11,8 @@ C 'Orchestra' \
 D 'Docker' \
 E 'Tools' \
 F 'Bashrc' \
-G 'DWAgent' \
+G 'DWAgent [x86]' \
+H 'DWAgent [ARM]' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -22,6 +23,7 @@ D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/dock
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
 G) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh ; start ;;
+H) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
