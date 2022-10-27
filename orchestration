@@ -57,8 +57,7 @@ function check {
 
       } || {
         echo "ATENÇÃO: Não há macvlan para os containers!"
-        sleep 3
-        start
+        pullall
         }
     } || {
       start
@@ -73,6 +72,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'Servers' \
 4 'Others' \
 5 'Docker Managers' \
+6 '- Pull Only -' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -81,6 +81,7 @@ case "$var0" in
 3) servers ; start ;;
 4) others ; start ;;
 5) managers ; start ;;
+6) pullall ; start ;;
 X) exit ;;
 esac
 }
@@ -182,6 +183,59 @@ case "$var0" in
 3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/21-rancher -O /tmp/rancher; sudo bash /tmp/rancher ;;
 4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/22-portainer -O /tmp/portainer; sudo bash /tmp/portainer ;;
 5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/23-pottava -O /tmp/pottava; sudo bash /tmp/pottava ;;
+X) start ;;
+esac
+}
+
+function pullall {
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
+1 'PiHole' \
+2 'Dominio' \
+3 'MySQL/Nextcloud/Collabora' \
+4 'SAMBA' \
+5 'Pentest' \
+6 'LocalSpeedtest' \
+7 'LAN Cache' \
+8 'OracleDB XE' \
+9 'YoutubeDL' \
+10 'Transmission' \
+11 'KeepAliveD 1' \
+12 'KeepAliveD 2' \
+13 'FileBrowser' \
+14 'UniFi' \
+15 'CUPS' \
+16 'HomeAssistant' \
+17 'Apache2' \
+18 'Yacht' \
+19 'Kuma' \
+20 'Rancher' \
+21 'Portainer' \
+22 'Pottava' \
+X 'Voltar' 2>&1 > /dev/tty )
+
+case "$var0" in
+1) ;;
+2) ;;
+3) ;;
+4) ;;
+5) ;;
+6) ;;
+7);;
+8);;
+9);;
+10);;
+11);;
+12);;
+13);;
+14);;
+15);;
+16);;
+17);;
+18);;
+19);;
+20);;
+21);;
+22);;
 X) start ;;
 esac
 }
