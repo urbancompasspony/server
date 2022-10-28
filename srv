@@ -29,6 +29,7 @@ esac
 }
 
 sudo apt install dialog curl -y
+[ $? -ne 0 ] && exit
 
 [ "$EUID" -ne 0 ] || {
   echo "Não execute esse script como Root! Saindo..."
