@@ -157,7 +157,7 @@ function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'CUPS' \
 2 'HomeAssistant' \
-3 'Menu for LUCS' \
+3 'Apache Static' \
 X 'Voltar' 2>&1 > /dev/tty )
 
 case "$var0" in
