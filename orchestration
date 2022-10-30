@@ -68,18 +68,18 @@ function check {
 function start {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Essentials' \
-2 'Tools' \
-3 'Servers' \
-4 'Others' \
+2 'Servers' \
+3 'Others' \
+4 'Tools' \
 5 'Docker Managers' \
-6 '- Pull Only -' \
+6 '- Pull Only! -' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) essentials ; start ;;
-2) tools ; start ;;
-3) servers ; start ;;
-4) others ; start ;;
+2) servers ; start ;;
+3) others ; start ;;
+4) tools ; start ;;
 5) managers ; start ;;
 6) pullall ; start ;;
 X) exit ;;
@@ -95,7 +95,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'C NextCloud' \
 6 'SAMBA' \
 7 'Pentest' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
@@ -116,7 +116,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'Backup ADDC' \
 4 'Backup SAMBA' \
 5 'LocalSpeedtest' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
@@ -138,7 +138,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'KeepAliveD 2' \
 7 'FileBrowser' \
 8 'UniFi' \
-X 'Voltar' 2>&1 > /dev/tty )
+9 'Spark [OpenFire]' \
+X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
@@ -149,6 +150,7 @@ case "$var0" in
 6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/20.2-keepalived -O /tmp/keep2; sudo bash /tmp/keep2 ;;
 7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/22-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
 8) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
+9) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/26-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
 X) start ;;
 esac
 }
@@ -158,7 +160,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'CUPS' \
 2 'HomeAssistant' \
 3 'Apache Static' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
@@ -175,7 +177,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'Rancher' \
 4 'Portainer' \
 5 'Pottava' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/14-yacht -O /tmp/yacht; sudo bash /tmp/yacht ;;
@@ -211,7 +213,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 20 'Rancher' \
 21 'Portainer' \
 22 'Pottava' \
-X 'Voltar' 2>&1 > /dev/tty )
+23 'OpenFire [Spark]' \
+X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) docker pull pihole/pihole:latest ;;
@@ -236,6 +239,7 @@ case "$var0" in
 20) docker pull rancher/server:stable ;;
 21) docker pull portainer/portainer-ce ;;
 22) docker pull pottava/docker-webui ;;
+23) docker pull urbancompasspony/openfire:latest ;;
 X) start ;;
 esac
 }
