@@ -9,6 +9,8 @@ export var1; export var2
 mTITLE="Docker Orchestration"
 bkTTITLE="Sistema Automatizado de Orquestração de Containers"
 
+github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
+
 function check {
   [ $(docker network ls | grep macvlan | awk '{print $2}') ] && { 
     lantest="sim" 
@@ -99,14 +101,14 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.0-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
-4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/26-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.3-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
-7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
-8) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
+2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
+3) wget "$github"04.0-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
+4) wget "$github"26-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+5) wget "$github"04.2-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+6) wget "$github"04.3-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+7) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
+8) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 X) start ;;
 esac
 }
@@ -121,11 +123,11 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
-2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
-3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
-4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
-5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/16-speedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+1) wget "$github"07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
+2) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
+3) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
+4) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
+5) wget "$github"16-speedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 X) start ;;
 esac
 }
@@ -143,14 +145,14 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
-2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/12-oracle_xe -O /tmp/oracle; sudo bash /tmp/oracle ;;
-3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/17-youtubedl -O /tmp/youtube; sudo bash /tmp/youtube ;;
-4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/18-transmission -O /tmp/transmission; sudo bash /tmp/transmission ;;
-5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/20.1-keepalived -O /tmp/keep1; sudo bash /tmp/keep1 ;;
-6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/20.2-keepalived -O /tmp/keep2; sudo bash /tmp/keep2 ;;
-7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/22-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
-8) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
+1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
+2) wget "$github"12-oracle_xe -O /tmp/oracle; sudo bash /tmp/oracle ;;
+3) wget "$github"17-youtubedl -O /tmp/youtube; sudo bash /tmp/youtube ;;
+4) wget "$github"18-transmission -O /tmp/transmission; sudo bash /tmp/transmission ;;
+5) wget "$github"20.1-keepalived -O /tmp/keep1; sudo bash /tmp/keep1 ;;
+6) wget "$github"20.2-keepalived -O /tmp/keep2; sudo bash /tmp/keep2 ;;
+7) wget "$github"22-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
+8) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
 X) start ;;
 esac
 }
@@ -163,9 +165,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/19-homeassistant -O /tmp/home; sudo bash /tmp/home ;;
-3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/24-apache -O /tmp/apache; sudo bash /tmp/apache ;;
+1) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
+2) wget "$github"19-homeassistant -O /tmp/home; sudo bash /tmp/home ;;
+3) wget "$github"24-apache -O /tmp/apache; sudo bash /tmp/apache ;;
 X) start ;;
 esac
 }
@@ -180,11 +182,11 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/14-yacht -O /tmp/yacht; sudo bash /tmp/yacht ;;
-2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/21-rancher -O /tmp/rancher; sudo bash /tmp/rancher ;;
-4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/22-portainer -O /tmp/portainer; sudo bash /tmp/portainer ;;
-5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/23-pottava -O /tmp/pottava; sudo bash /tmp/pottava ;;
+1) wget "$github"14-yacht -O /tmp/yacht; sudo bash /tmp/yacht ;;
+2) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
+3) wget "$github"21-rancher -O /tmp/rancher; sudo bash /tmp/rancher ;;
+4) wget "$github"22-portainer -O /tmp/portainer; sudo bash /tmp/portainer ;;
+5) wget "$github"23-pottava -O /tmp/pottava; sudo bash /tmp/pottava ;;
 X) start ;;
 esac
 }
@@ -193,53 +195,59 @@ function pullall {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole' \
 2 'Dominio' \
-3 'MySQL/Nextcloud/Collabora' \
-4 'SAMBA' \
-5 'Pentest' \
-6 'LocalSpeedtest' \
-7 'LAN Cache' \
-8 'OracleDB XE' \
-9 'YoutubeDL' \
-10 'Transmission' \
-11 'KeepAliveD 1' \
-12 'KeepAliveD 2' \
-13 'FileBrowser' \
-14 'UniFi' \
-15 'CUPS' \
-16 'HomeAssistant' \
-17 'Apache2' \
-18 'Yacht' \
-19 'Kuma' \
-20 'Rancher' \
-21 'Portainer' \
-22 'Pottava' \
-23 'OpenFire [Spark]' \
+3 'MySQL' \
+4 'Nextcloud' \
+5 'MariaDB' \
+6 'Collabora' \
+7 'SAMBA' \
+8 'Pentest' \
+9 'LocalSpeedtest' \
+10 'LAN Cache' \
+11 'OracleDB XE' \
+12 'YoutubeDL' \
+13 'Transmission' \
+14 'KeepAliveD 1' \
+15 'KeepAliveD 2' \
+16 'FileBrowser' \
+17 'UniFi' \
+18 'CUPS' \
+19 'HomeAssistant' \
+20 'Apache2' \
+21 'Yacht' \
+22 'Kuma' \
+23 'Rancher' \
+24 'Portainer' \
+25 'Pottava' \
+26 'OpenFire [Spark]' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) docker pull pihole/pihole:latest ;;
 2) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/domain; } || { docker pull urbancompasspony/domain-arm; } ;;
-3) docker pull mysql:8; docker pull nextcloud; docker pull collabora/code ;;
-4) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/migrate-samba; } || { docker pull urbancompasspony/migrate-samba-arm; } ;;
-5) echo "Not Found" ;;
-6) docker pull openspeedtest/latest ;;
-7) docker pull lancachenet/monolithic:latest ;;
+3) docker pull mysql:8 ;;
+4) docker pull nextcloud ;;
+5) docker pull mariadb:latest ;;
+6) docker pull collabora/code ;;
+7) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/migrate-samba; } || { docker pull urbancompasspony/migrate-samba-arm; } ;;
 8) echo "Not Found" ;;
-9) docker pull nbr23/youtube-dl-server:latest ;;
-10) echo "Not Found" ;;
+9) docker pull openspeedtest/latest ;;
+10) docker pull lancachenet/monolithic:latest ;;
 11) echo "Not Found" ;;
-12) echo "Not Found" ;;
+12) docker pull nbr23/youtube-dl-server:latest ;;
 13) echo "Not Found" ;;
-14) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
+14) echo "Not Found" ;;
 15) echo "Not Found" ;;
 16) echo "Not Found" ;;
-17) docker pull httpd:2.4 ;;
-18) docker pull selfhostedpro/yacht ;;
-19) docker pull louislam/uptime-kuma:1 ;;
-20) docker pull rancher/server:stable ;;
-21) docker pull portainer/portainer-ce ;;
-22) docker pull pottava/docker-webui ;;
-23) docker pull urbancompasspony/openfire:latest ;;
+17) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
+18) echo "Not Found" ;;
+19) echo "Not Found" ;;
+20) docker pull httpd:2.4 ;;
+21) docker pull selfhostedpro/yacht ;;
+22) docker pull louislam/uptime-kuma:1 ;;
+23) docker pull rancher/server:stable ;;
+24) docker pull portainer/portainer-ce ;;
+25) docker pull pottava/docker-webui ;;
+26) docker pull urbancompasspony/openfire:latest ;;
 X) start ;;
 esac
 }
