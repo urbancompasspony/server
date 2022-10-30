@@ -90,21 +90,23 @@ function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole' \
 2 'Dominio' \
-3 'A MySQL' \
-4 'B Collabora' \
-5 'C NextCloud' \
-6 'SAMBA' \
-7 'Pentest' \
+3 'Z MySQL' \
+4 'ZA Spark [OpenFire]' \
+5 'ZB1 NextCloud' \
+6 'ZB2 Collabora' \
+7 'SAMBA' \
+8 'Pentest' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
 2) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.1-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
-4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.3-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+3) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.0-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
+4) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/26-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
 5) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.2-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
-7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/04.3-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
+8) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 X) start ;;
 esac
 }
@@ -138,7 +140,6 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'KeepAliveD 2' \
 7 'FileBrowser' \
 8 'UniFi' \
-9 'Spark [OpenFire]' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -150,7 +151,6 @@ case "$var0" in
 6) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/20.2-keepalived -O /tmp/keep2; sudo bash /tmp/keep2 ;;
 7) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/22-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
 8) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
-9) wget https://raw.githubusercontent.com/urbancompasspony/docker/main/26-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
 X) start ;;
 esac
 }
