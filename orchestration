@@ -71,19 +71,21 @@ function start {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Essentials' \
 2 'Servers' \
-3 'Others' \
-4 'Tools' \
-5 'Docker Managers' \
-6 '- Pull Only! -' \
+3 'DataBases' \
+4 'Others' \
+5 'Tools' \
+6 'Docker Managers' \
+7 '- Pull Only! -' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) essentials ; start ;;
 2) servers ; start ;;
-3) others ; start ;;
-4) tools ; start ;;
-5) managers ; start ;;
-6) pullall ; start ;;
+3) database ; start ;;
+4) others ; start ;;
+5) tools ; start ;;
+6) managers ; start ;;
+7) pullall ; start ;;
 X) exit ;;
 esac
 }
@@ -92,67 +94,59 @@ function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole' \
 2 'Dominio' \
-3 'Z MySQL' \
-4 'ZA Spark [OpenFire]' \
-5 'ZB1 NextCloud' \
-6 'ZB2 Collabora' \
-7 'SAMBA' \
-8 'Pentest' \
+3 'NextCloud' \
+4 'Collabora' \
+5 'SAMBA' \
+6 'Pentest' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
 2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-3) wget "$github"04.0-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
-4) wget "$github"26-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-5) wget "$github"04.2-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-6) wget "$github"04.3-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
-7) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
-8) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-X) start ;;
-esac
-}
-
-function tools {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'AutoMigrate ADDC' \
-2 'AutoExport SAMBA' \
-3 'Backup ADDC' \
-4 'Backup SAMBA' \
-5 'LocalSpeedtest' \
-X '<' 2>&1 > /dev/tty )
-
-case "$var0" in
-1) wget "$github"07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
-2) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
-3) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
-4) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
-5) wget "$github"16-speedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+4) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+5) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
+6) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 X) start ;;
 esac
 }
 
 function servers {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'LAN Cache' \
-2 'OracleDB XE' \
-3 'YoutubeDL' \
-4 'Transmission' \
-5 'KeepAliveD 1' \
-6 'KeepAliveD 2' \
-7 'FileBrowser' \
-8 'UniFi' \
+1 'UniFi' \
+2 'OpenFire [Spark]' \
+3 'LAN Cache' \
+4 'OracleDB XE' \
+5 'YoutubeDL' \
+6 'Transmission' \
+7 'KeepAliveD 1' \
+8 'KeepAliveD 2' \
+9 'FileBrowser' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
-2) wget "$github"12-oracle_xe -O /tmp/oracle; sudo bash /tmp/oracle ;;
-3) wget "$github"17-youtubedl -O /tmp/youtube; sudo bash /tmp/youtube ;;
-4) wget "$github"18-transmission -O /tmp/transmission; sudo bash /tmp/transmission ;;
-5) wget "$github"20.1-keepalived -O /tmp/keep1; sudo bash /tmp/keep1 ;;
-6) wget "$github"20.2-keepalived -O /tmp/keep2; sudo bash /tmp/keep2 ;;
-7) wget "$github"22-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
-8) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
+1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
+2) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+3) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
+4) wget "$github"12-oracle_xe -O /tmp/oracle; sudo bash /tmp/oracle ;;
+5) wget "$github"17-youtubedl -O /tmp/youtube; sudo bash /tmp/youtube ;;
+6) wget "$github"18-transmission -O /tmp/transmission; sudo bash /tmp/transmission ;;
+7) wget "$github"20.1-keepalived -O /tmp/keep1; sudo bash /tmp/keep1 ;;
+8) wget "$github"20.2-keepalived -O /tmp/keep2; sudo bash /tmp/keep2 ;;
+9) wget "$github"22-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
+X) start ;;
+esac
+}
+
+function database {
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
+1 'MySQL' \
+2 'MariaDB' \
+X '<' 2>&1 > /dev/tty )
+
+case "$var0" in
+1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
+2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
 X) start ;;
 esac
 }
@@ -162,12 +156,14 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'CUPS' \
 2 'HomeAssistant' \
 3 'Apache Static' \
+4 'LocalSpeedtest' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
 2) wget "$github"19-homeassistant -O /tmp/home; sudo bash /tmp/home ;;
 3) wget "$github"24-apache -O /tmp/apache; sudo bash /tmp/apache ;;
+4) wget "$github"16-speedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 X) start ;;
 esac
 }
@@ -187,6 +183,23 @@ case "$var0" in
 3) wget "$github"21-rancher -O /tmp/rancher; sudo bash /tmp/rancher ;;
 4) wget "$github"22-portainer -O /tmp/portainer; sudo bash /tmp/portainer ;;
 5) wget "$github"23-pottava -O /tmp/pottava; sudo bash /tmp/pottava ;;
+X) start ;;
+esac
+}
+
+function tools {
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
+1 'AutoMigrate ADDC' \
+2 'AutoExport SAMBA' \
+3 'Backup ADDC' \
+4 'Backup SAMBA' \
+X '<' 2>&1 > /dev/tty )
+
+case "$var0" in
+1) wget "$github"07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
+2) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
+3) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
+4) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
 X) start ;;
 esac
 }
@@ -218,7 +231,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 23 'Rancher' \
 24 'Portainer' \
 25 'Pottava' \
-26 'OpenFire [Spark]' \
+26 'OpenFire' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
