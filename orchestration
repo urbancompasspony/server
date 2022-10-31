@@ -114,7 +114,7 @@ esac
 function servers {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'UniFi' \
-2 'OpenFire [Spark]' \
+2 'OpenFire' \
 3 'LAN Cache' \
 4 'OracleDB XE' \
 5 'YoutubeDL' \
