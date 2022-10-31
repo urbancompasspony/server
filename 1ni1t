@@ -80,17 +80,16 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 function init {
 password=$(dialog --backtitle "$bktitle" --title "Acesso ao USM" --insecure --passwordbox "Digite a senha!" 0 0 2>&1 > /dev/tty)
 hash1=$(echo "$password" | md5sum | awk '{print $1}')
-[ -z "$password" ] && {
-  clear
-  echo "É necessário digitar uma senha para continuar. Tente novamente!"
-} || {
-  [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && {
-    menu054
+  [ -z "$password" ] && {
+    clear
+    echo "É necessário digitar uma senha para continuar. Tente novamente!"
   } || {
-    echo "É necessário digitar a senha correta. Saindo."
-    }
-}
-
+    [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && {
+      menu054
+    } || {
+      echo "É necessário digitar a senha correta. Saindo."
+      }
+  }
 }
 
 # SISTEMA Normal
