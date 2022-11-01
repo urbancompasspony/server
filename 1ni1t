@@ -17,8 +17,10 @@
 # x.9: Mudanças pequenas, implementação de novas ferramentas.
 # rc-1: Correções de bugs de ferramentas ou menus
 
-version="v4.0"
-revis="r0.1"
+version="v5.0"
+revis="r0.2"
+
+# Remember to put muttrc on /root too!
 
 ################################################################################
 ################################################################################
@@ -32,13 +34,13 @@ hash2="576200e78f0ab25b437dc7372ae920d9"
 hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 # Docs
-FILE3="/tmp/.email"
-FILE4="/tmp/.relat"
+FILE3="/home/administrador/.email"
+FILE4="/home/administrador/.relat"
 
 doc_rel="0"
 datetime3=$(date +"%m-%Y") # Month for Docs!
 
-[ -d /home/administrador/.DOC ] || { mkdir "/home/administrador/.DOC" 2> /dev/null; }
+[ -d /home/administrador/.DOC ] || { mkdir "/home/administrador/.DOC/" 2> /dev/null; }
 [ -f /home/administrador/.DOC/$datetime3.docx ] || {
 cp "/home/administrador/.DOC/.relat.docx" "/home/administrador/.DOC/$datetime3.docx" 2> /dev/null
 
@@ -815,7 +817,7 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
              [ -z "$validmail" ] && {
               dialog --cr-wrap --title "Erro no E-mail!" --backtitle "$bktitle" --msgbox "Digite um e-mail válido!" 0 0
              } || {
-              echo "$validmail" > "/tmp/.email"
+              echo "$validmail" > "$FILE3"
               report="1"
               dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
               }
@@ -826,7 +828,7 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
         [ -z "$validmail" ] && {
           dialog --cr-wrap --title "Erro no E-mail!" --backtitle "$bktitle" --msgbox "Digite um e-mail válido!" 0 0
         } || {
-          echo "$validmail" > "/tmp/.email"
+          echo "$validmail" > "$FILE3"
           report="1"
           dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
           }
@@ -838,7 +840,7 @@ Pode ser mais de um, bastando separá-los com vírgula e espaço. Exemplo: user@
     dialog --title 'Confirmação' --backtitle "$bktitle" --yesno "Deseja trocar o e-mail de emissão de relatórios de diagnóstico?" 8 40
     [ $? = 0 ] && {
       validmail=$(dialog --title " " --backtitle "$bktitle" --inputbox "Insira o e-mail para o qual deseja enviar os relatórios gerados!" 9 40 2>&1 > /dev/tty)
-      echo "$validmail" > "/tmp/.email"
+      echo "$validmail" > "$FILE3"
       dialog --cr-wrap --title "Informação" --backtitle "$bktitle" --msgbox "Os relatórios somente funcionam nos items com *!" 0 0
     } || {
       dialog --title "Confirmação" --backtitle "$bktitle" --yesno "Deseja desativar a emissão de relatórios de diagnóstico?" 8 40
