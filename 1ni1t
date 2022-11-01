@@ -139,7 +139,7 @@ I 'Iniciar Scripts' \
 J '*Re-Iniciar NOIP' \
 K 'Config. Relatórios' \
 L 'Relatórios Salvos' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO09" 0 0 ; menu05 ;;
 esac
@@ -179,7 +179,7 @@ M 'Finalizar .docx > .PDF' \
 N 'Encaminhar .PDF' \
 O 'Apagar .docx' \
 P 'Apagar .PDF' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var10" in
 A) m11 ;;
@@ -219,7 +219,7 @@ D '*S.M.A.R.T.' \
 E '*Cluster: DRBD' \
 F '*Cluster: PCS' \
 G '*Smart UPS' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
 A) menu11 ;;
@@ -243,7 +243,7 @@ A '*Sistema' \
 B '*Temperatura' \
 C '*Armazenamento' \
 D '*Smart UPS' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var2" in
 A) menu11 ;;
@@ -414,7 +414,7 @@ K "CUPS       : $cups1" \
 L "Motion     : $motion1" \
 M "DWAgent    : $dwagent1" \
 N "VPN Client : $vpn" \
-X "Voltar" 2>&1 > /dev/tty )
+X "<" 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda com Significados de Status' --msgbox "$TEXTAO08" 0 0 ; menu03 ;;
 esac
@@ -520,7 +520,7 @@ menusk=$(dialog --help-button --help-label 'Ajuda' --backtitle "Análise de Atri
 "/dev/sdg" "$dumpst7" \
 "/dev/sdh" "$dumpst8" \
 "/dev/sdi" "$dumpst9" \
-"X Voltar" "" 2>&1 > /dev/tty )
+"<" "" 2>&1 > /dev/tty )
 case $? in
   2) dialog --title "Definições de SMART!" --msgbox "$TEXTAO04" 0 0 ; menu14 ;;
 esac
@@ -535,7 +535,7 @@ case "$menusk" in
 "/dev/sdg") menu141 "sdg" "$dump7" ; menu14 ;;
 "/dev/sdh") menu141 "sdh" "$dump8" ; menu14 ;;
 "/dev/sdi") menu141 "sdi" "$dump9" ; menu14 ;;
-"X Voltar") menu01 ;;
+"<") menu01 ;;
 esac
 }
 
@@ -594,7 +594,7 @@ function menu17 {
 var2=$(dialog --title 'UDPCast' --backtitle "$bktitle" --menu "Escolha o modo!" 0 0 0 \
 A 'Cliente' \
 B 'Servidor' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && {start}
 case "$var2" in
 A) echo "Modo Cliente. Para sair, precione CTRL + C!" ; udp-receiver --file=/dev/null ;;
@@ -763,7 +763,7 @@ C 'UserSpace' \
 D 'PowerSave' \
 E 'Performance' \
 F 'Schedutil' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 case $? in
   2) dialog --title 'Ajuda' --msgbox "$TEXTAO10" 0 0 ; menu053 ;;
 esac
@@ -1050,7 +1050,7 @@ A 'Parar RSYNC' \
 B 'Parar RSNAPSHOT' \
 C 'Parar BALANCE' \
 D 'Parar COPY' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var_stop" in
 A) m12 ;;
@@ -1142,7 +1142,7 @@ $blockedsites" 0 0 0 \
   C '*Atualizar Gravity' \
   D '*White List' \
   E '*Black List' \
-  X 'Voltar' 2>&1 > /dev/tty )
+  X '<' 2>&1 > /dev/tty )
   case $? in
     2) dialog --title 'Ajuda' --msgbox "$TEXTAO10" 0 0 ; menu053 ;;
   esac
