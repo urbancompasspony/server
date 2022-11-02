@@ -245,7 +245,7 @@ case "$var0" in
 8) echo "Not Found" ;;
 9) docker pull openspeedtest/latest ;;
 10) docker pull lancachenet/monolithic:latest ;;
-11) echo "Not Found" ;;
+11) docker pull gvenzl/oracle-xe:21-full ;;
 12) docker pull nbr23/youtube-dl-server:latest ;;
 13) echo "Not Found" ;;
 14) echo "Not Found" ;;
