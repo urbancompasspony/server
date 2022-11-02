@@ -128,7 +128,7 @@ case "$var0" in
 1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
 2) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
 3) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
-4) wget "$github"12-oracle_xe -O /tmp/oracle; sudo bash /tmp/oracle ;;
+4) wget "$github"05-oracle_xe -O /tmp/oracle; sudo bash /tmp/oracle ;;
 5) wget "$github"17-youtubedl -O /tmp/youtube; sudo bash /tmp/youtube ;;
 6) wget "$github"18-transmission -O /tmp/transmission; sudo bash /tmp/transmission ;;
 7) wget "$github"20.1-keepalived -O /tmp/keep1; sudo bash /tmp/keep1 ;;
