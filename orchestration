@@ -252,7 +252,7 @@ case "$var0" in
 15) echo "Not Found" ;;
 16) echo "Not Found" ;;
 17) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
-18) echo "Not Found" ;;
+18) docker pull urbancompasspony/cups ;;
 19) echo "Not Found" ;;
 20) docker pull httpd:2.4 ;;
 21) docker pull selfhostedpro/yacht ;;
