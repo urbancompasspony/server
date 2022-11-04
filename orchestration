@@ -74,8 +74,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'DataBases' \
 4 'Others' \
 5 'Tools' \
-6 'Docker Managers' \
-7 '- Pull Only! -' \
+6 '- Pull Only! -' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -84,8 +83,7 @@ case "$var0" in
 3) database ; start ;;
 4) others ; start ;;
 5) tools ; start ;;
-6) managers ; start ;;
-7) pullall ; start ;;
+6) pullall ; start ;;
 X) exit ;;
 esac
 }
@@ -114,26 +112,12 @@ esac
 function servers {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'UniFi' \
-2 'OpenFire + Spark' \
-3 'LAN Cache' \
-4 'OracleDB XE' \
-5 'YoutubeDL' \
-6 'Transmission' \
-7 'KeepAliveD 1' \
-8 'KeepAliveD 2' \
-9 'FileBrowser' \
+2 'OpenFire [+Spark]' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
 2) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-3) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
-4) wget "$github"05-oracle_xe -O /tmp/oracle; sudo bash /tmp/oracle ;;
-5) wget "$github"17-youtubedl -O /tmp/youtube; sudo bash /tmp/youtube ;;
-6) wget "$github"18-transmission -O /tmp/transmission; sudo bash /tmp/transmission ;;
-7) wget "$github"20.1-keepalived -O /tmp/keep1; sudo bash /tmp/keep1 ;;
-8) wget "$github"20.2-keepalived -O /tmp/keep2; sudo bash /tmp/keep2 ;;
-9) wget "$github"22-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
 X) start ;;
 esac
 }
@@ -142,28 +126,26 @@ function database {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'MySQL' \
 2 'MariaDB' \
+3 'OracleDB XE' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
 2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
+3) wget "$github"05-oracle_xe -O /tmp/oracle; sudo bash /tmp/oracle ;;
 X) start ;;
 esac
 }
 
 function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'CUPS' \
-2 'HomeAssistant' \
-3 'Apache Static' \
-4 'LocalSpeedtest' \
+1 'Apache Static' \
+2 'LocalSpeedtest' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-2) wget "$github"19-homeassistant -O /tmp/home; sudo bash /tmp/home ;;
-3) wget "$github"24-apache -O /tmp/apache; sudo bash /tmp/apache ;;
-4) wget "$github"16-speedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+1) wget "$github"24-apache -O /tmp/apache; sudo bash /tmp/apache ;;
+2) wget "$github"16-speedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 X) start ;;
 esac
 }
@@ -213,25 +195,17 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'MariaDB' \
 6 'Collabora' \
 7 'SAMBA' \
-8 'Pentest' \
-9 'LocalSpeedtest' \
-10 'LAN Cache' \
-11 'OracleDB XE' \
-12 'YoutubeDL' \
-13 'Transmission' \
-14 'KeepAliveD 1' \
-15 'KeepAliveD 2' \
-16 'FileBrowser' \
-17 'UniFi' \
-18 'CUPS' \
-19 'HomeAssistant' \
-20 'Apache2' \
-21 'Yacht' \
-22 'Kuma' \
-23 'Rancher' \
-24 'Portainer' \
-25 'Pottava' \
-26 'OpenFire' \
+8 'LocalSpeedtest' \
+9 'OracleDB XE' \
+10 'UniFi' \
+11 'CUPS' \
+12 'Apache2' \
+13 'Yacht' \
+14 'Kuma' \
+15 'Rancher' \
+16 'Portainer' \
+17 'Pottava' \
+18 'OpenFire' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -242,25 +216,17 @@ case "$var0" in
 5) docker pull mariadb:latest ;;
 6) docker pull collabora/code ;;
 7) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/migrate-samba; } || { docker pull urbancompasspony/migrate-samba-arm; } ;;
-8) echo "Not Found" ;;
-9) docker pull openspeedtest/latest ;;
-10) docker pull lancachenet/monolithic:latest ;;
-11) docker pull gvenzl/oracle-xe:21-full ;;
-12) docker pull nbr23/youtube-dl-server:latest ;;
-13) echo "Not Found" ;;
-14) echo "Not Found" ;;
-15) echo "Not Found" ;;
-16) echo "Not Found" ;;
-17) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
-18) docker pull urbancompasspony/cups ;;
-19) echo "Not Found" ;;
-20) docker pull httpd:2.4 ;;
-21) docker pull selfhostedpro/yacht ;;
-22) docker pull louislam/uptime-kuma:1 ;;
-23) docker pull rancher/server:stable ;;
-24) docker pull portainer/portainer-ce ;;
-25) docker pull pottava/docker-webui ;;
-26) docker pull urbancompasspony/openfire:latest ;;
+8) docker pull openspeedtest/latest ;;
+9) docker pull gvenzl/oracle-xe:21-full ;;
+10) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
+11) docker pull urbancompasspony/cups ;;
+12) docker pull httpd:2.4 ;;
+13) docker pull selfhostedpro/yacht ;;
+14) docker pull louislam/uptime-kuma:1 ;;
+15) docker pull rancher/server:stable ;;
+16) docker pull portainer/portainer-ce ;;
+17) docker pull pottava/docker-webui ;;
+18) docker pull urbancompasspony/openfire:latest ;;
 X) start ;;
 esac
 }
