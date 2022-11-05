@@ -210,22 +210,22 @@ X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) docker pull pihole/pihole:latest ;;
-2) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/domain; } || { docker pull urbancompasspony/domain-arm; } ;;
+2) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/domain:latest; } || { docker pull urbancompasspony/domain-arm:latest; } ;;
 3) docker pull mysql:8 ;;
-4) docker pull nextcloud ;;
+4) docker pull nextcloud:latest ;;
 5) docker pull mariadb:latest ;;
-6) docker pull collabora/code ;;
-7) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/migrate-samba; } || { docker pull urbancompasspony/migrate-samba-arm; } ;;
-8) docker pull openspeedtest/latest ;;
+6) docker pull collabora/code:latest ;;
+7) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/migrate-samba:latest; } || { docker pull urbancompasspony/migrate-samba-arm:latest; } ;;
+8) docker pull openspeedtest/latest:latest ;;
 9) docker pull gvenzl/oracle-xe:21-full ;;
 10) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
-11) docker pull urbancompasspony/cups ;;
+11) docker pull urbancompasspony/cups:latest ;;
 12) docker pull httpd:2.4 ;;
-13) docker pull selfhostedpro/yacht ;;
+13) docker pull selfhostedpro/yacht:latest ;;
 14) docker pull louislam/uptime-kuma:1 ;;
 15) docker pull rancher/server:stable ;;
-16) docker pull portainer/portainer-ce ;;
-17) docker pull pottava/docker-webui ;;
+16) docker pull portainer/portainer-ce:latest ;;
+17) docker pull pottava/docker-webui:latest ;;
 18) docker pull urbancompasspony/openfire:latest ;;
 X) start ;;
 esac
