@@ -140,12 +140,12 @@ esac
 function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Apache Static' \
-2 'LocalSpeedtest' \
+2 'OpenSpeedtest' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"24-apache -O /tmp/apache; sudo bash /tmp/apache ;;
-2) wget "$github"16-speedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+2) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 X) start ;;
 esac
 }
@@ -195,7 +195,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'MariaDB' \
 6 'Collabora' \
 7 'SAMBA' \
-8 'LocalSpeedtest' \
+8 'OpenSpeedTest' \
 9 'OracleDB XE' \
 10 'UniFi' \
 11 'CUPS' \
