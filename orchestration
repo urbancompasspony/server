@@ -113,11 +113,13 @@ function servers {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'UniFi' \
 2 'OpenFire [+Spark]' \
+3 'ntfy' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
 2) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+3) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
 X) start ;;
 esac
 }
