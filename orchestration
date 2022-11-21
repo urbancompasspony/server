@@ -209,6 +209,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 17 'Pottava' \
 18 'OpenFire' \
 19 'ntfy' \
+20 'RustDesk' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -231,6 +232,7 @@ case "$var0" in
 17) docker pull pottava/docker-webui:latest ;;
 18) docker pull urbancompasspony/openfire:latest ;;
 19) docker pull binwiederhier/ntfy ;;
+20) docker pull rustdesk/rustdesk-server ;;
 X) start ;;
 esac
 }
