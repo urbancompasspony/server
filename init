@@ -24,6 +24,7 @@ revis="r0.1"
 ################################################################################
 
 # For Ubuntu 22.04!
+export pty=True
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
