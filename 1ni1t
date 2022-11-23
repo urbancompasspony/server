@@ -1742,11 +1742,8 @@ pkg whois
 pkg arp-scan
 pkg traceroute
 pkg libatasmart-bin
-pkg mutt
 pkg udpcast
 pkg cifs-utils
-pkg msmtp
-pkg msmtp-mta
 pkg libreoffice --no-install-recommends
 
 # Início do Sistema:
