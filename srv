@@ -45,7 +45,7 @@ B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/1ni1
 C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
 D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; start ;;
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | bash ; start ;;
-F) docker exec -it dominio bash ; start ;;
+F) docker exec -i dominio /bin/bash ; start ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | sudo bash ; start ;;
 H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
