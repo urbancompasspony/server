@@ -56,12 +56,13 @@ esac
 }
 
 function echodomain {
-  echo "# # #"
-  echo " "
-  echo "Digite 'domain' para acessar o menu do Active Directory em Docker! Pressione Enter para continuar."
   echo " "
   echo "# # #"
-  read
+  echo " "
+  echo "Digite 'domain' para acessar o menu do Active Directory em Docker!"
+  echo " "
+  echo "# # #"
+  echo " "
 }
 
 sudo apt install dialog curl -y
