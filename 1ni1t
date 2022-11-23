@@ -94,6 +94,14 @@ hash1=$(echo "$password" | md5sum | awk '{print $1}')
   }
 }
 
+function domaincontroller {
+  [ $(which docker 2>/dev/null) ] && {
+    docker exec -it dominio bash
+  } || {
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | sudo bash
+  }
+}
+
 # SISTEMA Normal
 function start {
 doc_rel="1" # Relatorio!
@@ -116,7 +124,7 @@ case "$var1" in
 A) menu01 ;;
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | sudo bash ; start ;;
 C) menu03 ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | sudo bash ; start ;;
+D) domaincontroller ; start ;;
 E) menu05 ;;
 F) m10 ;;
 G) menu06 ;;
