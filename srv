@@ -62,4 +62,5 @@ sudo apt install dialog curl -y
   exit
   }
 
-init
+#init
+start
