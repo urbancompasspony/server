@@ -33,10 +33,11 @@ D 'Docker' \
 E 'Domain [Local]' \
 F 'Domain [Docker]' \
 G 'Virtual Machines' \
-H 'Tools' \
-I 'Bashrc' \
-J 'DWAgent [x86]' \
-K 'DWAgent [ARM]' \
+H 'G.U.I.' \
+I 'Tools' \
+J 'Bashrc' \
+K 'DWAgent [x86]' \
+L 'DWAgent [ARM]' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -47,10 +48,11 @@ D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/dock
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | bash ; start ;;
 F) echodomain ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | sudo bash ; start ;;
-H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
-J) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh ; start ;;
-K) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh ; start ;;
+H) startx ; start ;;
+I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
+J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
+K) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh ; start ;;
+L) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
