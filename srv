@@ -49,7 +49,7 @@ D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/dock
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | bash ; start ;;
 F) echodomain ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | sudo bash ; start ;;
-H) startx ; start ;;
+H) echogui ;;
 I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
 K) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh ; start ;;
@@ -64,6 +64,16 @@ function echodomain {
   echo "# # #"
   echo " "
   echo "Digite 'domain' para acessar o menu do Active Directory em Docker!"
+  echo " "
+  echo "# # #"
+  echo " "
+}
+
+function echogui {
+  echo " "
+  echo "# # #"
+  echo " "
+  echo "Digite 'startx' para acessar a Interface de Usuário!"
   echo " "
   echo "# # #"
   echo " "
