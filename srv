@@ -38,7 +38,6 @@ I 'Tools' \
 J 'Bashrc' \
 K 'DWAgent [x86]' \
 L 'DWAgent [ARM]' \
-M 'Beep!' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -54,7 +53,6 @@ I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tool
 J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
 K) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh ; start ;;
 L) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh ; start ;;
-M) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; sudo bash /home/administrador/.beep.sh ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
