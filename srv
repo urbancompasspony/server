@@ -52,8 +52,8 @@ G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_m
 H) echogui ;;
 I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
-K) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh ; start ;;
-L) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh ; start ;;
+K) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
+L) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
 M) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
 X) echo "Saindo..." ;;
 esac
