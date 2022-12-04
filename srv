@@ -39,6 +39,7 @@ J 'Bashrc' \
 K 'DWAgent [x86]' \
 L 'DWAgent [ARM]' \
 M 'Beep!' \
+N 'Update Domain Menu' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -55,6 +56,7 @@ J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/inst
 K) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
 L) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
 M) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
+N) docker exec dominio bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init" ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
