@@ -15,8 +15,8 @@ function menu04 {
   B 'Gestao de Grupos' \
   C 'Gestao de Computadores' \
   D 'Informacoes do Dominio' \
-  E 'Manutenção do Banco' \
-  F 'Update this Menu' \
+  E 'Manutencao do Banco' \
+  F 'Atualizar Menu' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
