@@ -34,7 +34,7 @@ echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
   dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 7 30
   menu19
 } || {
-  sudo mkdir -p "$VALUE2"
+  sudo mkdir -p "$mntpt1"
   sudo mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
   mntshow2=$(df -hT)
   exit
