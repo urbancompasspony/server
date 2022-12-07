@@ -37,9 +37,6 @@ echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
   sudo mkdir -p "$VALUE2"
   sudo mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
   mntshow2=$(df -hT)
-  dialog --title "Caminho montado!" --msgbox "$mntshow2" 25 60
-  read
-  sleep 3
   exit
   }
 }
