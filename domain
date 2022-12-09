@@ -6,7 +6,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Variaveis Globais
 export bktitle="Active Directory and Domain Controller"
-export ttitle="Server Menu v1.1"
+export ttitle="Server Menu v2.5"
 
 # Controlador de Dominio
 function menu04 {
