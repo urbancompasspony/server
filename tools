@@ -39,7 +39,9 @@ pass1=$(echo "$VALUE0" | sed -n 4p)
 dmn1=$(echo "$VALUE0" | sed -n 5p)
 
 [ -z "$path1" ] || [ -z "$mntpt1" ] || [ -z "$user1" ] || [ -z "$pass1" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 7 30; sambaclient; }
+  dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 7 30
+  sambaclient
+  }
 
 echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
 [ "$echa1" = "sim" ] && {
