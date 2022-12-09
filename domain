@@ -133,7 +133,7 @@ validpss1=$(echo "$VALUE0" | sed -n 3p)
 [ -z "$validpss1" ] || [ -z "$validusr1" ] || [ -z "$validsur1" ] && {
   dialog --title "ERRO" --msgbox "Nao deixe nenhum campo vazio!" 8 40
 } || {
-  repeated=$(samba-tool user list | grep "$validusr1")
+  repeated=$(samba-tool user list | grep -x "$validusr1")
   [ "$repeated" = "$validusr1" ] && {
     dialog --title "Informacao" --msgbox "O usuario $validusr1 ja existe!" 8 40
   } || {
@@ -171,7 +171,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 [ -z "$validusr" ] && {
   dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
 } || {
-  repeated=$(samba-tool user list | grep "$validusr")
+  repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
     validpss=$(dialog --title "$ttitle" --backtitle "Trocar a senha de usuario do Dominio em $HOSTNAME" --insecure --passwordbox 'Crie uma nova senha para o usuario' 0 0 2>&1 > /dev/tty )
     [ -z "$validpss" ] && {
@@ -193,7 +193,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
 } || {
-  repeated=$(samba-tool user list | grep "$validusr")
+  repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
     samba-tool user disable "$validusr"
     dialog --title "Informacao" --msgbox "Usuario $validusr bloqueado com sucesso!" 7 25
@@ -210,7 +210,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
 } || {
-  repeated=$(samba-tool user list | grep "$validusr")
+  repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
     samba-tool user enable "$validusr"
     dialog --title "Informacao" --msgbox "Usuario $validusr desbloqueado com sucesso!" 7 25
@@ -227,7 +227,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
 } || {
-  repeated=$(samba-tool user list | grep "$validusr")
+  repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
     dialog --title 'Confirmacao' --backtitle 'Exclusao de Usuario' --yesno 'Deseja excluir este usuario?' 0 0
     [ $? = 0 ] && {
@@ -249,7 +249,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
 } || {
-  repeated=$(samba-tool group list | grep "$validgrp")
+  repeated=$(samba-tool group list | grep -x "$validgrp")
   [ "$repeated" = "$validgrp" ] && {
     dialog --title "Informacao" --msgbox "O grupo $validgrp ja existe!" 6 20
   } || {
@@ -270,9 +270,9 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   [ -z "$validgrp" ] && {
     dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
   } || {
-    repeated=$(samba-tool user list | grep "$validusr")
+    repeated=$(samba-tool user list | grep -x "$validusr")
     [ "$repeated" = "$validusr" ] && {
-    repeated2=$(samba-tool group list | grep "$validgrp")
+    repeated2=$(samba-tool group list | grep -x "$validgrp")
       [ "$repeated2" = "$validgrp" ] && {
         samba-tool group addmembers "$validgrp" "$validusr"
         dialog --title "Informacao" --msgbox "O usuario $validusr foi adicionado ao grupo $validgrp!" 8 40
@@ -293,7 +293,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
 } || {
-  repeated=$(samba-tool group list | grep "$validgrp")
+  repeated=$(samba-tool group list | grep -x "$validgrp")
   [ "$repeated" = "$validgrp" ] && {
     dialog --title "$ttitle" --backtitle "Listagem de Membros" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
     usrgrps=$(samba-tool group listmembers "$validgrp")
@@ -315,9 +315,9 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   [ -z "$validgrp" ] && {
     dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
   } || {
-    repeated=$(samba-tool user list | grep "$validusr")
+    repeated=$(samba-tool user list | grep -x "$validusr")
     [ "$repeated" = "$validusr" ] && {
-      repeated2=$(samba-tool group list | grep "$validgrp")
+      repeated2=$(samba-tool group list | grep -x "$validgrp")
       [ "$repeated2" = "$validgrp" ] && {
         samba-tool group removemembers "$validgrp" "$validusr"
         dialog --title "Informacao" --msgbox "O usuario $validusr foi removido do grupo $validgrp!" 8 40
@@ -338,7 +338,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
 } || {
-  repeated=$(samba-tool group list | grep "$validgrp")
+  repeated=$(samba-tool group list | grep -x "$validgrp")
   [ "$repeated" = "$validgrp" ] && {  
     dialog --title 'Confirmacao' --backtitle 'Exclusao de Grupo' --yesno "Deseja excluir o grupo $validgrp?" 0 0
     [ $? = 0 ] && {
@@ -360,7 +360,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
 } || {
-  repeated=$(samba-tool user list | grep "$validusr")
+  repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
     dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "A senha de $validusr nao deve mais expirar?" 0 0
     [ $? = 0 ] && {
@@ -382,7 +382,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
 } || {
-  repeated=$(samba-tool user list | grep "$validusr")
+  repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
     dialog --title "$ttitle" --backtitle "Listagem de Grupos" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
     grpsusr=$(samba-tool user getgroups "$validusr")
@@ -401,7 +401,7 @@ Exemplo: joao_naves" 8 40 2>&1 > /dev/tty)
 [ -z "$validusr1" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
 } || {
-  repeated2=$(samba-tool user list | grep "$validusr1")
+  repeated2=$(samba-tool user list | grep -x "$validusr1")
   [ "$repeated2" = "$validusr1" ] && {
     dialog --title "Informacao" --msgbox "O usuario $validusr1 ja foi cadastrado!" 8 40
   } || {
@@ -419,7 +419,7 @@ validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
 [ -z "$validgrp1" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
 } || {
-  repeated3=$(samba-tool group list | grep "$validgrp1")
+  repeated3=$(samba-tool group list | grep -x "$validgrp1")
   [ "$repeated3" = "$validgrp1" ] && {
     dialog --title "Informacao" --msgbox "O grupo $validgrp1 ja foi cadastrado!" 8 40
   } || {
