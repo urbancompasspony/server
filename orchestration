@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# NEXTCLOUD VERSION:
+nv="25"
+
 # For Ubuntu 22.04!
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
@@ -218,7 +221,7 @@ case "$var0" in
 1) docker pull pihole/pihole:latest ;;
 2) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/domain:latest; } || { docker pull urbancompasspony/domain-arm:latest; } ;;
 3) docker pull mysql:8 ;;
-4) docker pull nextcloud:latest ;;
+4) docker pull nextcloud:"$nv" ;;
 5) docker pull mariadb:latest ;;
 6) docker pull collabora/code:latest ;;
 7) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/migrate-samba:latest; } || { docker pull urbancompasspony/migrate-samba-arm:latest; } ;;
