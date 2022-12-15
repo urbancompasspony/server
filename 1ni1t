@@ -31,8 +31,8 @@ export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
 # Hashs
+hash1="fbc5c0070b7d8b939700ad689f690784"
 hash2="576200e78f0ab25b437dc7372ae920d9"
-hash3="9ae7c2a8e120dssssa4915cba5a15e17"
 
 # Docs
 FILE3="/home/administrador/.email"
@@ -82,12 +82,12 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 # PASSWORD
 function init {
 password=$(dialog --backtitle "$bktitle" --title "Acesso ao USM" --insecure --passwordbox "Digite a senha!" 0 0 2>&1 > /dev/tty)
-hash1=$(echo "$password" | md5sum | awk '{print $1}')
+hash0=$(echo "$password" | md5sum | awk '{print $1}')
   [ -z "$password" ] && {
     clear
     echo "É necessário digitar uma senha para continuar. Tente novamente!"
   } || {
-    [ "$hash1" = "$hash2" ] || [ "$hash1" = "$hash3" ] && {
+    [ "$hash0" = "$hash1" ] || [ "$hash0" = "$hash2" ] && {
       menu054
     } || {
       echo "É necessário digitar a senha correta. Saindo."
