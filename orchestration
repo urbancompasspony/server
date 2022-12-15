@@ -118,6 +118,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'OpenFire [+Spark]' \
 3 'ntfy' \
 4 'RustDesk' \
+5 'OnlyOffice Web' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -125,6 +126,7 @@ case "$var0" in
 2) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
 3) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
 4) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
+5) wget "$github"34-onlyoffice -O /tmp/onlyoffice; sudo bash /tmp/onlyoffice ;;
 X) start ;;
 esac
 }
