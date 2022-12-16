@@ -244,5 +244,16 @@ X) start ;;
 esac
 }
 
-# Start
+[ -f /srv/containers/scripts/myip ] || {
+  IPMachine=$(hostname -I | awk '{print $1}')
+  MyIPNF=$(dialog --title 'MyIP!' --backtitle "IP Encontrado: $IPMachine" --inputbox "MyIP não encontrado. \nQual o IP do Servidor?" 10 40 2>&1 > /dev/tty)
+  sudo mkdir -p /srv/containers/scripts
+  sudo touch /srv/containers/scripts/myip
+  echo "$MyIPNF" | sudo tee /srv/containers/scripts/myip
+  dialog --title "IP Definido para o Orquestrador!" --msgbox "IP Definido com Sucesso!" 6 40
+  start
+} && {
+  start
+}
+
 check
