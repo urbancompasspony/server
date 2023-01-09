@@ -16,7 +16,8 @@ function menu04 {
   C 'Gestao de Computadores' \
   D 'Informacoes do Dominio' \
   E 'Manutencao do Banco' \
-  F 'Atualizar Menu' \
+  F 'GPUpdate Force' \
+  G 'Atualizar Menu' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
@@ -24,8 +25,9 @@ function menu04 {
   B) menu042 ;;
   C) menu043 ;;
   D) menuR ;;
-  E) samba-tool dbcheck --cross-ncs --fix ; menu04 ;;
-  F) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; menu04 ;;
+  E) samba-tool dbcheck --cross-ncs --fix ; read -p "Pressione Enter para continuar!" ; menu04 ;;
+  F) samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; menu04 ;;
+  G) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; menu04 ;;
   X) exit ;;
   esac
 }
