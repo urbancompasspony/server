@@ -16,7 +16,7 @@ function menu04 {
   C 'Gestao de Computadores' \
   D 'Informacoes do Dominio' \
   E 'GPUpdate /Force' \
-  F 'Manutenção' \
+  F 'Manutencao' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
@@ -47,7 +47,7 @@ function manut {
   D) samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
   E) samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
   F) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; manut ;;
-  X) exit ;;
+  X) menu04 ;;
   esac
 }
 
