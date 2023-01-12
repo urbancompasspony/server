@@ -5,8 +5,8 @@ export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
 # Variaveis Globais
-export bktitle="Active Directory and Domain Controller"
-export ttitle="Server Menu v2.5"
+export bktitle="Active Directory & Domain Controller"
+export ttitle="Server Menu v3.0"
 
 # Controlador de Dominio
 function menu04 {
@@ -15,9 +15,8 @@ function menu04 {
   B 'Gestao de Grupos' \
   C 'Gestao de Computadores' \
   D 'Informacoes do Dominio' \
-  E 'Manutencao do Banco' \
-  F 'GPUpdate Force' \
-  G 'Atualizar Menu' \
+  E 'GPUpdate /Force' \
+  F 'Manutenção' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
@@ -25,9 +24,29 @@ function menu04 {
   B) menu042 ;;
   C) menu043 ;;
   D) menuR ;;
-  E) samba-tool dbcheck --cross-ncs --fix ; read -p "Pressione Enter para continuar!" ; menu04 ;;
-  F) samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; menu04 ;;
-  G) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; menu04 ;;
+  E) samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; menu04 ;;
+  F) manut ; menu04 ;;
+  X) exit ;;
+  esac
+}
+
+function manut {
+  var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
+  A 'dbcheck' \
+  B 'dbcheck well-known-acls' \
+  C 'GPO ACL Check' \
+  D 'SysVol Check' \
+  E 'SysVol Reset' \
+  F 'Atualizar este Menu' \
+  X 'Voltar' 2>&1 > /dev/tty )
+  [ $? -ne 0 ] && exit
+  case "$var4" in
+  A) samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
+  B) samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
+  C) samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
+  D) samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
+  E) samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
+  F) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; manut ;;
   X) exit ;;
   esac
 }
