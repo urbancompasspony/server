@@ -153,12 +153,14 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'LUCS - ApacheStatic' \
 2 'OpenSpeedtest' \
 3 'Shell In a Box' \
+4 'SSH Only' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"24-lucs-apache -O /tmp/apache; sudo bash /tmp/apache ;;
 2) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 3) wget "$github"37-shellinabox -O /tmp/siab; sudo bash /tmp/siab ;;
+4) wget "$github"38-ssh-only -O /tmp/ssho; sudo bash /tmp/ssho ;;
 X) start ;;
 esac
 }
@@ -221,6 +223,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 18 'OpenFire' \
 19 'ntfy' \
 20 'RustDesk' \
+21 'Shell in a Box' \
+22 'Ubuntu 22.04' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -244,6 +248,8 @@ case "$var0" in
 18) docker pull urbancompasspony/openfire:latest ;;
 19) docker pull binwiederhier/ntfy ;;
 20) docker pull rustdesk/rustdesk-server ;;
+21) docker pull sspreitzer/shellinabox:latest ;;
+22) docker pull ubuntu:22.04 ;;
 X) start ;;
 esac
 }
