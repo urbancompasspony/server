@@ -152,11 +152,13 @@ function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'LUCS - ApacheStatic' \
 2 'OpenSpeedtest' \
+3 'Shell In a Box' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"24-lucs-apache -O /tmp/apache; sudo bash /tmp/apache ;;
 2) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+3) wget "$github"37-shellinabox -O /tmp/siab; sudo bash /tmp/siab ;;
 X) start ;;
 esac
 }
