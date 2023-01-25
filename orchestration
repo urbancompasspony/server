@@ -152,7 +152,7 @@ function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'LUCS - ApacheStatic' \
 2 'OpenSpeedtest' \
-3 'Shell In a Box' \
+3 'Shell in a Box' \
 4 'SSH Only' \
 X '<' 2>&1 > /dev/tty )
 
@@ -224,7 +224,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 19 'ntfy' \
 20 'RustDesk' \
 21 'Shell in a Box' \
-22 'Ubuntu 22.04' \
+22 'SSH Only' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
