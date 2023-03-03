@@ -118,8 +118,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'RustDesk' \
 5 'OnlyOffice Web' \
 6 'Apache2 Generic' \
-7 'NGINX Reverse Proxy' \
-8 'NGINX WebDomain' \
+7 'Apache2 Reverse Proxy' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -129,8 +128,7 @@ case "$var0" in
 4) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
 5) wget "$github"34-onlyoffice -O /tmp/onlyoffice; sudo bash /tmp/onlyoffice ;;
 6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-7) wget "$github"33-nginx-PR -O /tmp/nginspr; sudo bash /tmp/nginspr ;;
-8) wget "$github"33.1-nginx-addsite -O /tmp/addsite; sudo bash /tmp/addsite ;;
+7) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
 X) start ;;
 esac
 }
