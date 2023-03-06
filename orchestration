@@ -211,7 +211,7 @@ case "$var0" in
 11) docker pull urbancompasspony/openfire:latest ;;
 12) docker pull binwiederhier/ntfy ;;
 13) docker pull rustdesk/rustdesk-server ;;
-14) docker pull ubuntu:22.04 ;;
+14) docker pull urbancompasspony/ssh-dw:latest ;;
 15) docker pull urbancompasspony/reverseproxy:latest ;;
 X) start ;;
 esac
