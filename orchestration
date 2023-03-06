@@ -119,8 +119,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'ntfy' \
 4 'RustDesk' \
 5 'OnlyOffice Web' \
-6 'Apache2 Generic' \
-7 'Apache2 Reverse Proxy' \
+6 'Apache2 Standalone' \
+7 'Reverse Proxy' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -139,49 +139,24 @@ function database {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'MySQL' \
 2 'MariaDB' \
-3 'OracleDB XE' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
 2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
-3) wget "$github"05-oracle_xe -O /tmp/oracle; sudo bash /tmp/oracle ;;
 X) start ;;
 esac
 }
 
 function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'LUCS - ApacheStatic' \
-2 'OpenSpeedtest' \
-3 'Shell in a Box' \
-4 'SSH Only' \
+1 'OpenSpeedtest' \
+2 'SSH Only' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) wget "$github"24-lucs-apache -O /tmp/apache; sudo bash /tmp/apache ;;
-2) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-3) wget "$github"37-shellinabox -O /tmp/siab; sudo bash /tmp/siab ;;
-4) wget "$github"38-ssh-only -O /tmp/ssho; sudo bash /tmp/ssho ;;
-X) start ;;
-esac
-}
-
-function managers {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Yacht' \
-2 'Kuma' \
-3 'Rancher' \
-4 'Portainer' \
-5 'Pottava' \
-X '<' 2>&1 > /dev/tty )
-
-case "$var0" in
-1) wget "$github"14-yacht -O /tmp/yacht; sudo bash /tmp/yacht ;;
-2) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-3) wget "$github"21-rancher -O /tmp/rancher; sudo bash /tmp/rancher ;;
-4) wget "$github"22-portainer -O /tmp/portainer; sudo bash /tmp/portainer ;;
-5) wget "$github"23-pottava -O /tmp/pottava; sudo bash /tmp/pottava ;;
+1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+2) wget "$github"38-ssh-only -O /tmp/ssho; sudo bash /tmp/ssho ;;
 X) start ;;
 esac
 }
@@ -213,20 +188,13 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'Collabora' \
 7 'SAMBA' \
 8 'OpenSpeedTest' \
-9 'OracleDB XE' \
-10 'UniFi' \
-11 'CUPS' \
-12 'Apache' \
-13 'Yacht' \
-14 'Kuma' \
-15 'Rancher' \
-16 'Portainer' \
-17 'Pottava' \
-18 'OpenFire' \
-19 'ntfy' \
-20 'RustDesk' \
-21 'Shell in a Box' \
-22 'SSH Only' \
+9 'UniFi' \
+10 'Apache' \
+11 'OpenFire' \
+12 'ntfy' \
+13 'RustDesk' \
+14 'SSH Only' \
+15 'ReverseProxy' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -238,20 +206,13 @@ case "$var0" in
 6) docker pull collabora/code:latest ;;
 7) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/migrate-samba:latest; } || { docker pull urbancompasspony/migrate-samba-arm:latest; } ;;
 8) docker pull openspeedtest/latest:latest ;;
-9) docker pull gvenzl/oracle-xe:21-full ;;
-10) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
-11) docker pull urbancompasspony/cups:latest ;;
-12) docker pull httpd:2.4 ;;
-13) docker pull selfhostedpro/yacht:latest ;;
-14) docker pull louislam/uptime-kuma:1 ;;
-15) docker pull rancher/server:stable ;;
-16) docker pull portainer/portainer-ce:latest ;;
-17) docker pull pottava/docker-webui:latest ;;
-18) docker pull urbancompasspony/openfire:latest ;;
-19) docker pull binwiederhier/ntfy ;;
-20) docker pull rustdesk/rustdesk-server ;;
-21) docker pull sspreitzer/shellinabox:latest ;;
-22) docker pull ubuntu:22.04 ;;
+9) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
+10) docker pull httpd:2.4 ;;
+11) docker pull urbancompasspony/openfire:latest ;;
+12) docker pull binwiederhier/ntfy ;;
+13) docker pull rustdesk/rustdesk-server ;;
+14) docker pull ubuntu:22.04 ;;
+15) docker pull urbancompasspony/reverseproxy:latest ;;
 X) start ;;
 esac
 }
