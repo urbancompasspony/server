@@ -193,7 +193,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 11 'OpenFire' \
 12 'ntfy' \
 13 'RustDesk' \
-14 'SSH Only' \
+14 'SSH DW' \
 15 'ReverseProxy' \
 X '<' 2>&1 > /dev/tty )
 
