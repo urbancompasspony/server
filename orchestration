@@ -98,6 +98,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'NextCloud' \
 4 'Collabora' \
 5 'Pentest' \
+6 'Samba Share' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -106,6 +107,7 @@ case "$var0" in
 3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
 4) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
 5) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+6) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
 X) start ;;
 esac
 }
