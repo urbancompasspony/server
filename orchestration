@@ -151,7 +151,7 @@ esac
 function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'OpenSpeedtest' \
-2 'SSH Only' \
+2 'SSH DW' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
