@@ -156,7 +156,7 @@ X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-2) wget "$github"38-ssh-only -O /tmp/ssho; sudo bash /tmp/ssho ;;
+2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 X) start ;;
 esac
 }
