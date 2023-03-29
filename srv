@@ -31,34 +31,28 @@ var0=$(dialog --title 'System Manager' --backtitle "Sistema Automatizado de Orqu
 A 'Linite' \
 B 'Server Manager' \
 C 'Orchestra' \
-D 'Docker' \
-E 'Domain [Local]' \
-F 'Domain [Docker]' \
-G 'Virtual Machines' \
-H 'G.U.I. [Local]' \
-I 'Tools' \
-J 'Bashrc' \
-K 'DWAgent [x86]' \
-L 'DWAgent [ARM]' \
-M 'Beep!' \
-N 'Update Domain Menu' \
+D 'Domain [Local]' \
+E 'Domain [Docker]' \
+F 'G.U.I. [Local]' \
+G 'Tools' \
+H 'Bashrc' \
+I 'DWAgent [x86]' \
+J 'DWAgent [ARM]' \
+K 'Beep!' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/1ni1t | sudo bash ; start ;;
 C) orchestrapass ; start ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; start ;;
-E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | bash ; start ;;
-F) echodomain ;;
-G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | sudo bash ; start ;;
-H) echogui ;;
-I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
-K) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
-L) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
-M) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
-N) docker exec dominio bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init" ; start ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | bash ; start ;;
+E) echodomain ;;
+F) echogui ;;
+G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
+H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
+I) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
+J) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
+K) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
