@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# # # # # # # # #
+# SRV Menu v0.1 #
+# # # # # # # # # 
+
+# For Ubuntu!
+export pty=True
+export NEEDRESTART_MODE=a
+export DEBIAN_FRONTEND=noninteractive
+
+# Hashs
+hash1="576200e78f0ab25b437dc7372ae920d9"
+
+# ------------------------------------------------------------------------------
+
+# PASSWORD
+function init {
+password=$(dialog --backtitle "$bktitle" --title "Acesso ao USM" --insecure --passwordbox "Digite a senha!" 0 0 2>&1 > /dev/tty)
+hash0=$(echo "$password" | md5sum | awk '{print $1}')
+  [ -z "$password" ] && {
+    clear
+    echo "É necessário digitar uma senha para continuar. Tente novamente!"
+  } || {
+    [ "$hash0" = "$hash1" ] && {
+      start
+    } || {
+      echo "Senha incorreta. Saindo."
+      }
+  }
+}
+
+function start {
+datetime=$(date +"%d/%m %H:%M")
+uptime=$(uptime | awk {'print $3 $4 $5'})
+var1=$(dialog --backtitle "$bktitle" --title 'Menu Principal' --menu "Nome da Máquina: $HOSTNAME
+Data e Hora: $datetime
+UpTime: $uptime"  0 0 0 \
+A 'Máquinas Virtuais' \
+B 'Containers' \
+C 'Active Directory' \
+D 'Ferramentas' \
+E 'Avançado' \
+F '*Reiniciar' \
+G '*Desligar' \
+X 'SAIR' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && start
+case "$var1" in
+A) menu01 ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | sudo bash ; start ;;
+C) menu03 ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash ; start ;;
+E) menu05 ;;
+F) m10 ;;
+G) reb00t ;;
+H) shutd0 ;;
+X) echo "Saindo... Para voltar, digite 'menu'!" && exit ;;
+esac
+}
+
+function domaincontroller {
+  [ $(which docker 2>/dev/null) ] && {
+    docker exec -it dominio bash
+  } || {
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | sudo bash
+  }
+}
+
+function reb00t {
+bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+datetime=$(date +"%d/%m %H:%M")
+[ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ] || [ "$cp1" = "Executando" ] && {
+  dialog --cr-wrap --title 'ERRO AO REINICIAR' --backtitle "$bktitle" --msgbox "Reinício bloqueado! \n
+Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
+} || {
+  dialog --title 'Reiniciar' --backtitle "$bktitle" --yesno 'Deseja reiniciar este sistema?' 0 0
+  [ $? = 0 ] && {
+    [ "$report" = "1" ] && {
+      dialog --title 'Relatório' --yesno "Deseja enviar um relatório por e-mail sobre este reinício?" 8 40
+      [ $? = 0 ] && {
+        menu08 "$Recado $Recado5 $datetime $Mensagem"
+      } || {
+        echo "a" > /dev/null
+        }
+    }
+  sudo reboot
+  }
+}
+
+start
+}
+
+function shutd0 {
+rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
+datetime=$(date +"%d/%m %H:%M")
+[ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ] || [ "$cp1" = "Executando" ] && {
+  dialog --cr-wrap --title 'ERRO AO DESLIGAR' --backtitle 'ERRO AO TENTAR DESLIGAR.' --msgbox "Desligamento bloqueado! \n
+Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
+} || {
+  dialog --title 'Desligar' --backtitle 'D E S L I G A R' --yesno 'Deseja desligar este sistema?' 0 0
+  [ $? = 0 ] && {
+    [ "$report" = "1" ] && {
+      dialog --title 'Relatório' --yesno "Deseja enviar um relatório por e-mail sobre este desligamento?" 8 40
+      [ $? = 0 ] && {
+        menu08 "$Recado $Recado6 $datetime $Mensagem"
+      } || {
+        echo "a" > /dev/null
+        }
+    }
+  sudo shutdown -h now
+  }
+}
+
+start
+}
+
+# ------------------------------------------------------------------------------
+
+# Start
+
+# Checagem Obrigatória de Dependências:
+[ -f /home/$USER/.installed ] || {
+  sudo apt install dialog curl lm-sensors arp-scan traceroute libatasmart-bin udpcast cifs-utils
+  touch /home/$USER/.installed
+  init
+} && {
+  init
+}
+
+exit 0
