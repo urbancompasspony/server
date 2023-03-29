@@ -43,7 +43,7 @@ X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/1ni1t | sudo bash ; start ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/srvmgr | sudo bash ; start ;;
 C) orchestrapass ; start ;;
 D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | bash ; start ;;
 E) echodomain ;;
