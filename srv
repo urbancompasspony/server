@@ -156,7 +156,7 @@ hash="e4439267203fb5277d347e6cd6e440b5"
 
 # Checagem Obrigatória de Dependências:
 [ -f /home/$USER/.installed ] || {
-  sudo apt install dialog curl lm-sensors arp-scan traceroute libatasmart-bin udpcast cifs-utils
+  sudo apt install sshpass dialog curl lm-sensors arp-scan traceroute libatasmart-bin udpcast cifs-utils
   touch /home/$USER/.installed
   init
 } && {
