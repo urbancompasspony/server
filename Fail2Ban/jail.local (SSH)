@@ -1,5 +1,6 @@
 # INSIDE:
-# /etc/fail2ban/jail.d/defaults-debian.conf
+
+sudo nano /etc/fail2ban/jail.d/defaults-debian.conf
 
 [DEFAULT]
 bantime  = 600
