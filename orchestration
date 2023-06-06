@@ -99,7 +99,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'Collabora' \
 5 'Pentest' \
 6 'PentestHost' \
-7 'Samba Share' \
+7 'FTP Server' \
+8 'Samba Share' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -109,7 +110,8 @@ case "$var0" in
 4) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
 5) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 6) wget "$github"09.1-pentest -O /tmp/pentesthost; sudo bash /tmp/pentesthost ;;
-7) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
+7) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+8) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
 X) start ;;
 esac
 }
