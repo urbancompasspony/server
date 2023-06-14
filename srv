@@ -161,6 +161,7 @@ hash="e4439267203fb5277d347e6cd6e440b5"
     touch /home/$USER/.installed
     init
   } || {
+    sudo apt update
     sudo apt install sshpass dialog curl lm-sensors arp-scan traceroute libatasmart-bin udpcast cifs-utils
     touch /home/$USER/.installed
     init
