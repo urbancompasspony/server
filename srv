@@ -157,7 +157,7 @@ hash="e4439267203fb5277d347e6cd6e440b5"
 # Checagem Obrigatória de Dependências:
 [ -f /home/$USER/.installed ] || {
   [ -f /usr/bin/pacman ] && {
-    pacman -Syu dialog
+    sudo pacman -Syu dialog
     touch /home/$USER/.installed
     init
   } || {
