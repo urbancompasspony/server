@@ -165,12 +165,14 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'OpenSpeedtest' \
 2 'SSH DW' \
 3 'Syncthing' \
+4 'Syncthing Relay' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-3) wget "$github"42-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+4) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
 X) start ;;
 esac
 }
