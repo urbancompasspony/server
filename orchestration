@@ -151,11 +151,13 @@ function database {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'MySQL' \
 2 'MariaDB' \
+3 'OracleXE 21C' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
 2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
+3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
 X) start ;;
 esac
 }
