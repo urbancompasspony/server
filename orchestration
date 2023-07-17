@@ -238,11 +238,11 @@ case "$var0" in
 14) docker pull urbancompasspony/ssh-dw:latest ;;
 15) docker pull urbancompasspony/reverseproxy:latest ;;
 16) docker pull urbancompasspony/centosoracle:latest ;;
-17) docker pull urbancompasspony/ssh-dw:latest
-18) docker pull diouxx/glpi
-19) docker pull coppit/no-ip
-20) docker pull syncthing/syncthing:latest
-21) docker pull t4skforce/syncthing-relay:latest
+17) docker pull urbancompasspony/ssh-dw:latest ;
+18) docker pull diouxx/glpi ;
+19) docker pull coppit/no-ip ;
+20) docker pull syncthing/syncthing:latest ;
+21) docker pull t4skforce/syncthing-relay:latest ;
 X) start ;;
 esac
 }
