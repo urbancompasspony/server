@@ -213,6 +213,12 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 13 'RustDesk' \
 14 'SSH DW' \
 15 'ReverseProxy' \
+16 'OracleXE 21C' \
+17 'SSH DW' \
+18 'G.L.P.I.' \
+19 'NO-Ip' \
+20 'Syncthing' \
+21 'Syncthing Relay' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -231,6 +237,12 @@ case "$var0" in
 13) docker pull rustdesk/rustdesk-server ;;
 14) docker pull urbancompasspony/ssh-dw:latest ;;
 15) docker pull urbancompasspony/reverseproxy:latest ;;
+16) docker pull urbancompasspony/centosoracle:latest ;;
+17) docker pull urbancompasspony/ssh-dw:latest
+18) docker pull diouxx/glpi
+19) docker pull coppit/no-ip
+20) docker pull syncthing/syncthing:latest
+21) docker pull t4skforce/syncthing-relay:latest
 X) start ;;
 esac
 }
