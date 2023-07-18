@@ -61,15 +61,27 @@ echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
   }
 }
 
+function satas {
+  for number in $(find /sys/class/scsi_host/host* -maxdepth 0); do
+    echo "Scanning on $number!"
+    echo "0 0 0" > $number/scan
+    echo "Scan Ok"
+  done
+  echo "All done!"
+  sleep 5
+}
+
 function start {
 var0=$(dialog --title 'Tools' --backtitle "Ferramentas úteis!" --menu " " 0 0 0 \
 A 'SMB Client' \
 B 'Beep!' \
+C 'Sync all SATA' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
 A) sambaclient ; start ;;
 B) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
+C) satas ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
