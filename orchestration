@@ -253,10 +253,11 @@ esac
   sudo mkdir -p /srv/containers/scripts/config
 
   sudo touch /srv/containers/scripts/config/backupcont
-  echo "source" > /srv/containers/scripts/config/backupcont
-  echo "destiny" >> /srv/containers/scripts/config/backupcont
-  echo "mountpoint" >> /srv/containers/scripts/config/backupcont
-  echo "UUID" >> /srv/containers/scripts/config/backupcont
+
+  echo "source" | sudo tee /srv/containers/scripts/config/backupcont
+  echo "destiny" | sudo tee -a /srv/containers/scripts/config/backupcont
+  echo "mountpoint" | sudo tee -a /srv/containers/scripts/config/backupcont
+  echo "UUID" | sudo tee -a /srv/containers/scripts/config/backupcont
 
   wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
   cat 01-Backup | sudo tee /srv/containers/scripts/backupcont
