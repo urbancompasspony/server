@@ -1,274 +1,79 @@
 #!/bin/bash
 
-# NEXTCLOUD VERSION:
-nv="25"
+containers="/srv/containers"
 
-# For Ubuntu 22.04!
-export NEEDRESTART_MODE=a
-export DEBIAN_FRONTEND=noninteractive
+source=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
+destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
+UUIDD=$(sed -n '3p' /srv/containers/scripts/config/backupcont)
+mountpoint=$(sed -n '4p' /srv/containers/scripts/config/backupcont)
 
-export var1; export var2
+cd "$source"
 
-mTITLE="Docker Orchestration"
-bkTTITLE="Sistema Automatizado de Orquestração de Containers"
+datetime=$(date +"%d_%m_%y")
 
-github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
-
-function check {
-  [ $(docker network ls | grep macvlan | awk '{print $2}') ] && { 
-    lantest="sim" 
-  } || {
-    lantest="nao"
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Run this script as Root! Exiting..."
+    exit
     }
- 
-  [ "$lantest" = "nao" ] && {
-    dialog --title "MACVLAN" --yesno "Deseja criar uma rede macvlan?" 6 40
-    [ $? = 0 ] && {
-    
-    gateway0=$(route -n | grep 'UG[ \t]' | awk '{print $2}')
-    rede0=$(ls /sys/class/net | grep enp) 
-    
-    ip a
-    
-    echo ""
-    echo "#########################################"
-    echo "# Configurações pré-carregadas!         #"
-    echo "# Pressione ENTER ao acabar a consulta. #"
-    echo "#########################################"
-    echo ""
-    
-    read
-    
-    VALUE1="$gateway0/24"; VALUE2="$gateway0"; VALUE3="$rede0"
+}
 
-    VALUE0=$(dialog --ok-label "Criar" --title "Nova Rede Bridge" --form "Subnet = x.x.0.0/24" 10 40 0 \
-"Subnet  :" 1 1 "$VALUE1" 1 10 20 0 \
-"Gateway :" 2 1 "$VALUE2" 2 10 20 0 \
-"Interfc :" 3 1 "$VALUE3" 3 10 20 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    [ $? -ne 0 ] && exit
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    var2=$(echo "$VALUE0" | sed -n 2p)
-    var3=$(echo "$VALUE0" | sed -n 3p)
-    
-    [ -z "$var1" ] || [ -z "$var2" ] && {
-      dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-      check
+function checkB {
+for dirX in $mountpoint; do
+  disk=$(/bin/mount -U $UUIDD $dirX && echo "mounted" || echo "error")
+    [ "$disk" = "mounted" ]; then
+      # Stop all containers and wait until all are stopped
+      dockerctrl stop &&
+      # Check if there is some old .tar to delete first
+      checkC
+      # Run the backup os all containers
+      backup
+      # Start all containers again and wait until all are started
+      dockerctrl start &&
     } || {
-      sudo docker network create -d macvlan --subnet="$var1" --gateway="$var2" -o parent="$var3" macvlan
-      start
-      }
-
-      } || {
-        echo "ATENÇÃO: Não há macvlan para os containers!"
-        pullall
-        }
-    } || {
-      start
-      }
-
+      echo "Something happened, exiting..."
+      exit
+    }
+  done
 }
 
-function start {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Essentials' \
-2 'Servers' \
-3 'DataBases' \
-4 'Others' \
-5 'Tools' \
-6 '- Pull Only! -' \
-X 'Sair' 2>&1 > /dev/tty )
+function checkC {
+  for dir0 in $destiny; do
+    # Applying permissions!
+    chmod 777 -R "$destiny"
 
-case "$var0" in
-1) essentials ; start ;;
-2) servers ; start ;;
-3) database ; start ;;
-4) others ; start ;;
-5) tools ; start ;;
-6) pullall ; start ;;
-X) exit ;;
-esac
+    # Doesn't forget about the SLASH!
+    # Delete files older than 3 days
+    find "$dir0"/ -type f -mtime +3 -delete
+  done
 }
 
-function essentials {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'PiHole' \
-2 'Dominio' \
-3 'NextCloud' \
-4 'Collabora' \
-5 'Pentest' \
-6 'Pentest LocalHost' \
-7 'FTP Server' \
-8 'FTP Server LocalHost' \
-9 'Samba Share' \
-10 'No-IP' \
-11 'DDClient' \
-X '<' 2>&1 > /dev/tty )
-
-case "$var0" in
-1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-4) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
-5) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-6) wget "$github"09.1-pentest -O /tmp/pentesthost; sudo bash /tmp/pentesthost ;;
-7) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-8) wget "$github"37.1-ftp-server -O /tmp/ftp-host; sudo bash /tmp/ftp-host ;;
-9) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
-10) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
-11) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
-X) start ;;
-esac
+function dockerctrl {
+  docker "$1" $(docker ps -a -q)
 }
 
-function servers {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'UniFi' \
-2 'OpenFire [+Spark]' \
-3 'ntfy' \
-4 'RustDesk' \
-5 'OnlyOffice Web' \
-6 'Apache2 Standalone' \
-7 'Reverse Proxy' \
-8 'G.L.P.I.' \
-X '<' 2>&1 > /dev/tty )
+function backup {
+  for dir1 in $(find $containers/* -maxdepth 0); do
+    tar -cvf "$destiny"/"$dir1"-"$datetime".tar "$dir"
+  done
 
-case "$var0" in
-1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
-2) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-3) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-4) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-5) wget "$github"34-onlyoffice -O /tmp/onlyoffice; sudo bash /tmp/onlyoffice ;;
-6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-7) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-8) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-X) start ;;
-esac
+  for dir2 in $destiny; do
+    sudo rsync -a --delete "$source" "$dir2"
+  done
 }
 
-function database {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'MySQL' \
-2 'MariaDB' \
-3 'OracleXE 21C' \
-X '<' 2>&1 > /dev/tty )
+# Check if this script is running through root user
+checkA
+# Check if the disk is mounted
+checkB
 
-case "$var0" in
-1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
-2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
-3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
-X) start ;;
-esac
-}
+exit 1
 
-function others {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'OpenSpeedtest' \
-2 'SSH DW' \
-3 'Syncthing' \
-4 'Syncthing Relay' \
-X '<' 2>&1 > /dev/tty )
 
-case "$var0" in
-1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-4) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
-X) start ;;
-esac
-}
+#not used
 
-function tools {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'AutoMigrate ADDC' \
-2 'AutoExport SAMBA' \
-3 'Backup ADDC' \
-4 'Backup SAMBA' \
-X '<' 2>&1 > /dev/tty )
+# Delete folders older than 3 days
+#find "$destiny"/ -type d -mtime +3 -exec rm -rf {} \;
 
-case "$var0" in
-1) wget "$github"07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
-2) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
-3) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
-4) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
-X) start ;;
-esac
-}
-
-function pullall {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'PiHole' \
-2 'Dominio' \
-3 'MySQL' \
-4 'Nextcloud' \
-5 'MariaDB' \
-6 'Collabora' \
-7 'SAMBA' \
-8 'OpenSpeedTest' \
-9 'UniFi' \
-10 'Apache' \
-11 'OpenFire' \
-12 'ntfy' \
-13 'RustDesk' \
-14 'SSH DW' \
-15 'ReverseProxy' \
-16 'OracleXE 21C' \
-17 'SSH DW' \
-18 'G.L.P.I.' \
-19 'NO-Ip' \
-20 'Syncthing' \
-21 'Syncthing Relay' \
-X '<' 2>&1 > /dev/tty )
-
-case "$var0" in
-1) docker pull pihole/pihole:latest ;;
-2) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/domain:latest; } || { docker pull urbancompasspony/domain-arm:latest; } ;;
-3) docker pull mysql:8 ;;
-4) docker pull nextcloud:"$nv" ;;
-5) docker pull mariadb:latest ;;
-6) docker pull collabora/code:latest ;;
-7) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/migrate-samba:latest; } || { docker pull urbancompasspony/migrate-samba-arm:latest; } ;;
-8) docker pull openspeedtest/latest:latest ;;
-9) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
-10) docker pull httpd:2.4 ;;
-11) docker pull urbancompasspony/openfire:latest ;;
-12) docker pull binwiederhier/ntfy ;;
-13) docker pull rustdesk/rustdesk-server ;;
-14) docker pull urbancompasspony/ssh-dw:latest ;;
-15) docker pull urbancompasspony/reverseproxy:latest ;;
-16) docker pull urbancompasspony/centosoracle:latest ;;
-17) docker pull urbancompasspony/ssh-dw:latest ;;
-18) docker pull diouxx/glpi ;;
-19) docker pull coppit/no-ip ;;
-20) docker pull syncthing/syncthing:latest ;;
-21) docker pull t4skforce/syncthing-relay:latest ;;
-X) start ;;
-esac
-}
-
-[ -f /srv/containers/scripts/myip ] || {
-  IPMachine=$(hostname -I | awk '{print $1}')
-  MyIPNF=$(dialog --title 'MyIP!' --backtitle "IP Encontrado: $IPMachine" --inputbox "MyIP não encontrado. \nQual o IP do Servidor?" 10 40 2>&1 > /dev/tty)
-  sudo mkdir -p /srv/containers/scripts/config
-
-  sudo touch /srv/containers/scripts/config/backupcont
-
-  echo "source" | sudo tee /srv/containers/scripts/config/backupcont
-  echo "destiny" | sudo tee -a /srv/containers/scripts/config/backupcont
-  echo "mountpoint" | sudo tee -a /srv/containers/scripts/config/backupcont
-  echo "UUID" | sudo tee -a /srv/containers/scripts/config/backupcont
-
-  wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
-  cat 01-Backup | sudo tee /srv/containers/scripts/backupcont
-  sudo rm -r 01-Backup
-
-  sudo touch /srv/containers/scripts/myip
-  echo "$MyIPNF" | sudo tee /srv/containers/scripts/myip
-  dialog --title "IP Definido para o Orquestrador!" --msgbox "IP Definido com Sucesso!" 6 40
-  start
-} && {
-  start
-}
-
-check
+# Delete empty folders
+#find "$destiny"/ -type d -empty -delete
