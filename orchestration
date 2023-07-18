@@ -250,7 +250,18 @@ esac
 [ -f /srv/containers/scripts/myip ] || {
   IPMachine=$(hostname -I | awk '{print $1}')
   MyIPNF=$(dialog --title 'MyIP!' --backtitle "IP Encontrado: $IPMachine" --inputbox "MyIP não encontrado. \nQual o IP do Servidor?" 10 40 2>&1 > /dev/tty)
-  sudo mkdir -p /srv/containers/scripts
+  sudo mkdir -p /srv/containers/scripts/config
+
+  sudo touch /srv/containers/scripts/config/backupcont
+  echo "source" > /srv/containers/scripts/config/backupcont
+  echo "destiny" >> /srv/containers/scripts/config/backupcont
+  echo "mountpoint" >> /srv/containers/scripts/config/backupcont
+  echo "UUID" >> /srv/containers/scripts/config/backupcont
+
+  wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
+  cat 01-Backup | sudo tee /srv/containers/scripts/backupcont
+  sudo rm -r 01-Backup
+
   sudo touch /srv/containers/scripts/myip
   echo "$MyIPNF" | sudo tee /srv/containers/scripts/myip
   dialog --title "IP Definido para o Orquestrador!" --msgbox "IP Definido com Sucesso!" 6 40
