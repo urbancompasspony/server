@@ -168,6 +168,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'SSH DW' \
 3 'Syncthing' \
 4 'Syncthing Relay' \
+5 'Syncthing Discovery' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -175,6 +176,7 @@ case "$var0" in
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 4) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
+5) wget "$github"42.2-syncdiscovery -O /tmp/syncdiscovery; sudo bash /tmp/syncdiscovery ;;
 X) start ;;
 esac
 }
@@ -219,6 +221,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 19 'NO-Ip' \
 20 'Syncthing' \
 21 'Syncthing Relay' \
+22 'Syncthing Discovery' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -243,6 +246,7 @@ case "$var0" in
 19) docker pull coppit/no-ip ;;
 20) docker pull syncthing/syncthing:latest ;;
 21) docker pull t4skforce/syncthing-relay:latest ;;
+22) docker pull t4skforce/syncthing-discovery:latest ;;
 X) start ;;
 esac
 }
