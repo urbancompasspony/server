@@ -168,7 +168,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'SSH DW' \
 3 'Syncthing' \
 4 'Syncthing Relay' \
-5 'VDesktop Ubuntu 23.04' \
+5 'VDesktop Ubuntu 22.04' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
