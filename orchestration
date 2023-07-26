@@ -94,30 +94,32 @@ esac
 function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole' \
-2 'Dominio' \
-3 'NextCloud' \
-4 'Collabora' \
-5 'Pentest' \
-6 'Pentest LocalHost' \
-7 'FTP Server' \
-8 'FTP Server LocalHost' \
-9 'Samba Share' \
-10 'No-IP' \
-11 'DDClient' \
+2 'PiHole LocalHost' \
+3 'Dominio' \
+4 'NextCloud' \
+5 'Collabora' \
+6 'Pentest' \
+7 'Pentest LocalHost' \
+8 'FTP Server' \
+9 'FTP Server LocalHost' \
+0 'Samba Share' \
+11 'No-IP' \
+12 'DDClient' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-4) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
-5) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-6) wget "$github"09.1-pentest -O /tmp/pentesthost; sudo bash /tmp/pentesthost ;;
-7) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-8) wget "$github"37.1-ftp-server -O /tmp/ftp-host; sudo bash /tmp/ftp-host ;;
-9) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
-10) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
-11) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
+2) wget "$github"01.1-pihole -O /tmp/1pihole; sudo bash /tmp/1pihole ;;
+3) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
+4) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+5) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+6) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+7) wget "$github"09.1-pentest -O /tmp/pentesthost; sudo bash /tmp/pentesthost ;;
+8) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+9) wget "$github"37.1-ftp-server -O /tmp/ftp-host; sudo bash /tmp/ftp-host ;;
+10) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
+11) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
+12) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
 X) start ;;
 esac
 }
