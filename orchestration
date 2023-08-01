@@ -134,6 +134,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'Apache2 Standalone' \
 7 'Reverse Proxy' \
 8 'G.L.P.I.' \
+9 'Lan Cache' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -145,6 +146,7 @@ case "$var0" in
 6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
 7) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
 8) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+9) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
 X) start ;;
 esac
 }
