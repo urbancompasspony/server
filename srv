@@ -43,7 +43,7 @@ C 'Install .Bashrc' \
 D 'DWAgent [x86]' \
 E 'DWAgent [ARM]' \
 F 'A.D. & D.C.' \
-G 'Máquinas Virtuais' \
+G 'Cluster Virt-MNG' \
 H 'Containers' \
 I 'Tools' \
 J 'Reiniciar' \
@@ -58,7 +58,7 @@ C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/inst
 D) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
 E) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
 F) domainlocal01 ; start ;;
-G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | sudo bash ; start ;;
+G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/cluster-virt-manager | sudo bash ; start ;;
 H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash ; start ;;
 I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 J) reb00t ;;
