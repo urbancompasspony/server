@@ -170,23 +170,25 @@ function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'OpenSpeedtest' \
 2 'SSH DW' \
-3 'Syncthing' \
-4 'Syncthing Relay' \
-5 'VDesktop Ubuntu 22.04' \
-6 'VDesktop Ubuntu 22.04 LH' \
-7 'xpra Virt-Manager' \
-8 'Collabora' \
+3 'Syncthing Client' \
+4 'Syncthing Client Localhost' \
+5 'Syncthing Relay - Server' \
+6 'VDesktop Ubuntu 22.04' \
+7 'VDesktop Ubuntu 22.04 LH' \
+8 'xpra Virt-Manager' \
+9 'Collabora' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-4) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
-5) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
-6) wget "$github"44.01-xpra-ubuntu2204 -O /tmp/1buntu2204; sudo bash /tmp/1buntu2204 ;;
-7) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
-8) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+4) wget "$github"42.01-syncthing-localhost -O /tmp/syncthing-lh; sudo bash /tmp/syncthing-lh ;;
+5) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
+6) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
+7) wget "$github"44.01-xpra-ubuntu2204 -O /tmp/1buntu2204; sudo bash /tmp/1buntu2204 ;;
+8) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+9) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
 X) start ;;
 esac
 }
