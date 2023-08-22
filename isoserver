@@ -1,1 +1,57 @@
+#!/bin/bash
 
+# For Ubuntu!
+export pty=True
+export NEEDRESTART_MODE=a
+export DEBIAN_FRONTEND=noninteractive
+
+lanhost="http://172.20.0.22"
+wanhost="https://cs.linuxuniverse.com.br:3434"
+usern4me="admin"
+passw0rd="isorulez"
+
+function start {
+var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao ISO Downloader!" --menu " " 0 0 0 \
+A 'pfSense 2.7 (L)' \
+B 'pfSense 2.7 (W)' \
+C 'pfSense 2.6 (L)' \
+D 'pfSense 2.6 (W)' \
+E 'Ubuntu Server 22.04 LTS (L)' \
+F 'Ubuntu Server 22.04 LTS (W)' \
+G 'Windows Server 2019 STD (L)' \
+H 'Windows Server 2019 STD (W)' \
+I 'Windows 10 (L)' \
+J 'Windows 10 (W)' \
+K 'Windows 11 (L)' \
+L 'Windows 11 (W)' \
+M 'ReviOS W10 (L)' \
+N 'ReviOS W10 (W)' \
+O 'ReviOS W11 (L)' \
+P 'ReviOS W11 (W)' \
+Q 'Reboot' \
+R 'Shutdown' \
+X 'Sair' 2>&1 > /dev/tty )
+case "$var0" in
+A) wget --user $usern4me --password $passw0rd $lanhost/pfSense-2.7.iso ; start ;;
+B) wget --user $usern4me --password $passw0rd $wanhost/pfSense-2.7.iso ; start ;;
+C) wget --user $usern4me --password $passw0rd $lanhost/pfSense2.6.iso ; start ;;
+D) wget --user $usern4me --password $passw0rd $wanhost/pfSense2.6.iso ; start ;;
+E) wget --user $usern4me --password $passw0rd $lanhost/ubuntuserver2204.iso ; start ;;
+F) wget --user $usern4me --password $passw0rd $wanhost/ubuntuserver2204.iso ; start ;;
+G) wget --user $usern4me --password $passw0rd $lanhost/wserver2019STD.iso ; start ;;
+H) wget --user $usern4me --password $passw0rd $wanhost/wserver2019STD.iso ; start ;;
+I) wget --user $usern4me --password $passw0rd $lanhost/Windows10.iso ; start ;;
+J) wget --user $usern4me --password $passw0rd $wanhost/Windows10.iso ; start ;;
+K) wget --user $usern4me --password $passw0rd $lanhost/Windows11.iso ; start ;;
+L) wget --user $usern4me --password $passw0rd $wanhost/Windows11.iso ; start ;;
+M) wget --user $usern4me --password $passw0rd $lanhost/ReviOSW10.iso ; start ;;
+N) wget --user $usern4me --password $passw0rd $wanhost/ReviOSW10.iso ; start ;;
+O) wget --user $usern4me --password $passw0rd $lanhost/ReviOSW11.iso ; start ;;
+P) wget --user $usern4me --password $passw0rd $wanhost/ReviOSW11.iso ; start ;;
+Q) reb00t ;;
+R) shutd0 ;;
+X) echo "Saindo..." ;;
+esac
+}
+
+start
