@@ -7,7 +7,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 destpath="/home/administrador/.ISOs"
 
-mkdir $destpath
+mkdir -p $destpath
 lanhost="http://172.20.0.22"
 wanhost="https://cs.linuxuniverse.com.br:3434"
 usern4me="admin"
