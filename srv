@@ -46,9 +46,9 @@ F 'A.D. & D.C.' \
 G 'Cluster Virt-MNG' \
 H 'Containers' \
 I 'Tools' \
-J 'Config' \
-K 'Reiniciar' \
-L 'Desligar' \
+J 'Config DateTime' \
+K 'Reboot' \
+L 'Shutdown' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -62,7 +62,7 @@ F) domainlocal01 ; start ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/cluster-virt-manager | sudo bash ; start ;;
 H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash ; start ;;
 I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-J) timedatectl set-timezone America/Bahia ; start ;;
+J) sudo timedatectl set-timezone America/Bahia ; start ;;
 K) reb00t ;;
 L) shutd0 ;;
 X) echo "Saindo..." ;;
