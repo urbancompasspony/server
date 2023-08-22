@@ -5,7 +5,14 @@ export pty=True
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
-destpath="/home/administrador/.ISOs"
+function check {
+  [ "$EUID" -ne 0 ] || {
+    echo "Não execute esse script como Root!"
+    exit
+    }
+}
+
+destpath="/home/$USER/.ISOs"
 
 mkdir -p $destpath
 lanhost="http://172.20.0.22"
@@ -57,4 +64,5 @@ X) echo "Saindo..." ;;
 esac
 }
 
+check
 start
