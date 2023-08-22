@@ -47,8 +47,9 @@ G 'Cluster Virt-MNG' \
 H 'Containers' \
 I 'Tools' \
 J 'Config DateTime' \
-K 'Reboot' \
-L 'Shutdown' \
+K 'ISO Downloader' \
+L 'Reboot' \
+M 'Shutdown' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -63,8 +64,9 @@ G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/clus
 H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | sudo bash ; start ;;
 I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 J) sudo timedatectl set-timezone America/Bahia ; start ;;
-K) reb00t ;;
-L) shutd0 ;;
+K) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | bash ; start ;;
+L) reb00t ;;
+M) shutd0 ;;
 X) echo "Saindo..." ;;
 esac
 }
