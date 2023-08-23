@@ -38,8 +38,12 @@ M 'ReviOS W10 (L)' \
 N 'ReviOS W10 (W)' \
 O 'ReviOS W11 (L)' \
 P 'ReviOS W11 (W)' \
-Q 'Reboot' \
-R 'Shutdown' \
+Q 'virtio-win-0.1.185 (L)' \
+R 'virtio-win-0.1.185 (W)' \
+S 'virtio-win-0.1.229 (L)' \
+T 'virtio-win-0.1.229 (W)' \
+U 'Reboot' \
+V 'Shutdown' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) wget --user $usern4me --password $passw0rd $lanhost/pfSense-2.7.iso -O $destpath/pfSense-2.7.iso ; start ;;
@@ -58,8 +62,12 @@ M) wget --user $usern4me --password $passw0rd $lanhost/ReviOSW10.iso -O $destpat
 N) wget --user $usern4me --password $passw0rd $wanhost/ReviOSW10.iso -O $destpath/ReviOSW10.iso ; start ;;
 O) wget --user $usern4me --password $passw0rd $lanhost/ReviOSW11.iso -O $destpath/ReviOSW11.iso ; start ;;
 P) wget --user $usern4me --password $passw0rd $wanhost/ReviOSW11.iso -O $destpath/ReviOSW11.iso ; start ;;
-Q) reb00t ;;
-R) shutd0 ;;
+Q) wget --user $usern4me --password $passw0rd $lanhost/virtio-win-0.1.185.iso -O $destpath/virtio-win-0.1.185.iso ; start ;;
+R) wget --user $usern4me --password $passw0rd $wanhost/virtio-win-0.1.185.iso -O $destpath/virtio-win-0.1.185.iso ; start ;;
+S) wget --user $usern4me --password $passw0rd $lanhost/virtio-win-0.1.229.iso -O $destpath/virtio-win-0.1.229.iso ; start ;;
+T) wget --user $usern4me --password $passw0rd $wanhost/virtio-win-0.1.229.iso -O $destpath/virtio-win-0.1.229.iso ; start ;;
+U) reb00t ;;
+V) shutd0 ;;
 X) echo "Saindo..." ;;
 esac
 }
