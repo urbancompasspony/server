@@ -189,24 +189,46 @@ VALUE0=$(dialog --title "Definição de Senha" --form "" 8 40 0 \
 passs=$(echo "$VALUE0" | sed -n 1p)
 
 [ $passs = "0" ] && {
-  echo "Não deixe o campo Senha em branco! Cancelando..."
+  clear
+  echo "Não deixe o campo em branco! Cancelando..."
   sleep 3
 } || {
-  echo "OK, continuando..."
-  sleep 1
+  echo -e "while true;
+do
+xpra start --bind-tcp=0.0.0.0:9876,auth=password:value=$passs --html=on --start=virt-manager --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 "1360x768"x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
+sleep 5
+done" | sudo tee /srv/containers/scripts/xpra
+
+  sudo chmod +x /srv/containers/scripts/xpra
+  echo "@reboot sleep 15; bash /srv/containers/scripts/xpra" > /tmp/crontab_new
+  crontab -l | cat - /tmp/crontab_new > crontab.txt && crontab crontab.txt
+  rm crontab.txt
+
+  bash /srv/containers/scripts/xpra &
+  }
 }
 
-echo -e "while true;
-  do
-    xpra start --bind-tcp=0.0.0.0:9876,auth=password:value=$passs --html=on --start=virt-manager --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 "1360x768"x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
-    sleep 5
-  done" | sudo tee /srv/containers/scripts/xpra
-sudo chmod +x /srv/containers/scripts/xpra
-echo "@reboot sleep 15; bash /srv/containers/scripts/xpra" > /tmp/crontab_new
-crontab -l | cat - /tmp/crontab_new > crontab.txt && crontab crontab.txt
-rm crontab.txt
+function macvland {
+  var1="0"; var2="0"; var3="0"
+  VALUE1="192.168.0.0"; VALUE2="192.168.0.1" ; VALUE3="enp2s0"
 
-bash /srv/containers/scripts/xpra &
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo MACVLAN" --form "LAN for Containers" 10 40 0 \
+"Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
+"Gateway :" 2 1 "$VALUE2" 2 11 30 0 \
+"Parent  :" 3 1 "$VALUE3" 3 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+
+  [ "$var1" = "0" ] || [ "$var2" = "0" ] || [ "$var3" = "0" ] && {
+    clear
+    echo "Não deixe nenhum campo vazio! Saindo..."
+    sleep 3
+  } || {
+    docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" macvlan
+  }
 }
 
 function start {
@@ -216,6 +238,7 @@ B 'Beep!' \
 C 'Sync all SATA' \
 D 'DNS Test' \
 E 'AutoSet XPRA VirtMgr' \
+F 'Macvlan for Docker' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -224,6 +247,7 @@ B) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
 C) satas ; start ;;
 D) dnstest ; start ;;
 E) xpraset ; start ;;
+F) macvland ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
