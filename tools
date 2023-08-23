@@ -146,6 +146,7 @@ function ping1 {
 
 function xpraset {
 sudo mkdir -p /srv/containers/scripts
+passs="0"
 
   sudo apt install -y \
     software-properties-common \
@@ -186,6 +187,14 @@ VALUE0=$(dialog --title "Definição de Senha" --form "" 8 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
 passs=$(echo "$VALUE0" | sed -n 1p)
+
+[ $passs = "0" ] && {
+  echo "Não deixe o campo Senha em branco! Cancelando..."
+  sleep 3
+} || {
+  echo "OK, continuando..."
+  sleep 1
+}
 
 echo -e "while true;
   do
