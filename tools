@@ -145,6 +145,8 @@ function ping1 {
 }
 
 function xpraset {
+sudo mkdir -p /srv/containers/scripts
+
   sudo apt install -y \
     software-properties-common \
     apt-transport-https \
@@ -179,11 +181,23 @@ sudo apt-get install -y wget && \
     sudo apt-get update && \
     sudo apt-get install -y xpra
 
-echo "" > /srv/containers/scripts/xpra
-chmod +x /srv/containers/scripts/xpra
+VALUE0=$(dialog --title "Definição de Senha" --form "" 8 40 0 \
+"Senha: " 1 1 "" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+passs=$(echo "$VALUE0" | sed -n 1p)
+
+echo -e "while true;
+  do
+    xpra start --bind-tcp=0.0.0.0:9876,auth=password:value=$passs --html=on --start=virt-manager --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 "1360x768"x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
+    sleep 5
+  done" | sudo tee /srv/containers/scripts/xpra
+sudo chmod +x /srv/containers/scripts/xpra
 echo "@reboot sleep 15; bash /srv/containers/scripts/xpra" > /tmp/crontab_new
 crontab -l | cat - /tmp/crontab_new > crontab.txt && crontab crontab.txt
 rm crontab.txt
+
+bash /srv/containers/scripts/xpra &
 }
 
 function start {
