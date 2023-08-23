@@ -144,12 +144,55 @@ function ping1 {
   ping -c 1 "$1" | awk 'NR==2{print $7,$8}'
 }
 
+function xpraset {
+  sudo apt install -y \
+    software-properties-common \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    dpkg \
+    gcc \
+    sed \
+    sudo \
+    grep \
+    wget \
+    xterm \
+    less \
+    gpgv \
+    libfuse2 \
+    libglib2.0-0 \
+    libxext6 \
+    libsm6 \
+    libxrender1 \
+    lsb-release \
+    mesa-utils \
+    xvfb \
+    ssh-askpass \
+    virt-manager \
+    dbus-x11 \
+    libglib2.0-bin \
+    gir1.2-spiceclientgtk-3.0
+
+sudo apt-get install -y wget && \
+    wget -q https://xpra.org/gpg.asc -O- | sudo apt-key add - &&  \
+    echo "deb https://xpra.org/ $(lsb_release -c | awk {'print $2'}) main" | sudo tee -a /etc/apt/sources.list.d/xpra.list && \
+    sudo apt-get update && \
+    sudo apt-get install -y xpra
+
+echo "" > /srv/containers/scripts/xpra
+chmod +x /srv/containers/scripts/xpra
+echo "@reboot sleep 15; bash /srv/containers/scripts/xpra" > /tmp/crontab_new
+crontab -l | cat - /tmp/crontab_new > crontab.txt && crontab crontab.txt
+rm crontab.txt
+}
+
 function start {
 var0=$(dialog --title 'Tools' --backtitle "Ferramentas úteis!" --menu " " 0 0 0 \
 A 'SMB Client' \
 B 'Beep!' \
 C 'Sync all SATA' \
 D 'DNS Test' \
+E 'AutoSet XPRA VirtMgr' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -157,6 +200,7 @@ A) sambaclient ; start ;;
 B) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
 C) satas ; start ;;
 D) dnstest ; start ;;
+E) xpraset ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
