@@ -210,7 +210,11 @@ done" | sudo tee /srv/containers/scripts/xpra
 
 function macvland {
   macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
-  [ "$macvlanr" = "nao" ] {
+  [ "$macvlanr" = "nao" ] && {
+    clear
+    echo "Macvlan não encontrado. Criando..."
+    sleep 2
+
     var1="0"; var2="0"; var3="0"
     VALUE1="192.168.0.0"; VALUE2="192.168.0.1" ; VALUE3="enp2s0"
 
@@ -232,9 +236,7 @@ function macvland {
       docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" macvlan
     }
   } || {
-    clear
-    echo "Macvlan encontrado!"
-    sleep 3
+    echo "." > /dev/null
   }
 }
 
@@ -244,7 +246,7 @@ A 'SMB Client' \
 B 'Beep!' \
 C 'Sync all SATA' \
 D 'DNS Test' \
-E 'Macvlan for Docker' \
+E 'Set Macvlan' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
