@@ -207,9 +207,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 19 'NO-Ip' \
 20 'Syncthing' \
 21 'Syncthing Relay' \
-22 'XPra Ubuntu 22.04 Gnome' \
-23 'Virt-Manager on Docker' \
-24 'xpra Virt-Manager' \
+22 'xpra Ubuntu 22.04 Gnome' \
+23 'xpra virt-manager' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -235,8 +234,7 @@ case "$var0" in
 20) docker pull syncthing/syncthing:latest ;;
 21) docker pull t4skforce/syncthing-relay:latest ;;
 22) docker pull urbancompasspony/xpra-ubuntu:latest ;;
-23) docker pull mber5/virt-manager:latest ;;
-24) docker pull urbancompasspony/xpra-virt-manager:latest ;;
+23) docker pull urbancompasspony/xpra-virt-manager:latest ;;
 X) start ;;
 esac
 }
