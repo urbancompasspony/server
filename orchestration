@@ -70,30 +70,22 @@ function macvland {
 function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole' \
-3 'Dominio' \
-4 'NextCloud' \
-5 'WeTTY' \
-6 'Pentest' \
-7 'Pentest LocalHost' \
-8 'FTP Server' \
-9 'FTP Server LocalHost' \
-0 'Samba Share' \
-11 'No-IP' \
-12 'DDClient' \
+2 'Dominio' \
+3 'NextCloud' \
+4 'WeTTY' \
+5 'Pentest' \
+6 'FTP Server' \
+7 'Samba Share' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-3) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-4) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-5) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
-6) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-7) wget "$github"09.1-pentest -O /tmp/pentesthost; sudo bash /tmp/pentesthost ;;
-8) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-9) wget "$github"37.1-ftp-server -O /tmp/ftp-host; sudo bash /tmp/ftp-host ;;
-10) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
-11) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
-12) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
+2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
+3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+4) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
+5) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+6) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+7) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
 X) start ;;
 esac
 }
@@ -107,7 +99,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'OnlyOffice Web' \
 6 'Apache2 Standalone' \
 7 'Reverse Proxy' \
-8 'G.L.P.I.' \
+8 'GLPI' \
 9 'Lan Cache' \
 X '<' 2>&1 > /dev/tty )
 
@@ -144,25 +136,25 @@ function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'OpenSpeedtest' \
 2 'SSH DW' \
-3 'Syncthing Client' \
-4 'Syncthing Client Localhost' \
-5 'Syncthing Relay - Server' \
-6 'VDesktop Ubuntu 22.04' \
-7 'VDesktop Ubuntu 22.04 LH' \
-8 'xpra Virt-Manager' \
-9 'Collabora' \
+3 'Syncthing - Client' \
+4 'Syncthing Relay - Server' \
+5 'VDesktop Ubuntu 22.04' \
+6 'VDesktop Ubuntu 22.04 LH' \
+7 'xpra virt-manager' \
+8 'Collabora' \
+9 'No-IP' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-4) wget "$github"42.01-syncthing-localhost -O /tmp/syncthing-lh; sudo bash /tmp/syncthing-lh ;;
-5) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
-6) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
-7) wget "$github"44.01-xpra-ubuntu2204 -O /tmp/1buntu2204; sudo bash /tmp/1buntu2204 ;;
-8) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
-9) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+4) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
+5) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
+6) wget "$github"44.01-xpra-ubuntu2204 -O /tmp/1buntu2204; sudo bash /tmp/1buntu2204 ;;
+7) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+8) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+9) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
 X) start ;;
 esac
 }
