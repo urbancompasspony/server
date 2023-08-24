@@ -14,62 +14,6 @@ bkTTITLE="Sistema Automatizado de Orquestração de Containers"
 
 github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
-function check {
-  [ $(docker network ls | grep macvlan | awk '{print $2}') ] && { 
-    lantest="sim" 
-  } || {
-    lantest="nao"
-    }
- 
-  [ "$lantest" = "nao" ] && {
-    dialog --title "MACVLAN" --yesno "Deseja criar uma rede macvlan?" 6 40
-    [ $? = 0 ] && {
-    
-    gateway0=$(route -n | grep 'UG[ \t]' | awk '{print $2}')
-    rede0=$(ls /sys/class/net | grep enp) 
-    
-    ip a
-    
-    echo ""
-    echo "#########################################"
-    echo "# Configurações pré-carregadas!         #"
-    echo "# Pressione ENTER ao acabar a consulta. #"
-    echo "#########################################"
-    echo ""
-    
-    read
-    
-    VALUE1="$gateway0/24"; VALUE2="$gateway0"; VALUE3="$rede0"
-
-    VALUE0=$(dialog --ok-label "Criar" --title "Nova Rede Bridge" --form "Subnet = x.x.0.0/24" 10 40 0 \
-"Subnet  :" 1 1 "$VALUE1" 1 10 20 0 \
-"Gateway :" 2 1 "$VALUE2" 2 10 20 0 \
-"Interfc :" 3 1 "$VALUE3" 3 10 20 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    [ $? -ne 0 ] && exit
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    var2=$(echo "$VALUE0" | sed -n 2p)
-    var3=$(echo "$VALUE0" | sed -n 3p)
-    
-    [ -z "$var1" ] || [ -z "$var2" ] && {
-      dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-      check
-    } || {
-      sudo docker network create -d macvlan --subnet="$var1" --gateway="$var2" -o parent="$var3" macvlan
-      start
-      }
-
-      } || {
-        echo "ATENÇÃO: Não há macvlan para os containers!"
-        pullall
-        }
-    } || {
-      start
-      }
-
-}
-
 function start {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Essentials' \
@@ -299,6 +243,12 @@ X) start ;;
 esac
 }
 
+###############
+# START HERE! #
+###############
+
+macvland
+
 [ -f /srv/containers/scripts/myip ] || {
   IPMachine=$(hostname -I | awk '{print $1}')
   MyIPNF=$(dialog --title 'MyIP!' --backtitle "IP Encontrado: $IPMachine" --inputbox "MyIP não encontrado. \nQual o IP do Servidor?" 10 40 2>&1 > /dev/tty)
@@ -317,10 +267,7 @@ esac
   sudo touch /srv/containers/scripts/myip
   echo "$MyIPNF" | sudo tee /srv/containers/scripts/myip
 
-  macvland
   start
 } && {
   start
 }
-
-check
