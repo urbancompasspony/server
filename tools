@@ -209,25 +209,32 @@ done" | sudo tee /srv/containers/scripts/xpra
 }
 
 function macvland {
-  var1="0"; var2="0"; var3="0"
-  VALUE1="192.168.0.0"; VALUE2="192.168.0.1" ; VALUE3="enp2s0"
+  macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
+  [ "$macvlanr" = "nao" ] {
+    var1="0"; var2="0"; var3="0"
+    VALUE1="192.168.0.0"; VALUE2="192.168.0.1" ; VALUE3="enp2s0"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo MACVLAN" --form "LAN for Containers" 10 40 0 \
+    VALUE0=$(dialog --ok-label "Criar" --title "Novo MACVLAN" --form "LAN for Containers" 10 40 0 \
 "Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
 "Gateway :" 2 1 "$VALUE2" 2 11 30 0 \
 "Parent  :" 3 1 "$VALUE3" 3 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-  [ $? -ne 0 ] && exit
-  var1=$(echo "$VALUE0" | sed -n 1p)
-  var2=$(echo "$VALUE0" | sed -n 2p)
-  var3=$(echo "$VALUE0" | sed -n 3p)
+    [ $? -ne 0 ] && exit
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    var2=$(echo "$VALUE0" | sed -n 2p)
+    var3=$(echo "$VALUE0" | sed -n 3p)
 
-  [ "$var1" = "0" ] || [ "$var2" = "0" ] || [ "$var3" = "0" ] && {
-    clear
-    echo "Não deixe nenhum campo vazio! Saindo..."
-    sleep 3
+    [ "$var1" = "0" ] || [ "$var2" = "0" ] || [ "$var3" = "0" ] && {
+      clear
+      echo "Não deixe nenhum campo vazio! Saindo..."
+      sleep 3
+    } || {
+      docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" macvlan
+    }
   } || {
-    docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" macvlan
+    clear
+    echo "Macvlan encontrado!"
+    sleep 3
   }
 }
 
@@ -237,8 +244,7 @@ A 'SMB Client' \
 B 'Beep!' \
 C 'Sync all SATA' \
 D 'DNS Test' \
-E 'AutoSet XPRA VirtMgr' \
-F 'Macvlan for Docker' \
+E 'Macvlan for Docker' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -246,8 +252,7 @@ A) sambaclient ; start ;;
 B) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
 C) satas ; start ;;
 D) dnstest ; start ;;
-E) xpraset ; start ;;
-F) macvland ; start ;;
+E) macvland ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
