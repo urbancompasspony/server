@@ -70,7 +70,6 @@ function macvland {
 function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole' \
-2 'PiHole LocalHost' \
 3 'Dominio' \
 4 'NextCloud' \
 5 'WeTTY' \
@@ -85,7 +84,6 @@ X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-2) wget "$github"01.1-pihole -O /tmp/1pihole; sudo bash /tmp/1pihole ;;
 3) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
 4) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
 5) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
