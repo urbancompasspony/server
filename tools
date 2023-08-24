@@ -210,7 +210,7 @@ done" | sudo tee /srv/containers/scripts/xpra
 
 function macvland {
   macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
-  [ "$macvlanr" = "nao" ] && {
+  [ "$macvlanr" = "no" ] && {
     clear
     echo "Macvlan não encontrado. Criando..."
     sleep 2
