@@ -69,7 +69,7 @@ function macvland {
 
 function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'PiHole' \
+1 'PiHole (%)' \
 2 'Dominio' \
 3 'NextCloud' \
 4 'WeTTY' \
@@ -140,7 +140,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'Syncthing Relay - Server' \
 5 'VDesktop Ubuntu 22.04' \
 6 'VDesktop Ubuntu 22.04 LH' \
-7 'xpra virt-manager' \
+7 'xpra virt-manager (%)' \
 8 'Collabora' \
 9 'No-IP' \
 X '<' 2>&1 > /dev/tty )
