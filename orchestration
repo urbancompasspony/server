@@ -237,11 +237,12 @@ esac
 # START HERE! #
 ###############
 
-macvland
-
-[ -f /srv/containers/scripts/myip ] || {
+[ -f /srv/containers/scripts/myip ] && {
+  macvland
+  start
+} || {
   IPMachine=$(hostname -I | awk '{print $1}')
-  MyIPNF=$(dialog --title 'MyIP!' --backtitle "IP Encontrado: $IPMachine" --inputbox "MyIP não encontrado. \nQual o IP do Servidor?" 10 40 2>&1 > /dev/tty)
+  MyIPNF=$(dialog --title 'MyIP!' --backtitle "Sugestão: $IPMachine" --inputbox "MyIP não encontrado. \nQual o IP do Servidor?" 10 40 2>&1 > /dev/tty)
   sudo mkdir -p /srv/containers/scripts/config
 
   sudo touch /srv/containers/scripts/config/backupcont
@@ -257,7 +258,6 @@ macvland
   sudo touch /srv/containers/scripts/myip
   echo "$MyIPNF" | sudo tee /srv/containers/scripts/myip
 
-  start
-} && {
+  macvland
   start
 }
