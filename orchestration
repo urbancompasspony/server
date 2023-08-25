@@ -20,8 +20,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'Servers' \
 3 'DataBases' \
 4 'Others' \
-5 'Tools' \
-6 '- Pull Only! -' \
+5 'Pull Only!' \
+6 'Tools' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -29,8 +29,8 @@ case "$var0" in
 2) servers ; start ;;
 3) database ; start ;;
 4) others ; start ;;
-5) tools ; start ;;
-6) pullall ; start ;;
+5) pullall ; start ;;
+6) tools ; start ;;
 X) exit ;;
 esac
 }
@@ -70,12 +70,12 @@ function macvland {
 function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole (L/W)' \
-2 'Dominio' \
-3 'NextCloud' \
-4 'WeTTY' \
-5 'Pentest' \
-6 'FTP Server' \
-7 'Samba Share' \
+2 'Dominio (W)' \
+3 'NextCloud (W)' \
+4 'WeTTY (L/W)' \
+5 'Pentest (L/W)' \
+6 'FTP Server (L/W)' \
+7 'SMB Server (L/W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -98,9 +98,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'RustDesk' \
 5 'OnlyOffice Web' \
 6 'Apache2 Standalone' \
-7 'Reverse Proxy' \
+7 'Apache2 Reverse Proxy' \
 8 'GLPI' \
-9 'Lan Cache' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -112,7 +111,6 @@ case "$var0" in
 6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
 7) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
 8) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-9) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
 X) start ;;
 esac
 }
@@ -134,14 +132,13 @@ esac
 
 function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'OpenSpeedtest' \
-2 'SSH DW' \
-3 'Syncthing - Client' \
-4 'Syncthing Relay - Server' \
-5 'VDesktop Ubuntu 22.04' \
+1 'OpenSpeedtest (L/W)' \
+2 'SSH DW (L)' \
+3 'Syncthing - Client (L/W)' \
+4 'Syncthing Relay - Server (W)' \
+5 'VDesktop Ubuntu 22.04 (W)' \
 6 'xpra virt-manager (L/W)' \
-7 'Collabora' \
-8 'No-IP' \
+7 'No-IP (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -151,8 +148,7 @@ case "$var0" in
 4) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
 5) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
 6) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
-7) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
-8) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
+7) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
 X) start ;;
 esac
 }
