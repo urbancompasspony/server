@@ -96,10 +96,11 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'OpenFire [+Spark] (W)' \
 3 'ntfy (W)' \
 4 'RustDesk (W)' \
-5 'OnlyOffice (W)' \
+5 'OnlyOffice Web (W)' \
 6 'Apache2 Standalone (W)' \
 7 'Apache2 Reverse Proxy (W)' \
 8 'GLPI (W)' \
+9 'Collabora Web (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -111,6 +112,7 @@ case "$var0" in
 6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
 7) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
 8) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+9) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
 X) start ;;
 esac
 }
@@ -136,9 +138,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'SSH DW (L)' \
 3 'Syncthing - Client (W)' \
 4 'Syncthing Relay - Server (W)' \
-5 'VDesktop Ubuntu 22.04 (W)' \
-6 'xpra virt-manager (L/W)' \
-7 'No-IP (W)' \
+5 'xpra virt-manager (L/W)' \
+6 'No-IP (W)' \
+7 'VDesktop Ubuntu 22.04 (L/W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -146,9 +148,9 @@ case "$var0" in
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 4) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
-5) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
-6) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
-7) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
+5) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+6) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
+7) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
 X) start ;;
 esac
 }
