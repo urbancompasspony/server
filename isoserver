@@ -12,7 +12,7 @@ function check {
     }
 }
 
-destpath="/var/lib/libvirt/images/pool"
+destpath="/var/lib/libvirt/images"
 
 sudo mkdir -p "$destpath"
 sudo chmod 777 -R "/var/lib/libvirt/images"
