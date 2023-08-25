@@ -243,10 +243,12 @@ function macvland {
 function start {
 var0=$(dialog --title 'Tools' --backtitle "Ferramentas úteis!" --menu " " 0 0 0 \
 A 'SMB Client' \
-B 'Beep!' \
+B 'Test Beep!' \
 C 'Sync all SATA' \
 D 'DNS Test' \
-E 'Set Macvlan' \
+E 'ISO Downloader' \
+F 'Set Macvlan' \
+G 'Auto Config Time&Date' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -254,7 +256,9 @@ A) sambaclient ; start ;;
 B) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
 C) satas ; start ;;
 D) dnstest ; start ;;
-E) macvland ; start ;;
+E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | bash ; start ;;
+F) macvland ; start ;;
+G) sudo timedatectl set-timezone America/Bahia ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
