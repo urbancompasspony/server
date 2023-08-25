@@ -45,12 +45,18 @@ function macvland {
     var1="0"; var2="0"; var3="0"
     VALUE1="192.168.0.0"; VALUE2="192.168.0.1" ; VALUE3="enp2s0"
 
-    VALUE0=$(dialog --ok-label "Criar" --title "Novo MACVLAN" --form "LAN for Containers" 10 40 0 \
+    VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Criar novo MACVLAN" --form "MACVLAN for Containers" 10 40 0 \
 "Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
 "Gateway :" 2 1 "$VALUE2" 2 11 30 0 \
 "Parent  :" 3 1 "$VALUE3" 3 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-    [ $? -ne 0 ] && exit
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+      2) iphelp=$(ip -4 a); dialog --title 'Network, Parent, Gateway and Subnet!' --msgbox "$iphelp" 0 0 ; macvland ;;
+    esac
+
     var1=$(echo "$VALUE0" | sed -n 1p)
     var2=$(echo "$VALUE0" | sed -n 2p)
     var3=$(echo "$VALUE0" | sed -n 3p)
