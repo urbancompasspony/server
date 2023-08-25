@@ -42,10 +42,11 @@ B 'Install .Bashrc' \
 C 'DWAgent [x86]' \
 D 'DWAgent [ARM]' \
 E 'AD Domain' \
-F 'Orchestra' \
-G 'Config & Tools' \
-H 'Reboot' \
-I 'Shutdown' \
+F 'Desktop' \
+G 'Orchestra' \
+H 'Config & Tools' \
+I 'Reboot' \
+J 'Shutdown' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -55,10 +56,11 @@ B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/inst
 C) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
 D) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
 E) domainlocal01 ; start ;;
-F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
-G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-H) reb00t ;;
-I) shutd0 ;;
+F) startx ; start ;;
+G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
+H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
+I) reb00t ;;
+J) shutd0 ;;
 X) echo "Saindo..." ;;
 esac
 }
