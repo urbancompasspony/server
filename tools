@@ -28,8 +28,8 @@ VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --title "M
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
 case $? in
-  1) exit ;;
-  2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0 ; menu19 ;;
+  1) echo "." > /dev/null ;;
+  2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0 ; sambaclient ;;
 esac
 
 path1=$(echo "$VALUE0" | sed -n 1p)
@@ -46,7 +46,7 @@ dmn1=$(echo "$VALUE0" | sed -n 5p)
 echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
 [ "$echa1" = "sim" ] && {
   dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 7 30
-  menu19
+  sambaclient
 } || {
   echo "$path1" > "$pathmount"
   echo "$mntpt1" >> "$pathmount"
@@ -57,7 +57,6 @@ echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
   sudo mkdir -p "$mntpt1"
   sudo mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
   mntshow2=$(df -hT)
-  exit
   }
 }
 
