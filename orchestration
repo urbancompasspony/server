@@ -74,8 +74,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'NextCloud (W)' \
 4 'WeTTY (L/W)' \
 5 'Pentest (L/W)' \
-6 'FTP Server (L/W)' \
-7 'SMB Server (L/W)' \
+6 'FTP Server (W)' \
+7 'SMB Server (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -92,14 +92,14 @@ esac
 
 function servers {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'UniFi' \
-2 'OpenFire [+Spark]' \
-3 'ntfy' \
-4 'RustDesk' \
-5 'OnlyOffice Web' \
-6 'Apache2 Standalone' \
-7 'Apache2 Reverse Proxy' \
-8 'GLPI' \
+1 'UniFi (W)' \
+2 'OpenFire [+Spark] (W)' \
+3 'ntfy (W)' \
+4 'RustDesk (W)' \
+5 'OnlyOffice (W)' \
+6 'Apache2 Standalone (W)' \
+7 'Apache2 Reverse Proxy (W)' \
+8 'GLPI (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -132,9 +132,9 @@ esac
 
 function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'OpenSpeedtest (L/W)' \
+1 'OpenSpeedtest (W)' \
 2 'SSH DW (L)' \
-3 'Syncthing - Client (L/W)' \
+3 'Syncthing - Client (W)' \
 4 'Syncthing Relay - Server (W)' \
 5 'VDesktop Ubuntu 22.04 (W)' \
 6 'xpra virt-manager (L/W)' \
