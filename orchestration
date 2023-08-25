@@ -39,7 +39,7 @@ function macvland {
   macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
   [ "$macvlanr" = "no" ] && {
     clear
-    echo "Macvlan não encontrado. Criando..."
+    echo "Macvlan não encontrado..."
     sleep 2
 
     var1="0"; var2="0"; var3="0"
@@ -54,7 +54,7 @@ function macvland {
     case $? in
       0) echo "." > /dev/null ;;
       1) exit ;;
-      2) clear ; ip -4 a ; read "Pressione Enter para continuar" ; macvland ;;
+      2) clear ; ip -4 a ; read -p "Pressione Enter para continuar!" ; macvland ;;
     esac
 
     var1=$(echo "$VALUE0" | sed -n 1p)
