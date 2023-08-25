@@ -15,7 +15,7 @@ function check {
 destpath="/var/lib/libvirt/images"
 
 sudo mkdir -p "$destpath"
-sudo chmod 777 -R "/var/lib/libvirt/images"
+sudo chmod 777 -R "$destpath"
 
 lanhost="http://172.20.0.22"
 wanhost="https://cs.linuxuniverse.com.br:3434"
