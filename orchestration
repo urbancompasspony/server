@@ -69,7 +69,7 @@ function macvland {
 
 function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'PiHole (%)' \
+1 'PiHole (L/W)' \
 2 'Dominio' \
 3 'NextCloud' \
 4 'WeTTY' \
@@ -119,9 +119,9 @@ esac
 
 function database {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'MySQL' \
-2 'MariaDB' \
-3 'OracleXE 21C' \
+1 'MySQL (W)' \
+2 'MariaDB (W)' \
+3 'OracleXE 21C (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -139,10 +139,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'Syncthing - Client' \
 4 'Syncthing Relay - Server' \
 5 'VDesktop Ubuntu 22.04' \
-6 'VDesktop Ubuntu 22.04 LH' \
-7 'xpra virt-manager (%)' \
-8 'Collabora' \
-9 'No-IP' \
+6 'xpra virt-manager (L/W)' \
+7 'Collabora' \
+8 'No-IP' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -151,10 +150,9 @@ case "$var0" in
 3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 4) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
 5) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
-6) wget "$github"44.01-xpra-ubuntu2204 -O /tmp/1buntu2204; sudo bash /tmp/1buntu2204 ;;
-7) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
-8) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
-9) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
+6) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+7) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+8) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
 X) start ;;
 esac
 }
