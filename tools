@@ -28,8 +28,9 @@ VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --title "M
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
 case $? in
-  1) echo "." > /dev/null ;;
-  2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0 ; sambaclient ;;
+   0) echo "." > /dev/null ;;
+   1) exit ;;
+   2) mntshow1=$(ls /mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0 ; sambaclient ;;
 esac
 
 path1=$(echo "$VALUE0" | sed -n 1p)
