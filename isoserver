@@ -42,35 +42,34 @@ Q 'virtio-win-0.1.185 (L)' \
 R 'virtio-win-0.1.185 (W)' \
 S 'virtio-win-0.1.229 (L)' \
 T 'virtio-win-0.1.229 (W)' \
-U 'Reboot' \
-V 'Shutdown' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
-A) wget --user $usern4me --password $passw0rd $lanhost/pfSense-2.7.iso -O $destpath/pfSense-2.7.iso ; start ;;
-B) wget --user $usern4me --password $passw0rd $wanhost/pfSense-2.7.iso -O $destpath/pfSense-2.7.iso ; start ;;
-C) wget --user $usern4me --password $passw0rd $lanhost/pfSense2.6.iso -O $destpath/pfSense2.6.iso ; start ;;
-D) wget --user $usern4me --password $passw0rd $wanhost/pfSense2.6.iso -O $destpath/pfSense2.6.iso ; start ;;
-E) wget --user $usern4me --password $passw0rd $lanhost/ubuntuserver2204.iso -O $destpath/ubuntuserver2204.iso ; start ;;
-F) wget --user $usern4me --password $passw0rd $wanhost/ubuntuserver2204.iso -O $destpath/ubuntuserver2204.iso ; start ;;
-G) wget --user $usern4me --password $passw0rd $lanhost/wserver2019STD.iso -O $destpath/wserver2019STD.iso ; start ;;
-H) wget --user $usern4me --password $passw0rd $wanhost/wserver2019STD.iso -O $destpath/wserver2019STD.iso ; start ;;
-I) wget --user $usern4me --password $passw0rd $lanhost/Windows10.iso -O $destpath/Windows10.iso ; start ;;
-J) wget --user $usern4me --password $passw0rd $wanhost/Windows10.iso -O $destpath/Windows10.iso ; start ;;
-K) wget --user $usern4me --password $passw0rd $lanhost/Windows11.iso -O $destpath/Windows11.iso ; start ;;
-L) wget --user $usern4me --password $passw0rd $wanhost/Windows11.iso -O $destpath/Windows11.iso ; start ;;
-M) wget --user $usern4me --password $passw0rd $lanhost/ReviOSW10.iso -O $destpath/ReviOSW10.iso ; start ;;
-N) wget --user $usern4me --password $passw0rd $wanhost/ReviOSW10.iso -O $destpath/ReviOSW10.iso ; start ;;
-O) wget --user $usern4me --password $passw0rd $lanhost/ReviOSW11.iso -O $destpath/ReviOSW11.iso ; start ;;
-P) wget --user $usern4me --password $passw0rd $wanhost/ReviOSW11.iso -O $destpath/ReviOSW11.iso ; start ;;
-Q) wget --user $usern4me --password $passw0rd $lanhost/virtio-win-0.1.185.iso -O $destpath/virtio-win-0.1.185.iso ; start ;;
-R) wget --user $usern4me --password $passw0rd $wanhost/virtio-win-0.1.185.iso -O $destpath/virtio-win-0.1.185.iso ; start ;;
-S) wget --user $usern4me --password $passw0rd $lanhost/virtio-win-0.1.229.iso -O $destpath/virtio-win-0.1.229.iso ; start ;;
-T) wget --user $usern4me --password $passw0rd $wanhost/virtio-win-0.1.229.iso -O $destpath/virtio-win-0.1.229.iso ; start ;;
-U) reb00t ;;
-V) shutd0 ;;
+A) wget --user $usern4me --password $passw0rd $lanhost/pfSense-2.7.iso -O $destpath/pfSense-2.7.iso ; setperma ; start ;;
+B) wget --user $usern4me --password $passw0rd $wanhost/pfSense-2.7.iso -O $destpath/pfSense-2.7.iso ; setperma ; start ;;
+C) wget --user $usern4me --password $passw0rd $lanhost/pfSense2.6.iso -O $destpath/pfSense2.6.iso ; setperma ; start ;;
+D) wget --user $usern4me --password $passw0rd $wanhost/pfSense2.6.iso -O $destpath/pfSense2.6.iso ; setperma ; start ;;
+E) wget --user $usern4me --password $passw0rd $lanhost/ubuntuserver2204.iso -O $destpath/ubuntuserver2204.iso ; setperma ; start ;;
+F) wget --user $usern4me --password $passw0rd $wanhost/ubuntuserver2204.iso -O $destpath/ubuntuserver2204.iso ; setperma ; start ;;
+G) wget --user $usern4me --password $passw0rd $lanhost/wserver2019STD.iso -O $destpath/wserver2019STD.iso ; setperma ; start ;;
+H) wget --user $usern4me --password $passw0rd $wanhost/wserver2019STD.iso -O $destpath/wserver2019STD.iso ; setperma ; start ;;
+I) wget --user $usern4me --password $passw0rd $lanhost/Windows10.iso -O $destpath/Windows10.iso ; setperma ; start ;;
+J) wget --user $usern4me --password $passw0rd $wanhost/Windows10.iso -O $destpath/Windows10.iso ; setperma ; start ;;
+K) wget --user $usern4me --password $passw0rd $lanhost/Windows11.iso -O $destpath/Windows11.iso ; setperma ; start ;;
+L) wget --user $usern4me --password $passw0rd $wanhost/Windows11.iso -O $destpath/Windows11.iso ; setperma ; start ;;
+M) wget --user $usern4me --password $passw0rd $lanhost/ReviOSW10.iso -O $destpath/ReviOSW10.iso ; setperma ; start ;;
+N) wget --user $usern4me --password $passw0rd $wanhost/ReviOSW10.iso -O $destpath/ReviOSW10.iso ; setperma ; start ;;
+O) wget --user $usern4me --password $passw0rd $lanhost/ReviOSW11.iso -O $destpath/ReviOSW11.iso ; setperma ; start ;;
+P) wget --user $usern4me --password $passw0rd $wanhost/ReviOSW11.iso -O $destpath/ReviOSW11.iso ; setperma ; start ;;
+Q) wget --user $usern4me --password $passw0rd $lanhost/virtio-win-0.1.185.iso -O $destpath/virtio-win-0.1.185.iso ; setperma ; start ;;
+R) wget --user $usern4me --password $passw0rd $wanhost/virtio-win-0.1.185.iso -O $destpath/virtio-win-0.1.185.iso ; setperma ; start ;;
+S) wget --user $usern4me --password $passw0rd $lanhost/virtio-win-0.1.229.iso -O $destpath/virtio-win-0.1.229.iso ; setperma ; start ;;
+T) wget --user $usern4me --password $passw0rd $wanhost/virtio-win-0.1.229.iso -O $destpath/virtio-win-0.1.229.iso ; setperma ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
 
-check
+function setperma {
+  sudo chmod 777 -R "$destpath"
+}
+
 start
