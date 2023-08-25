@@ -38,11 +38,11 @@ hash1="fe5dfdd991450623c39efc7705e47ad5"
 function start {
 var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
 A 'Linite' \
-B 'Orchestra' \
-C 'Install .Bashrc' \
-D 'DWAgent [x86]' \
-E 'DWAgent [ARM]' \
-F 'AD Domain' \
+B 'Install .Bashrc' \
+C 'DWAgent [x86]' \
+D 'DWAgent [ARM]' \
+E 'AD Domain' \
+F 'Orchestra' \
 G 'Config & Tools' \
 H 'Reboot' \
 I 'Shutdown' \
@@ -51,11 +51,11 @@ X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
-C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
-D) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
-E) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
-F) domainlocal01 ; start ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
+C) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
+D) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
+E) domainlocal01 ; start ;;
+F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 H) reb00t ;;
 I) shutd0 ;;
