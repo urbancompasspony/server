@@ -249,7 +249,7 @@ E 'ISO Downloader' \
 F 'Set Macvlan' \
 G 'Remove Macvlan' \
 H 'Auto Config Time&Date' \
-X 'Sair' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 
