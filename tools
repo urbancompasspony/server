@@ -256,6 +256,7 @@ E 'ISO Downloader' \
 F 'Set Macvlan' \
 G 'Remove Macvlan' \
 H 'Auto Config Time&Date' \
+I 'Manutenção PiHole DB' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -268,6 +269,7 @@ E) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/m
 F) macvland ; start ;;
 G) clear ; docker network rm macvlan ; sleep 2 ; start ;;
 H) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start ;;
+I) clear ; docker exec pihole bash -c "pihole -g -r recover" ; sleep 2 ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
