@@ -246,6 +246,38 @@ function macvland {
   }
 }
 
+function smartdump {
+  # Clear SMART_DUMP File
+  rm SMART_DUMP
+  touch SMART_DUMP
+  
+  # Check SMART of block devices /dev/sdX
+  for i in a b c d e f g h i j k l m n o p
+    do
+      sudo skdump /dev/sd$i >> SMART_DUMP"
+    done
+
+  # Check if there is NVME
+  [ -b /dev/nvme0n1 ] && {
+    for i in 1 2 3 4 5 6 7 8
+      do
+        sudo smartctl -a /dev/nvme0n1p$i >> SMART_DUMP"
+      done
+  } || {
+    echo "NVME not present."
+  }
+
+  # Check if there is MegaRAID
+  [ $4 = 1 ] && {
+    for i in 0 1 2 3 4 5 6 7 8
+      do
+        sudo smartctl -d megaraid,$i -a /dev/sg$5 >> SMART_DUMP"
+      done
+    } || {
+      echo "MegaRAID not present."
+    }
+}
+
 function start {
 var0=$(dialog --title 'Tools' --backtitle "Ferramentas úteis!" --menu " " 0 0 0 \
 A 'SMB Client' \
@@ -257,6 +289,7 @@ F 'Set Macvlan' \
 G 'Remove Macvlan' \
 H 'Auto Config Time&Date' \
 I 'Manutenção PiHole DB' \
+J 'SMART Dump' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -270,6 +303,7 @@ F) macvland ; start ;;
 G) clear ; docker network rm macvlan ; sleep 2 ; start ;;
 H) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start ;;
 I) clear ; docker exec pihole bash -c "pihole -g -r recover" ; sleep 2 ; start ;;
+J) clear ; smartdump ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
