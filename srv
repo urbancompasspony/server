@@ -56,7 +56,7 @@ B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/inst
 C) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
 D) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
 E) domainlocal01 ; start ;;
-F) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ; start ;;
+F) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
 H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 I) reb00t ;;
