@@ -17,57 +17,45 @@ destpath="/var/lib/libvirt/images"
 sudo mkdir -p "$destpath"
 sudo chmod 777 -R "$destpath"
 
-lanhost="http://172.20.0.22"
+serverip="172.20.0.22"
+lanhost="http://$serverip"
 wanhost="http://cs.linuxuniverse.com.br:3434"
+
 usern4me="admin"
 passw0rd="isorulez"
 
+if ping -c 1 $serverip >/dev/null; then
+    webadress="$lanhost"
+  else
+    webadress="$wanhost"
+  fi
+
 function start {
 var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao ISO Downloader!" --menu " " 0 0 0 \
-A 'pfSense 2.7 (L)' \
-B 'pfSense 2.7 (W)' \
-C 'pfSense 2.6 (L)' \
-D 'pfSense 2.6 (W)' \
-E 'Ubuntu Server 22.04 LTS (L)' \
-F 'Ubuntu Server 22.04 LTS (W)' \
-G 'Windows Server 2019 STD (L)' \
-H 'Windows Server 2019 STD (W)' \
-I 'Windows 10 (L)' \
-J 'Windows 10 (W)' \
-K 'Windows 11 (L)' \
-L 'Windows 11 (W)' \
-M 'ReviOS W10 (L)' \
-N 'ReviOS W10 (W)' \
-O 'ReviOS W11 (L)' \
-P 'ReviOS W11 (W)' \
-Q 'virtio-win-0.1.185 (L)' \
-R 'virtio-win-0.1.185 (W)' \
-S 'virtio-win-0.1.229 (L)' \
-T 'virtio-win-0.1.229 (W)' \
+A 'pfSense 2.7' \
+B 'pfSense 2.6' \
+C 'Ubuntu Server 22.04 LTS' \
+D 'Windows Server 2019 STD' \
+E 'Windows 10' \
+F 'Windows 11' \
+G 'ReviOS W10' \
+H 'ReviOS W11' \
+I 'virtio-win-0.1.185' \
+J 'virtio-win-0.1.229' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 
-A) sudo wget --user $usern4me --password $passw0rd $lanhost/pfSense-2.7.iso -O $destpath/pfSense-2.7.iso ; setperma ; start ;;
-B) sudo wget --user $usern4me --password $passw0rd $wanhost/pfSense-2.7.iso -O $destpath/pfSense-2.7.iso ; setperma ; start ;;
-C) sudo wget --user $usern4me --password $passw0rd $lanhost/pfSense2.6.iso -O $destpath/pfSense2.6.iso ; setperma ; start ;;
-D) sudo wget --user $usern4me --password $passw0rd $wanhost/pfSense2.6.iso -O $destpath/pfSense2.6.iso ; setperma ; start ;;
-E) sudo wget --user $usern4me --password $passw0rd $lanhost/ubuntuserver2204.iso -O $destpath/ubuntuserver2204.iso ; setperma ; start ;;
-F) sudo wget --user $usern4me --password $passw0rd $wanhost/ubuntuserver2204.iso -O $destpath/ubuntuserver2204.iso ; setperma ; start ;;
-G) sudo wget --user $usern4me --password $passw0rd $lanhost/wserver2019STD.iso -O $destpath/wserver2019STD.iso ; setperma ; start ;;
-H) sudo wget --user $usern4me --password $passw0rd $wanhost/wserver2019STD.iso -O $destpath/wserver2019STD.iso ; setperma ; start ;;
-I) sudo wget --user $usern4me --password $passw0rd $lanhost/Windows10.iso -O $destpath/Windows10.iso ; setperma ; start ;;
-J) sudo wget --user $usern4me --password $passw0rd $wanhost/Windows10.iso -O $destpath/Windows10.iso ; setperma ; start ;;
-K) sudo wget --user $usern4me --password $passw0rd $lanhost/Windows11.iso -O $destpath/Windows11.iso ; setperma ; start ;;
-L) sudo wget --user $usern4me --password $passw0rd $wanhost/Windows11.iso -O $destpath/Windows11.iso ; setperma ; start ;;
-M) sudo wget --user $usern4me --password $passw0rd $lanhost/ReviOSW10.iso -O $destpath/ReviOSW10.iso ; setperma ; start ;;
-N) sudo wget --user $usern4me --password $passw0rd $wanhost/ReviOSW10.iso -O $destpath/ReviOSW10.iso ; setperma ; start ;;
-O) sudo wget --user $usern4me --password $passw0rd $lanhost/ReviOSW11.iso -O $destpath/ReviOSW11.iso ; setperma ; start ;;
-P) sudo wget --user $usern4me --password $passw0rd $wanhost/ReviOSW11.iso -O $destpath/ReviOSW11.iso ; setperma ; start ;;
-Q) sudo wget --user $usern4me --password $passw0rd $lanhost/virtio-win-0.1.185.iso -O $destpath/virtio-win-0.1.185.iso ; setperma ; start ;;
-R) sudo wget --user $usern4me --password $passw0rd $wanhost/virtio-win-0.1.185.iso -O $destpath/virtio-win-0.1.185.iso ; setperma ; start ;;
-S) sudo wget --user $usern4me --password $passw0rd $lanhost/virtio-win-0.1.229.iso -O $destpath/virtio-win-0.1.229.iso ; setperma ; start ;;
-T) sudo wget --user $usern4me --password $passw0rd $wanhost/virtio-win-0.1.229.iso -O $destpath/virtio-win-0.1.229.iso ; setperma ; start ;;
+A) sudo wget --user $usern4me --password $passw0rd $webadress/pfSense-2.7.iso -O $destpath/pfSense-2.7.iso ; setperma ; start ;;
+B) sudo wget --user $usern4me --password $passw0rd $webadress/pfSense2.6.iso -O $destpath/pfSense2.6.iso ; setperma ; start ;;
+C) sudo wget --user $usern4me --password $passw0rd $webadress/ubuntuserver2204.iso -O $destpath/ubuntuserver2204.iso ; setperma ; start ;;
+D) sudo wget --user $usern4me --password $passw0rd $webadress/wserver2019STD.iso -O $destpath/wserver2019STD.iso ; setperma ; start ;;
+E) sudo wget --user $usern4me --password $passw0rd $webadress/Windows10.iso -O $destpath/Windows10.iso ; setperma ; start ;;
+F) sudo wget --user $usern4me --password $passw0rd $webadress/Windows11.iso -O $destpath/Windows11.iso ; setperma ; start ;;
+G) sudo wget --user $usern4me --password $passw0rd $webadress/ReviOSW10.iso -O $destpath/ReviOSW10.iso ; setperma ; start ;;
+H) sudo wget --user $usern4me --password $passw0rd $webadress/ReviOSW11.iso -O $destpath/ReviOSW11.iso ; setperma ; start ;;
+I) sudo wget --user $usern4me --password $passw0rd $webadress/virtio-win-0.1.185.iso -O $destpath/virtio-win-0.1.185.iso ; setperma ; start ;;
+J) sudo wget --user $usern4me --password $passw0rd $webadress/virtio-win-0.1.229.iso -O $destpath/virtio-win-0.1.229.iso ; setperma ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
