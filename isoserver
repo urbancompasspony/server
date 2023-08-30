@@ -30,8 +30,6 @@ else
     webadress="$wanhost"
 fi
 
-commandline="sudo wget --user $usern4me --password $passw0rd"
-
 function start {
 var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao ISO Downloader!" --menu " " 0 0 0 \
 A 'pfSense 2.7' \
@@ -48,18 +46,22 @@ X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 
-A) $commandline $webadress/pfSense-2.7.iso -O $destpath/pfSense-2.7.iso ; setperma ; start ;;
-B) $commandline $webadress/pfSense2.6.iso -O $destpath/pfSense2.6.iso ; setperma ; start ;;
-C) $commandline $webadress/ubuntuserver2204.iso -O $destpath/ubuntuserver2204.iso ; setperma ; start ;;
-D) $commandline $webadress/wserver2019STD.iso -O $destpath/wserver2019STD.iso ; setperma ; start ;;
-E) $commandline $webadress/Windows10.iso -O $destpath/Windows10.iso ; setperma ; start ;;
-F) $commandline $webadress/Windows11.iso -O $destpath/Windows11.iso ; setperma ; start ;;
-G) $commandline $webadress/ReviOSW10.iso -O $destpath/ReviOSW10.iso ; setperma ; start ;;
-H) $commandline $webadress/ReviOSW11.iso -O $destpath/ReviOSW11.iso ; setperma ; start ;;
-I) $commandline $webadress/virtio-win-0.1.185.iso -O $destpath/virtio-win-0.1.185.iso ; setperma ; start ;;
-J) $commandline $webadress/virtio-win-0.1.229.iso -O $destpath/virtio-win-0.1.229.iso ; setperma ; start ;;
+A) calling pfSense-2.7.iso ; setperma ; start ;;
+B) calling pfSense2.6.iso ; setperma ; start ;;
+C) calling ubuntuserver2204.iso ; setperma ; start ;;
+D) calling wserver2019STD.iso ; setperma ; start ;;
+E) calling Windows10.iso ; setperma ; start ;;
+F) calling Windows11.iso ; setperma ; start ;;
+G) calling ReviOSW10.iso ; setperma ; start ;;
+H) calling ReviOSW11.iso ; setperma ; start ;;
+I) calling virtio-win-0.1.185.iso ; setperma ; start ;;
+J) calling virtio-win-0.1.229.iso ; setperma ; start ;;
 X) echo "Saindo..." ;;
 esac
+}
+
+function calling {
+  sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
 }
 
 function setperma {
