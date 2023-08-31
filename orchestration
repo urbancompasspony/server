@@ -128,7 +128,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'MySQL (W)' \
 2 'MariaDB (W)' \
 3 'OracleXE 21C (W)' \
-4 'PHP My Admin (L/W)' \
+4 'PHP My Admin (L)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
