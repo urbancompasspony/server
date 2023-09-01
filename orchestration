@@ -144,7 +144,7 @@ function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'OpenSpeedtest (W)' \
 2 'SSH DW (L)' \
-3 'Syncthing - Client (W)' \
+3 'Syncthing - Client (L/W)' \
 4 'Syncthing Relay - Server (W)' \
 5 'xpra virt-manager (L/W)' \
 6 'No-IP (W)' \
