@@ -61,7 +61,7 @@ G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orch
 H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 I) reb00t ;;
 J) shutd0 ;;
-X) echo "Saindo..." ;;
+X) exit ;;
 esac
 }
 
