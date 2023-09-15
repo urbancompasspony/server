@@ -257,6 +257,10 @@ esac
   cat 01-Backup | sudo tee /srv/containers/scripts/backupcont
   sudo rm -r 01-Backup
 
+  wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf"
+  cat rsnapshot.conf | sudo tee /srv/containers/scripts/rsnapshot
+  sudo rm -r rsnapshot.conf
+
   sudo touch /srv/containers/scripts/myip
   echo "$MyIPNF" | sudo tee /srv/containers/scripts/myip
 
