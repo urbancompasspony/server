@@ -129,6 +129,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'MariaDB (W)' \
 3 'OracleXE 21C (W)' \
 4 'PHP My Admin (L)' \
+5 'Firebird (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -136,6 +137,7 @@ case "$var0" in
 2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
 3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
 4) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
+5) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
 X) start ;;
 esac
 }
