@@ -78,20 +78,18 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole (L/W)' \
 2 'Dominio (W)' \
 3 'NextCloud (W)' \
-4 'WeTTY (L/W)' \
-5 'Pentest (L/W)' \
-6 'FTP Server (W)' \
-7 'SMB Server (W)' \
+4 'Pentest (L/W)' \
+5 'FTP Server (W)' \
+6 'SMB Server (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
 2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
 3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-4) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
-5) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-6) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-7) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
+4) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+5) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+6) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
 X) start ;;
 esac
 }
@@ -102,11 +100,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'OpenFire [+Spark] (W)' \
 3 'ntfy (W)' \
 4 'RustDesk (W)' \
-5 'OnlyOffice Web (W)' \
-6 'Apache2 Standalone (W)' \
-7 'Apache2 Reverse Proxy (W)' \
-8 'GLPI (W)' \
-9 'Collabora Web (W)' \
+5 'Apache2 Standalone (W)' \
+6 'Apache2 Reverse Proxy (W)' \
+7 'GLPI (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -114,11 +110,9 @@ case "$var0" in
 2) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
 3) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
 4) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-5) wget "$github"34-onlyoffice -O /tmp/onlyoffice; sudo bash /tmp/onlyoffice ;;
-6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-7) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-8) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-9) wget "$github"25-collabora -O /tmp/collabora; sudo bash /tmp/collabora ;;
+5) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
+6) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+7) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
 X) start ;;
 esac
 }
