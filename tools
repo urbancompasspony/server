@@ -2,6 +2,38 @@
 
 pathmount="/tmp/pathmount"
 
+function start {
+var0=$(dialog --title 'Tools' --backtitle "Ferramentas úteis!" --menu " " 0 0 0 \
+A 'SMB Client' \
+B 'Test Beep' \
+C 'Sync all SATA' \
+D 'Test DNS' \
+E 'ISO Downloader' \
+F 'Set Macvlan' \
+G 'Remove Macvlan' \
+H 'Auto Config Time&Date' \
+I 'Manutenção PiHole DB' \
+J 'SMART Dump' \
+K 'Tunnel SSH' \
+X '<' 2>&1 > /dev/tty )
+
+case "$var0" in
+
+A) sambaclient ; start ;;
+B) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
+C) satas ; start ;;
+D) dnstest ; start ;;
+E) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | bash ; start ;;
+F) macvland ; start ;;
+G) clear ; docker network rm macvlan ; sleep 2 ; start ;;
+H) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start ;;
+I) clear ; piholemnt ; start ;;
+J) clear ; smartdump ; start ;;
+K) clear ; synctunnel ; start ;;
+X) echo "Saindo..." ;;
+esac
+}
+
 function sambaclient {
 [ -f  "$pathmount" ] && {
   VALUE1=$(sed -n '1p' "$pathmount")
@@ -293,34 +325,65 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
     docker exec "$var1" bash -c "pihole -g -r recover"
 }
 
-function start {
-var0=$(dialog --title 'Tools' --backtitle "Ferramentas úteis!" --menu " " 0 0 0 \
-A 'SMB Client' \
-B 'Test Beep' \
-C 'Sync all SATA' \
-D 'Test DNS' \
-E 'ISO Downloader' \
-F 'Set Macvlan' \
-G 'Remove Macvlan' \
-H 'Auto Config Time&Date' \
-I 'Manutenção PiHole DB' \
-J 'SMART Dump' \
-X '<' 2>&1 > /dev/tty )
+function synctunnel {
+tunnelmount="/tmp/tunnelmount"
+tunneloptions="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=60 -o ServerAliveCountMax=5"
+known_hosts_file="/home/$USER/.ssh/known_hosts"
 
-case "$var0" in
+[ -f  "$tunnelmount" ] && {
+  VALUE1=$(sed -n '1p' "$tunnelmount")
+  VALUE2=$(sed -n '2p' "$tunnelmount")
+  VALUE3=$(sed -n '3p' "$tunnelmount") 
+  VALUE4=$(sed -n '4p' "$tunnelmount")
+  VALUE5=$(sed -n '5p' "$tunnelmount")  
+} || {
+  touch "$tunnelmount"
 
-A) sambaclient ; start ;;
-B) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
-C) satas ; start ;;
-D) dnstest ; start ;;
-E) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | bash ; start ;;
-F) macvland ; start ;;
-G) clear ; docker network rm macvlan ; sleep 2 ; start ;;
-H) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start ;;
-I) clear ; piholemnt ; start ;;
-J) clear ; smartdump ; start ;;
-X) echo "Saindo..." ;;
+  VALUE1="192.168.0.1"
+  VALUE2="root"
+  VALUE3="admin"
+  VALUE4="22"
+  VALUE5="192.168.0.10"
+}
+
+VALUE0=$(dialog --ok-label "Conectar" --title "Tunnel SSH" --form "Connecting..." 13 50 0 \
+"Firewall: " 1 1 "$VALUE1" 1 10 34 0 \
+"UserFW:" 2 1 "$VALUE2" 2 10 34 0 \
+"PassFW:" 3 1 "$VALUE3" 3 10 34 0 \
+"SrcPrt:" 4 1 "$VALUE4" 4 10 34 0 \
+"IP Dst:" 5 1 "$VALUE5" 5 10 34 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+case $? in
+   0) echo "." > /dev/null ;;
+   1) exit ;;
 esac
+
+path1=$(echo "$VALUE0" | sed -n 1p)
+user1=$(echo "$VALUE0" | sed -n 2p)
+pass1=$(echo "$VALUE0" | sed -n 3p)
+prt1=$(echo "$VALUE0" | sed -n 4p)
+ipdst1=$(echo "$VALUE0" | sed -n 5p)
+
+[ -z "$path1" ] || [ -z "$user1" ] || [ -z "$pass1" ] || [ -z "$prt1" ] || [ -z "$ipdst1" ] && {
+  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 7 30
+  synctunnel
+  }
+
+  echo "$path1" > "$tunnelmount"
+  echo "$user1" >> "$tunnelmount"
+  echo "$pass1" >> "$tunnelmount"
+  echo "$prt1" >> "$tunnelmount"
+  echo "$ipdst1" >> "$tunnelmount"
+
+  clear
+  ssh-keygen -f $known_hosts_file -R "$2"
+
+  echo ""
+  echo "Access the service as 'localhost' through port '4321'!"
+  echo ""
+
+  sshpass -p "$pass1" ssh $tunneloptions "$user1"@"$path1" -N -L 4321:"$ipdst1":"$prt1"
 }
 
 sudo apt install dialog cifs-utils smbclient -y
