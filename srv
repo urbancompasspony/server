@@ -27,6 +27,7 @@ hash0=$(echo "$password" | md5sum | awk '{print $1}')
   } || {
     [ "$hash0" = "$hash1" ] && {
       curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+      . .bashrc
       start
     } || {
       echo "Senha incorreta. Saindo..."
@@ -39,27 +40,27 @@ hash1="fe5dfdd991450623c39efc7705e47ad5"
 function start {
 var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
 A 'Linite' \
-C 'DWAgent [x86]' \
-D 'DWAgent [ARM]' \
-E 'Active Directory' \
-F 'Desktop' \
-G 'Orchestra' \
-H 'Tools' \
-I 'Reboot' \
-J 'Shutdown' \
+B 'DWAgent [x86]' \
+C 'DWAgent [ARM]' \
+D 'Active Directory' \
+E 'Desktop' \
+F 'Orchestra' \
+G 'Settings' \
+H 'Reboot this Server' \
+I 'Shutdown this Server' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
 
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
-C) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
-D) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
-E) clear ; echo "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" ; sleep 5 ;;
-F) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ;;
-G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
-H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-I) reb00t ;;
-J) shutd0 ;;
+B) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
+C) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
+D) clear ; echo "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" ; sleep 5 ;;
+E) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ;;
+F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
+G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
+H) reb00t ;;
+I) shutd0 ;;
 X) exit ;;
 esac
 }
@@ -88,57 +89,23 @@ sambastatus=$(ps aux | grep "domain" | grep -v grep 1> /dev/null && echo "Execut
 hash1="e4439267203fb5277d347e6cd6e440b5"
 
 function reb00t {
-bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-datetime=$(date +"%d/%m %H:%M")
-[ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ] || [ "$cp1" = "Executando" ] && {
-  dialog --cr-wrap --title 'ERRO AO REINICIAR' --backtitle "$bktitle" --msgbox "Reinício bloqueado! \n
-Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
-} || {
-  dialog --title 'Reiniciar' --backtitle "$bktitle" --yesno 'Deseja reiniciar este sistema?' 0 0
+  dialog --title 'Reiniciar' --backtitle "Reinício" --yesno 'Deseja reiniciar este sistema?' 0 0
   [ $? = 0 ] && {
-    [ "$report" = "1" ] && {
-      dialog --title 'Relatório' --yesno "Deseja enviar um relatório por e-mail sobre este reinício?" 8 40
-      [ $? = 0 ] && {
-        menu08 "$Recado $Recado5 $datetime $Mensagem"
-      } || {
-        echo "a" > /dev/null
-        }
-    }
-  sudo reboot
+    sudo reboot
+  } || {
+    start
   }
-}
-start
 }
 
 hash1="576200e78f0ab25b437dc7372ae920d9"
 
 function shutd0 {
-rrsnap=$(ps aux | grep "rsnapshot" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-rsync1=$(ps aux | grep "rsync" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-bbalance=$(ps aux | grep "btrfs balance start" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-cp1=$(ps u | grep "cp" | grep -v grep 1> /dev/null && echo "Executando" || echo "Parado")
-datetime=$(date +"%d/%m %H:%M")
-[ "$bbalance" = "Executando" ] || [ "$rrsnap" = "Executando" ] || [ "$rsync1" = "Executando" ] || [ "$cp1" = "Executando" ] && {
-  dialog --cr-wrap --title 'ERRO AO DESLIGAR' --backtitle 'ERRO AO TENTAR DESLIGAR.' --msgbox "Desligamento bloqueado! \n
-Favor verificar o Status do Sistema ou tente novamente mais tarde." 0 0
-} || {
-  dialog --title 'Desligar' --backtitle 'D E S L I G A R' --yesno 'Deseja desligar este sistema?' 0 0
+  dialog --title 'Desligar' --backtitle "Desligamento" --yesno 'Deseja desligar este sistema?' 0 0
   [ $? = 0 ] && {
-    [ "$report" = "1" ] && {
-      dialog --title 'Relatório' --yesno "Deseja enviar um relatório por e-mail sobre este desligamento?" 8 40
-      [ $? = 0 ] && {
-        menu08 "$Recado $Recado6 $datetime $Mensagem"
-      } || {
-        echo "a" > /dev/null
-        }
-    }
-  sudo shutdown -h now
+    sudo shutdown -h now
+  } || {
+    start
   }
-}
-start
 }
 
 # ------------------------------------------------------------------------------
@@ -147,7 +114,7 @@ start
 hash="e4439267203fb5277d347e6cd6e440b5"
 
 [ "$EUID" -ne 0 ] || {
-  echo "Não execute esse script como Root! Saindo..."
+  echo "Não execute esse script com sudo! Saindo..."
   exit
   }
 
