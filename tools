@@ -9,12 +9,9 @@ B 'Test Beep' \
 C 'Sync all SATA' \
 D 'Test DNS' \
 E 'ISO Downloader' \
-F 'Set Macvlan' \
-G 'Remove Macvlan' \
-H 'Auto Config Time&Date' \
-I 'Manutenção PiHole DB' \
-J 'SMART Dump' \
-K 'Tunnel SSH' \
+F 'Config Time&Date' \
+G 'SMART Dump' \
+H 'Tunnel SSH' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -24,12 +21,9 @@ B) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
 C) satas ; start ;;
 D) dnstest ; start ;;
 E) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | bash ; start ;;
-F) macvland ; start ;;
-G) clear ; docker network rm macvlan ; sleep 2 ; start ;;
-H) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start ;;
-I) clear ; piholemnt ; start ;;
-J) clear ; smartdump ; start ;;
-K) clear ; synctunnel ; start ;;
+F) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start ;;
+G) clear ; smartdump ; start ;;
+H) clear ; synctunnel ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
@@ -240,44 +234,6 @@ done" | sudo tee /srv/containers/scripts/xpra
   }
 }
 
-function macvland {
-  macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
-  [ "$macvlanr" = "no" ] && {
-    clear
-    echo "Macvlan não encontrado. Criando..."
-    sleep 2
-
-    var1="0"; var2="0"; var3="0"
-    VALUE1="192.168.0.0"; VALUE2="192.168.0.1" ; VALUE3="enp2s0"
-
-    VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Criar novo MACVLAN" --form "MACVLAN for Containers" 10 40 0 \
-"Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
-"Gateway :" 2 1 "$VALUE2" 2 11 30 0 \
-"Parent  :" 3 1 "$VALUE3" 3 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-      2) clear ; ip -4 a ; sleep 10 ; clear ; macvland ;;
-    esac
-
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    var2=$(echo "$VALUE0" | sed -n 2p)
-    var3=$(echo "$VALUE0" | sed -n 3p)
-
-    [ "$var1" = "0" ] || [ "$var2" = "0" ] || [ "$var3" = "0" ] && {
-      clear
-      echo "Não deixe nenhum campo vazio!"
-      macvland
-    } || {
-      docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" macvlan
-    }
-  } || {
-    echo "." > /dev/null
-  }
-}
-
 function smartdump {
   # Clear SMART_DUMP File
   rm SMART_DUMP
@@ -308,21 +264,6 @@ function smartdump {
     } || {
       echo "MegaRAID not present."
     }
-}
-
-function piholemnt {
-VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
-"NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
-
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    clear
-    docker exec "$var1" bash -c "pihole -g -r recover"
 }
 
 function synctunnel {
