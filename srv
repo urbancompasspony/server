@@ -26,6 +26,7 @@ hash0=$(echo "$password" | md5sum | awk '{print $1}')
     echo "É necessário digitar uma senha para continuar. Saindo..."
   } || {
     [ "$hash0" = "$hash1" ] && {
+      curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
       start
     } || {
       echo "Senha incorreta. Saindo..."
@@ -38,10 +39,9 @@ hash1="fe5dfdd991450623c39efc7705e47ad5"
 function start {
 var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
 A 'Linite' \
-B 'Install .Bashrc' \
 C 'DWAgent [x86]' \
 D 'DWAgent [ARM]' \
-E 'AD-DC Domain' \
+E 'Active Directory' \
 F 'Desktop' \
 G 'Orchestra' \
 H 'Tools' \
@@ -52,7 +52,6 @@ X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
 C) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
 D) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
 E) clear ; echo "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" ; sleep 5 ;;
