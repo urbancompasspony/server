@@ -49,8 +49,9 @@ D 'Active Directory' \
 E 'Desktop' \
 F 'Orchestra' \
 G 'Settings' \
-H 'Reboot this Server' \
-I 'Shutdown this Server' \
+H 'LazyDocker' \
+I 'Reboot Server' \
+J 'Shutdown Server' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -62,8 +63,9 @@ D) clear ; echo "Digite domain para entrar no painel de controle do AD-DC SAMBA4
 E) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ;;
 F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-H) reb00t ;;
-I) shutd0 ;;
+H) lazydocker ;;
+I) reb00t ;;
+J) shutd0 ;;
 X) exit ;;
 esac
 }
