@@ -34,7 +34,9 @@ hash0=$(echo "$password" | md5sum | awk '{print $1}')
       echo "---------------------------------"
       echo "Senha incorreta. Tente novamente!"
       echo "---------------------------------"
-      sleep $timeout; timeout=$((timeout+1)); [ "$timeout" = 5 ] || [ "$timeout" = 10 ] && { echo "Quanto mais errar, mais vai demorar!"; }
+      echo "Espere $timeout segundo(s). Quanto mais errar, mais vai demorar!"
+      echo ""
+      sleep $timeout; timeout=$((timeout+1))
       init
       }
   }
