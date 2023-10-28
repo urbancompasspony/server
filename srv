@@ -115,9 +115,6 @@ function shutd0 {
 
 # ------------------------------------------------------------------------------
 
-# Password
-hash="e4439267203fb5277d347e6cd6e440b5"
-
 [ "$EUID" -ne 0 ] || {
   echo "Não execute esse script com sudo! Saindo..."
   exit
