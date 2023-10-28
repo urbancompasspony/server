@@ -16,21 +16,19 @@ github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
 function start {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Essentials' \
-2 'Servers' \
-3 'DataBases' \
-4 'Others' \
-5 'Pull Only!' \
-6 'Tools' \
+A 'Essentials' \
+B 'Servers' \
+C 'DataBases' \
+D 'Others' \
+E 'Tools' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) essentials ; start ;;
-2) servers ; start ;;
-3) database ; start ;;
-4) others ; start ;;
-5) pullall ; start ;;
-6) tools ; start ;;
+A) essentials ; start ;;
+B) servers ; start ;;
+C) database ; start ;;
+D) others ; start ;;
+E) tools ; start ;;
 X) exit ;;
 esac
 }
@@ -161,19 +159,25 @@ esac
 
 function tools {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'AutoMigrate ADDC' \
-2 'AutoExport SAMBA' \
-3 'Backup ADDC' \
-4 'Backup SAMBA' \
-5 'LazyDocker' \
+A 'AutoMigrate ADDC' \
+B 'AutoExport SAMBA' \
+C 'Backup ADDC' \
+D 'Backup SAMBA' \
+E 'LazyDocker' \
+F 'Manutenção PiHole DB' \
+G 'Set Macvlan' \
+H 'Remove Macvlan' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) wget "$github"07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
-2) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
-3) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
-4) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
-5) curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash ;;
+A) wget "$github"07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
+B) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
+C) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
+D) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
+E) curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash ;;
+F) clear ; piholemnt ;;
+G) macvland ;;
+H) clear ; docker network rm macvlan ; sleep 2 ;;
 X) start ;;
 esac
 }
@@ -231,6 +235,59 @@ case "$var0" in
 23) docker pull urbancompasspony/xpra-virt-manager:latest ;;
 X) start ;;
 esac
+}
+
+function piholemnt {
+VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
+"NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    clear
+    docker exec "$var1" bash -c "pihole -g -r recover"
+}
+
+function macvland {
+  macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
+  [ "$macvlanr" = "no" ] && {
+    clear
+    echo "Macvlan não encontrado. Criando..."
+    sleep 2
+
+    var1="0"; var2="0"; var3="0"
+    VALUE1="192.168.0.0"; VALUE2="192.168.0.1" ; VALUE3="enp2s0"
+
+    VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Criar novo MACVLAN" --form "MACVLAN for Containers" 10 40 0 \
+"Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
+"Gateway :" 2 1 "$VALUE2" 2 11 30 0 \
+"Parent  :" 3 1 "$VALUE3" 3 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+      2) clear ; ip -4 a ; sleep 10 ; clear ; macvland ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    var2=$(echo "$VALUE0" | sed -n 2p)
+    var3=$(echo "$VALUE0" | sed -n 3p)
+
+    [ "$var1" = "0" ] || [ "$var2" = "0" ] || [ "$var3" = "0" ] && {
+      clear
+      echo "Não deixe nenhum campo vazio!"
+      macvland
+    } || {
+      docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" macvlan
+    }
+  } || {
+    echo "." > /dev/null
+  }
 }
 
 ###############
