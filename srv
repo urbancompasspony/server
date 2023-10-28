@@ -43,16 +43,16 @@ function start {
 var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
 A 'First Configuration' \
 B 'Orchestra' \
-C 'Settings' \
-D 'Managers' \
+C 'Managers' \
+D 'Settings' \
 E 'Reboot Server' \
 F 'Shutdown Server' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) firstconfig ; start ;;
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
-C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-D) managers ; start ;;
+C) managers ; start ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 E) reb00t ;;
 F) shutd0 ;;
 X) exit ;;
@@ -66,9 +66,9 @@ B 'DWAgent [x86]' \
 C 'DWAgent [ARM]' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
-A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
-B) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
-C) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
+A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; firstconfig ;;
+B) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; firstconfig ;;
+C) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; firstconfig ;;
 X) exit ;;
 esac
 }
@@ -82,9 +82,9 @@ D 'Active Directory' \
 E 'Start Desktop' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
-A) lazydocker ;;
-B) curl -sSL https://github.com/urbancompasspony/server/blob/main/docker | bash ; start ;;
-C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; start ;;
+A) lazydocker ; managers ;;
+B) curl -sSL https://github.com/urbancompasspony/server/blob/main/docker | bash ; managers ;;
+C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
 D) clear ; echo "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" ; sleep 5 ;;
 E) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ;;
 X) exit ;;
