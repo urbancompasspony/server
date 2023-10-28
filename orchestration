@@ -165,6 +165,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'AutoExport SAMBA' \
 3 'Backup ADDC' \
 4 'Backup SAMBA' \
+5 'LazyDocker' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -172,6 +173,7 @@ case "$var0" in
 2) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
 3) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
 4) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
+5) curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash ;;
 X) start ;;
 esac
 }
