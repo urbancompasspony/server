@@ -41,31 +41,37 @@ hash1="fe5dfdd991450623c39efc7705e47ad5"
 
 function start {
 var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
-A 'Linite' \
-B 'DWAgent [x86]' \
-C 'DWAgent [ARM]' \
-D 'Orchestra' \
-E 'Settings' \
-F 'Managers' \
-K 'Reboot Server' \
-L 'Shutdown Server' \
+A 'First Configuration' \
+B 'Orchestra' \
+C 'Settings' \
+D 'Managers' \
+E 'Reboot Server' \
+F 'Shutdown Server' \
 X 'Sair' 2>&1 > /dev/tty )
-
 case "$var0" in
-
-A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
-B) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
-C) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
-E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-F) managers ; start ;;
-K) reb00t ;;
-L) shutd0 ;;
+A) firstconfig ; start ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
+C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
+D) managers ; start ;;
+E) reb00t ;;
+F) shutd0 ;;
 X) exit ;;
 esac
 }
 
-
+function firstconfig {
+var0=$(dialog --title ' ' --backtitle "Fiest Configuration!" --menu " " 0 0 0 \
+A 'Linite' \
+B 'DWAgent [x86]' \
+C 'DWAgent [ARM]' \
+X 'Sair' 2>&1 > /dev/tty )
+case "$var0" in
+A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
+B) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
+C) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
+X) exit ;;
+esac
+}
 
 function managers {
 var0=$(dialog --title ' ' --backtitle "Managers" --menu " " 0 0 0 \
