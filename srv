@@ -44,13 +44,11 @@ var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao Server Manager $version!" --
 A 'Linite' \
 B 'DWAgent [x86]' \
 C 'DWAgent [ARM]' \
-D 'Active Directory' \
-E 'Desktop' \
-F 'Orchestra' \
-G 'Settings' \
-H 'LazyDocker' \
-I 'Reboot Server' \
-J 'Shutdown Server' \
+D 'Orchestra' \
+E 'Settings' \
+F 'Managers' \
+K 'Reboot Server' \
+L 'Shutdown Server' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -58,13 +56,31 @@ case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; start ;;
 B) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
 C) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
+E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
+F) managers ; start ;;
+K) reb00t ;;
+L) shutd0 ;;
+X) exit ;;
+esac
+}
+
+
+
+function managers {
+var0=$(dialog --title ' ' --backtitle "Managers" --menu " " 0 0 0 \
+A 'LazyDocker Manager' \
+B 'TUI Docker Manager' \
+C 'TUI VM Manager' \
+D 'Active Directory' \
+E 'Start Desktop' \
+X 'Sair' 2>&1 > /dev/tty )
+case "$var0" in
+A) lazydocker ;;
+B) curl -sSL https://github.com/urbancompasspony/server/blob/main/docker | bash ; start ;;
+C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; start ;;
 D) clear ; echo "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" ; sleep 5 ;;
 E) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ;;
-F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
-G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-H) lazydocker ;;
-I) reb00t ;;
-J) shutd0 ;;
 X) exit ;;
 esac
 }
@@ -72,7 +88,7 @@ esac
 function domainlocal01 {
   [ $(which docker 2>/dev/null) ] && {
     docker ps -a | grep dominio 1> /dev/null && {
-      docker exec dominio bash
+      domain
     } || {
       domainlocal02
     }
