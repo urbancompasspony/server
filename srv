@@ -23,14 +23,17 @@ password=$(dialog --backtitle "Server Manager $version" --title " " --insecure -
 hash0=$(echo "$password" | md5sum | awk '{print $1}')
   [ -z "$password" ] && {
     clear
-    echo ""
+    echo "--------------------------------------------------------"
     echo "É necessário digitar uma senha para continuar. Saindo..."
-    echo ""
+    echo "--------------------------------------------------------"
   } || {
     [ "$hash0" = "$hash1" ] && {
       start
     } || {
+      clear
+      echo "---------------------------------"
       echo "Senha incorreta. Tente novamente!"
+      echo "---------------------------------"
       sleep $timeout; timeout=$((timeout+1)); [ "$timeout" = 5 ] || [ "$timeout" = 10 ] && { echo "Quanto mais errar, mais vai demorar!"; }
       init
       }
