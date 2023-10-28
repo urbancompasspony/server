@@ -68,7 +68,7 @@ esac
 function domainlocal01 {
   [ $(which docker 2>/dev/null) ] && {
     docker ps -a | grep dominio 1> /dev/null && {
-      docker exec -it dominio bash
+      docker exec dominio bash
     } || {
       domainlocal02
     }
