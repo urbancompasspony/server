@@ -41,10 +41,10 @@ A 'Linite' \
 B 'Install .Bashrc' \
 C 'DWAgent [x86]' \
 D 'DWAgent [ARM]' \
-E 'AD Domain' \
+E 'AD-DC Domain' \
 F 'Desktop' \
 G 'Orchestra' \
-H 'Config & Tools' \
+H 'Tools' \
 I 'Reboot' \
 J 'Shutdown' \
 X 'Sair' 2>&1 > /dev/tty )
@@ -55,7 +55,7 @@ A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/lini
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
 C) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; start ;;
 D) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; start ;;
-E) domainlocal01 ; start ;;
+E) clear ; echo "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" ; sleep 5 ;;
 F) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ;;
 G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
 H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
