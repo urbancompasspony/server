@@ -19,7 +19,6 @@ version="v2.0"
 
 # PASSWORD
 function init {
-timeout=1
 password=$(dialog --backtitle "Server Manager $version" --title " " --insecure --passwordbox "Digite a senha!" 0 0 2>&1 > /dev/tty)
 hash0=$(echo "$password" | md5sum | awk '{print $1}')
   [ -z "$password" ] && {
@@ -32,7 +31,7 @@ hash0=$(echo "$password" | md5sum | awk '{print $1}')
       start
     } || {
       echo "Senha incorreta. Tente novamente!"
-      sleep $timeout; timeout=$timeout+1
+      sleep $timeout; timeout=$((timeout+1)); [ "$timeout" = 5 ] || [ "$timeout" = 10 ] && { echo "Quanto mais errar, mais vai demorar!"; }
       init
       }
   }
