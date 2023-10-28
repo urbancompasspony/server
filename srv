@@ -26,8 +26,6 @@ hash0=$(echo "$password" | md5sum | awk '{print $1}')
     echo "É necessário digitar uma senha para continuar. Saindo..."
   } || {
     [ "$hash0" = "$hash1" ] && {
-      curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
-      . .bashrc
       start
     } || {
       echo "Senha incorreta. Saindo..."
@@ -125,10 +123,14 @@ echo ""
 # Checagem Obrigatória de Dependências:
 [ -f /home/$USER/.installed ] || {
   [ -f /usr/bin/pacman ] && {
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+    . .bashrc
     sudo pacman -Syu dialog
     touch /home/$USER/.installed
     init
   } || {
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+    . .bashrc    
     sudo apt update
     sudo apt install sshpass dialog curl lm-sensors arp-scan traceroute libatasmart-bin udpcast cifs-utils
     touch /home/$USER/.installed
