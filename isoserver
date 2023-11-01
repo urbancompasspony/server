@@ -61,6 +61,7 @@ esac
 }
 
 function calling {
+  clear
   sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
 }
 
