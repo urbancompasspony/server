@@ -483,19 +483,21 @@ Por favor, configure-o manualmente e tente novamente." 10 50
 
 function menu {
 var0=$(dialog --title "DOMAIN Folder Control 1.0" --backtitle " " --menu " " 0 0 0 \
-1 'Mostrar pastas configuradas' \
-2 'Criar nova pasta compartilhada' \
-3 'Deletar pasta compartilhada' \
-4 'Revalidar Configuracoes' \
+A 'Mostrar Pastas Compartilhadas' \
+B 'Criar Nova Pasta Compartilhada' \
+C 'Excluir Pasta Compartilhada' \
+D 'Revalidar Configuracoes' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
-1) list_all ; menu ;;
-2) create ; menu ;;
-3) delete ; menu ;;
-4) revalidate ; menu ;;
+A) list_all ; menu ;;
+B) create ; menu ;;
+C) delete ; menu ;;
+D) revalidate ; menu ;;
 X) exit ;;
 esac
+
+menu04
 }
 
 function list_all {
@@ -506,6 +508,8 @@ function list_all {
     clear
     dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 5 40
   }
+
+menu
 }
 
 function create {
@@ -549,6 +553,8 @@ EOF
 
 ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
 smbcontrol all reload-config
+
+menu
 }
 
 function delete {
@@ -570,12 +576,15 @@ VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compa
       smbcontrol all reload-config
     } || {
       echo "a" > /dev/null
-      }
+    }
+
+menu
 }
 
 function revalidate {
   ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
   smbcontrol all reload-config
+  menu
 }
 
 # Start all!
