@@ -89,9 +89,9 @@ X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) lazydocker ; managers ;;
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
-C) clear ; dialog --title "Informação" --msgbox "Digite domain para entrar no painel de controle do AD-DC SAMBA4!!" 10 50 ;;
+C) clear ; dialog --title "Informação" --msgbox "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" 10 50 ;;
 D) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/smb_folder_manager | bash ; managers ;;
-E) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ;;
+E) clear ; dialog --title "Informação" --msgbox "Digite startx para entrar no modo Desktop!" 10 50 ;;
 X) exit ;;
 esac
 }
