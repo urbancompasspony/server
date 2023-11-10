@@ -11,10 +11,7 @@ being $SHARED the same as the original shared! just an alias to set it easy, one
 
 add to /etc/samba/smb.conf
 include = /etc/samba/includes.conf
-
 remove all entrances about shared folder!
-
-INSIDE CONTAINER:
 
 prepare everything:
 ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf
@@ -29,9 +26,9 @@ docker restart CONTAINER
 #########################
 
 OUTSIDE CONTAINER:
-mkdir /srv/containers/dominio/config/smb.conf.d/
+sudo mkdir /srv/containers/dominio/config/smb.conf.d/
 
-nano /srv/containers/dominio/config/smb.conf.d/SHARED.conf
+sudo nano /srv/containers/dominio/config/smb.conf.d/SHARED.conf
 being SHARED the same as the original shared! just an alias to set it easy, one .conf per GROUP
 
 add to /srv/containers/dominio/config/smb.conf
