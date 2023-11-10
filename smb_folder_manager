@@ -1,0 +1,160 @@
+#!/bin/bash
+
+function smb_cont {
+VALUE0=$(dialog --help-button --help-label "Dicas" --ok-label "Ok" --title "SAMBA Folder Control 1.5" --form " " 8 45 0 \
+"Container:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+      2) dockercont ;;
+    esac
+
+    NOMECONTAINER=$(echo "$VALUE0" | sed -n 1p)
+    clear
+    validation
+}
+
+function dockercont {
+  cont=$(docker container ls -a --format "{{.Names}}, ({{.Status}})")
+  dialog --title "Lista de Containers:" --msgbox "$cont" 10 50
+  smb_cont
+}
+
+function validation {
+  result=$(grep -rnw /srv/containers/$NOMECONTAINER/etc/samba/smb.conf -e 'include' 2>/dev/null 1>/dev/null && echo sim || echo nao)
+  [ $result = sim ] && {
+    menu
+  } || {
+    clear
+    dialog --title "ERRO" --msgbox "Sub-sistema INCLUDE não encontrado para o container $NOMECONTAINER! \n
+O editor de pastas compartilhadas não pôde continuar. \n
+Por favor, configure-o manualmente e tente novamente." 10 50
+  }
+}
+
+function menu {
+var0=$(dialog --title "SAMBA Folder Control 1.0" --backtitle " " --menu " " 0 0 0 \
+1 'Show all shared config' \
+2 'Create a new shared folder' \
+3 'Delete a shared folder' \
+4 'Revalidate Configurations' \
+X '<' 2>&1 > /dev/tty )
+
+case "$var0" in
+1) list_all ; menu ;;
+2) create ; menu ;;
+3) delete ; menu ;;
+4) revalidate ; menu ;;
+X) exit ;;
+esac
+}
+
+function list_all {
+  [ -d "/srv/containers/$NOMECONTAINER/etc/samba/smb.conf.d" ] && {
+    listagem=$(ls -a /srv/containers/$NOMECONTAINER/etc/samba/smb.conf.d/*)
+    dialog --title "Lista de Configurações Existentes:" --msgbox "$listagem" 10 50
+  } || {
+    clear
+    dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 7 30
+  }
+}
+
+function create {
+VALUE1="administrador"
+VALUE2="P4ssw0rd"
+VALUE3="server"
+VALUE4="/mnt/custom_folder"
+VALUE5="@supervisor"
+VALUE6="yes"
+VALUE7="yes"
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
+"UserName:" 1 1 "$VALUE1" 1 10 34 0 \
+"PassWord:" 2 1 "$VALUE2" 2 10 34 0 \
+"ShrName :" 3 1 "$VALUE3" 3 10 34 0 \
+"PathName:" 4 1 "$VALUE4" 4 10 34 0 \
+"Grp Name:" 5 1 "$VALUE5" 5 10 34 0 \
+"Writable:" 6 1 "$VALUE6" 6 10 34 0 \
+"Browser :" 7 1 "$VALUE7" 7 10 50 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
+  var5=$(echo "$VALUE0" | sed -n 5p)
+  var6=$(echo "$VALUE0" | sed -n 6p)
+  var7=$(echo "$VALUE0" | sed -n 7p)
+
+sudo mkdir -p /srv/containers/$NOMECONTAINER/etc/samba/$var3
+
+docker exec "$NOMECONTAINER" mkdir -p $var4
+docker exec "$NOMECONTAINER" useradd -M -d /etc/samba/shares/$var3 -s /usr/sbin/nologin -G sambashare $var1
+docker exec "$NOMECONTAINER" chown $var1:sambashare /etc/samba/shares/$var3
+docker exec "$NOMECONTAINER" chmod 2770 /etc/samba/shares/$var3
+docker exec "$NOMECONTAINER" bash -c "echo -e '$var2\n$var2' | smbpasswd -a -s $var1"
+
+sudo tee /srv/containers/$NOMECONTAINER/etc/samba/smb.conf.d/$var3.conf << EOF
+[$var3]
+path = $var4
+valid users = $var5
+admin users = $var5
+guest ok = no
+writable = $var6
+browsable = $var7
+create mask = 0777
+force create mode = 0777
+directory mask = 0777
+force directory mode = 0777
+EOF
+
+docker exec "$NOMECONTAINER" bash -c "ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf"
+docker exec "$NOMECONTAINER" smbcontrol all reload-config
+docker restart "$NOMECONTAINER"
+}
+
+function delete {
+VALUE0=$(dialog --ok-label "Ok" --title "Container" --form "Container: $NOMECONTAINER" 8 35 0 \
+"ShrName:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    
+    dialog --title 'Confirmacao' --backtitle 'Exclusao de Compartilhamento' --yesno 'Deseja excluir o compartilhamento?' 0 0
+    [ $? = 0 ] && {
+      sudo rm -r /etc/samba/smb.conf.d/$var1.conf
+      docker exec "$NOMECONTAINER" bash -c "ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf"
+      docker exec "$NOMECONTAINER" smbcontrol all reload-config
+      docker restart "$NOMECONTAINER"
+    } || {
+      echo "a" > /dev/null
+      }
+}
+
+function revalidate {
+  gauge1 "10"
+  docker exec "$NOMECONTAINER" bash -c "ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf"
+  gauge1 "25"
+  docker exec "$NOMECONTAINER" smbcontrol all reload-config
+  gauge1 "75"
+  docker restart $NOMECONTAINER
+  gauge1 "100"
+  sleep 1
+}
+
+function gauge1 {
+  echo  "$1" | dialog --title "Revalidando..." --gauge "Aguarde a conclusão!" 8 40
+}
+
+smb_cont
+
+exit 1
