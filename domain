@@ -468,7 +468,7 @@ menu04
 # DOMAIN FOLDER MANAGER
 
 function validation {
-  result=$(grep -rnw /srv/containers/$NOMECONTAINER/etc/samba/smb.conf -e 'include' 2>/dev/null 1>/dev/null && echo sim || echo nao)
+  result=$(grep -rnw /etc/samba/smb.conf -e 'include' 2>/dev/null 1>/dev/null && echo sim || echo nao)
   [ $result = sim ] && {
     menu
   } || {
