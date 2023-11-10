@@ -22,21 +22,14 @@ function init {
 password=$(dialog --backtitle "Server Manager $version" --title " " --insecure --passwordbox "Digite a senha!" 0 0 2>&1 > /dev/tty)
 hash0=$(echo "$password" | md5sum | awk '{print $1}')
   [ -z "$password" ] && {
-    clear
-    echo "--------------------------------------------------------"
-    echo "É necessário digitar uma senha para continuar. Saindo..."
-    echo "--------------------------------------------------------"
+      dialog --title "ERROR" --msgbox "É necessário digitar uma senha para continuar." 6 40
   } || {
     [ "$hash0" = "$hash1" ] && {
       start
     } || {
       clear
-      echo "---------------------------------"
-      echo "Senha incorreta. Tente novamente!"
-      echo "---------------------------------"
-      echo "Espere $timeout segundo(s). Quanto mais errar, mais vai demorar!"
-      echo ""
-      sleep $timeout; timeout=$((timeout+1))
+      dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
+      timeout=$((timeout+1)); sleep $timeout
       init
       }
   }
