@@ -21,8 +21,10 @@ version="v2.0"
 function init {
 password=$(dialog --backtitle "Server Manager $version" --title " " --insecure --passwordbox "Digite a senha!" 0 0 2>&1 > /dev/tty)
 hash0=$(echo "$password" | md5sum | awk '{print $1}')
+  [ $? -ne 0 ] && exit
   [ -z "$password" ] && {
       dialog --title "ERROR" --msgbox "É necessário digitar uma senha para continuar." 6 40
+      clear
   } || {
     [ "$hash0" = "$hash1" ] && {
       start
