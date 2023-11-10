@@ -535,7 +535,7 @@ mkdir -p /mnt/$var2
 
 tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
-path = $var2
+path = /mnt/$var2
 valid users = $var3
 admin users = $var3
 writable = $var4
