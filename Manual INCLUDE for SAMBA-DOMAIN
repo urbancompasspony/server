@@ -6,45 +6,41 @@ INSIDE CONTAINER
 
 mkdir /etc/samba/smb.conf.d/
 
-nano /etc/samba/smb.conf.d/$SHARED.conf
-being $SHARED the same as the original shared! just an alias to set it easy
-one .conf per user
+nano /etc/samba/smb.conf.d/SHARED.conf
+being $SHARED the same as the original shared! just an alias to set it easy, one .conf per USER
 
 add to /etc/samba/smb.conf
 include = /etc/samba/includes.conf
 
 remove all entrances about shared folder!
-create inside docker container:
+
+INSIDE CONTAINER:
 
 prepare everything:
 ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf
-
-reload samba:
 smbcontrol all reload-config
 
 OUTSIDE CONTAINER:
 
-restart container to check
 docker restart CONTAINER
 
 #########################
 # FOR DOMAIN CONTROLLER #
 #########################
 
-INSIDE CONTAINER:
-mkdir /etc/samba/external/smb.conf.d/
-
-nano /etc/samba/external/smb.conf.d/$SHARED.conf
-being $SHARED the same as the original shared! just an alias to set it easy
-one .conf per user
-
 OUTSIDE CONTAINER:
+mkdir /srv/containers/dominio/config/smb.conf.d/
+
+nano /srv/containers/dominio/config/smb.conf.d/SHARED.conf
+being SHARED the same as the original shared! just an alias to set it easy, one .conf per GROUP
+
 add to /srv/containers/dominio/config/smb.conf
 include = /etc/samba/external/includes.conf
-remove all entrances about shared folders!
+
+remove all entrances about shared folders previously made!
 
 INSIDE CONTAINER:
 ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
 
 OUTSIDE CONTAINER:
-RECREATE CONTAINER TO VALIDADE!
+RECREATE CONTAINER THROUGH ORCHESTRA TO VALIDADE!
