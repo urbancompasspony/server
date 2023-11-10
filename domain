@@ -500,11 +500,11 @@ esac
 
 function list_all {
   [ -d "/etc/samba/external/smb.conf.d" ] && {
-    listagem=$(ls -a /etc/samba/external/smb.conf.d/*)
-    dialog --title "Lista de Configuracoes Existentes:" --msgbox "$listagem" 10 50
+    listagem=$(ls /etc/samba/external/smb.conf.d/* | xargs -n 1 basename)
+    dialog --title "Lista de Pastas Compartilhadas:" --msgbox "$listagem" 15 35
   } || {
     clear
-    dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 7 30
+    dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 5 40
   }
 }
 
