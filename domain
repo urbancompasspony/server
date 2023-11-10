@@ -548,8 +548,7 @@ force directory mode = 0777
 EOF
 
 ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
-dialog --title "Information" --msgbox "Para aplicar as mudancas refaca-o via Orchestration!" 6 40
-curl -sSL https://srv.linuxuniverse.com.br | bash
+smbcontrol all reload-config
 }
 
 function delete {
@@ -568,8 +567,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compa
     [ $? = 0 ] && {
       rm /etc/samba/external/smb.conf.d/$var1.conf
       ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
-      dialog --title "Information" --msgbox "Para aplicar as mudancas refaca-o via Orchestration!" 6 40
-      curl -sSL https://srv.linuxuniverse.com.br | bash
+      smbcontrol all reload-config
     } || {
       echo "a" > /dev/null
       }
@@ -577,8 +575,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compa
 
 function revalidate {
   ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
-  dialog --title "Information" --msgbox "Para aplicar as mudancas refaca-o via Orchestration!" 6 40
-  curl -sSL https://srv.linuxuniverse.com.br | bash
+  smbcontrol all reload-config
 }
 
 # Start all!
