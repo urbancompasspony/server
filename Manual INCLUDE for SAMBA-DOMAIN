@@ -1,6 +1,8 @@
+#############
+# FOR SAMBA #
+#############
 
 add to /etc/samba/smb.conf
-
 include = /etc/samba/includes.conf
 
 remove all entrances about shared folder!
@@ -8,8 +10,8 @@ create inside docker container:
 
 mkdir /etc/samba/smb.conf.d/
 
-nano /etc/samba/smb.conf.d/$USER.conf
-being $USER the same as the original shared! just an alias to set it easy
+nano /etc/samba/smb.conf.d/$SHARED.conf
+being $SHARED the same as the original shared! just an alias to set it easy
 one .conf per user
 
 prepare everything:
@@ -20,3 +22,24 @@ smbcontrol all reload-config
 
 restart container to check
 docker restart CONTAINER
+
+#########################
+# FOR DOMAIN CONTROLLER #
+#########################
+
+add to /srv/containers/dominio/config/smb.conf
+include = /etc/samba/includes.conf
+
+remove all entrances about shared folder!
+create inside docker container:
+
+mkdir /etc/samba/smb.conf.d/
+
+nano /etc/samba/smb.conf.d/$SHARED.conf
+being $SHARED the same as the original shared! just an alias to set it easy
+one .conf per user
+
+prepare everything:
+ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf
+
+RECREATE CONTAINER TO VALIDADE!
