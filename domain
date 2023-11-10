@@ -474,7 +474,7 @@ function validation {
   } || {
     clear
     dialog --title "ERRO" --msgbox "Sub-sistema INCLUDE nao encontrado para este Dominio! \n
-O editor de pastas compartilhadas não pôde continuar. \n
+O editor de pastas compartilhadas nao pode continuar. \n
 Por favor, configure-o manualmente e tente novamente." 10 50
   }
 }
