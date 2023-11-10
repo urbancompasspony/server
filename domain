@@ -14,18 +14,20 @@ function menu04 {
   A 'Gestao de Usuarios' \
   B 'Gestao de Grupos' \
   C 'Gestao de Computadores' \
-  D 'Informacoes do Dominio' \
-  E 'GPUpdate /Force' \
-  F 'Manutencao' \
+  D 'Gestao de Pastas da Rede' \
+  E 'Informacoes do Dominio' \
+  F 'GPUpdate /Force' \
+  G 'Manutencao' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
   A) menu041 ;;
   B) menu042 ;;
   C) menu043 ;;
-  D) menuR ;;
-  E) samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; menu04 ;;
-  F) manut ; menu04 ;;
+  D) validation ;;
+  E) menuR ;;
+  F) samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; menu04 ;;
+  G) manut ; menu04 ;;
   X) exit ;;
   esac
 }
@@ -461,6 +463,117 @@ $domainv \n \n
 " 0 0
 
 menu04
+}
+
+# DOMAIN FOLDER MANAGER
+
+function validation {
+  result=$(grep -rnw /srv/containers/$NOMECONTAINER/etc/samba/smb.conf -e 'include' 2>/dev/null 1>/dev/null && echo sim || echo nao)
+  [ $result = sim ] && {
+    menu
+  } || {
+    clear
+    dialog --title "ERRO" --msgbox "Sub-sistema INCLUDE não encontrado para este Dominio! \n
+O editor de pastas compartilhadas não pôde continuar. \n
+Por favor, configure-o manualmente e tente novamente." 10 50
+  }
+}
+
+function menu {
+var0=$(dialog --title "DOMAIN Folder Control 1.0" --backtitle " " --menu " " 0 0 0 \
+1 'Mostrar pastas configuradas' \
+2 'Criar nova pasta compartilhada' \
+3 'Deletar pasta compartilhada' \
+4 'Revalidar Configuracoes' \
+X '<' 2>&1 > /dev/tty )
+
+case "$var0" in
+1) list_all ; menu ;;
+2) create ; menu ;;
+3) delete ; menu ;;
+4) revalidate ; menu ;;
+X) exit ;;
+esac
+}
+
+function list_all {
+  [ -d "/etc/samba/smb.conf.d" ] && {
+    listagem=$(ls -a /etc/samba/smb.conf.d/*)
+    dialog --title "Lista de Configuracoes Existentes:" --msgbox "$listagem" 10 50
+  } || {
+    clear
+    dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 7 30
+  }
+}
+
+function create {
+VALUE1="server"
+VALUE2="custom_folder"
+VALUE3="@supervisor"
+VALUE4="yes"
+VALUE5="yes"
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Compartilhamento" --form "Controlador de Domínio" 15 45 0 \
+"ShrName :" 1 1 "$VALUE1" 1 10 34 0 \
+"PathName:" 2 1 "$VALUE2" 2 10 34 0 \
+"Grp Name:" 3 1 "$VALUE3" 3 10 34 0 \
+"Writable:" 4 1 "$VALUE4" 4 10 34 0 \
+"Browser :" 5 1 "$VALUE5" 5 10 34 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
+  var5=$(echo "$VALUE0" | sed -n 5p)
+
+mkdir -p /mnt/$var2
+
+tee /etc/samba/smb.conf.d/$var1.conf << EOF
+[$var1]
+path = $var2
+valid users = $var3
+admin users = $var3
+writable = $var4
+browsable = $var5
+guest ok = no
+create mask = 0777
+force create mode = 0777
+directory mask = 0777
+force directory mode = 0777
+EOF
+
+ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf
+dialog --title "Information" --msgbox "Para aplicar as mudancas saia deste container e revalide-o via Orchestration!" 7 45
+}
+
+function delete {
+VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compartilhamento" 8 35 0 \
+"ShrName:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    
+    dialog --title 'Confirmacao' --backtitle 'Exclusao de Compartilhamento' --yesno 'Deseja excluir o compartilhamento?' 0 0
+    [ $? = 0 ] && {
+      rm /etc/samba/smb.conf.d/$var1.conf
+      ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf
+      dialog --title "Information" --msgbox "Para aplicar as mudancas saia deste container e revalide-o via Orchestration!" 7 45
+    } || {
+      echo "a" > /dev/null
+      }
+}
+
+function revalidate {
+  ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf
+  dialog --title "Information" --msgbox "Para aplicar as mudancas saia deste container e revalide-o via Orchestration!" 7 45
 }
 
 # Start all!
