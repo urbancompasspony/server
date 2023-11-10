@@ -465,10 +465,12 @@ $domainv \n \n
 menu04
 }
 
-# DOMAIN FOLDER MANAGER
+#########################
+# DOMAIN FOLDER MANAGER #
+#########################
 
 function validation {
-  result=$(grep -rnw /etc/samba/smb.conf -e 'include' 2>/dev/null 1>/dev/null && echo sim || echo nao)
+  result=$(grep -rnw /etc/samba/external/smb.conf -e 'include' 2>/dev/null 1>/dev/null && echo sim || echo nao)
   [ $result = sim ] && {
     menu
   } || {
@@ -497,8 +499,8 @@ esac
 }
 
 function list_all {
-  [ -d "/etc/samba/smb.conf.d" ] && {
-    listagem=$(ls -a /etc/samba/smb.conf.d/*)
+  [ -d "/etc/samba/external/smb.conf.d" ] && {
+    listagem=$(ls -a /etc/samba/external/smb.conf.d/*)
     dialog --title "Lista de Configuracoes Existentes:" --msgbox "$listagem" 10 50
   } || {
     clear
@@ -531,7 +533,7 @@ VALUE5="yes"
 
 mkdir -p /mnt/$var2
 
-tee /etc/samba/smb.conf.d/$var1.conf << EOF
+tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
 path = $var2
 valid users = $var3
@@ -545,7 +547,7 @@ directory mask = 0777
 force directory mode = 0777
 EOF
 
-ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf
+ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
 dialog --title "Information" --msgbox "Para aplicar as mudancas saia deste container e revalide-o via Orchestration!" 7 45
 }
 
@@ -563,8 +565,8 @@ VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compa
     
     dialog --title 'Confirmacao' --backtitle 'Exclusao de Compartilhamento' --yesno 'Deseja excluir o compartilhamento?' 0 0
     [ $? = 0 ] && {
-      rm /etc/samba/smb.conf.d/$var1.conf
-      ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf
+      rm /etc/samba/external/smb.conf.d/$var1.conf
+      ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
       dialog --title "Information" --msgbox "Para aplicar as mudancas saia deste container e revalide-o via Orchestration!" 7 45
     } || {
       echo "a" > /dev/null
@@ -572,7 +574,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compa
 }
 
 function revalidate {
-  ls /etc/samba/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/includes.conf
+  ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
   dialog --title "Information" --msgbox "Para aplicar as mudancas saia deste container e revalide-o via Orchestration!" 7 45
 }
 
