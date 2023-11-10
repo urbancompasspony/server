@@ -83,13 +83,15 @@ var0=$(dialog --title ' ' --backtitle "Managers" --menu " " 0 0 0 \
 A 'LazyDocker Manager' \
 B 'TUI VM Manager' \
 C 'Active Directory' \
-D 'Start Desktop' \
+D 'Samba Folder MGR' \
+E 'Start Desktop' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) lazydocker ; managers ;;
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
-C) clear ; echo "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" ; sleep 5 ;;
-D) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ;;
+C) clear ; dialog --title "Informação" --msgbox "Digite domain para entrar no painel de controle do AD-DC SAMBA4!!" 10 50 ;;
+D) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/smb_folder_manager | bash ; managers ;;
+E) clear ; echo "Digite startx para entrar no modo Desktop!" ; sleep 5 ;;
 X) exit ;;
 esac
 }
