@@ -53,8 +53,8 @@ esac
 
 function list_all {
   [ -d "/srv/containers/$NOMECONTAINER/etc/samba/smb.conf.d" ] && {
-    listagem=$(ls -a /srv/containers/$NOMECONTAINER/etc/samba/smb.conf.d/*)
-    dialog --title "Lista de Configurações Existentes:" --msgbox "$listagem" 10 50
+    listagem=$(ls /srv/containers/$NOMECONTAINER/etc/samba/smb.conf.d/* | xargs -n 1 basename)
+    dialog --title "Lista de Pastas Compartilhadas:" --msgbox "$listagem" 15 35
   } || {
     clear
     dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 7 30
