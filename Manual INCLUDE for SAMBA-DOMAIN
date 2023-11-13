@@ -6,12 +6,16 @@ INSIDE CONTAINER
 
 mkdir /etc/samba/smb.conf.d/
 
+TERMINAL 1
+nano /etc/samba/smb.conf
+TERMINAL 2
 nano /etc/samba/smb.conf.d/SHARED.conf
-being $SHARED the same as the original shared! just an alias to set it easy, one .conf per USER
+being SHARED the same as the original shared! just an alias to set it easy, one .conf per GROUP
 
 add to /etc/samba/smb.conf
 # Shared Folders
 include = /etc/samba/includes.conf
+
 remove all entrances about shared folder!
 
 prepare everything:
