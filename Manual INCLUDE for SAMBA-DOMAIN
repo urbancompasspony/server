@@ -29,9 +29,9 @@ docker restart CONTAINER
 OUTSIDE CONTAINER:
 sudo mkdir /srv/containers/dominio/config/smb.conf.d/
 
-Check shares:
-cat /srv/containers/dominio/config/smb.conf
-
+TERMINAL 1
+sudo nano /srv/containers/dominio/config/smb.conf
+TERMINAL 2
 sudo nano /srv/containers/dominio/config/smb.conf.d/SHARED.conf
 being SHARED the same as the original shared! just an alias to set it easy, one .conf per GROUP
 
