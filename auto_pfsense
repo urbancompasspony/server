@@ -13,7 +13,7 @@ virt-install --import \
 --os-variant=freebsd13.1 \
 --graphics vnc \
 --import \
---autostart &
+--autostart 1>/dev/null 2>/dev/null &
 
 dialog --title "Informação" --msgbox "A máquina virtual está sendo criada e inicializada!" 6 40
 dialog --title "Informação" --msgbox "Verifique o status da máquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
