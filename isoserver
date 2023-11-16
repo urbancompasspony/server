@@ -45,7 +45,7 @@ J 'virtio-win-0.1.185' \
 K 'virtio-win-0.1.229' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-A) calling pfSense.img ; setperma ; start ;;
+A) calling pfsense.img ; setperma ; start ;;
 B) calling pfSense-2.7.iso ; setperma ; start ;;
 C) calling pfSense2.6.iso ; setperma ; start ;;
 D) calling ubuntuserver2204.iso ; setperma ; start ;;
