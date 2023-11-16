@@ -31,15 +31,17 @@ esac
 function firstconfig {
 var0=$(dialog --title ' ' --backtitle "Fiest Configuration!" --menu " " 0 0 0 \
 A 'Linite' \
-B 'DWAgent [x86]' \
-C 'DWAgent [ARM]' \
-D 'Atualizar Bashrc' \
+B 'AutoConfig pfSense' \
+C 'DWAgent [x86]' \
+D 'DWAgent [ARM]' \
+E 'Atualizar Bashrc' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; firstconfig ;;
-B) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; firstconfig ;;
-C) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; firstconfig ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; firstconfig ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | bash ; firstconfig ;;
+C) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; firstconfig ;;
+D) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; firstconfig ;;
+E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; firstconfig ;;
 X) start ;;
 esac
 }
