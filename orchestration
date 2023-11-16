@@ -269,9 +269,16 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "MySQL - NextCloud
     var2=$(echo "$VALUE0" | sed -n 2p)
 
     clear
+    echo "File Locks atualmente no Banco de Dados:"
+    docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
+    sleep 5
     docker exec "$var1" mysql --user=root --password="$var2" -D nextcloud -e 'delete from oc_file_locks where 1'
-    unset var1
-    unset var2
+    sleep 1
+    clear
+    echo "Conferencia de limpeza de File Locks:"
+    docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
+    echo "Se nada aparecer aqui, foi limpo com sucesso!"
+    sleep 3
 }
 
 function macvland {
