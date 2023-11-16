@@ -1,5 +1,30 @@
 #!/bin/bash
 
+function check {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+destpath="/var/lib/libvirt/images"
+
+sudo mkdir -p "$destpath"
+sudo chmod 777 -R "$destpath"
+
+serverip="172.20.0.22"
+lanhost="http://$serverip"
+wanhost="http://cs.linuxuniverse.com.br:3434"
+
+usern4me="admin"
+passw0rd="isorulez"
+
+if ping -c 1 $serverip >/dev/null; then
+    webadress="$lanhost"
+else
+    webadress="$wanhost"
+fi
+
 function createvm {
 virt-install --import \
 --name pfSense \
@@ -20,11 +45,23 @@ dialog --title "Informação" --msgbox "Verifique o status da máquina virtual p
 exit
 }
 
+function calling {
+  clear
+  sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
+}
+
+function setperma {
+  sudo chmod 777 -R "$destpath"
+}
+
+check
+
 [ -f /var/lib/libvirt/images/pfsense.img ] &&
   createvm
 } || {
-  clear
-  dialog --title "ERROR" --msgbox "A imagem pfsense.img não foi encontrada." 6 40
+  calling pfsense.img
+  setperma
+  createvm
 }
 
 exit 1
