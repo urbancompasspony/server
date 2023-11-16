@@ -46,7 +46,6 @@ B 'Managers' \
 C 'Settings' \
 D 'Reboot Server' \
 E 'Shutdown Server' \
-F 'Experimental' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
@@ -54,7 +53,6 @@ B) managers ; start ;;
 C) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 D) reb00t ;;
 E) shutd0 ;;
-F) experimental ;;
 X) exit ;;
 esac
 }
@@ -67,7 +65,6 @@ case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | bash ; experimental ;;
 X) start ;;
 esac
-
 }
 
 function managers {
