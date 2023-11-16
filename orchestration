@@ -164,9 +164,10 @@ B 'AutoExport SAMBA' \
 C 'Backup ADDC' \
 D 'Backup SAMBA' \
 E 'LazyDocker' \
-F 'Manutenção PiHole DB' \
-G 'Set Macvlan' \
-H 'Remove Macvlan' \
+F 'Set Macvlan' \
+G 'Remove Macvlan' \
+H 'PiHole - Manutencao' \
+I 'Nextcloud Clear FileLocks' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -175,9 +176,10 @@ B) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/m
 C) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
 D) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
 E) curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash ;;
-F) clear ; piholemnt ;;
-G) macvland ;;
-H) clear ; docker network rm macvlan ; sleep 2 ;;
+F) macvland ;;
+G) clear ; docker network rm macvlan ; sleep 2 ;;
+H) clear ; piholemnt ;;
+I) clear ; filelocks ;;
 X) start ;;
 esac
 }
@@ -250,6 +252,26 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
     var1=$(echo "$VALUE0" | sed -n 1p)
     clear
     docker exec "$var1" bash -c "pihole -g -r recover"
+}
+
+function filelocks {
+VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "MySQL - NextCloud" 9 35 0 \
+"mSQLcont:" 1 1 "$VALUE1" 1 11 30 0 \
+"Password:" 2 1 "$VALUE2" 2 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    var2=$(echo "$VALUE0" | sed -n 2p)
+
+    clear
+    docker exec "$var1" mysql --user=root --password="$var2" -D nextcloud -e 'delete from oc_file_locks where 1'
+    unset var1
+    unset var2
 }
 
 function macvland {
