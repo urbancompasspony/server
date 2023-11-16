@@ -64,7 +64,7 @@ var0=$(dialog --title ' ' --backtitle "EXPERIMENTAL CONFIGURATIONS!" --menu " " 
 A 'AutoSetup pfSense' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-A) https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; experimental ;;
+A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | bash ; experimental ;;
 X) start ;;
 esac
 
