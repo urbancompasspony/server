@@ -7,21 +7,24 @@ virt-install --import \
 --memory 2048 \
 --vcpus 2 \
 --cpu host \
---network macvtap=enp1s0,model=virtio \
---network macvtap=enp2s0,model=virtio \
+--network type=direct,source=enp1s0,source_mode=vepa,mac=52:54:00:55:ea:01 \
+--network type=direct,source=enp2s0,source_mode=vepa,mac=52:54:00:55:ea:02 \
 --disk /var/lib/libvirt/images/pfsense.img \
 --os-variant=freebsd13.1 \
 --graphics vnc \
 --import \
---autostart
+--autostart &
+
+dialog --title "Informação" --msgbox "A máquina virtual está sendo criada e inicializada!" 6 40
+dialog --title "Informação" --msgbox "Verifique o status da máquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
+exit
 }
 
 [ -f /var/lib/libvirt/images/pfsense.img ] &&
   createvm
 } || {
   clear
-  echo "Imagem não encontrada. Favor conferir a existência de pfsense.img!"
-  sleep 3
+  dialog --title "ERROR" --msgbox "A imagem pfsense.img não foi encontrada." 6 40
 }
 
 exit 1
