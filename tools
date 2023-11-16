@@ -4,27 +4,43 @@ pathmount="/tmp/pathmount"
 
 function start {
 var0=$(dialog --title 'Tools' --backtitle "Ferramentas úteis!" --menu " " 0 0 0 \
-A 'SMB Client' \
-B 'Test Beep' \
-C 'Sync all SATA' \
-D 'Test DNS' \
-E 'ISO Downloader' \
-F 'Config Time&Date' \
-G 'SMART Dump' \
-H 'Tunnel SSH' \
+A 'First Configuration' \
+B 'SMB Client' \
+C 'Test Beep' \
+D 'Sync all SATA' \
+E 'Test DNS' \
+F 'ISO Downloader' \
+G 'Config Time&Date' \
+H 'SMART Dump' \
+I 'Tunnel SSH' \
 X '<' 2>&1 > /dev/tty )
-
 case "$var0" in
-
-A) sambaclient ; start ;;
-B) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
-C) satas ; start ;;
-D) dnstest ; start ;;
-E) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | bash ; start ;;
-F) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start ;;
-G) clear ; smartdump ; start ;;
-H) clear ; synctunnel ; start ;;
+A) firstconfig ; start ;;
+B) sambaclient ; start ;;
+C) sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
+D) satas ; start ;;
+E) dnstest ; start ;;
+F) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | bash ; start ;;
+G) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start ;;
+H) clear ; smartdump ; start ;;
+I) clear ; synctunnel ; start ;;
 X) echo "Saindo..." ;;
+esac
+}
+
+function firstconfig {
+var0=$(dialog --title ' ' --backtitle "Fiest Configuration!" --menu " " 0 0 0 \
+A 'Linite' \
+B 'DWAgent [x86]' \
+C 'DWAgent [ARM]' \
+D 'Atualizar Bashrc' \
+X '<' 2>&1 > /dev/tty )
+case "$var0" in
+A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; firstconfig ;;
+B) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; firstconfig ;;
+C) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; firstconfig ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; firstconfig ;;
+X) start ;;
 esac
 }
 
