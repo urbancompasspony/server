@@ -101,8 +101,8 @@ function createvm2 {
 --import \
 --autostart 1>/dev/null 2>/dev/null &
 
-dialog --title "Informação" --msgbox "A máquina virtual está sendo criada e inicializada!" 6 40
-dialog --title "Informação" --msgbox "Verifique o status da máquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
+dialog --title "Informação" --msgbox "Se a maquina virtual nao existia, ela sera criada e inicializada!" 6 40
+dialog --title "Informação" --msgbox "Verifique o status da maquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
 
 exit
 }
@@ -123,8 +123,8 @@ function createvm3 {
 --import \
 --autostart 1>/dev/null 2>/dev/null &
 
-dialog --title "Informação" --msgbox "A máquina virtual está sendo criada e inicializada!" 6 40
-dialog --title "Informação" --msgbox "Verifique o status da máquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
+dialog --title "Informação" --msgbox "Se a maquina virtual nao existia, ela sera criada e inicializada!" 6 40
+dialog --title "Informação" --msgbox "Verifique o status da maquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
 
 exit
 }
@@ -146,8 +146,8 @@ function createvm4 {
 --import \
 --autostart 1>/dev/null 2>/dev/null &
 
-dialog --title "Informação" --msgbox "A máquina virtual está sendo criada e inicializada!" 6 40
-dialog --title "Informação" --msgbox "Verifique o status da máquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
+dialog --title "Informação" --msgbox "Se a maquina virtual nao existia, ela sera criada e inicializada!" 6 40
+dialog --title "Informação" --msgbox "Verifique o status da maquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
 
 exit
 }
