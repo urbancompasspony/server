@@ -1,11 +1,8 @@
 #!/bin/bash
 
-function check {
-  [ "$EUID" -ne 0 ] && {
-    echo "Execute esse script como Root!"
-    exit
-    }
-}
+##############
+# Parameters #
+##############
 
 destpath="/var/lib/libvirt/images"
 
@@ -19,21 +16,85 @@ wanhost="http://cs.linuxuniverse.com.br:3434"
 usern4me="admin"
 passw0rd="isorulez"
 
+# Check where get the .img file
 if ping -c 1 $serverip >/dev/null; then
     webadress="$lanhost"
 else
     webadress="$wanhost"
 fi
 
-function createvm {
-virt-install --import \
+#############
+# Functions #
+#############
+
+function check {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function start {
+  [ -f /var/lib/libvirt/images/pfsense.img ] && {
+    setinter
+  } || {
+    calling pfsense.img
+    setperma
+    setinter
+  }
+}
+
+function calling {
+  clear
+  sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
+}
+
+function setperma {
+  sudo chmod 777 -R "$destpath"
+}
+
+function setinter {
+  VALUE1="enp1s0"; VALUE2="enp2s0"; VALUE3="0"; VALUE4="0"
+
+  VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Definir Interfaces" --form "Networking for pfSense on VM" 11 40 0 \
+"IF LAN 1:" 1 1 "$VALUE1" 1 11 30 0 \
+"IF LAN 2:" 2 1 "$VALUE2" 2 11 30 0 \
+"IF LAN 3:" 3 1 "$VALUE3" 3 11 30 0 \
+"IF LAN 4:" 4 1 "$VALUE4" 4 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  case $? in
+    0) echo "." > /dev/null ;;
+    1) exit ;;
+    2) dialognet ; setinter ;;
+  esac
+
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
+
+  [ $var3 = "0" ] && [ $var4 = "0" ] && { createvm2 "$var1" "$var2"; }
+
+  [ $var4 = "0" ] && { createvm3 "$var1" "$var2" "$var3"; }
+
+  createvm4 "$var1" "$var2" "$var3" "$var4"
+}
+
+function dialognet {
+  dialog --title "Informação" --msgbox "Checar a existencia de altnames nas informacoes a seguir!" 7 40
+  dialog --title "Informação" --msgbox "$(ip a)" 25 70
+}
+
+function createvm2 {
+  virt-install --import \
 --name pfSense \
 --boot hd,cdrom,menu=on \
 --memory 2048 \
 --vcpus 2 \
 --cpu host \
---network type=direct,source=enp1s0,source_mode=vepa,mac=52:54:00:55:ea:01 \
---network type=direct,source=enp2s0,source_mode=vepa,mac=52:54:00:55:ea:02 \
+--network type=direct,source=$1,source_mode=vepa,mac=52:54:00:55:ea:01 \
+--network type=direct,source=$2,source_mode=vepa,mac=52:54:00:55:ea:02 \
 --disk /var/lib/libvirt/images/pfsense.img \
 --os-variant=freebsd13.1 \
 --graphics vnc \
@@ -46,23 +107,56 @@ dialog --title "Informação" --msgbox "Verifique o status da máquina virtual p
 exit
 }
 
-function calling {
-  clear
-  sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
+function createvm3 {
+  virt-install --import \
+--name pfSense \
+--boot hd,cdrom,menu=on \
+--memory 2048 \
+--vcpus 2 \
+--cpu host \
+--network type=direct,source=$1,source_mode=vepa,mac=52:54:00:55:ea:01 \
+--network type=direct,source=$2,source_mode=vepa,mac=52:54:00:55:ea:02 \
+--network type=direct,source=$3,source_mode=vepa,mac=52:54:00:55:ea:03 \
+--disk /var/lib/libvirt/images/pfsense.img \
+--os-variant=freebsd13.1 \
+--graphics vnc \
+--import \
+--autostart 1>/dev/null 2>/dev/null &
+
+dialog --title "Informação" --msgbox "A máquina virtual está sendo criada e inicializada!" 6 40
+dialog --title "Informação" --msgbox "Verifique o status da máquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
+
+exit
 }
 
-function setperma {
-  sudo chmod 777 -R "$destpath"
+function createvm4 {
+  virt-install --import \
+--name pfSense \
+--boot hd,cdrom,menu=on \
+--memory 2048 \
+--vcpus 2 \
+--cpu host \
+--network type=direct,source=$1,source_mode=vepa,mac=52:54:00:55:ea:01 \
+--network type=direct,source=$2,source_mode=vepa,mac=52:54:00:55:ea:02 \
+--network type=direct,source=$3,source_mode=vepa,mac=52:54:00:55:ea:03 \
+--network type=direct,source=$4,source_mode=vepa,mac=52:54:00:55:ea:04 \
+--disk /var/lib/libvirt/images/pfsense.img \
+--os-variant=freebsd13.1 \
+--graphics vnc \
+--import \
+--autostart 1>/dev/null 2>/dev/null &
+
+dialog --title "Informação" --msgbox "A máquina virtual está sendo criada e inicializada!" 6 40
+dialog --title "Informação" --msgbox "Verifique o status da máquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
+
+exit
 }
+
+#########
+# Start #
+#########
 
 check
-
-[ -f /var/lib/libvirt/images/pfsense.img ] && {
-  createvm
-} || {
-  calling pfsense.img
-  setperma
-  createvm
-}
+start
 
 exit 1
