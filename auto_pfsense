@@ -57,7 +57,7 @@ function setperma {
 
 check
 
-[ -f /var/lib/libvirt/images/pfsense.img ] &&
+[ -f /var/lib/libvirt/images/pfsense.img ] && {
   createvm
 } || {
   calling pfsense.img
