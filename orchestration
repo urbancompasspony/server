@@ -282,7 +282,7 @@ function macvland {
 }
 
 function dialognet {
-  dialog --title "Informação" --msgbox "$(ip -4 a)" 25 70
+  dialog --title "Informação" --msgbox "$(ip a)" 25 70
 }
 
 ###############
