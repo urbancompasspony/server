@@ -166,7 +166,7 @@ D 'Backup SAMBA' \
 E 'LazyDocker' \
 F 'Set Macvlan' \
 G 'Remove Macvlan' \
-H 'PiHole - Manutencao' \
+H 'PiHole Manutencao' \
 I 'Nextcloud Clear FileLocks' \
 X '<' 2>&1 > /dev/tty )
 
@@ -300,7 +300,7 @@ function macvland {
     case $? in
       0) echo "." > /dev/null ;;
       1) exit ;;
-      2) clear ; ip -4 a ; sleep 10 ; clear ; macvland ;;
+      2) dialognet ; macvland ;;
     esac
 
     var1=$(echo "$VALUE0" | sed -n 1p)
@@ -317,6 +317,10 @@ function macvland {
   } || {
     echo "." > /dev/null
   }
+}
+
+function dialognet {
+  dialog --title "Informação" --msgbox "$(ip -4 a)" 25 70
 }
 
 ###############
