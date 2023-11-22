@@ -1,5 +1,7 @@
 #!/bin/bash
 
+customname="/srv/containers/SAMBA_SHARE"
+
 ransomrange="micro
 zepto
 cerber
@@ -193,17 +195,12 @@ vxlock
 pubg
 crab"
 
-customname="/srv/containers/SAMBA_SHARE"
-
 function ransomfunc {
-  for i in ransomrange
+  for i in "$ransomrange";
   do
-    cat /srv/containers/"$1"/log/syslog | grep "$i"
+    echo $i
+    cat "$1"/log/syslog | grep "$i"
   done
-}
-
-[ -d /srv/containers/dominio ] && {
-  ransomfunc "/srv/containers/dominio "
 }
 
 [ -d /srv/containers/dominio ] && {
