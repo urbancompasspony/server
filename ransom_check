@@ -21,10 +21,10 @@ function ransom01 {
   cat "$1" | egrep -i "$extensoes" | sudo tee -a "$path_to_pentest"
   echo "Executando Etapa 02"
   cat "$1" | egrep -i "$extensoes2" | sudo tee -a "$path_to_pentest"
-  echo "Executando Etapa 03"
-  for i in "${notefiles[@]}"; do
-    grep -rl "$i" $(sudo find /mnt/ ! -path "*alpha*" ! -path "*beta*" ! -path "*gamma*" ! -path "*delta*") | sudo tee -a "$path_to_pentest"
-  done
+ # echo "Executando Etapa 03"
+ # for i in "${notefiles[@]}"; do
+ #   grep -rl "$i" $(sudo find /mnt/ ! -path "*alpha*" ! -path "*beta*" ! -path "*gamma*" ! -path "*delta*") | sudo tee -a "$path_to_pentest"
+ # done
 }
 
 function ransom02 {
@@ -32,14 +32,14 @@ function ransom02 {
   cat "$1" | egrep -i "$extensoes" | sudo tee -a "$alternative_path"
   echo "Executando Etapa 02"
   cat "$1" | egrep -i "$extensoes2" | sudo tee -a "$alternative_path"
-  echo "Executando Etapa 03"
-  for i in "${notefiles[@]}"; do
-    sudo grep -rl "$i" $(sudo find /mnt/ ! -path "*alpha*" ! -path "*beta*" ! -path "*gamma*" ! -path "*delta*") | sudo tee -a "$alternative_path"
-  done
+#  echo "Executando Etapa 03"
+#  for i in "${notefiles[@]}"; do
+# sudo grep -rl "$i" $(sudo find /mnt/ ! -path "*alpha*" ! -path "*beta*" ! -path "*gamma*" ! -path "*delta*") | sudo tee -a "$alternative_path"
+#  done
 }
 
 function start {
-  sudo find /srv/containers/*/log -name "syslog" | tee /tmp/listfiles
+  sudo find /srv/containers/*/log -name "*syslog*" | tee /tmp/listfiles
   cat /tmp/listfiles | while read LINE; do
     [ -d /srv/containers/pentest ] && {
       ransom01 $LINE
