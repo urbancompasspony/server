@@ -36,7 +36,7 @@ function ransom02 {
 }
 
 function start {
-  sudo find /srv/containers/*/log -name "*syslog*" | tee /tmp/listfiles
+  sudo find /srv/containers/*/log -name "syslog" | tee /tmp/listfiles
   cat /tmp/listfiles | while read LINE; do
     [ -d /srv/containers/pentest ] && {
       ransom01 $LINE
