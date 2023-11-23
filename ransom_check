@@ -1,7 +1,5 @@
 #!/bin/bash
 
-path_to_files="/mnt"
-
 path_to_pentest="/srv/containers/pentest/Pentests/Ransomware_Detected"
 alternative_path="/home/administrador/Resultados_Ransomware"
 
@@ -25,7 +23,7 @@ function ransom01 {
   cat "$1" | egrep -i "$extensoes2" | sudo tee -a "$path_to_pentest"
   echo "Executando Etapa 03"
   for i in "${notefiles[@]}"; do
-    grep -rl "$i" "$path_to_files" | sudo tee -a "$path_to_pentest"
+    grep -rl "$i" $(sudo find /mnt/ ! -path "*alpha*" ! -path "*beta*" ! -path "*gamma*" ! -path "*delta*") | sudo tee -a "$path_to_pentest"
   done
 }
 
@@ -36,7 +34,7 @@ function ransom02 {
   cat "$1" | egrep -i "$extensoes2" | sudo tee -a "$alternative_path"
   echo "Executando Etapa 03"
   for i in "${notefiles[@]}"; do
-    sudo grep -rl "$i" "$path_to_files" | sudo tee -a "$alternative_path"
+    sudo grep -rl "$i" $(sudo find /mnt/ ! -path "*alpha*" ! -path "*beta*" ! -path "*gamma*" ! -path "*delta*") | sudo tee -a "$alternative_path"
   done
 }
 
