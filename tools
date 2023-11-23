@@ -13,6 +13,7 @@ F 'ISO Downloader' \
 G 'Config Time&Date' \
 H 'SMART Dump' \
 I 'Tunnel SSH' \
+J 'RansomExt' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) firstconfig ; start ;;
@@ -24,6 +25,7 @@ F) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/m
 G) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start ;;
 H) clear ; smartdump ; start ;;
 I) clear ; synctunnel ; start ;;
+J) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/ransomext | sudo bash ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
