@@ -17,21 +17,16 @@ notefiles=("HELPDECRYPT.TXT", "HELP_YOUR_FILES.TXT", "HELP_TO_DECRYPT_YOUR_FILES
   }
 
 function ransom01 {
-  echo "Executando Etapa 01"
   cat "$1" | egrep -i "$extensoes" | sudo tee -a "$path_to_pentest"
-  echo "Executando Etapa 02"
   cat "$1" | egrep -i "$extensoes2" | sudo tee -a "$path_to_pentest"
 
- # echo "Executando Etapa 03"
  # for i in "${notefiles[@]}"; do
  #   grep -rl "$i" $(sudo find /mnt/ ! -path "*alpha*" ! -path "*beta*" ! -path "*gamma*" ! -path "*delta*") | sudo tee -a "$path_to_pentest"
  # done
 }
 
 function ransom02 {
-  echo "Executando Etapa 01"
   cat "$1" | egrep -i "$extensoes" | sudo tee -a "$alternative_path"
-  echo "Executando Etapa 02"
   cat "$1" | egrep -i "$extensoes2" | sudo tee -a "$alternative_path"
 
 #  echo "Executando Etapa 03"
