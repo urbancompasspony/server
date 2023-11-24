@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Sudo Crontab
+# 00 8,12,15,18 * * * bash /srv/containers/scripts/ransomext
+
 path_to_pentest="/srv/containers/pentest/Pentests/Ransomware_Detected"
 alternative_path="/home/administrador/Resultados_Ransomware"
 
