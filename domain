@@ -535,6 +535,11 @@ VALUE5="yes"
   var4=$(echo "$VALUE0" | sed -n 4p)
   var5=$(echo "$VALUE0" | sed -n 5p)
 
+[ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
+  dialog --title "ERRO" --msgbox "O compartilhamento já existe! Saindo..." 5 40
+  exit
+}
+
 mkdir -p /mnt/$var2
 
 tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
