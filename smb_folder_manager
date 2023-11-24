@@ -90,6 +90,11 @@ VALUE7="yes"
   var6=$(echo "$VALUE0" | sed -n 6p)
   var7=$(echo "$VALUE0" | sed -n 7p)
 
+[ -d /srv/containers/$NOMECONTAINER/etc/samba/$var3 ] && {
+  dialog --title "ERRO" --msgbox "O compartilhamento já existe! Saindo..." 5 40
+  exit
+}
+
 sudo mkdir -p /srv/containers/$NOMECONTAINER/etc/samba/$var3
 
 docker exec "$NOMECONTAINER" mkdir -p $var4
