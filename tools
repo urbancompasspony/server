@@ -14,6 +14,7 @@ G 'Config Time&Date' \
 H 'SMART Dump' \
 I 'Tunnel SSH' \
 J 'RansomExt' \
+K 'Install Beep' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) firstconfig ; start ;;
@@ -26,8 +27,16 @@ G) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start 
 H) clear ; smartdump ; start ;;
 I) clear ; synctunnel ; start ;;
 J) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/ransomext | sudo bash ; start ;;
+K) clear ; beep ; start ;;
 X) echo "Saindo..." ;;
 esac
+}
+
+function beep {
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/$USER/.beep.sh
+  sudo bash /home/$USER/.beep.sh
+  echo "@reboot sleep 60; bash /home/$USER/.beep.sh" >> /tmp/crontab_new
+  sudo crontab -l | cat - /tmp/crontab_new > crontab.txt && sudo crontab crontab.txt
 }
 
 function firstconfig {
