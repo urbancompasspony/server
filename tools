@@ -33,9 +33,9 @@ esac
 }
 
 function beep {
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/$USER/.beep.sh
-  sudo bash /home/$USER/.beep.sh
-  echo "@reboot sleep 60; bash /home/$USER/.beep.sh" >> /tmp/crontab_new
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
+  sudo bash /home/administrador/.beep.sh
+  echo "@reboot sleep 60; bash /home/administrador/.beep.sh" >> /tmp/crontab_new
   sudo crontab -l | cat - /tmp/crontab_new > crontab.txt && sudo crontab crontab.txt
 }
 
@@ -50,8 +50,8 @@ X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite | sudo bash ; firstconfig ;;
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; firstconfig ;;
-C) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/$USER/dwagent_x86.sh ; firstconfig ;;
-D) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/$USER/dwagent_generic.sh ; firstconfig ;;
+C) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh ; firstconfig ;;
+D) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh ; firstconfig ;;
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; firstconfig ;;
 X) start ;;
 esac
