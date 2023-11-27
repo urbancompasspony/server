@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# CREATE NETWORK DEVICES AS BRIDGE, NEVER AS VEPA, 'CUZ THIS CONFLICTS WITH MACVLAN DOCKER!
+
 ##############
 # Parameters #
 ##############
