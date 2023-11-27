@@ -93,8 +93,8 @@ function createvm2 {
 --memory 2048 \
 --vcpus 2 \
 --cpu host \
---network type=direct,source=$1,source_mode=vepa,mac=52:54:00:55:ea:01 \
---network type=direct,source=$2,source_mode=vepa,mac=52:54:00:55:ea:02 \
+--network type=direct,source=$1,source_mode=bridge,mac=52:54:00:55:ea:01 \
+--network type=direct,source=$2,source_mode=bridge,mac=52:54:00:55:ea:02 \
 --disk /var/lib/libvirt/images/pfsense.img \
 --os-variant=freebsd13.1 \
 --graphics vnc \
@@ -114,9 +114,9 @@ function createvm3 {
 --memory 2048 \
 --vcpus 2 \
 --cpu host \
---network type=direct,source=$1,source_mode=vepa,mac=52:54:00:55:ea:01 \
---network type=direct,source=$2,source_mode=vepa,mac=52:54:00:55:ea:02 \
---network type=direct,source=$3,source_mode=vepa,mac=52:54:00:55:ea:03 \
+--network type=direct,source=$1,source_mode=bridge,mac=52:54:00:55:ea:01 \
+--network type=direct,source=$2,source_mode=bridge,mac=52:54:00:55:ea:02 \
+--network type=direct,source=$3,source_mode=bridge,mac=52:54:00:55:ea:03 \
 --disk /var/lib/libvirt/images/pfsense.img \
 --os-variant=freebsd13.1 \
 --graphics vnc \
@@ -136,10 +136,10 @@ function createvm4 {
 --memory 2048 \
 --vcpus 2 \
 --cpu host \
---network type=direct,source=$1,source_mode=vepa,mac=52:54:00:55:ea:01 \
---network type=direct,source=$2,source_mode=vepa,mac=52:54:00:55:ea:02 \
---network type=direct,source=$3,source_mode=vepa,mac=52:54:00:55:ea:03 \
---network type=direct,source=$4,source_mode=vepa,mac=52:54:00:55:ea:04 \
+--network type=direct,source=$1,source_mode=bridge,mac=52:54:00:55:ea:01 \
+--network type=direct,source=$2,source_mode=bridge,mac=52:54:00:55:ea:02 \
+--network type=direct,source=$3,source_mode=bridge,mac=52:54:00:55:ea:03 \
+--network type=direct,source=$4,source_mode=bridge,mac=52:54:00:55:ea:04 \
 --disk /var/lib/libvirt/images/pfsense.img \
 --os-variant=freebsd13.1 \
 --graphics vnc \
