@@ -15,9 +15,7 @@ function menu04 {
   B 'Gestao de Grupos' \
   C 'Gestao de Computadores' \
   D 'Gestao de Pastas da Rede' \
-  E 'Informacoes do Dominio' \
-  F 'GPUpdate /Force' \
-  G 'Manutencao' \
+  E 'Configuracoes' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
@@ -25,9 +23,7 @@ function menu04 {
   B) menu042 ;;
   C) menu043 ;;
   D) validation ;;
-  E) menuR ;;
-  F) samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; menu04 ;;
-  G) manut ; menu04 ;;
+  E) manut ; menu04 ;;
   X) exit ;;
   esac
 }
@@ -39,8 +35,12 @@ function manut {
   C 'GPO ACL Check' \
   D 'SysVol Check' \
   E 'SysVol Reset' \
-  F 'Atualizar este Menu' \
-  X 'Voltar' 2>&1 > /dev/tty )
+  F 'GPUpdate /Force' \
+  G 'Informacoes do Dominio' \
+  H 'Exibir padroes de senhas' \
+  I 'Exibir processos do SAMBA' \
+  J 'Atualizar este Menu' \
+  X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
   A) samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
@@ -48,7 +48,11 @@ function manut {
   C) samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
   D) samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
   E) samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
-  F) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; manut ;;
+  F) samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; menu04 ;;
+  G) menuR ;;
+  H) menuS ;;
+  I) menuT ;;
+  J) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; manut ;;
   X) menu04 ;;
   esac
 }
@@ -66,7 +70,7 @@ H 'Desbloquear Usuario' \
 I 'Alterar Senha de um Usuario' \
 J 'Alterar Politica de um Usuario' \
 K 'Excluir Usuario' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && exit
 case "$var41" in
 A) menuD ;;
@@ -91,7 +95,7 @@ B 'Exibir todos os Grupos' \
 C 'Procurar Grupo' \
 D 'Exibir Usuarios de um Grupo' \
 E 'Excluir um Grupo' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && exit
 case "$var42" in
 A) menuI ;;
@@ -106,7 +110,7 @@ esac
 function menu043 {
 var43=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
 A 'Exibir todos os Computadores' \
-X 'Voltar' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && exit
 case "$var43" in
 A) menuB ;;
@@ -462,7 +466,19 @@ Versao do SAMBA: $smbv \n \n
 $domainv \n \n
 " 0 0
 
-menu04
+manut
+}
+
+function menuS {
+dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
+
+manut
+}
+
+function menuT {
+dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox  "$(samba-tool processes)" 0 0
+
+manut
 }
 
 #########################
@@ -494,7 +510,7 @@ A) list_all ; menu ;;
 B) create ; menu ;;
 C) delete ; menu ;;
 D) revalidate ; menu ;;
-X) exit ;;
+X) menu04 ;;
 esac
 
 menu04
@@ -509,7 +525,7 @@ function list_all {
     dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 5 40
   }
 
-menu
+validation
 }
 
 function create {
@@ -559,7 +575,7 @@ EOF
 ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
 smbcontrol all reload-config
 
-menu
+validation
 }
 
 function delete {
@@ -583,14 +599,14 @@ VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compa
       echo "a" > /dev/null
     }
 
-menu
+validation
 }
 
 function revalidate {
   ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
   smbcontrol all reload-config
-  menu
+  validation
 }
 
 # Start all!
-menuR
+menu04
