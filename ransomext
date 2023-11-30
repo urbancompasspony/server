@@ -3,49 +3,46 @@
 # Sudo Crontab
 # 00 8,12,15,18 * * * bash /srv/containers/scripts/ransomext
 
+main_paths01="/home/nathandrake/Área de trabalho/teste01/teste04"
+main_paths02="/home/nathandrake/Área de trabalho/teste01/teste05"
+main_paths03="/tmp"
+main_paths04="/tmp"
+main_paths05="/tmp"
+
 path_to_pentest="/srv/containers/pentest/Pentests/Ransomware_Detected"
 alternative_path="/home/administrador/Resultados_Ransomware"
 
-sudo rm "$path_to_pentest" "$alternative_path"
+[ -f "$path_to_pentest" ] && { sudo rm "$path_to_pentest"; }
+[ -f "$alternative_path" ] && { sudo rm "$alternative_path"; }
 
 extensoes="\\.micro$|\\.zepto$|\\.cerber$|\\.locky$|\\.cerber3$|\\.cryp1$|\\.mole$|\\.onion$|\\.axx$|\\.osiris$|\\.crypz$|\\.crypt$|\\.locked$|\\.odin$|\\.ccc$|\\.cerber2$|\\.sage$|\\.globe$|\\.exx$|\\.good$|\\.wallet$|\\.1txt$|\\.decrypt2017$|\\.encrypt$|\\.ezz$|\\.zzzzz$|\\.MERRY$|\\.enciphered$|\\.r5a$|\\.aesir$|\\.ecc$|\\.enigma$|\\.cryptowall$|\\.encrypted$|\\.loli$|\\.breaking_bad$|\\.coded$|\\.ha3$|\\.damage$|\\.wcry$|\\.lol!$|\\.cryptolocker$|\\.dharma$|\\.MRCR1$|\\.sexy$|\\.crjoker$|\\.fantom$|\\.keybtc@inbox_com$|\\.rrk$|\\.legion$|\\.kratos$|\\.LeChiffre$|\\.kraken$|\\.zcrypt$|\\.maya$|\\.enc$|\\.file0locked$|\\.crinf$|\\.serp$|\\.potato$|\\.ytbl$|\\.surprise$|\\.angelamerkel$|\\.windows10$|\\.lesli$|\\.serpent$|\\.PEGS1$|\\.dale$|\\.pdcr$|\\.zzz$|\\.xyz$|\\.1cbu1$|\\.venusf$|\\.coverton$|\\.thor$|\\.rnsmwr$|\\.evillock$|\\.R16m01d05$|\\.wflx$|\\.nuclear55$|\\.darkness$|\\.encr$|\\.rekt$|\\.kernel_time$|\\.zyklon$|\\.Dexter$|\\.locklock$|\\.cry$|\\.VforVendetta$|\\.btc$|\\.raid10$|\\.dCrypt$|\\.zorro$|\\.AngleWare$|\\.EnCiPhErEd$|\\.purge$|\\.realfs0ciety@sigaint.org.fs0ciety$|\\.shit$|\\.atlas$|\\.exotic$|\\.crypted$|\\.padcrypt$|\\.xxx$|\\.hush$|\\.vbransom$|\\.RMCM1$|\\.cryeye$|\\.unavailable$|\\.braincrypt$|\\.fucked$|\\.crypte$|\\._AiraCropEncrypted$|\\.stn$|\\.paym$|\\.spora$|\\.RARE1$|\\.alcatraz$|\\.pzdc$|\\.aaa$|\\.encrypted$|\\.ttt$|\\.odcodc$|\\.vvv$|\\.ruby$|\\.pays$|\\.comrade$|\\.enc$|\\.abc$|\\.xxx$|\\.antihacker2017$|\\.herbst$|\\.szf$|\\.rekt$|\\.bript$|\\.crptrgr$|\\.kkk$|\\.rdm$|\\.BarRax$|\\.vindows$|\\.helpmeencedfiles$|\\.hnumkhotep$|\\.CCCRRRPPP$|\\.kyra$|\\.fun$|\\.rip$|\\.73i87A$|\\.bitstak$|\\.kernel_complete$|\\.payrms$|\\.a5zfn$|\\.perl$|\\.noproblemwedecfiles$|\\.lcked$|\\.p5tkjw$|\\.paymrss$|\\.dxxd$|\\.pec$|\\.rokku$|\\.lock93$|\\.vxlock$|\\.pubg$|\\.crab$"
 
 extensoes2="\\.happyday$|\\.happydayzz$|\\.happydayzzz$|\\.hb15$|\\.helpdecrypt@ukr\.net$|\\.helpmeencedfiles$|\\.herbst$|\\.help$|\\.hnumkhotep$|\\.howcanihelpusir$|\\.hush$|\\.hydracrypt\.$|\\.iaufkakfhsaraf$|\\.ifuckedyou$|\\.iloveworld$|\\.infected$|\\.isis$|\\.ipYgh$|\\.iwanthelpuuu$|\\.jaff$|\\.JUST$|\\.justbtcwillhelpyou$|\\.karma$|\\.kb15$|\\.kencf$|\\.keepcalm$|\\.kernel_complete$|\\.kernel_pid$|\\.kernel_time$|\\.keybtc@inbox_com$|\\.KEYH0LES$|\\.KEYZ$|\\.keemail.me$|\\.killedXXX$|\\.kirked$|\\.kimcilware$|\\.KKK$|\\.kk$|\\.korrektor$|\\.kostya$|\\.kr3$|\\.kraken$|\\.kratos$|\\.kyra$|\\.lechiffre$|\\.L0CKED$|\\.L0cked$|\\.lambda_l0cked$|\\.LeChiffre$|\\.legion$|\\.lesli$|\\.letmetrydecfiles$|\\.lock\.$|\\.lock93$|\\.locked$|\\.Locked-by-Mafia$|\\.locked-mafiaware$|\\.locklock$|\\.locky$|\\.LOL!$|\\.omg\.$|\\.only-we_can_help_you$|\\.oor$|\\.oplata@qq.com$|\\.oshit$|\\.osiris$|\\.otherinformation$|\\.oxr$|\\.p5tkjw$|\\.pablukcrypt$|\\.padcrypt$|\\.paybtcs$|\\.paym$|\\.paymrss$|\\.payms$|\\.paymst$|\\.paymts$|\\.payransom$|\\.pdcr$|\\.PEGS1$|\\.perl$|\\.pizda@qq_com$|\\.PoAr2w$|\\.porno$|\\.potato$|\\.powerfulldecrypt$|\\.powned$|\\.pr0tect$|\\.purge$|\\.pzdc$|\\.R.i.P$|\\.r16m\.$|\\.R16M01D05$|\\.r3store$|\\.R4A$|\\.R5A$|\\.r5a$|\\.RAD$|\\.RADAMANT$|\\.raid10$|\\.RARE1$|\\.razy$|\\.RDM$|\\.rdmk$|\\.realfs0ciety@sigaint.org.fs0ciety$|\\.rekt$|\\.remind$|\\.rip$|\\.RMCM1$|\\.rmd$|\\.rnsmwr$|\\.rokku$|\\.rrk$|\\.RSNSlocked$|\\.RSplited$|\\.sage$|\\.salsa222$|\\.sanction$|\\.scl$|\\.SecureCrypted$|\\.serpent$|\\.sexy$|\\.shino$|\\.shit$|\\.sifreli$|\\.Silent$|\\.sport$|\\.stn$|\\.supercrypt$|\\.surprise$|\\.szf$|\\.t5019$|\\.TheTrumpLockerf$|\\.TheTrumpLockerfp$|\\.theworldisyours$|\\.thor$|\\.toxcrypt$|\\.troyancoder@qq_com$|\\.trun$|\\.trmt$|\\.ttt$|\\.tzu$|\\.uk-dealer@sigaint.org$|\\.unavailable$|\\.unlockvt@india.com$|\\.vault$|\\.vbransom$|\\.vekanhelpu$|\\.velikasrbija$|\\.venusf$|\\.Venusp$|\\.versiegelt$|\\.VforVendetta$|\\.vindows$|\\.viki$|\\.visioncrypt$|\\.vvv$|\\.vxLock$|\\.wallet$|\\.wcry$|\\.weareyourfriends$|\\.weencedufiles$|\\.wflx$|\\.wlu$|\\.Where_my_files.txt$|\\.Whereisyourfiles$|\\.windows10$|\\.wnx$|\\.WNCRY$|\\.wncryt$|\\.wnry$|\\.wowreadfordecryp$|\\.wowwhereismyfiles$|\\.wuciwug$|\\.www$|\\.xcri$|\\.xdata$|\\.xort$|\\.xrnt$|\\.xrtn$|\\.xtbl$|\\.xxx$|\\.xyz$|\\.ya.ru$|\\.yourransom$|\\.Z81928819$|\\.zc3791$|\\.zcrypt$|\\.zendr4$|\\.zepto$|\\.zorro$|\\.zXz$|\\.zyklon$|\\.zzz$|\\.aaa$|\\.abc$|\\.AES256$|\\.chifrator@qq_com$|\\.darkness$|\\.Encrypted$|\\.encryptedped$|\\.gruzin@qq_com$|\\.gws$|\\.ha3$|\\.helpdecrypt@ukr_net$|\\.KEYHOLES$|\\.KEYZ$|\\.kkk$|\\.one-we_can_help_you$|\\.oor$|\\.oplata@qq_com$|\\.R4A$|\\.RRK$|\\.ryp$|\\.vscrypt$|\\.zzz$|\\.wncry$|\\.wncrypt$|\\.___xratteamLucked$|\\.__AiraCropEncrypted!$|\\._AiraCropEncrypted$|\\._read_thi_file\.$|\\.31392E30362E32303136*$"
 
-notefiles=("HELPDECRYPT.TXT", "HELP_YOUR_FILES.TXT", "HELP_TO_DECRYPT_YOUR_FILES.txt", "RECOVERY_KEY.txt", "HELP_RESTORE_FILES.txt", "HELP_RECOVER_FILES.txt", "HELP_TO_SAVE_FILES.txt", "DecryptAllFiles.txt", "DECRYPT_INSTRUCTIONS.TXT", "INSTRUCCIONES_DESCIFRADO.TXT", "How_To_Recover_Files.txt", "YOUR_FILES.HTML", "YOUR_FILES.url", "encryptor_raas_readme_liesmich.txt", "Help_Decrypt.txt", "DECRYPT_INSTRUCTION.TXT", "HOW_TO_DECRYPT_FILES.TXT", "ReadDecryptFilesHere.txt", "Coin.Locker.txt", "_secret_code.txt", "About_Files.txt", "Read.txt", "ReadMe.txt", "DECRYPT_ReadMe.TXT", "DecryptAllFiles.txt", "FILESAREGONE.TXT", "IAMREADYTOPAY.TXT", "HELLOTHERE.TXT", "READTHISNOW!!!.TXT", "SECRETIDHERE.KEY", "IHAVEYOURSECRET.KEY", "SECRET.KEY", "HELPDECYPRT_YOUR_FILES.HTML", "help_decrypt_your_files.html", "HELP_TO_SAVE_FILES.txt", "RECOVERY_FILES.txt", "RECOVERY_FILE.TXT", "RECOVERY_FILE.*\.txt", "HowtoRESTORE_FILES.txt", "HowtoRestore_FILES.txt", "howto_recover_file.txt", "restorefiles.txt", "howrecover+.*\.txt", "_how_recover.txt", "recoveryfile.*\.txt", "recoverfile.*\.txt", "recoveryfile.*\.txt", "Howto_Restore_FILES.TXT", "help_recover_instructions+.*\.txt", "_Locky_recover_instructions.txt")
+notefiles=("HELPDECRYPT.TXT" "HELP_YOUR_FILES.TXT" "HELP_TO_DECRYPT_YOUR_FILES.txt" "RECOVERY_KEY.txt" "HELP_RESTORE_FILES.txt" "HELP_RECOVER_FILES.txt" "HELP_TO_SAVE_FILES.txt" "DecryptAllFiles.txt" "DECRYPT_INSTRUCTIONS.TXT" "INSTRUCCIONES_DESCIFRADO.TXT" "How_To_Recover_Files.txt" "YOUR_FILES.HTML" "YOUR_FILES.url" "encryptor_raas_readme_liesmich.txt" "Help_Decrypt.txt" "DECRYPT_INSTRUCTION.TXT" "HOW_TO_DECRYPT_FILES.TXT" "ReadDecryptFilesHere.txt" "Coin.Locker.txt" "_secret_code.txt" "About_Files.txt" "Read.txt" "ReadMe.txt" "DECRYPT_ReadMe.TXT" "DecryptAllFiles.txt" "FILESAREGONE.TXT" "IAMREADYTOPAY.TXT" "HELLOTHERE.TXT" "READTHISNOW!!!.TXT" "SECRETIDHERE.KEY" "IHAVEYOURSECRET.KEY" "SECRET.KEY" "HELPDECYPRT_YOUR_FILES.HTML" "help_decrypt_your_files.html" "HELP_TO_SAVE_FILES.txt" "RECOVERY_FILES.txt" "RECOVERY_FILE.TXT" "RECOVERY_FILE.*\.txt" "HowtoRESTORE_FILES.txt" "HowtoRestore_FILES.txt" "howto_recover_file.txt" "restorefiles.txt" "howrecover+.*\.txt" "_how_recover.txt" "recoveryfile.*\.txt" "recoverfile.*\.txt" "recoveryfile.*\.txt" "Howto_Restore_FILES.TXT" "help_recover_instructions+.*\.txt" "_Locky_recover_instructions.txt")
 
 [ "$EUID" -ne 0 ] && {
   echo "Execute esse script com sudo! Saindo..."
   exit
   }
 
-function ransom01 {
-  cat "$1" | egrep -i "$extensoes" | sudo tee -a "$path_to_pentest"
-  cat "$1" | egrep -i "$extensoes2" | sudo tee -a "$path_to_pentest"
+function ransom {
+  cat "$1" | grep -E -i "$extensoes" | sudo tee -a "$2"
+  cat "$1" | grep -E -i "$extensoes2" | sudo tee -a "$2"
 
- # for i in "${notefiles[@]}"; do
- #   grep -rl "$i" $(sudo find /mnt/ ! -path "*alpha*" ! -path "*beta*" ! -path "*gamma*" ! -path "*delta*") | sudo tee -a "$path_to_pentest"
- # done
-}
-
-function ransom02 {
-  cat "$1" | egrep -i "$extensoes" | sudo tee -a "$alternative_path"
-  cat "$1" | egrep -i "$extensoes2" | sudo tee -a "$alternative_path"
-
-#  echo "Executando Etapa 03"
-#  for i in "${notefiles[@]}"; do
-# sudo grep -rl "$i" $(sudo find /mnt/ ! -path "*alpha*" ! -path "*beta*" ! -path "*gamma*" ! -path "*delta*") | sudo tee -a "$alternative_path"
-#  done
+  for i in "${notefiles[@]}"; do
+    find "$main_paths01" "$main_paths02" "$main_paths03" "$main_paths04" "$main_paths05" -type f -name $i | sudo tee -a "$2"
+  done
 }
 
 function start {
   sudo find /srv/containers/*/log -name "syslog" | tee /tmp/listfiles
   cat /tmp/listfiles | while read LINE; do
     [ -d /srv/containers/pentest ] && {
-      ransom01 $LINE
+      ransom $LINE "$path_to_pentest"
       [ -s "$path_to_pentest" ] || { sudo rm "$path_to_pentest"; }
     } || {
-      ransom02 $LINE
+      ransom $LINE "$alternative_path"
       [ -s "$alternative_path" ] || { sudo rm "$alternative_path"; }
     }
   done
