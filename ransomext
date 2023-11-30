@@ -5,14 +5,19 @@
 # Sudo Crontab
 # 00 8,12,15,18 * * * bash /srv/containers/scripts/ransomext
 
-main_paths01="/home/nathandrake/Área de trabalho/teste01/teste04"
-main_paths02="/home/nathandrake/Área de trabalho/teste01/teste05"
+main_paths01="/tmp"
+main_paths02="/tmp"
 main_paths03="/tmp"
 main_paths04="/tmp"
 main_paths05="/tmp"
 
-path_to_pentest="/srv/containers/pentest/Pentests/Ransomware_Detected"
-alternative_path="/home/administrador/Resultados_Ransomware"
+path_pentests="/srv/containers/pentest/Pentests"
+path_to_pentest="$path_pentests/Ransomware_Detectado"
+
+path_alternative="/home/administrador"
+alternative_path="$path_alternative/Ransomware_Detectado"
+
+message00="Nenhum ransomware detectado!"
 
 ################################################################################
 
@@ -30,6 +35,9 @@ notefiles=("HELPDECRYPT.TXT" "HELP_YOUR_FILES.TXT" "HELP_TO_DECRYPT_YOUR_FILES.t
 [ -f "$path_to_pentest" ] && { sudo rm "$path_to_pentest"; }
 [ -f "$alternative_path" ] && { sudo rm "$alternative_path"; }
 
+[ -f "$path_pentests/Nenhum malware detectado na rede." ] && { sudo rm "$path_pentests/$message00"; }
+[ -f "$path_alternative/Nenhum malware detectado na rede." ] && { sudo rm "$path_alternative/$message00"; }
+
 function ransom {
   cat "$1" | grep -E -i "$extensoes" | sudo tee -a "$2"
   cat "$1" | grep -E -i "$extensoes2" | sudo tee -a "$2"
@@ -44,10 +52,10 @@ function start {
   cat /tmp/listfiles | while read LINE; do
     [ -d /srv/containers/pentest ] && {
       ransom $LINE "$path_to_pentest"
-      [ -s "$path_to_pentest" ] || { sudo rm "$path_to_pentest"; }
+      [ -s "$path_to_pentest" ] || { sudo mv "$path_to_pentest" "$path_pentests/$message00" ; }
     } || {
       ransom $LINE "$alternative_path"
-      [ -s "$alternative_path" ] || { sudo rm "$alternative_path"; }
+      [ -s "$alternative_path" ] || { sudo mv "$alternative_path" "$path_alternative/$message00" ; }
     }
   done
 }
