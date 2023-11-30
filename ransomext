@@ -1,5 +1,7 @@
 #!/bin/bash
 
+################################################################################
+
 # Sudo Crontab
 # 00 8,12,15,18 * * * bash /srv/containers/scripts/ransomext
 
@@ -12,8 +14,7 @@ main_paths05="/tmp"
 path_to_pentest="/srv/containers/pentest/Pentests/Ransomware_Detected"
 alternative_path="/home/administrador/Resultados_Ransomware"
 
-[ -f "$path_to_pentest" ] && { sudo rm "$path_to_pentest"; }
-[ -f "$alternative_path" ] && { sudo rm "$alternative_path"; }
+################################################################################
 
 extensoes="\\.micro$|\\.zepto$|\\.cerber$|\\.locky$|\\.cerber3$|\\.cryp1$|\\.mole$|\\.onion$|\\.axx$|\\.osiris$|\\.crypz$|\\.crypt$|\\.locked$|\\.odin$|\\.ccc$|\\.cerber2$|\\.sage$|\\.globe$|\\.exx$|\\.good$|\\.wallet$|\\.1txt$|\\.decrypt2017$|\\.encrypt$|\\.ezz$|\\.zzzzz$|\\.MERRY$|\\.enciphered$|\\.r5a$|\\.aesir$|\\.ecc$|\\.enigma$|\\.cryptowall$|\\.encrypted$|\\.loli$|\\.breaking_bad$|\\.coded$|\\.ha3$|\\.damage$|\\.wcry$|\\.lol!$|\\.cryptolocker$|\\.dharma$|\\.MRCR1$|\\.sexy$|\\.crjoker$|\\.fantom$|\\.keybtc@inbox_com$|\\.rrk$|\\.legion$|\\.kratos$|\\.LeChiffre$|\\.kraken$|\\.zcrypt$|\\.maya$|\\.enc$|\\.file0locked$|\\.crinf$|\\.serp$|\\.potato$|\\.ytbl$|\\.surprise$|\\.angelamerkel$|\\.windows10$|\\.lesli$|\\.serpent$|\\.PEGS1$|\\.dale$|\\.pdcr$|\\.zzz$|\\.xyz$|\\.1cbu1$|\\.venusf$|\\.coverton$|\\.thor$|\\.rnsmwr$|\\.evillock$|\\.R16m01d05$|\\.wflx$|\\.nuclear55$|\\.darkness$|\\.encr$|\\.rekt$|\\.kernel_time$|\\.zyklon$|\\.Dexter$|\\.locklock$|\\.cry$|\\.VforVendetta$|\\.btc$|\\.raid10$|\\.dCrypt$|\\.zorro$|\\.AngleWare$|\\.EnCiPhErEd$|\\.purge$|\\.realfs0ciety@sigaint.org.fs0ciety$|\\.shit$|\\.atlas$|\\.exotic$|\\.crypted$|\\.padcrypt$|\\.xxx$|\\.hush$|\\.vbransom$|\\.RMCM1$|\\.cryeye$|\\.unavailable$|\\.braincrypt$|\\.fucked$|\\.crypte$|\\._AiraCropEncrypted$|\\.stn$|\\.paym$|\\.spora$|\\.RARE1$|\\.alcatraz$|\\.pzdc$|\\.aaa$|\\.encrypted$|\\.ttt$|\\.odcodc$|\\.vvv$|\\.ruby$|\\.pays$|\\.comrade$|\\.enc$|\\.abc$|\\.xxx$|\\.antihacker2017$|\\.herbst$|\\.szf$|\\.rekt$|\\.bript$|\\.crptrgr$|\\.kkk$|\\.rdm$|\\.BarRax$|\\.vindows$|\\.helpmeencedfiles$|\\.hnumkhotep$|\\.CCCRRRPPP$|\\.kyra$|\\.fun$|\\.rip$|\\.73i87A$|\\.bitstak$|\\.kernel_complete$|\\.payrms$|\\.a5zfn$|\\.perl$|\\.noproblemwedecfiles$|\\.lcked$|\\.p5tkjw$|\\.paymrss$|\\.dxxd$|\\.pec$|\\.rokku$|\\.lock93$|\\.vxlock$|\\.pubg$|\\.crab$"
 
@@ -22,9 +23,12 @@ extensoes2="\\.happyday$|\\.happydayzz$|\\.happydayzzz$|\\.hb15$|\\.helpdecrypt@
 notefiles=("HELPDECRYPT.TXT" "HELP_YOUR_FILES.TXT" "HELP_TO_DECRYPT_YOUR_FILES.txt" "RECOVERY_KEY.txt" "HELP_RESTORE_FILES.txt" "HELP_RECOVER_FILES.txt" "HELP_TO_SAVE_FILES.txt" "DecryptAllFiles.txt" "DECRYPT_INSTRUCTIONS.TXT" "INSTRUCCIONES_DESCIFRADO.TXT" "How_To_Recover_Files.txt" "YOUR_FILES.HTML" "YOUR_FILES.url" "encryptor_raas_readme_liesmich.txt" "Help_Decrypt.txt" "DECRYPT_INSTRUCTION.TXT" "HOW_TO_DECRYPT_FILES.TXT" "ReadDecryptFilesHere.txt" "Coin.Locker.txt" "_secret_code.txt" "About_Files.txt" "Read.txt" "ReadMe.txt" "DECRYPT_ReadMe.TXT" "DecryptAllFiles.txt" "FILESAREGONE.TXT" "IAMREADYTOPAY.TXT" "HELLOTHERE.TXT" "READTHISNOW!!!.TXT" "SECRETIDHERE.KEY" "IHAVEYOURSECRET.KEY" "SECRET.KEY" "HELPDECYPRT_YOUR_FILES.HTML" "help_decrypt_your_files.html" "HELP_TO_SAVE_FILES.txt" "RECOVERY_FILES.txt" "RECOVERY_FILE.TXT" "RECOVERY_FILE.*\.txt" "HowtoRESTORE_FILES.txt" "HowtoRestore_FILES.txt" "howto_recover_file.txt" "restorefiles.txt" "howrecover+.*\.txt" "_how_recover.txt" "recoveryfile.*\.txt" "recoverfile.*\.txt" "recoveryfile.*\.txt" "Howto_Restore_FILES.TXT" "help_recover_instructions+.*\.txt" "_Locky_recover_instructions.txt")
 
 [ "$EUID" -ne 0 ] && {
-  echo "Execute esse script com sudo! Saindo..."
+  echo "Execute esse script como sudo! Saindo..."
   exit
   }
+
+[ -f "$path_to_pentest" ] && { sudo rm "$path_to_pentest"; }
+[ -f "$alternative_path" ] && { sudo rm "$alternative_path"; }
 
 function ransom {
   cat "$1" | grep -E -i "$extensoes" | sudo tee -a "$2"
