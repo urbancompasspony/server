@@ -251,7 +251,7 @@ function macvland {
     sleep 2
 
     var1="0"; var2="0"; var3="0"
-    VALUE1="192.168.0.0"; VALUE2="192.168.0.1-254?" ; VALUE3="enp2s0"
+    VALUE1="XXX.YYY.ZZ.0"; VALUE2="XXX.YYY.ZZ.1-254?" ; VALUE3="enpXsY"
 
     VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Criar novo MACVLAN" --form "MACVLAN for Containers" 10 40 0 \
 "Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
