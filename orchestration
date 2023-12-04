@@ -22,7 +22,6 @@ C 'DataBases' \
 D 'Others' \
 E 'Tools' \
 X 'Sair' 2>&1 > /dev/tty )
-
 case "$var0" in
 A) essentials ; start ;;
 B) servers ; start ;;
@@ -50,7 +49,7 @@ case "$var0" in
 4) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 5) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
 6) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
-X) start ;;
+X) echo "." > /dev/null ;;
 esac
 }
 
@@ -73,7 +72,7 @@ case "$var0" in
 5) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
 6) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
 7) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-X) start ;;
+X) echo "." > /dev/null ;;
 esac
 }
 
@@ -92,7 +91,7 @@ case "$var0" in
 3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
 4) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
 5) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
-X) start ;;
+X) echo "." > /dev/null ;;
 esac
 }
 
@@ -115,89 +114,33 @@ case "$var0" in
 5) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
 6) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
 7) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
-X) start ;;
+X) echo "." > /dev/null ;;
 esac
 }
 
 function tools {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-A 'AutoMigrate ADDC' \
-B 'AutoExport SAMBA' \
-C 'Backup ADDC' \
-D 'Backup SAMBA' \
-E 'LazyDocker' \
-F 'Set Macvlan' \
-G 'Remove Macvlan' \
-H 'PiHole Manutencao' \
-I 'Nextcloud Clear FileLocks' \
+A 'LazyDocker' \
+B 'Set Macvlan' \
+C 'Remove Macvlan' \
+D 'PiHole Manutencao' \
+E 'Nextcloud Clear FileLocks' \
+F 'AutoMigrate AD-DC' \
+G 'AutoExport SAMBA' \
+H 'Backup AD-DC' \
+I 'Backup SAMBA' \
 X '<' 2>&1 > /dev/tty )
-
 case "$var0" in
-A) wget "$github"07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
-B) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
-C) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
-D) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
-E) curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash ;;
-F) macvland ;;
-G) clear ; docker network rm macvlan ; sleep 2 ;;
-H) clear ; piholemnt ;;
-I) clear ; filelocks ;;
-X) start ;;
-esac
-}
-
-function pullall {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'PiHole' \
-2 'Dominio' \
-3 'MySQL' \
-4 'Nextcloud' \
-5 'MariaDB' \
-6 'Collabora' \
-7 'SAMBA' \
-8 'OpenSpeedTest' \
-9 'UniFi' \
-10 'Apache' \
-11 'OpenFire' \
-12 'ntfy' \
-13 'RustDesk' \
-14 'SSH DW' \
-15 'ReverseProxy' \
-16 'OracleXE 21C' \
-17 'SSH DW' \
-18 'G.L.P.I.' \
-19 'NO-Ip' \
-20 'Syncthing' \
-21 'Syncthing Relay' \
-22 'xpra Ubuntu 22.04 Gnome' \
-23 'xpra virt-manager' \
-X '<' 2>&1 > /dev/tty )
-
-case "$var0" in
-1) docker pull pihole/pihole:latest ;;
-2) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/domain:latest; } || { docker pull urbancompasspony/domain-arm:latest; } ;;
-3) docker pull mysql:8 ;;
-4) docker pull nextcloud:"$nv" ;;
-5) docker pull mariadb:latest ;;
-6) docker pull collabora/code:latest ;;
-7) [ $(arch) = "x86_64" ] && { docker pull urbancompasspony/migrate-samba:latest; } || { docker pull urbancompasspony/migrate-samba-arm:latest; } ;;
-8) docker pull openspeedtest/latest:latest ;;
-9) docker pull lscr.io/linuxserver/unifi-controller:latest ;;
-10) docker pull httpd:2.4 ;;
-11) docker pull urbancompasspony/openfire:latest ;;
-12) docker pull binwiederhier/ntfy ;;
-13) docker pull rustdesk/rustdesk-server ;;
-14) docker pull urbancompasspony/ssh-dw:latest ;;
-15) docker pull urbancompasspony/reverseproxy:latest ;;
-16) docker pull urbancompasspony/centosoracle:latest ;;
-17) docker pull urbancompasspony/ssh-dw:latest ;;
-18) docker pull diouxx/glpi ;;
-19) docker pull coppit/no-ip ;;
-20) docker pull syncthing/syncthing:latest ;;
-21) docker pull t4skforce/syncthing-relay:latest ;;
-22) docker pull urbancompasspony/xpra-ubuntu:latest ;;
-23) docker pull urbancompasspony/xpra-virt-manager:latest ;;
-X) start ;;
+A) curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash ;;
+B) macvland ;;
+C) clear ; docker network rm macvlan ; sleep 2 ;;
+D) clear ; piholemnt ;;
+E) clear ; filelocks ;;
+F) wget "$github"07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
+G) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
+H) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
+I) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
+X) echo "." > /dev/null ;;
 esac
 }
 
