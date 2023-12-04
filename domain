@@ -6,24 +6,20 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Variaveis Globais
 export bktitle="Active Directory & Domain Controller"
-export ttitle="Server Menu v3.5"
+export ttitle="Server Menu v4"
 
 # Controlador de Dominio
 function menu04 {
   var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
-  A 'Gestao de Usuarios' \
-  B 'Gestao de Grupos' \
-  C 'Gestao de Computadores' \
-  D 'Gestao de Pastas da Rede' \
-  E 'Configuracoes' \
+  A 'Usuarios & Grupos' \
+  B 'Gestao de Pastas da Rede' \
+  C 'Settings' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
-  A) menu041 ;;
-  B) menu042 ;;
-  C) menu043 ;;
-  D) validation ;;
-  E) manut ; menu04 ;;
+  A) menu041 ; menu04 ;;
+  B) validation ; menu04 ;;
+  C) manut ; menu04 ;;
   X) exit ;;
   esac
 }
@@ -36,110 +32,89 @@ function manut {
   D 'SysVol Check' \
   E 'SysVol Reset' \
   F 'GPUpdate /Force' \
-  G 'Informacoes do Dominio' \
-  H 'Exibir padroes de senhas' \
-  I 'Exibir processos do SAMBA' \
-  J 'Atualizar este Menu' \
+  G 'Domain information' \
+  H 'Password information' \
+  I 'Show SMB processes' \
+  J 'Update this menu' \
   X '<' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && exit
+  [ $? -ne 0 ] && return
   case "$var4" in
   A) samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
   B) samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
   C) samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
   D) samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
   E) samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
-  F) samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; menu04 ;;
-  G) menuR ;;
-  H) menuS ;;
-  I) menuT ;;
+  F) samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; manut ;;
+  G) menuR ; manut ;;
+  H) menuS ; manut ;;
+  I) menuT ; manut ;;
   J) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; manut ;;
-  X) menu04 ;;
+  X) echo "." >/dev/null ;;
   esac
 }
 
 function menu041 {
 var41=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
-A 'Criar Usuario' \
-B 'Exibir todos os Usuarios' \
-C 'Procurar Usuario' \
-D 'Exibir Grupos de Usuario' \
-E 'Adicionar Usuario a um Grupo' \
-F 'Remover Usuario de um Grupo' \
-G 'Bloquear Usuario' \
-H 'Desbloquear Usuario' \
-I 'Alterar Senha de um Usuario' \
-J 'Alterar Politica de um Usuario' \
-K 'Excluir Usuario' \
+1 'Criar Usuario' \
+2 'Criar Grupo' \
+3 'Exibir todos os Usuarios' \
+4 'Exibir todos os Grupos' \
+5 'Procurar Usuario' \
+6 'Procurar Grupo' \
+7 'Exibir Grupos de Usuario' \
+8 'Exibir Usuarios de um Grupo' \
+9 'Adicionar Usuario a um Grupo' \
+10 'Remover Usuario de um Grupo' \
+11 'Bloquear Usuario' \
+12 'Desbloquear Usuario' \
+13 'Alterar Senha de um Usuario' \
+14 'Alterar Politica de um Usuario' \
+15 'Excluir Usuario' \
+16 'Excluir um Grupo' \
+17 'Exibir todos os Computadores' \
 X '<' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && exit
+[ $? -ne 0 ] && return
 case "$var41" in
-A) menuD ;;
-B) menuA ;;
-C) menuP ;;
-D) menuO ;;
-E) menuJ ;;
-F) menuL ;;
-G) menuF ;;
-H) menuG ;;
-I) menuE ;;
-J) menuN ;;
-K) menuH ;;
-X) menu04 ;;
-esac
-}
-
-function menu042 {
-var42=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
-A 'Criar Grupo' \
-B 'Exibir todos os Grupos' \
-C 'Procurar Grupo' \
-D 'Exibir Usuarios de um Grupo' \
-E 'Excluir um Grupo' \
-X '<' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && exit
-case "$var42" in
-A) menuI ;;
-B) menuC ;;
-C) menuQ ;;
-D) menuK ;;
-E) menuM ;;
-X) menu04 ;;
-esac
-}
-
-function menu043 {
-var43=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
-A 'Exibir todos os Computadores' \
-X '<' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && exit
-case "$var43" in
-A) menuB ;;
-X) menu04 ;;
+1) menuD ; menu041 ;;
+2) menuI ; menu041 ;;
+3) menuA ; menu041 ;;
+4) menuC ; menu041 ;;
+5) menuP ; menu041 ;;
+6) menuQ ; menu041 ;;
+7) menuO ; menu041 ;;
+8) menuK ; menu041 ;;
+9) menuJ ; menu041 ;;
+10) menuL ; menu041 ;;
+11) menuF ; menu041 ;;
+12) menuG ; menu041 ;;
+13) menuE ; menu041 ;;
+14) menuN ; menu041 ;;
+15) menuH ; menu041 ;;
+16) menuM ; menu041 ;;
+17) menuB ; menu041 ;;
+X) echo "." >/dev/null ;;
 esac
 }
 
 function menuA {
 dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os Usuarios! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
-[ $? -ne 0 ] && menu041
+[ $? -ne 0 ] && return
 usrlst=$(samba-tool user list)
 echo "$usrlst" | less
-menu041
 }
 
 function menuB {
 dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os Computadores! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
-[ $? -ne 0 ] && menu043
+[ $? -ne 0 ] && return
 cmplist=$(samba-tool computer list)
 echo "$cmplist" | less
-menu043
 }
 
 function menuC {
 dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
-[ $? -ne 0 ] && menu042
+[ $? -ne 0 ] && return
 grplist=$(samba-tool group list)
 echo "$grplist" | less
-menu042
 }
 
 function menuD {
@@ -153,7 +128,7 @@ Navegue com as setas para cima e baixo." 15 50 0 \
 "Exibicao:" 2 1 "$VALUE2" 2 10 34 0 \
 "Senha:" 3 1 "$VALUE3" 3 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && menu041
+[ $? -ne 0 ] && return
 validusr1=$(echo "$VALUE0" | sed -n 1p)
 validsur1=$(echo "$VALUE0" | sed -n 2p)
 validpss1=$(echo "$VALUE0" | sed -n 3p)
@@ -161,11 +136,12 @@ validpss1=$(echo "$VALUE0" | sed -n 3p)
   dialog --title "ERRO" --msgbox "Nao deixe nenhum campo vazio!" 8 40
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr1")
-  [ "$repeated" = "$validusr1" ] && {
-    dialog --title "Informacao" --msgbox "O usuario $validusr1 ja existe!" 8 40
+  repeated2=$(samba-tool group list | grep -x "$validusr1")
+  [ "$repeated" = "$validusr1" ] || [ "$repeated2" = "$validusr1" ] && {
+    dialog --title "Informacao" --msgbox "Conflito detectado! \nO usuario $validusr1 nao sera criado!" 8 40
   } || {
     dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "$validusr1 deve trocar a senha ao logar? \n
-Esta opcao só pode ser definida agora. Se escolher Nao, devera usar o RSAT caso mude de ideia." 8 40
+Se escolher Nao, devera usar o RSAT caso mude de ideia." 8 40
     [ $? = 0 ] && {
        samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1" --must-change-at-next-login
       dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "A senha de $validusr nunca expira?" 0 0
@@ -190,7 +166,6 @@ Esta opcao só pode ser definida agora. Se escolher Nao, devera usar o RSAT caso
   }
 }
 
-menu041
 }
 
 function menuE {
@@ -212,7 +187,6 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
     }
 }
 
-menu041
 }
 
 function menuF {
@@ -229,7 +203,6 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
     }
 }
 
-menu041
 }
 
 function menuG {
@@ -246,7 +219,6 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
     }
 }
 
-menu041
 }
 
 function menuH {
@@ -268,7 +240,6 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   }
 }
 
-menu041
 }
 
 function menuI {
@@ -276,16 +247,16 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
 } || {
-  repeated=$(samba-tool group list | grep -x "$validgrp")
-  [ "$repeated" = "$validgrp" ] && {
-    dialog --title "Informacao" --msgbox "O grupo $validgrp ja existe!" 6 20
+  repeated=$(samba-tool user list | grep -x "$validgrp")
+  repeated2=$(samba-tool group list | grep -x "$validgrp")
+  [ "$repeated" = "$validgrp" ] || [ "$repeated2" = "$validgrp" ] && {
+    dialog --title "Informacao" --msgbox "Conflito detectado! O grupo $validgrp nao sera criado!" 8 40
   } || {
     samba-tool group add "$validgrp"
     dialog --title "Informacao" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
     }
 }
 
-menu042
 }
 
 function menuJ {
@@ -309,10 +280,8 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
     } || {
       dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
       }
-  menu041
     }
   }
-menu042
 }
 
 function menuK {
@@ -330,7 +299,6 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   }
 }
 
-menu042
 }
 
 function menuL {
@@ -357,7 +325,6 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   }
 }
 
-menu041
 }
 
 function menuM {
@@ -379,7 +346,6 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   }
 }
 
-menu042
 }
 
 function menuN {
@@ -401,7 +367,6 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
     }
 }
 
-menu041
 }
 
 function menuO {
@@ -419,12 +384,11 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
     }
 }
 
-menu041
 }
 
 function menuP {
 validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario. \n
-Exemplo: joao_naves" 8 40 2>&1 > /dev/tty)
+Exemplo: joao_naves" 9 40 2>&1 > /dev/tty)
 [ -z "$validusr1" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
 } || {
@@ -436,12 +400,11 @@ Exemplo: joao_naves" 8 40 2>&1 > /dev/tty)
     }
 }
 
-menu041
 }
 
 function menuQ {
 validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de grupo" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && menu042
+[ $? -ne 0 ] && return
 
 [ -z "$validgrp1" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
@@ -454,7 +417,6 @@ validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
     }
 }
 
-menu042
 }
 
 function menuR {
@@ -465,20 +427,14 @@ Nome da Maquina: $HOSTNAME \n \n
 Versao do SAMBA: $smbv \n \n
 $domainv \n \n
 " 0 0
-
-manut
 }
 
 function menuS {
-dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
-
-manut
+  dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
 }
 
 function menuT {
-dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox  "$(samba-tool processes)" 0 0
-
-manut
+  dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox  "$(samba-tool processes)" 0 0
 }
 
 #########################
@@ -490,7 +446,6 @@ function validation {
   [ $result = sim ] && {
     menu
   } || {
-    clear
     dialog --title "ERRO" --msgbox "Sub-sistema INCLUDE nao encontrado para este Dominio! \n
 O editor de pastas compartilhadas nao pode continuar. \n
 Por favor, configure-o manualmente e tente novamente." 10 50
@@ -510,10 +465,8 @@ A) list_all ; menu ;;
 B) create ; menu ;;
 C) delete ; menu ;;
 D) revalidate ; menu ;;
-X) menu04 ;;
+X) echo "." >/dev/null ;;
 esac
-
-menu04
 }
 
 function list_all {
@@ -524,8 +477,6 @@ function list_all {
     clear
     dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 5 40
   }
-
-validation
 }
 
 function create {
@@ -543,7 +494,7 @@ VALUE5="yes"
 "Browser :" 5 1 "$VALUE5" 5 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
-  [ $? -ne 0 ] && exit
+  [ $? -ne 0 ] && return
 
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
@@ -574,8 +525,6 @@ EOF
 
 ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
 smbcontrol all reload-config
-
-validation
 }
 
 function delete {
@@ -598,14 +547,11 @@ VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compa
     } || {
       echo "a" > /dev/null
     }
-
-validation
 }
 
 function revalidate {
   ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
   smbcontrol all reload-config
-  validation
 }
 
 # Start all!
