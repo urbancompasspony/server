@@ -125,10 +125,6 @@ B 'Set Macvlan' \
 C 'Remove Macvlan' \
 D 'PiHole Manutencao' \
 E 'Nextcloud Clear FileLocks' \
-F 'AutoMigrate AD-DC' \
-G 'AutoExport SAMBA' \
-H 'Backup AD-DC' \
-I 'Backup SAMBA' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash ;;
@@ -136,10 +132,6 @@ B) macvland ;;
 C) clear ; docker network rm macvlan ; sleep 2 ;;
 D) clear ; piholemnt ;;
 E) clear ; filelocks ;;
-F) wget "$github"07.1-AutoMigrateADDC.sh -O /tmp/migrateaddc; sudo bash /tmp/migrateaddc ;;
-G) wget "$github"08.1-AutoExport_Samba.sh -O /tmp/migratesamba; sudo bash /tmp/migratesamba ;;
-H) wget "$github"07.2-BackupADDC.sh -O /tmp/backupaddc; sudo bash /tmp/backupaddc ;;
-I) wget "$github"08.2-Backup_SAMBA -O /tmp/backupsmb; sudo bash /tmp/backupsmb ;;
 X) echo "." > /dev/null ;;
 esac
 }
