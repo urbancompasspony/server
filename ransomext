@@ -2,7 +2,7 @@
 
 ################################################################################
 
-# Sudo Crontab
+# RansomExt
 # 00 8,12,15,18 * * * bash /srv/containers/scripts/ransomext
 
 main_paths01="/tmp"
