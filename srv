@@ -40,7 +40,7 @@ hash0=$(echo "$password" | md5sum | awk '{print $1}')
 hash1="fe5dfdd991450623c39efc7705e47ad5"
 
 function start {
-var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
+var0=$(dialog --title "Escolha um sub menu" --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
 A 'Orchestra' \
 B 'Managers' \
 C 'Settings' \
