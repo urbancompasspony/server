@@ -39,12 +39,12 @@ function manut {
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
-  A) samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
-  B) samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
-  C) samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
-  D) samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
-  E) samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
-  F) samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; manut ;;
+  A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
+  B) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
+  C) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
+  D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
+  E) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
+  F) clear ; samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; manut ;;
   G) menuR ; manut ;;
   H) menuS ; manut ;;
   I) menuT ; manut ;;
