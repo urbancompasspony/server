@@ -26,24 +26,24 @@ function menu04 {
 
 function manut {
   var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
-  A '> SysVol Check <' \
-  B 'dbcheck well-known-acls' \
-  C 'GPO ACL Check' \
+  A 'SYSVOL CHECK' \
+  B 'SysVol Reset' \
+  C 'dbcheck well-known-acls' \
   D 'dbcheck' \
-  E 'SysVol Reset' \
-  F 'GPUpdate /Force' \
-  G 'Domain information' \
-  H 'Password information' \
+  E 'GPO ACL Check' \
+  F 'GPUpdate /Force via SMB' \
+  G 'Domain details' \
+  H 'Password details' \
   I 'Show SMB processes' \
-  J 'Update this menu' \
+  J 'Upgrade this menu' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
   A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
-  B) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
-  C) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
+  B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
+  C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
   D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
-  E) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
+  E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
   F) clear ; samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; manut ;;
   G) menuR ; manut ;;
   H) menuS ; manut ;;
