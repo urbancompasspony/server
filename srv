@@ -44,15 +44,11 @@ var0=$(dialog --title "Escolha um sub menu" --backtitle "Bem-Vindo ao Server Man
 A 'Orchestra' \
 B 'Managers' \
 C 'Settings' \
-D 'Reboot Server' \
-E 'Shutdown Server' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ; start ;;
 B) managers ; start ;;
 C) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-D) reb00t ; start ;;
-E) shutd0 ; start ;;
 X) exit ;;
 esac
 }
