@@ -149,6 +149,8 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
     var1=$(echo "$VALUE0" | sed -n 1p)
     clear
     docker exec "$var1" bash -c "pihole -g -r recover"
+    docker exec "$var1" bash -c "rm /etc/pihole/pihole-FTL.db"
+    docker restart "$var1"
 }
 
 function filelocks {
