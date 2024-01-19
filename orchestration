@@ -104,6 +104,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'xpra virt-manager (L/W)' \
 6 'No-IP (W)' \
 7 'VDesktop Ubuntu 22.04 (L/W)' \
+8 'Ollama - IA' \
+9 'Ollama - WebUI' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -114,6 +116,8 @@ case "$var0" in
 5) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
 6) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
 7) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
+8) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+9) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
 X) echo "." > /dev/null ;;
 esac
 }
