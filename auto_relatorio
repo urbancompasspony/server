@@ -3,10 +3,10 @@
 datetime=$(date +"%d/%m - %H:%M:")
 
 #setfolder=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
-setfolder="/home/nathandrake/Área de trabalho"
+setfolder="/home/nathandrake/Particular/0_ThinkPad/Desktop/0 RELATORIOS"
 
 function relat0 {
-var0=$(dialog --title 'Relatórios' --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
+var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
 A 'Atualização de Sistema' \
 B 'SMART Dump' \
 C 'Backup Localhost' \
@@ -14,9 +14,8 @@ D 'Manutenção Domínio' \
 E 'Manutenção do PiHole' \
 F 'Pentest' \
 G 'SysLogs' \
-H 'Customizado' \
-Y 'Voltar' \
-X 'Sair' 2>&1 > /dev/tty ) 
+H 'Customizado' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && start
 case "$var0" in
 A) upgrade0 ; relat0 ;;
 B) smartdump0 ; relat0 ;;
@@ -26,8 +25,6 @@ E) pihole0 ; relat0 ;;
 F) pentest0 ; relat0 ;;
 G) syslog0 ; relat0 ;;
 H) custom0 ; relat0 ;;
-Y) start ;;
-X) exit ;;
 esac
 }
 
@@ -86,7 +83,7 @@ function start {
   files=() # Esvaziar a variável; Loop pasta, adicionar arquivos ao array
 while IFS= read -r -d $'\0' file; do
     files+=("$file" "")
-done < <(find "$setfolder" -maxdepth 1 -type f -name "*.txt" -print0)
+done < <(find "$setfolder" -maxdepth 2 -type f -name "*.txt" -print0)
 # para todos os arquivos: done < <(find "/home" -maxdepth 1 -type f -print0)
 
 # Verificar se há pelo menos 1 arquivo ou gerar erro.
@@ -94,7 +91,7 @@ done < <(find "$setfolder" -maxdepth 1 -type f -name "*.txt" -print0)
     clear
     echo "Nenhum arquivo encontrado em $directory"
   } || {
-    file=$(dialog --stdout --title "Escolha um documento" --cancel-label "Voltar" --menu "Escolha:" 0 0 0 "${files[@]}")
+    file=$(dialog --stdout --title "Escolha um documento" --cancel-label "Sair" --menu "Escolha:" 0 0 0 "${files[@]}")
     [ $? -ne 0 ] && exit # Se pressionar Voltar nesta tela, ele sai do programa!
     clear
 
