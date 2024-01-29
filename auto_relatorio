@@ -3,7 +3,7 @@
 datetime=$(date +"%d/%m - %H:%M:")
 
 #setfolder=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
-setfolder="/home/nathandrake/Particular/0_ThinkPad/Desktop/0 RELATORIOS"
+setfolder="/srv/relatorios"
 
 function relat0 {
 var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
