@@ -1,0 +1,107 @@
+#!/bin/bash
+
+datetime=$(date +"%d/%m - %H:%M:")
+
+#setfolder=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
+setfolder="/home/nathandrake/Área de trabalho"
+
+function relat0 {
+var0=$(dialog --title 'Relatórios' --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
+A 'Atualização de Sistema' \
+B 'SMART Dump' \
+C 'Backup Localhost' \
+D 'Manutenção Domínio' \
+E 'Manutenção do PiHole' \
+F 'Pentest' \
+G 'SysLogs' \
+H 'Customizado' \
+Y 'Voltar' \
+X 'Sair' 2>&1 > /dev/tty ) 
+case "$var0" in
+A) upgrade0 ; relat0 ;;
+B) smartdump0 ; relat0 ;;
+C) backup0 ; relat0 ;;
+D) domain0 ; relat0 ;;
+E) pihole0 ; relat0 ;;
+F) pentest0 ; relat0 ;;
+G) syslog0 ; relat0 ;;
+H) custom0 ; relat0 ;;
+Y) start ;;
+X) exit ;;
+esac
+}
+
+function upgrade0 {
+  echo "$datetime Nesta data o servidor foi atualizado e está em dia com a segurança digital.
+" >> "$file"
+}
+
+function smartdump0 {
+  echo "$datetime Foi realizada a verificação da saúde dos discos rígidos.
+Mais informações no anexo SMART_DUMP do e-mail.
+" >> "$file"
+}
+
+function backup0 {
+  echo "$datetime Foi realizada a verificação das rotinas de backup do servidor.
+O backup em nuvem, se existente, também foi verificado.
+" >> "$file"
+}
+
+function domain0 {
+  echo "$datetime Foi realizada a verificação da integridade do Domínio.
+" >> "$file"
+}
+
+function pihole0 {
+  echo "$datetime Nesta data o serviço de DNS foi atualizado e as listas de bloqueio
+foram revalidadas.
+" >> "$file"
+}
+
+function pentest0 {
+  echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
+Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notificados.
+" >> "$file"
+}
+
+function syslog0 {
+  echo "$datetime Foi realizada a verificação da integridade dos Logs de Eventos
+das pastas da rede e se os registros de uso, dos compartilhamentos, estão em dia.
+" >> "$file"
+}
+
+function custom0 {
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Relatório" --form "Customizado" 8 40 0 \
+"Relat:" 1 1 "$VALUE1" 1 8 100 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+#[ $? -ne 0 ] && relat0 # Não precisa disso se já chamou a função lá em cima
+var1=$(echo "$VALUE0" | sed -n 1p)
+
+  echo "$datetime $var1
+" >> "$file"
+}
+
+function start {
+  files=() # Esvaziar a variável; Loop pasta, adicionar arquivos ao array
+while IFS= read -r -d $'\0' file; do
+    files+=("$file" "")
+done < <(find "$setfolder" -maxdepth 1 -type f -name "*.txt" -print0)
+# para todos os arquivos: done < <(find "/home" -maxdepth 1 -type f -print0)
+
+# Verificar se há pelo menos 1 arquivo ou gerar erro.
+  [ ${#files[@]} -eq 0 ] && {
+    clear
+    echo "Nenhum arquivo encontrado em $directory"
+  } || {
+    file=$(dialog --stdout --title "Escolha um documento" --cancel-label "Voltar" --menu "Escolha:" 0 0 0 "${files[@]}")
+    [ $? -ne 0 ] && exit # Se pressionar Voltar nesta tela, ele sai do programa!
+    clear
+
+    relat0
+  }
+}
+
+start
+
+exit 0
