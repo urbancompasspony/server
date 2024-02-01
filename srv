@@ -84,7 +84,7 @@ function reb00t {
   }
 }
 
-hash1="576200e78f0ab25b437dc7372ae920d9"
+hash1="7c6126d9cc35fccb0c8a3a42147ea85f"
 
 function shutd0 {
   dialog --title 'Desligar' --backtitle "Desligamento" --yesno 'Deseja desligar este sistema?' 0 0
