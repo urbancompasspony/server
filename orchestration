@@ -20,7 +20,7 @@ A 'Essentials' \
 B 'Servers' \
 C 'DataBases' \
 D 'Others' \
-E 'Tools' \
+E 'Maintenance' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) essentials ; start ;;
@@ -124,14 +124,14 @@ esac
 
 function tools {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-A 'LazyDocker' \
+A 'Retore Backup' \
 B 'Set Macvlan' \
 C 'Remove Macvlan' \
 D 'PiHole Manutencao' \
 E 'Nextcloud Clear FileLocks' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-A) curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash ;;
+A) clear ; restorebkp ;;
 B) macvland ;;
 C) clear ; docker network rm macvlan ; sleep 2 ;;
 D) clear ; piholemnt ;;
@@ -225,6 +225,13 @@ function macvland {
 function dialognet {
   dialog --title "Informação" --msgbox "Checar a existencia de altnames nas informacoes a seguir!" 7 40
   dialog --title "Informação" --msgbox "$(ip a)" 25 70
+}
+
+function restorebkp {
+echo "em breve!"
+sleep 2
+# /srv/containers/scripts/pathrestore
+#sudo tar -xvf dominio-30_01_24.tar -C /srv/containers/
 }
 
 ###############
