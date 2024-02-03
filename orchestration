@@ -81,16 +81,16 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'MySQL (W)' \
 2 'MariaDB (W)' \
 3 'OracleXE 21C (W)' \
-4 'PHP My Admin (L)' \
-5 'Firebird (W)' \
+4 'Firebird (W)' \
+5 'PHP My Admin (L)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
 2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
 3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
-4) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
-5) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
+4) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
+5) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -100,39 +100,35 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'OpenSpeedtest (W)' \
 2 'SSH DW (L)' \
 3 'Syncthing - Client (L/W)' \
-4 'Syncthing Relay - Server (W)' \
-5 'xpra virt-manager (L/W)' \
-6 'No-IP (W)' \
-7 'VDesktop Ubuntu 22.04 (L/W)' \
-8 'Ollama - IA' \
-9 'Ollama - WebUI' \
+4 'xpra virt-manager (L/W)' \
+5 'No-IP (W)' \
+6 'Ollama: IA' \
+7 'Ollama: WebUI' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
 1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-4) wget "$github"42.1-syncrelay -O /tmp/syncrelay; sudo bash /tmp/syncrelay ;;
-5) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
-6) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
-7) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
-8) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-9) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+4) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+5) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
+6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
 X) echo "." > /dev/null ;;
 esac
 }
 
 function tools {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-A 'Retore Backup' \
-B 'Set Macvlan' \
-C 'Remove Macvlan' \
-D 'PiHole Manutencao' \
-E 'Nextcloud Clear FileLocks' \
+A 'Retore a Backup' \
+B 'Set MACVLAN' \
+C 'Remove MACVLAN' \
+D 'PiHole: Maintenance' \
+E 'Nextcloud: Clear FileLocks' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) clear ; restorebkp ;;
-B) macvland ;;
+B) clear ; macvland ;;
 C) clear ; docker network rm macvlan ; sleep 2 ;;
 D) clear ; piholemnt ;;
 E) clear ; filelocks ;;
