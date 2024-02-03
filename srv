@@ -57,18 +57,16 @@ esac
 
 function managers {
 var0=$(dialog --title ' ' --backtitle "Managers" --menu " " 0 0 0 \
-A 'LazyDocker Manager' \
-B 'TUI VM Manager' \
-C 'Active Directory' \
-D 'Samba Folder Mgr' \
-E 'Start Desktop' \
+A 'TUI VM Manager' \
+B 'Active Directory' \
+C 'Samba Folder Mgr' \
+D 'Start Desktop' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-A) lazydocker ; managers ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
-C) clear ; dialog --title "Informação" --msgbox "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" 6 40 ; exit ;;
-D) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/smb_folder_manager | bash ; managers ;;
-E) clear ; dialog --title "Informação" --msgbox "Digite startx para entrar no modo Desktop!" 5 50 ; exit ;;
+A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
+B) clear ; dialog --title "Informação" --msgbox "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" 6 40 ; exit ;;
+C) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/smb_folder_manager | bash ; managers ;;
+D) clear ; dialog --title "Informação" --msgbox "Digite startx para entrar no modo Desktop!" 5 50 ; exit ;;
 X) echo "." >/dev/null ;;
 esac
 }
