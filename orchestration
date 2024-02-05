@@ -141,6 +141,7 @@ esac
 }
 
 function missingindices {
+VALUE1="nextcloud"
 VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "MySQL - NextCloud" 9 35 0 \
 "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -159,6 +160,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "MySQL - NextCloud
 }
 
 function checkcore {
+VALUE1="nextcloud"
 VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "MySQL - NextCloud" 9 35 0 \
 "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -194,6 +196,8 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
 }
 
 function filelocks {
+VALUE1="nextcloud-mysql"
+
 VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "MySQL - NextCloud" 9 35 0 \
 "mSQLcont:" 1 1 "$VALUE1" 1 11 30 0 \
 "Password:" 2 1 "$VALUE2" 2 11 30 0 \
