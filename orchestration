@@ -39,7 +39,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'NextCloud (W)' \
 4 'Pentest (L/W)' \
 5 'FTP Server (W)' \
-6 'SMB Server (W)' \
+6 'CUPS Printer (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -48,7 +48,7 @@ case "$var0" in
 3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
 4) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 5) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-6) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
+6) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -104,6 +104,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'No-IP (W)' \
 6 'Ollama: IA' \
 7 'Ollama: WebUI' \
+8 'SMB Server (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -114,6 +115,7 @@ case "$var0" in
 5) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
 6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
 7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+8) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
 X) echo "." > /dev/null ;;
 esac
 }
