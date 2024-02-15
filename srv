@@ -43,14 +43,16 @@ function start {
 var0=$(dialog --title "Escolha um sub menu" --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
 A 'Orchestra' \
 B 'Managers' \
-C 'Settings' \
-D 'Atualizar Bashrc' \
+C 'Maintenance' \
+D 'Auto Relatorios' \
+E 'Atualizar Bashrc' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
 B) managers ; start ;;
 C) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_relatorio | bash ; start ;;
+E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
 X) exit ;;
 esac
 }
