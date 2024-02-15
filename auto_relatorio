@@ -12,26 +12,28 @@ dateonly=$(date +"%m / %Y")
 
 function relat0 {
 var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
-A 'Cabecalho do Relatorio' \
-B 'Atualizacao de Sistema' \
-C 'Gerar SMART_DUMP' \
-D 'Manutencao do Dominio' \
-E 'Manutencao do PiHole' \
-F 'Status Pentesting' \
-G 'SysLogs do SAMBA' \
-H 'Status dos Backups' \
-I 'Relat. Custom' 2>&1 > /dev/tty )
+A 'Atualizacao de Sistema' \
+B 'Gerar SMART_DUMP' \
+C 'Manutencao do Dominio' \
+D 'Manutencao do PiHole' \
+E 'Status Pentesting' \
+F 'SysLogs do SAMBA' \
+G 'Status dos Backups' \
+H 'Relat. Custom' \
+I 'CUIDADO: Cabecalho' \
+X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var0" in
-A) cabecalho ; relat0 ;;
-B) upgrade0 ; relat0 ;;
-C) smartdump0 ; relat0 ;;
-D) domain0 ; relat0 ;;
-E) pihole0 ; relat0 ;;
-F) pentest0 ; relat0 ;;
-G) syslog0 ; relat0 ;;
-H) backup0 ; relat0 ;;
-I) custom0 ; relat0 ;;
+A) upgrade0 ; relat0 ;;
+B) smartdump0 ; relat0 ;;
+C) domain0 ; relat0 ;;
+D) pihole0 ; relat0 ;;
+E) pentest0 ; relat0 ;;
+F) syslog0 ; relat0 ;;
+G) backup0 ; relat0 ;;
+H) custom0 ; relat0 ;;
+I) cabecalho ; relat0 ;;
+X) echo a > /dev/null ;;
 esac
 }
 
@@ -105,7 +107,6 @@ function pentest0 {
   ls -la /srv/containers/pentest/Pentests/Likely_Vulnerable; read
   echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
 Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notificados.
-Nenhum arquivo suspeito ou que mereça atenção foi identificado como perigoso na rede.
 " >> "$file"
 }
 
