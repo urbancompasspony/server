@@ -1,24 +1,27 @@
 #!/bin/bash
 
-datetime=$(date +"%d/%m - %H:%M:")
-dateonly=$(date +"%d/%m/%y")
-
-#setfolder=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
 setfolder="/srv/relatorios"
 
-sudo touch $setfolder/relatorio.txt
+#setfolder=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
+
+# ============================================================================ #
+
+randomminutes=$(dc -e `date +%N`' 60 % p')
+
+datetime=$(date +"%d/$randomminutes - %H:%M:")
+dateonly=$(date +"%d/%m/%y")
 
 function relat0 {
 var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
 A 'Cabecalho do Relatorio' \
 B 'Atualizacao de Sistema' \
-C 'SMART_DUMP' \
-D 'Manutencao Dominio' \
+C 'Gerar SMART_DUMP' \
+D 'Manutencao do Dominio' \
 E 'Manutencao do PiHole' \
-F 'Pentest' \
-G 'SysLogs' \
-H 'Backup Localhost' \
-I 'Customizado' 2>&1 > /dev/tty )
+F 'Status Pentesting' \
+G 'SysLogs do SAMBA' \
+H 'Status dos Backups' \
+I 'Relat. Custom' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var0" in
 A) cabecalho ; relat0 ;;
@@ -196,6 +199,12 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
     docker restart "$var1"
 }
 
+[ "$EUID" -ne 0 ] && {
+  echo "Execute esse script com sudo! Saindo..."
+  exit
+  }
+
+sudo touch $setfolder/relatorio.txt
 start
 
 exit 0
