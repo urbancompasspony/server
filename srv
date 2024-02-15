@@ -66,7 +66,7 @@ D 'Start Desktop' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
-B) clear ; dialog --title "Informação" --msgbox "Digite domain para entrar no painel de controle do AD-DC SAMBA4!" 6 40 ; exit ;;
+B) clear ; docker exec -it dominio bash ; exit ;;
 C) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/smb_folder_manager | bash ; managers ;;
 D) clear ; dialog --title "Informação" --msgbox "Digite startx para entrar no modo Desktop!" 5 50 ; exit ;;
 X) echo "." >/dev/null ;;
