@@ -9,7 +9,7 @@ setfolder="/srv/relatorios"
 randomminutes=$(dc -e `date +%N`' 60 % p')
 
 datetime=$(date +"%d/$randomminutes - %H:%M:")
-dateonly=$(date +"%d/%m/%y")
+dateonly=$(date +"%m / %Y")
 
 function relat0 {
 var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
