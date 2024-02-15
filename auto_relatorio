@@ -105,6 +105,7 @@ function pentest0 {
   ls -la /srv/containers/pentest/Pentests/Likely_Vulnerable; read
   echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
 Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notificados.
+Nenhum arquivo suspeito ou que mereça atenção foi identificado como perigoso na rede.
 " >> "$file"
 }
 
