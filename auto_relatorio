@@ -7,7 +7,6 @@ setfolder="/srv/relatorios"
 # ============================================================================ #
 
 randomminutes=$(dc -e `date +%N`' 60 % p')
-
 datetime=$(date +"%d/$randomminutes - %H:%M:")
 dateonly=$(date +"%m / %Y")
 
@@ -179,7 +178,7 @@ function smartdump {
     }
 
 echo "" >> SMART_DUMP
-echo "Verificacao concluida! Pressione Enter para sair." >> SMART_DUMP
+echo "Verificacao concluida em $datetime ! Pressione Enter para sair." >> SMART_DUMP
 }
 
 function piholemnt {
