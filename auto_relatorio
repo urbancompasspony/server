@@ -51,6 +51,7 @@ function upgrade0 {
   clear
   apt update -y &&
   apt upgrade -y &&
+  apt autoremove -y &&
   echo "$datetime Nesta data o servidor foi atualizado e está em dia com a segurança digital.
 " >> "$file"
 }
