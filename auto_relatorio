@@ -1,68 +1,113 @@
 #!/bin/bash
 
 datetime=$(date +"%d/%m - %H:%M:")
+dateonly=$(date +"%d/%m/%y")
 
 #setfolder=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
 setfolder="/srv/relatorios"
 
+sudo touch $setfolder/relatorio.txt
+
 function relat0 {
 var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
-A 'Atualização de Sistema' \
-B 'SMART Dump' \
-C 'Backup Localhost' \
-D 'Manutenção Domínio' \
-E 'Manutenção do PiHole' \
+A 'Cabecalho do Relatorio' \
+B 'Atualizacao de Sistema' \
+C 'SMART_DUMP' \
+D 'Manutencao Dominio' \
+E 'Manutencao do PiHole' \
 F 'Pentest' \
 G 'SysLogs' \
-H 'Customizado' 2>&1 > /dev/tty )
+H 'Backup Localhost' \
+I 'Customizado' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var0" in
-A) upgrade0 ; relat0 ;;
-B) smartdump0 ; relat0 ;;
-C) backup0 ; relat0 ;;
+A) cabecalho ; relat0 ;;
+B) upgrade0 ; relat0 ;;
+C) smartdump0 ; relat0 ;;
 D) domain0 ; relat0 ;;
 E) pihole0 ; relat0 ;;
 F) pentest0 ; relat0 ;;
 G) syslog0 ; relat0 ;;
-H) custom0 ; relat0 ;;
+H) backup0 ; relat0 ;;
+I) custom0 ; relat0 ;;
 esac
 }
 
+function cabecalho {
+  clear
+  echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA
+Conforme estipulado em contrato mensal de prestação de serviços na área de
+informática, segue abaixo o relatório de suporte, manutenções preventivas e
+corretivas executados no período de $dateonly:
+" > "$file"
+  cat $file
+  sleep 3
+}
+
 function upgrade0 {
+  export DEBIAN_FRONTEND=noninteractive
+  clear
+  apt update -y &&
+  apt upgrade -y &&
   echo "$datetime Nesta data o servidor foi atualizado e está em dia com a segurança digital.
 " >> "$file"
 }
 
 function smartdump0 {
+  clear
+  smartdump
+  clear
+  cat /home/administrador/SMART_DUMP
+  read
   echo "$datetime Foi realizada a verificação da saúde dos discos rígidos.
 Mais informações no anexo SMART_DUMP do e-mail.
 " >> "$file"
 }
 
 function backup0 {
+  clear
+  df -h; read
+  clear
+  journalctl -b 0 | grep rsnap; read
+  clear
+  journalctl -b 0 | grep rsync; read
+  clear
+  journalctl -b 0 | grep rclone; read
+  clear
+  destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
+  ls -la $destiny; read
+  clear
   echo "$datetime Foi realizada a verificação das rotinas de backup do servidor.
 O backup em nuvem, se existente, também foi verificado.
 " >> "$file"
 }
 
 function domain0 {
+  clear
+  docker exec -it dominio bash
   echo "$datetime Foi realizada a verificação da integridade do Domínio.
 " >> "$file"
 }
 
 function pihole0 {
+  clear
+  piholemnt
   echo "$datetime Nesta data o serviço de DNS foi atualizado e as listas de bloqueio
 foram revalidadas.
 " >> "$file"
 }
 
 function pentest0 {
+  clear
+  ls -la /srv/containers/pentest/Pentests/Likely_Vulnerable; read
   echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
 Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notificados.
 " >> "$file"
 }
 
 function syslog0 {
+  clear
+  cat /srv/containers/*/log/syslog | grep renameat | tail; read
   echo "$datetime Foi realizada a verificação da integridade dos Logs de Eventos
 das pastas da rede e se os registros de uso, dos compartilhamentos, estão em dia.
 " >> "$file"
@@ -97,6 +142,58 @@ done < <(find "$setfolder" -maxdepth 2 -type f -name "*.txt" -print0)
 
     relat0
   }
+}
+
+function smartdump {
+  # Clear SMART_DUMP File
+  rm SMART_DUMP
+  touch SMART_DUMP
+  
+  # Check SMART of block devices /dev/sdX
+  for i in a b c d e f g h i j k l m n o p
+    do
+      sudo skdump /dev/sd$i >> SMART_DUMP
+    done
+
+  # Check if there is NVME
+  [ -b /dev/nvme0n1 ] && {
+    for i in 1 2 3 4 5 6 7 8
+      do
+        sudo smartctl -a /dev/nvme0n1p$i >> SMART_DUMP
+      done
+  } || {
+    echo "NVME not present."
+  }
+
+  # Check if there is MegaRAID
+  [ $4 = 1 ] && {
+    for i in 0 1 2 3 4 5 6 7 8
+      do
+        sudo smartctl -d megaraid,$i -a /dev/sg$5 >> SMART_DUMP
+      done
+    } || {
+      echo "MegaRAID not present."
+    }
+
+echo "" >> SMART_DUMP
+echo "Verificacao concluida! Pressione Enter para sair." >> SMART_DUMP
+}
+
+function piholemnt {
+VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
+"NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    clear
+    docker exec "$var1" bash -c "pihole -g -r recover"
+    docker exec "$var1" bash -c "rm /etc/pihole/pihole-FTL.db"
+    docker restart "$var1"
 }
 
 start
