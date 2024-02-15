@@ -203,6 +203,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
   exit
   }
 
+sudo mkdir -p $setfolder
 sudo touch $setfolder/relatorio.txt
 start
 
