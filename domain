@@ -32,10 +32,11 @@ function manut {
   D 'dbcheck' \
   E 'GPO ACL Check' \
   F 'GPUpdate /Force via SMB' \
-  G 'Domain details' \
-  H 'Password details' \
-  I 'Show SMB processes' \
-  J 'Upgrade this menu' \
+  G 'Upgrade MSI Files: ADMX' \
+  H 'Domain details' \
+  I 'Password details' \
+  J 'Show SMB processes' \
+  K 'Upgrade this menu' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -45,10 +46,11 @@ function manut {
   D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
   F) clear ; samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; manut ;;
-  G) menuR ; manut ;;
-  H) menuS ; manut ;;
-  I) menuT ; manut ;;
-  J) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; manut ;;
+  G) clear ; samba-tool gpo admxload -U Administrator --admx-dir="/msifiles" ; manut ;;
+  H) menuR ; manut ;;
+  I) menuS ; manut ;;
+  J) menuT ; manut ;;
+  K) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; manut ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -556,3 +558,5 @@ function revalidate {
 
 # Start all!
 menu04
+
+# EDITOR=nano ldbedit -H /var/lib/samba/private/sam.ldb --cross-ncs "(objectClass=nTDSDSA)" msDS-Behavior-Version
