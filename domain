@@ -13,13 +13,15 @@ function menu04 {
   var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
   A 'Usuarios & Grupos' \
   B 'Gestao de Pastas da Rede' \
-  C 'Settings' \
+  C 'Unidades Organizacionais' \
+  D 'Settings' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
   A) menu041 ; menu04 ;;
   B) validation ; menu04 ;;
-  C) manut ; menu04 ;;
+  C) menuOUs ; menu04 ;;
+  D) manut ; menu04 ;;
   X) exit ;;
   esac
 }
@@ -96,6 +98,11 @@ case "$var41" in
 17) menuB ; menu041 ;;
 X) echo "." >/dev/null ;;
 esac
+}
+
+function menuOUs {
+  echo "em breve!"
+  sleep 3
 }
 
 function menuA {
