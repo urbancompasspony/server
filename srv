@@ -120,7 +120,7 @@ function shutd0 {
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
     . .bashrc    
     sudo apt update
-    sudo apt install sshpass dialog curl lm-sensors arp-scan traceroute libatasmart-bin udpcast cifs-utils
+    sudo apt install sshpass dialog curl lm-sensors arp-scan traceroute libatasmart-bin udpcast cifs-utils smbclient
     touch /home/$USER/.installed
     init
     }
