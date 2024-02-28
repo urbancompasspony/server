@@ -357,5 +357,6 @@ ipdst1=$(echo "$VALUE0" | sed -n 5p)
   sshpass -p "$pass1" ssh $tunneloptions "$user1"@"$path1" -N -L 4321:"$ipdst1":"$prt1"
 }
 
-sudo apt install dialog cifs-utils smbclient -y
 start
+
+exit 1
