@@ -105,6 +105,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'Ollama: IA' \
 7 'Ollama: WebUI' \
 8 'SMB Server (W)' \
+9 'Collabora Office' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -116,6 +117,7 @@ case "$var0" in
 6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
 7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
 8) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
+9) wget "$github"25-collabora -O /tmp/collab; sudo bash /tmp/collab ;;
 X) echo "." > /dev/null ;;
 esac
 }
