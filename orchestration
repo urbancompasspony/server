@@ -106,7 +106,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 7 'Ollama: WebUI (L)' \
 8 'SMB Server (W)' \
 9 'Collabora (IP Only - W)' \
-10 'OnlyOffice' (W) \
+10 'OnlyOffice (W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
