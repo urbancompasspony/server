@@ -102,10 +102,11 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'Syncthing - Client (L/W)' \
 4 'xpra virt-manager (L/W)' \
 5 'No-IP (W)' \
-6 'Ollama: IA' \
-7 'Ollama: WebUI' \
+6 'Ollama: IA (L)' \
+7 'Ollama: WebUI (L)' \
 8 'SMB Server (W)' \
-9 'Collabora Office' \
+9 'Collabora (IP Only - W)' \
+10 'OnlyOffice' (W) \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -118,6 +119,7 @@ case "$var0" in
 7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
 8) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
 9) wget "$github"25-collabora -O /tmp/collab; sudo bash /tmp/collab ;;
+10) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 X) echo "." > /dev/null ;;
 esac
 }
