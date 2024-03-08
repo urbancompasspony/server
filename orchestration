@@ -107,6 +107,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 8 'SMB Server (W)' \
 9 'Collabora (IP Only - W)' \
 10 'OnlyOffice (W)' \
+11 'Windows VMs (L/W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -120,6 +121,7 @@ case "$var0" in
 8) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
 9) wget "$github"25-collabora -O /tmp/collab; sudo bash /tmp/collab ;;
 10) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+11) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
 X) echo "." > /dev/null ;;
 esac
 }
