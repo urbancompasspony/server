@@ -107,7 +107,7 @@ function shutd0 {
   [ -f /usr/bin/pacman ] && {
     clear
     echo ""
-    echo -e "\033[39;5mPor favor, insira a senha do usuário $USER!\033[0m"
+    echo -e "\033[39;5mPor favor, insira a senha do usuário $USER\033[0m"
     echo ""
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
     . .bashrc
@@ -117,7 +117,7 @@ function shutd0 {
   } || {
     clear
     echo ""
-    echo -e "\033[39;5mPor favor, insira a senha do usuário $USER!\033[0m"
+    echo -e "\033[39;5mPor favor, insira a senha do usuário $USER\033[0m"
     echo ""
 
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
