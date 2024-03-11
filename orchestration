@@ -99,15 +99,13 @@ function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'OpenSpeedtest (W)' \
 2 'SSH DW (L)' \
-3 'Syncthing - Client (L/W)' \
+3 'Syncthing: Client (L/W)' \
 4 'xpra virt-manager (L/W)' \
-5 'No-IP (W)' \
-6 'Ollama: IA (L)' \
-7 'Ollama: WebUI (L)' \
-8 'SMB Server (W)' \
-9 'Collabora (IP Only - W)' \
-10 'OnlyOffice (W)' \
-11 'Windows VMs (L/W)' \
+5 'Ollama: IA (L)' \
+6 'Ollama: WebUI (L)' \
+7 'SMB Server (W)' \
+8 'OnlyOffice (W)' \
+9 'Windows VMs (L/W)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -115,13 +113,11 @@ case "$var0" in
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 4) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
-5) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
-6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-8) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
-9) wget "$github"25-collabora -O /tmp/collab; sudo bash /tmp/collab ;;
-10) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-11) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
+5) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+6) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+7) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
+8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+9) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
 X) echo "." > /dev/null ;;
 esac
 }
