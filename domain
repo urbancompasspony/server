@@ -62,6 +62,8 @@ function manut {
 function menuhelp {
 clear
 echo " "
+echo "If using a modified version of Windows, like ReviCC, there is a big chance to have problems!"
+echo " "
 echo "Issue: Can't add users or groups to Security Filtering!"
 echo "When trying, it is still blank. Ignored command. Some errors on ACL Permissions."
 echo "Solution: UNjoin client machine from AD, rename the machine and join again!"
