@@ -38,7 +38,8 @@ function manut {
   H 'Domain details' \
   I 'Password details' \
   J 'Show SMB processes' \
-  K 'Upgrade this menu' \
+  K 'Help!' \
+  L 'Upgrade this menu' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -52,9 +53,22 @@ function manut {
   H) menuR ; manut ;;
   I) menuS ; manut ;;
   J) menuT ; manut ;;
-  K) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; manut ;;
+  K) menuhelp ; manut ;;
+  L) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; manut ;;
   X) echo "." >/dev/null ;;
   esac
+}
+
+function menuhelp {
+clear
+echo " "
+echo "Issue: Can't add users or groups to Security Filtering!"
+echo "When trying, it is still blank. Ignored command. Some errors on ACL Permissions."
+echo "Solution: UNjoin client machine from AD, rename the machine and join again!"
+echo "Sad, but it is the only and simple solution. This problem comes from"
+echo "losting some kind of AD Trust Relationship."
+echo ""
+sleep 5
 }
 
 function menu041 {
