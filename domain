@@ -79,7 +79,7 @@ var41=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
 3 'Exibir todos os Usuarios' \
 4 'Exibir todos os Grupos' \
 5 'Verificar Usuario' \
-6 'Procurar Grupo' \
+6 'Verificar Grupo' \
 7 'Exibir Grupos de Usuario' \
 8 'Exibir Usuarios de um Grupo' \
 9 'Adicionar Usuario a um Grupo' \
@@ -440,9 +440,14 @@ validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
 } || {
   repeated3=$(samba-tool group list | grep -x "$validgrp1")
   [ "$repeated3" = "$validgrp1" ] && {
-    dialog --title "Informacao" --msgbox "O grupo $validgrp1 ja foi cadastrado!" 8 40
+    dialog --title "Informacao" --msgbox "O grupo $validgrp1 esta cadastrado!" 8 40
+    clear
+    dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os dados! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
+    [ $? -ne 0 ] && return
+    grpdata=$(samba-tool group show $validusr1)
+    echo "$grpdata" | less
   } || {
-    dialog --title "Informacao" --msgbox "O grupo $validgrp1 nao foi encontrado." 8 40
+    dialog --title "Informacao" --msgbox "O grupo $validgrp1 nao foi encontrado neste servidor." 8 40
     }
 }
 
