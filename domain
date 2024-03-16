@@ -38,7 +38,7 @@ function manut {
   H 'Domain details' \
   I 'Password details' \
   J 'Show SMB processes' \
-  K 'Help!' \
+  K 'FAQ & Help!' \
   L 'Upgrade this menu' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
@@ -78,7 +78,7 @@ var41=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
 2 'Criar Grupo' \
 3 'Exibir todos os Usuarios' \
 4 'Exibir todos os Grupos' \
-5 'Procurar Usuario' \
+5 'Verificar Usuario' \
 6 'Procurar Grupo' \
 7 'Exibir Grupos de Usuario' \
 8 'Exibir Usuarios de um Grupo' \
@@ -418,9 +418,14 @@ Exemplo: joao_naves" 9 40 2>&1 > /dev/tty)
 } || {
   repeated2=$(samba-tool user list | grep -x "$validusr1")
   [ "$repeated2" = "$validusr1" ] && {
-    dialog --title "Informacao" --msgbox "O usuario $validusr1 ja foi cadastrado!" 8 40
+    dialog --title "Informacao" --msgbox "O usuario $validusr1 esta cadastrado!" 8 40
+    clear
+    dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os dados! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
+    [ $? -ne 0 ] && return
+    usrdata=$(samba-tool user show $validusr1)
+    echo "$usrdata" | less
   } || {
-    dialog --title "Informacao" --msgbox "O usuario $validusr1 nao foi encontrado." 8 40
+    dialog --title "Informacao" --msgbox "O usuario $validusr1 nao foi encontrado neste servidor." 8 40
     }
 }
 
