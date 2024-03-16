@@ -88,9 +88,10 @@ var41=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
 12 'Desbloquear Usuario' \
 13 'Alterar Senha de um Usuario' \
 14 'Alterar Politica de um Usuario' \
-15 'Excluir Usuario' \
-16 'Excluir um Grupo' \
-17 'Exibir todos os Computadores' \
+15 'Testar Senha de Usuario' \
+16 'Excluir Usuario' \
+17 'Excluir um Grupo' \
+18 'Exibir todos os Computadores' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
@@ -108,9 +109,10 @@ case "$var41" in
 12) menuG ; menu041 ;;
 13) menuE ; menu041 ;;
 14) menuN ; menu041 ;;
-15) menuH ; menu041 ;;
-16) menuM ; menu041 ;;
-17) menuB ; menu041 ;;
+15) menupass ; menu41 ;;
+16) menuH ; menu041 ;;
+17) menuM ; menu041 ;;
+18) menuB ; menu041 ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -429,6 +431,11 @@ Exemplo: joao_naves" 9 40 2>&1 > /dev/tty)
     }
 }
 
+}
+
+function menupass {
+echo "em breve!"
+echo "kinit USER"
 }
 
 function menuQ {
