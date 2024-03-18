@@ -14,16 +14,140 @@ function menu04 {
   A 'Usuarios & Grupos' \
   B 'Gestao de Pastas da Rede' \
   C 'Unidades Organizacionais' \
-  D 'Settings' \
+  D 'Ferramentas de Usuarios' \
+  E 'Ferramentas de Dominio' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
   A) menu041 ; menu04 ;;
   B) validation ; menu04 ;;
   C) menuOUs ; menu04 ;;
-  D) manut ; menu04 ;;
+  D) menutools ; menu04 ;;
+  E) manut ; menu04 ;;
   X) exit ;;
   esac
+}
+
+function menutools {
+var41=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
+1 'Verificar Usuario' \
+2 'Verificar Grupo' \
+3 'Bloquear Usuario' \
+4 'Desbloquear Usuario' \
+5 'Promote Usuario a Admin' \
+6 'Demote Usuario de Admin' \
+7 'Alterar Senha de um Usuario' \
+8 'Alterar Politica de um Usuario' \
+9 'Testar Senha de Usuario' \
+10 'Excluir um Usuario' \
+11 'Excluir um Grupo' \
+X '<' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && return
+case "$var41" in
+1) menuP ; menutools ;;
+2) menuQ ; menutools ;;
+3) menuF ; menutools ;;
+4) menuG ; menutools ;;
+5) menuautoadmin ; menutools ;;
+6) menuremoadmin ; menutools ;;
+7) menuE ; menutools ;;
+8) menuN ; menutools ;;
+9) menupass ; menutools ;;
+10) menuH ; menutools ;;
+11) menuM ; menutools ;;
+X) echo "." >/dev/null ;;
+esac
+}
+
+function menuautoadmin {
+validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] && {
+  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
+} || {
+  repeated=$(samba-tool user list | grep -x "$validusr")
+  [ "$repeated" = "$validusr" ] && {
+      clear
+
+      samba-tool group addmembers "Domain Admins" "$validusr"
+      sleep 1
+
+      samba-tool group addmembers "Schema Admins" "$validusr"
+      sleep 1
+
+      samba-tool group addmembers "Enterprise Admins" "$validusr"
+      sleep 1
+
+      samba-tool group addmembers "Group Policy Creator Owners" "$validusr"
+      sleep 1
+
+      samba-tool group addmembers "Administrators" "$validusr"
+      sleep 1
+
+      dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
+  } || {
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    }
+}
+
+}
+
+function menuremoadmin {
+validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] && {
+  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
+} || {
+  repeated=$(samba-tool user list | grep -x "$validusr")
+  [ "$repeated" = "$validusr" ] && {
+      clear
+
+      samba-tool group removemembers "Domain Admins" "$validusr"
+      sleep 1
+
+      samba-tool group removemembers "Schema Admins" "$validusr"
+      sleep 1
+
+      samba-tool group removemembers "Enterprise Admins" "$validusr"
+      sleep 1
+
+      samba-tool group removemembers "Group Policy Creator Owners" "$validusr"
+      sleep 1
+
+      samba-tool group removemembers "Administrators" "$validusr"
+      sleep 1
+
+      dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
+  } || {
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    }
+}
+
+}
+
+function menu041 {
+var41=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
+1 'Criar Usuario' \
+2 'Criar Grupo' \
+3 'Exibir todos os Usuarios' \
+4 'Exibir todos os Grupos' \
+5 'Exibir Grupos de Usuario' \
+6 'Exibir Usuarios de um Grupo' \
+7 'Adicionar Usuario a um Grupo' \
+8 'Remover Usuario de um Grupo' \
+9 'Exibir todos os Computadores' \
+X '<' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && return
+case "$var41" in
+1) menuD ; menu041 ;;
+2) menuI ; menu041 ;;
+3) menuA ; menu041 ;;
+4) menuC ; menu041 ;;
+5) menuO ; menu041 ;;
+6) menuK ; menu041 ;;
+7) menuJ ; menu041 ;;
+8) menuL ; menu041 ;;
+9) menuB ; menu041 ;;
+X) echo "." >/dev/null ;;
+esac
 }
 
 function manut {
@@ -61,6 +185,7 @@ function manut {
 
 function menuhelp {
 clear
+
 echo " "
 echo "If using a modified version of Windows, like ReviCC, there is a big chance to have problems!"
 echo " "
@@ -69,52 +194,7 @@ echo "When trying, it is still blank. Ignored command. Some errors on ACL Permis
 echo "Solution: UNjoin client machine from AD, rename the machine and join again!"
 echo "Sad, but it is the only and simple solution. This problem comes from"
 echo "losting some kind of AD Trust Relationship."
-echo ""
-}
-
-function menu041 {
-var41=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
-1 'Criar Usuario' \
-2 'Criar Grupo' \
-3 'Exibir todos os Usuarios' \
-4 'Exibir todos os Grupos' \
-5 'Verificar Usuario' \
-6 'Verificar Grupo' \
-7 'Exibir Grupos de Usuario' \
-8 'Exibir Usuarios de um Grupo' \
-9 'Adicionar Usuario a um Grupo' \
-10 'Remover Usuario de um Grupo' \
-11 'Bloquear Usuario' \
-12 'Desbloquear Usuario' \
-13 'Alterar Senha de um Usuario' \
-14 'Alterar Politica de um Usuario' \
-15 'Testar Senha de Usuario' \
-16 'Excluir Usuario' \
-17 'Excluir um Grupo' \
-18 'Exibir todos os Computadores' \
-X '<' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && return
-case "$var41" in
-1) menuD ; menu041 ;;
-2) menuI ; menu041 ;;
-3) menuA ; menu041 ;;
-4) menuC ; menu041 ;;
-5) menuP ; menu041 ;;
-6) menuQ ; menu041 ;;
-7) menuO ; menu041 ;;
-8) menuK ; menu041 ;;
-9) menuJ ; menu041 ;;
-10) menuL ; menu041 ;;
-11) menuF ; menu041 ;;
-12) menuG ; menu041 ;;
-13) menuE ; menu041 ;;
-14) menuN ; menu041 ;;
-15) menupass ; menu41 ;;
-16) menuH ; menu041 ;;
-17) menuM ; menu041 ;;
-18) menuB ; menu041 ;;
-X) echo "." >/dev/null ;;
-esac
+echo " "
 }
 
 function menuOUs {
