@@ -514,8 +514,21 @@ Exemplo: joao_naves" 9 40 2>&1 > /dev/tty)
 }
 
 function menupass {
-echo "em breve!"
-echo "kinit USER"
+validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] && {
+  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
+} || {
+  repeated=$(samba-tool user list | grep -x "$validusr")
+  [ "$repeated" = "$validusr" ] && {
+      clear
+      kinit "$validusr"
+      echo ""
+      read -p "Pressione Enter para continuar!"
+  } || {
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    }
+}
+
 }
 
 function menuQ {
