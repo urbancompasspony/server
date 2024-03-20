@@ -106,6 +106,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 7 'SMB Server (W)' \
 8 'OnlyOffice (W)' \
 9 'Windows VMs (L/W)' \
+10 'tmate server (L)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -118,6 +119,7 @@ case "$var0" in
 7) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
 8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 9) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
+10) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
 X) echo "." > /dev/null ;;
 esac
 }
