@@ -6,6 +6,7 @@ A 'Retore a Backup' \
 B 'Set MACVLAN' \
 C 'Remove MACVLAN' \
 D 'PiHole: Maintenance' \
+E 'PiHole Install Error' \
 E 'Nextcloud: filelocks' \
 F 'Nextcloud: add-missing-indices' \
 G 'Nextcloud: check-core' \
@@ -16,6 +17,7 @@ A) clear ; restorebkp ;;
 B) clear ; macvland ;;
 C) clear ; docker network rm macvlan ; sleep 2 ;;
 D) clear ; piholemnt ;;
+E) clear ; piholeinst ;;
 E) clear ; filelocks ;;
 F) clear ; missingindices ;;
 G) clear ; checkcore ;;
@@ -23,8 +25,6 @@ H) clear ; disableldap ;;
 X) echo "." > /dev/null ;;
 esac
 }
-
-
 
 function disableldap {
 VALUE1="nextcloud"
@@ -98,6 +98,23 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
     clear
     docker exec "$var1" bash -c "pihole -g -r recover"
     docker exec "$var1" bash -c "rm /etc/pihole/pihole-FTL.db"
+    docker restart "$var1"
+}
+
+function piholeinst {
+VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
+"NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    clear
+    docker exec "$var1" bash -c "rm /etc/pihole/gravity.db"
+    docker exec "$var1" bash -c "pihole -g"
     docker restart "$var1"
 }
 
