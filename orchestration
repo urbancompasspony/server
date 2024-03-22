@@ -19,7 +19,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 A 'Essentials' \
 B 'Servers' \
 C 'DataBases' \
-D 'Others' \
+D 'Misc' \
 E 'Maintenance' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
@@ -27,7 +27,7 @@ A) essentials ; start ;;
 B) servers ; start ;;
 C) database ; start ;;
 D) others ; start ;;
-E) tools ; start ;;
+E) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
 X) exit ;;
 esac
 }
@@ -122,184 +122,6 @@ case "$var0" in
 10) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
 X) echo "." > /dev/null ;;
 esac
-}
-
-function tools {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-A 'Retore a Backup' \
-B 'Set MACVLAN' \
-C 'Remove MACVLAN' \
-D 'PiHole: Maintenance' \
-E 'Nextcloud: filelocks' \
-F 'Nextcloud: add-missing-indices' \
-G 'Nextcloud: check-core' \
-H 'Nextcloud: Disable LDAP' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-A) clear ; restorebkp ;;
-B) clear ; macvland ;;
-C) clear ; docker network rm macvlan ; sleep 2 ;;
-D) clear ; piholemnt ;;
-E) clear ; filelocks ;;
-F) clear ; missingindices ;;
-G) clear ; checkcore ;;
-H) clear ; disableldap ;;
-X) echo "." > /dev/null ;;
-esac
-}
-
-function disableldap {
-VALUE1="nextcloud"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Disable LDAP" 9 35 0 \
-"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
-
-    var1=$(echo "$VALUE0" | sed -n 1p)
-
-    clear
-    echo "Disabling LDAP Backend!"
-    docker exec -u 33 "$var1" ./occ ldap:set-config "s01" "ldapConfigurationActive" "0"
-    sleep 2
-    docker restart "$var1"
-    sleep 5
-}
-
-function checkcore {
-VALUE1="nextcloud"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
-"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
-
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    clear
-    echo "Checking core integrity..."
-    docker exec -u 33 "$var1" ./occ integrity:check-core
-    sleep 5
-}
-
-function missingindices {
-VALUE1="nextcloud"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
-"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
-
-    var1=$(echo "$VALUE0" | sed -n 1p)
-
-    clear
-    echo "Adding missing indices..."
-    docker exec -u 33 "$var1" ./occ db:add-missing-indices
-    sleep 5
-}
-
-function piholemnt {
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
-"NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
-
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    clear
-    docker exec "$var1" bash -c "pihole -g -r recover"
-    docker exec "$var1" bash -c "rm /etc/pihole/pihole-FTL.db"
-    docker restart "$var1"
-}
-
-function filelocks {
-VALUE1="nextcloud-mysql"
-
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "MySQL - NextCloud" 9 35 0 \
-"mSQLcont:" 1 1 "$VALUE1" 1 11 30 0 \
-"Password:" 2 1 "$VALUE2" 2 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
-
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    var2=$(echo "$VALUE0" | sed -n 2p)
-
-    clear
-    echo "File Locks atualmente no Banco de Dados:"
-    docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
-    sleep 5
-    docker exec "$var1" mysql --user=root --password="$var2" -D nextcloud -e 'delete from oc_file_locks where 1'
-    sleep 1
-    clear
-    echo "Conferencia de limpeza de File Locks:"
-    docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
-    echo "Se nada aparecer aqui, foi limpo com sucesso!"
-    sleep 3
-}
-
-function macvland {
-  macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
-  [ "$macvlanr" = "no" ] && {
-    clear
-    echo "Macvlan não encontrado. Criando..."
-    sleep 2
-
-    var1="0"; var2="0"; var3="0"
-    VALUE1="XXX.YYY.ZZ.0"; VALUE2="XXX.YYY.ZZ.1-254?" ; VALUE3="enpXsY"
-
-    VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Criar novo MACVLAN" --form "MACVLAN for Containers" 10 40 0 \
-"Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
-"Gateway :" 2 1 "$VALUE2" 2 11 30 0 \
-"Parent  :" 3 1 "$VALUE3" 3 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-      2) dialognet ; macvland ;;
-    esac
-
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    var2=$(echo "$VALUE0" | sed -n 2p)
-    var3=$(echo "$VALUE0" | sed -n 3p)
-
-    [ "$var1" = "0" ] || [ "$var2" = "0" ] || [ "$var3" = "0" ] && {
-      clear
-      echo "Não deixe nenhum campo vazio!"
-      macvland
-    } || {
-      docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" macvlan
-    }
-  } || {
-    echo "." > /dev/null
-  }
-}
-
-function dialognet {
-  dialog --title "Informação" --msgbox "Checar a existencia de altnames nas informacoes a seguir!" 7 40
-  dialog --title "Informação" --msgbox "$(ip a)" 25 70
-}
-
-function restorebkp {
-echo "em breve!"
-sleep 2
-# /srv/containers/scripts/pathrestore
-#sudo tar -xvf dominio-30_01_24.tar -C /srv/containers/
 }
 
 ###############
