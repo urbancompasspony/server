@@ -11,18 +11,18 @@ export ttitle="Server Menu v4"
 # Controlador de Dominio
 function menu04 {
   var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
-  A 'Usuarios & Grupos' \
-  B 'Gestao de Pastas da Rede' \
-  C 'Unidades Organizacionais' \
-  D 'Ferramentas de Usuarios' \
-  E 'Ferramentas de Dominio' \
+  A 'Ferramentas Aditivas U&G' \
+  B 'Ferramentas Destrutivas U&G' \
+  C 'Gestao de Pastas Compartilhadas' \
+  D 'Gerenciar Unidades Organizacionais' \
+  E 'Manutencao Geral do Dominio' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
   A) menu041 ; menu04 ;;
-  B) validation ; menu04 ;;
-  C) menuOUs ; menu04 ;;
-  D) menutools ; menu04 ;;
+  B) menutools ; menu04 ;;
+  C) validation ; menu04 ;;
+  D) menuOUs ; menu04 ;;
   E) manut ; menu04 ;;
   X) exit ;;
   esac
@@ -30,31 +30,31 @@ function menu04 {
 
 function menutools {
 var41=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
-1 'Verificar Usuario' \
-2 'Verificar Grupo' \
-3 'Bloquear Usuario' \
-4 'Desbloquear Usuario' \
-5 'Promote Usuario a Admin' \
-6 'Demote Usuario de Admin' \
-7 'Alterar Senha de um Usuario' \
-8 'Alterar Politica de um Usuario' \
-9 'Testar Senha de Usuario' \
-10 'Excluir um Usuario' \
-11 'Excluir um Grupo' \
+A 'Bloquear Usuario' \
+B 'Desbloquear Usuario' \
+C 'Adicionar Usuario a um Grupo' \
+D 'Remover Usuario de um Grupo' \
+E 'Promote Usuario a Admin' \
+F 'Demote Usuario de Admin' \
+G 'Alterar Senha de um Usuario' \
+H 'Alterar Politica de um Usuario' \
+I 'Excluir um Usuario' \
+J 'Excluir um Grupo' \
+K 'Excluir um Computador' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
-1) menuP ; menutools ;;
-2) menuQ ; menutools ;;
-3) menuF ; menutools ;;
-4) menuG ; menutools ;;
-5) menuautoadmin ; menutools ;;
-6) menuremoadmin ; menutools ;;
-7) menuE ; menutools ;;
-8) menuN ; menutools ;;
-9) menupass ; menutools ;;
-10) menuH ; menutools ;;
-11) menuM ; menutools ;;
+A) menuF ; menutools ;;
+B) menuG ; menutools ;;
+C) menuJ ; menu041 ;;
+D) menuL ; menu041 ;;
+E) menuautoadmin ; menutools ;;
+F) menuremoadmin ; menutools ;;
+G) menuE ; menutools ;;
+H) menuN ; menutools ;;
+I) menuH ; menutools ;;
+J) menuM ; menutools ;;
+K) menupc ; menutools ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -67,22 +67,16 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
       clear
-
       samba-tool group addmembers "Domain Admins" "$validusr"
       sleep 1
-
       samba-tool group addmembers "Schema Admins" "$validusr"
       sleep 1
-
       samba-tool group addmembers "Enterprise Admins" "$validusr"
       sleep 1
-
       samba-tool group addmembers "Group Policy Creator Owners" "$validusr"
       sleep 1
-
       samba-tool group addmembers "Administrators" "$validusr"
       sleep 1
-
       dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
   } || {
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
@@ -99,22 +93,16 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
       clear
-
       samba-tool group removemembers "Domain Admins" "$validusr"
       sleep 1
-
       samba-tool group removemembers "Schema Admins" "$validusr"
       sleep 1
-
       samba-tool group removemembers "Enterprise Admins" "$validusr"
       sleep 1
-
       samba-tool group removemembers "Group Policy Creator Owners" "$validusr"
       sleep 1
-
       samba-tool group removemembers "Administrators" "$validusr"
       sleep 1
-
       dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
   } || {
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
@@ -125,27 +113,29 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 function menu041 {
 var41=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
-1 'Criar Usuario' \
-2 'Criar Grupo' \
-3 'Exibir todos os Usuarios' \
-4 'Exibir todos os Grupos' \
-5 'Exibir Grupos de Usuario' \
-6 'Exibir Usuarios de um Grupo' \
-7 'Adicionar Usuario a um Grupo' \
-8 'Remover Usuario de um Grupo' \
-9 'Exibir todos os Computadores' \
+A 'Verificar Usuario' \
+B 'Verificar Grupo' \
+C 'Criar Usuario' \
+D 'Criar Grupo' \
+E 'Testar Senha de Usuario' \
+F 'Exibir todos os Usuarios' \
+G 'Exibir todos os Grupos' \
+H 'Exibir Grupos de Usuario' \
+I 'Exibir Usuarios de um Grupo' \
+J 'Exibir todos os Computadores' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
-1) menuD ; menu041 ;;
-2) menuI ; menu041 ;;
-3) menuA ; menu041 ;;
-4) menuC ; menu041 ;;
-5) menuO ; menu041 ;;
-6) menuK ; menu041 ;;
-7) menuJ ; menu041 ;;
-8) menuL ; menu041 ;;
-9) menuB ; menu041 ;;
+A) menuP ; menutools ;;
+B) menuQ ; menutools ;;
+C) menuD ; menu041 ;;
+D) menuI ; menu041 ;;
+E) menupass ; menutools ;;
+F) menuA ; menu041 ;;
+G) menuC ; menu041 ;;
+H) menuO ; menu041 ;;
+I) menuK ; menu041 ;;
+J) menuB ; menu041 ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -154,9 +144,9 @@ function manut {
   var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
   A 'SYSVOL CHECK' \
   B 'SysVol Reset' \
-  C 'dbcheck well-known-acls' \
-  D 'dbcheck' \
-  E 'GPO ACL Check' \
+  C 'dbcheck: well-known-acls' \
+  D 'dbcheck: general' \
+  E 'GPO: ACL Check (admin)' \
   F 'GPUpdate /Force via SMB' \
   G 'Upgrade MSI Files: ADMX' \
   H 'Domain details' \
@@ -343,6 +333,27 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
       }
   } || {
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  }
+}
+
+}
+
+function menupc {
+validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador, \ncom o $ se houver. \nUse \\\ antes do $. \nExemplo: DESKTOP-JDKSH\\\\$" 0 0 2>&1 > /dev/tty)
+[ -z "$validpc" ] && {
+  dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
+} || {
+  repeated=$(samba-tool computer list | grep -x "$validpc")
+  [ "$repeated" = "$validpc" ] && {
+    dialog --title 'Confirmacao' --backtitle 'Exclusao de Computador' --yesno 'Deseja excluir este computador?' 0 0
+    [ $? = 0 ] && {
+      samba-tool computer delete "$validpc"
+      dialog --title "Informacao" --msgbox "Computador $validpc excluido com sucesso!" 7 25
+    } || {
+      echo "a" > /dev/null
+      }
+  } || {
+    dialog --title "ERROR" --msgbox "Computador invalido!" 7 25
   }
 }
 
