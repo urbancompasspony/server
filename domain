@@ -6,7 +6,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Variaveis Globais
 export bktitle="Active Directory & Domain Controller"
-export ttitle="Server Menu v4"
+export ttitle="Server Menu v5"
 
 # Controlador de Dominio
 function menu04 {
@@ -46,8 +46,8 @@ X '<' 2>&1 > /dev/tty )
 case "$var41" in
 A) menuF ; menutools ;;
 B) menuG ; menutools ;;
-C) menuJ ; menu041 ;;
-D) menuL ; menu041 ;;
+C) menuJ ; menutools ;;
+D) menuL ; menutools ;;
 E) menuautoadmin ; menutools ;;
 F) menuremoadmin ; menutools ;;
 G) menuE ; menutools ;;
@@ -57,58 +57,6 @@ J) menuM ; menutools ;;
 K) menupc ; menutools ;;
 X) echo "." >/dev/null ;;
 esac
-}
-
-function menuautoadmin {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
-} || {
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  [ "$repeated" = "$validusr" ] && {
-      clear
-      samba-tool group addmembers "Domain Admins" "$validusr"
-      sleep 1
-      samba-tool group addmembers "Schema Admins" "$validusr"
-      sleep 1
-      samba-tool group addmembers "Enterprise Admins" "$validusr"
-      sleep 1
-      samba-tool group addmembers "Group Policy Creator Owners" "$validusr"
-      sleep 1
-      samba-tool group addmembers "Administrators" "$validusr"
-      sleep 1
-      dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
-  } || {
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-    }
-}
-
-}
-
-function menuremoadmin {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
-} || {
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  [ "$repeated" = "$validusr" ] && {
-      clear
-      samba-tool group removemembers "Domain Admins" "$validusr"
-      sleep 1
-      samba-tool group removemembers "Schema Admins" "$validusr"
-      sleep 1
-      samba-tool group removemembers "Enterprise Admins" "$validusr"
-      sleep 1
-      samba-tool group removemembers "Group Policy Creator Owners" "$validusr"
-      sleep 1
-      samba-tool group removemembers "Administrators" "$validusr"
-      sleep 1
-      dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
-  } || {
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-    }
-}
-
 }
 
 function menu041 {
@@ -126,17 +74,17 @@ J 'Exibir todos os Computadores' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
-A) menuP ; menutools ;;
-B) menuQ ; menutools ;;
+A) menuP ; menu041 ;;
+B) menuQ ; menu041 ;;
 C) menuD ; menu041 ;;
 D) menuI ; menu041 ;;
-E) menupass ; menutools ;;
+E) menupass ; menu041 ;;
 F) menuA ; menu041 ;;
 G) menuC ; menu041 ;;
 H) menuO ; menu041 ;;
 I) menuK ; menu041 ;;
 J) menuB ; menu041 ;;
-X) echo "." >/dev/null ;;
+X) echo "." > /dev/null ;;
 esac
 }
 
@@ -188,6 +136,7 @@ echo " "
 }
 
 function menuOUs {
+  clear
   echo "em breve!"
   sleep 3
 }
@@ -582,6 +531,58 @@ function menuT {
   dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox  "$(samba-tool processes)" 0 0
 }
 
+function menuautoadmin {
+validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] && {
+  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
+} || {
+  repeated=$(samba-tool user list | grep -x "$validusr")
+  [ "$repeated" = "$validusr" ] && {
+      clear
+      samba-tool group addmembers "Domain Admins" "$validusr"
+      sleep 1
+      samba-tool group addmembers "Schema Admins" "$validusr"
+      sleep 1
+      samba-tool group addmembers "Enterprise Admins" "$validusr"
+      sleep 1
+      samba-tool group addmembers "Group Policy Creator Owners" "$validusr"
+      sleep 1
+      samba-tool group addmembers "Administrators" "$validusr"
+      sleep 1
+      dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
+  } || {
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    }
+}
+
+}
+
+function menuremoadmin {
+validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] && {
+  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
+} || {
+  repeated=$(samba-tool user list | grep -x "$validusr")
+  [ "$repeated" = "$validusr" ] && {
+      clear
+      samba-tool group removemembers "Domain Admins" "$validusr"
+      sleep 1
+      samba-tool group removemembers "Schema Admins" "$validusr"
+      sleep 1
+      samba-tool group removemembers "Enterprise Admins" "$validusr"
+      sleep 1
+      samba-tool group removemembers "Group Policy Creator Owners" "$validusr"
+      sleep 1
+      samba-tool group removemembers "Administrators" "$validusr"
+      sleep 1
+      dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
+  } || {
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    }
+}
+
+}
+
 #########################
 # DOMAIN FOLDER MANAGER #
 #########################
@@ -589,7 +590,7 @@ function menuT {
 function validation {
   result=$(grep -rnw /etc/samba/external/smb.conf -e 'include' 2>/dev/null 1>/dev/null && echo sim || echo nao)
   [ $result = sim ] && {
-    menu
+    echo "." >/dev/null
   } || {
     dialog --title "ERRO" --msgbox "Sub-sistema INCLUDE nao encontrado para este Dominio! \n
 O editor de pastas compartilhadas nao pode continuar. \n
@@ -604,7 +605,6 @@ B 'Criar Nova Pasta Compartilhada' \
 C 'Excluir Pasta Compartilhada' \
 D 'Revalidar Configuracoes' \
 X '<' 2>&1 > /dev/tty )
-
 case "$var0" in
 A) list_all ; menu ;;
 B) create ; menu ;;
@@ -649,7 +649,6 @@ VALUE5="yes"
 
 [ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
   dialog --title "ERRO" --msgbox "O compartilhamento já existe! Saindo..." 5 40
-  exit
 }
 
 mkdir -p /mnt/$var2
@@ -679,7 +678,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compa
 
     case $? in
       0) echo "." > /dev/null ;;
-      1) exit ;;
+      1) echo "." > /dev/null ;;
     esac
 
     var1=$(echo "$VALUE0" | sed -n 1p)
@@ -690,7 +689,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compa
       ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
       smbcontrol all reload-config
     } || {
-      echo "a" > /dev/null
+      echo "." > /dev/null
     }
 }
 
