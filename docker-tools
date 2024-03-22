@@ -7,10 +7,10 @@ B 'Set MACVLAN' \
 C 'Remove MACVLAN' \
 D 'PiHole: Maintenance' \
 E 'PiHole Install Error' \
-E 'Nextcloud: filelocks' \
-F 'Nextcloud: add-missing-indices' \
-G 'Nextcloud: check-core' \
-H 'Nextcloud: Disable LDAP' \
+F 'Nextcloud: filelocks' \
+G 'Nextcloud: add-missing-indices' \
+H 'Nextcloud: check-core' \
+I 'Nextcloud: Disable LDAP' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) clear ; restorebkp ;;
@@ -18,10 +18,10 @@ B) clear ; macvland ;;
 C) clear ; docker network rm macvlan ; sleep 2 ;;
 D) clear ; piholemnt ;;
 E) clear ; piholeinst ;;
-E) clear ; filelocks ;;
-F) clear ; missingindices ;;
-G) clear ; checkcore ;;
-H) clear ; disableldap ;;
+F) clear ; filelocks ;;
+G) clear ; missingindices ;;
+H) clear ; checkcore ;;
+I) clear ; disableldap ;;
 X) echo "." > /dev/null ;;
 esac
 }
