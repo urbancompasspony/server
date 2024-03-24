@@ -4,7 +4,7 @@ export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
 export bktitle="Active Directory & Domain Controller"
-export ttitle="- Server Menu v5 -"
+export ttitle=" Server Menu v5.3 "
 
 function menu04 {
   var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
