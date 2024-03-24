@@ -129,7 +129,7 @@ function manut {
   D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
   F) clear ; samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; manut ;;
-  G) clear ; samba-tool gpo admxload -U Administrator --admx-dir="/msifiles" ; echo "" ; read -p "Regras carregas. Ignore a mensagem acima! Pressione Enter para continuar!" ; manut ;;
+  G) clear ; samba-tool gpo admxload -U Administrator --admx-dir="/msifiles" ; echo "" ; read -p "Regras carregadas. Ignore a mensagem acima! Pressione Enter para continuar!" ; manut ;;
   H) menuR ; manut ;;
   I) menuS ; manut ;;
   J) menuT ; manut ;;
