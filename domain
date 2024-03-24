@@ -4,30 +4,32 @@ export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
 export bktitle="Active Directory & Domain Controller"
-export ttitle=" Server Menu v5.3 "
+export ttitle=" Server Menu v6.0 "
 
-function menu04 {
+function main_menu {
   var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
   A 'Ferramentas de Usuarios' \
   B 'Ferramentas de Grupos' \
   C 'Ferramentas de Computadores' \
   D 'Gestao de Pastas Compartilhadas' \
   E 'Unidades Organizacionais' \
-  F 'Manutencao Geral do Dominio' \
+  F 'Informacoes do Dominio' \
+  G 'Manutencao Geral do Dominio' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
-  A) menutools ; menu04 ;;
-  B) menu041 ; menu04 ;;
-  C) menupcc ; menu04 ;;
-  D) validation ; menu04 ;;
-  E) menuOUs ; menu04 ;;
-  F) manut ; menu04 ;;
+  A) user_tools ; main_menu ;;
+  B) group_tools ; main_menu ;;
+  C) pc_tools ; main_menu ;;
+  D) shared_folders ; main_menu ;;
+  E) ou_tools ; main_menu ;;
+  F) info_domain ; main_menu ;;
+  G) s_settings ; main_menu ;;
   X) exit ;;
   esac
 }
 
-function menutools {
+function user_tools {
 var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Usuarios" --menu " " 0 0 0 \
 A 'Procurar/Verificar um Usuario' \
 B 'Criar Usuario' \
@@ -41,32 +43,36 @@ I 'Promote Usuario a Admin' \
 J 'Demote Usuario de Admin' \
 K 'Alterar Senha de um Usuario' \
 L 'Testar Senha de Usuario' \
-M 'Alterar Politica de um Usuario' \
-N 'Mover Usuario para OU' \
-O 'Excluir um Usuario' \
+M 'Senha de Usuario deve Expirar?' \
+N 'Quando a Senha vai Expirar?' \
+O 'Forcar Troca de Senha Imediata!' \
+P 'Mover Usuario para OU' \
+Q 'Excluir um Usuario' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
-A) menuP ; menutools ;;
-B) menuD ; menutools ;;
-C) menuA ; menutools ;;
-D) menuF ; menutools ;;
-E) menuG ; menutools ;;
-F) menuJ ; menutools ;;
-G) menuO ; menutools ;;
-H) menuL ; menutools ;;
-I) menuautoadmin ; menutools ;;
-J) menuremoadmin ; menutools ;;
-K) menuE ; menutools ;;
-L) menupass ; menutools ;;
-M) menuN ; menutools ;;
-N) menuOUC ; menutools ;;
-O) menuH ; menutools ;;
+A) check_user ; user_tools ;;
+B) create_user ; user_tools ;;
+C) show_users ; user_tools ;;
+D) blk_user ; user_tools ;;
+E) ublk_user ; user_tools ;;
+F) add_user_group ; user_tools ;;
+G) show_group_user ; user_tools ;;
+H) rm_user_group ; user_tools ;;
+I) promote_user ; user_tools ;;
+J) demote_user ; user_tools ;;
+K) change_pass ; user_tools ;;
+L) test_pass ; user_tools ;;
+M) expiracy_usr_pass ; user_tools ;;
+N) expiracy_days ; user_tools ;;
+O) expiracy_now ; user_tools ;;
+P) mv_user_ou ; user_tools ;; 
+Q) rm_user ; user_tools ;;
 X) echo "." >/dev/null ;;
 esac
 }
 
-function menu041 {
+function group_tools {
 var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Grupos" --menu " " 0 0 0 \
 A 'Procurar/Verificar um Grupo' \
 B 'Criar Grupo' \
@@ -77,17 +83,17 @@ F 'Excluir um Grupo' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
-A) menuQ ; menu041 ;;
-B) menuI ; menu041 ;;
-C) menuC ; menu041 ;;
-D) menuK ; menu041 ;;
-E) menuOUD ; menu041 ;;
-F) menuM ; menu041 ;;
+A) check_group ; group_tools ;;
+B) create_group ; group_tools ;;
+C) show_groups ; group_tools ;;
+D) show_user_group ; group_tools ;;
+E) mv_group_ou ; group_tools ;;
+F) rm_group ; group_tools ;;
 X) echo "." > /dev/null ;;
 esac
 }
 
-function menupcc {
+function pc_tools {
 var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Computadores" --menu " " 0 0 0 \
 A 'Procurar/Verificar um Computador' \
 B 'Exibir todos os Computadores' \
@@ -97,16 +103,37 @@ E 'Excluir um Computador' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
-A) checkpcc ; menupcc ;;
-B) menuB ; menupcc ;;
-C) menupcadd ; menupcc ;;
-D) menupcou ; menupcc ;;
-E) menupcr ; menupcc ;;
+A) check_pc ; pc_tools ;;
+B) show_pcs ; pc_tools ;;
+C) create_pc ; pc_tools ;;
+D) mv_pc_ou ; pc_tools ;;
+E) rm_pc ; pc_tools ;;
 X) echo "." > /dev/null ;;
 esac
 }
 
-function manut {
+function info_domain {
+  var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
+  A 'Detalhes do Dominio' \
+  B 'Requisitos de Senhas' \
+  C 'Processos do SMB.service' \
+  D 'Status das Sessoes Ativas' \
+  E 'Status dos Compartilhamentos' \
+  F 'F.A.Q. & Ajuda!' \
+  X '<' 2>&1 > /dev/tty )
+  [ $? -ne 0 ] && return
+  case "$var4" in
+  A) domain_details ; info_domain ;;
+  B) show_pass_policy ; info_domain ;;
+  C) smb_process ; info_domain ;;
+  D) active_sessions ; info_domain ;;
+  E) active_shares ; info_domain ;;
+  F) faq_help ; read -p "Pressione Enter para continuar!" ; info_domain ;;
+  X) echo "." >/dev/null ;;
+  esac
+}
+
+function s_settings {
   var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
   A 'SYSVOL CHECK' \
   B 'SysVol Reset' \
@@ -114,32 +141,35 @@ function manut {
   D 'dbcheck: general' \
   E 'GPO: ACL Check (administrator)' \
   F 'GPUpdate /Force (via SMB)' \
-  G 'Upgrade .MSI Files: .ADMX' \
-  H 'Detalhes do Dominio' \
-  I 'Requisitos de Senhas' \
-  J 'Processos do SMB.service' \
-  K 'F.A.Q. & Ajuda!' \
-  L 'Atualizar este Menu' \
+  G 'Force Upgrade .MSI Files' \
+  H 'Atualizar este Menu' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
-  A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
-  B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
-  C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
-  D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; manut ;;
-  E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; manut ;;
-  F) clear ; samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; manut ;;
-  G) clear ; samba-tool gpo admxload -U Administrator --admx-dir="/msifiles" ; echo "" ; read -p "Regras carregadas. Ignore a mensagem acima! Pressione Enter para continuar!" ; manut ;;
-  H) menuR ; manut ;;
-  I) menuS ; manut ;;
-  J) menuT ; manut ;;
-  K) menuhelp ; read -p "Pressione Enter para continuar!" ; manut ;;
-  L) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; manut ;;
+  A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  F) clear ; samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  G) clear ; force_msi ; s_settings ;;
+  H) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
 }
 
-function menu {
+function force_msi {
+admxurl=$(curl -s 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=103507' | grep -o -m1 -E "url=http.*msi" | cut -d '=' -f2) \
+    && wget -O admx.msi "$admxurl" \
+    && mkdir /msifiles \
+    && msiextract -C /msifiles/ admx.msi
+
+samba-tool gpo admxload -U Administrator --admx-dir="/msifiles"
+echo ""
+read -p "Regras carregadas. Ignore as mensagens de erro acima! Pressione Enter para continuar!"
+}
+
+function shared_folders {
 var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
 A 'Mostrar Pastas Compartilhadas' \
 B 'Criar Nova Pasta Compartilhada' \
@@ -147,19 +177,15 @@ C 'Excluir Pasta Compartilhada' \
 D 'Revalidar Configuracoes' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-A) list_all ; menu ;;
-B) create ; menu ;;
-C) delete ; menu ;;
-D) revalidate ; menu ;;
+A) show_shared ; shared_folders ;;
+B) create_shared ; shared_folders ;;
+C) remove_shared ; shared_folders ;;
+D) revalid_shared ; shared_folders ;;
 X) echo "." >/dev/null ;;
 esac
 }
 
-#######################################################################################
-# ORGANIZATION UNITS MENUS! # \/
-#######################################################################################
-
-function menuOUs {
+function ou_tools {
   var12=$(dialog --title "$ttitle" --backtitle "Unidades Organizacionais" --menu " " 0 0 0 \
   A 'Listar todas as OUs' \
   B 'Criar uma OU' \
@@ -168,22 +194,36 @@ function menuOUs {
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var12" in
-  A) menuOUA ; menuOUs ;;
-  B) menuOUB ; menuOUs ;;
-  C) menuOUL ; menuOUs ;;
-  D) menuOUE ; menuOUs ;;
+  A) show_ous ; ou_tools ;;
+  B) create_ou ; ou_tools ;;
+  C) list_obj_ou ; ou_tools ;;
+  D) rm_ou ; ou_tools ;;
   X) echo "." >/dev/null ;;
   esac
 }
 
-function menuOUA {
+function active_shares {
+dialog --title "$ttitle" --backtitle "Status de Compartilhamentos Ativos" --msgbox "Pressione Enter para visualizar! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
+[ $? -ne 0 ] && return
+active_sh=$(net status shares)
+echo "$active_sh" | less
+}
+
+function active_sessions {
+dialog --title "$ttitle" --backtitle "Status de Sessoes Ativas" --msgbox "Pressione Enter para visualizar! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
+[ $? -ne 0 ] && return
+active_se=$(net status sessions)
+echo "$active_se" | less
+}
+
+function show_ous {
 dialog --title "$ttitle" --backtitle "Lista de OUs" --msgbox "Pressione Enter para visualizar as OUs! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && return
 oulst=$(samba-tool ou list)
 echo "$oulst" | less
 }
 
-function menuOUB {
+function create_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Criando uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
 [ -z "$validou" ] && {
   dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
@@ -198,7 +238,7 @@ validou=$(dialog --title "$ttitle" --backtitle "Criando uma OU" --inputbox "Insi
   }
 }
 
-function menuOUC {
+function mv_user_ou {
 validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
@@ -223,7 +263,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputb
   }
 }
 
-function menuOUD {
+function mv_group_ou {
 validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
@@ -248,7 +288,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox
   }
 }
 
-function menuOUE {
+function rm_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "Insira o nome da OU:" 0 0 2>&1 > /dev/tty)
 [ -z "$validou" ] && {
   dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
@@ -257,7 +297,7 @@ validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "In
   [ "$repeated" = "OU=$validou" ] && {
     dialog --title 'Confirmacao' --backtitle 'Exclusao de OU' --yesno 'Deseja excluir esta OU?' 0 0
     [ $? = 0 ] && {
-      samba-tool ou delete OU="$validou"
+      samba-tool ou remove_shared OU="$validou"
       dialog --title "Informacao" --msgbox "A OU=$validou removida com sucesso!" 7 25
     } || {
       echo "a" > /dev/null
@@ -268,7 +308,7 @@ validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "In
   }
 }
 
-function menuOUL {
+function list_obj_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Objetos de uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
 [ -z "$validou" ] && {
   dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
@@ -285,32 +325,24 @@ validou=$(dialog --title "$ttitle" --backtitle "Objetos de uma OU" --inputbox "I
   }
 }
 
-#######################################################################################
-# ORGANIZATION UNITS MENUS! # /\
-#######################################################################################
-
-#######################################################################################
-# USER & GROUP MANAGEMENT MENUS! # \/
-#######################################################################################
-
-function menuA {
+function show_users {
 dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os Usuarios! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && return
 usrlst=$(samba-tool user list)
 echo "$usrlst" | less
 }
 
-function menuC {
+function show_groups {
 dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os Grupos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && return
 grplist=$(samba-tool group list)
 echo "$grplist" | less
 }
 
-function menuD {
+function create_user {
 VALUE1="joao_naves"
 VALUE2="Joao Naves"
-VALUE3="1234567Ab"
+VALUE3="A1234567b"
 
 VALUE0=$(dialog --ok-label "Criar"  --backtitle "$bktitle" --title "Adicionar Usuario" --form "Preencha todos os campos! \nApague os modelos." 13 40 0 \
 "Usuario: " 1 1 "$VALUE1" 1 10 34 0 \
@@ -329,8 +361,7 @@ validpss1=$(echo "$VALUE0" | sed -n 3p)
   [ "$repeated" = "$validusr1" ] || [ "$repeated2" = "$validusr1" ] && {
     dialog --title "Informacao" --msgbox "Conflito detectado! \nO usuario $validusr1 nao sera criado!" 8 40
   } || {
-    dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "$validusr1 deve trocar a senha ao logar? \n
-Se escolher Nao, devera usar o RSAT caso mude de ideia." 8 40
+    dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "$validusr1 deve trocar a senha ao logar?" 0 0
     [ $? = 0 ] && {
        samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1" --must-change-at-next-login
       dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "A senha de $validusr nunca expira?" 0 0
@@ -357,7 +388,7 @@ Se escolher Nao, devera usar o RSAT caso mude de ideia." 8 40
 
 }
 
-function menuE {
+function change_pass {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
@@ -378,7 +409,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menuF {
+function blk_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
@@ -394,7 +425,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menuG {
+function ublk_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
@@ -410,7 +441,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menuH {
+function rm_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
@@ -419,7 +450,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   [ "$repeated" = "$validusr" ] && {
     dialog --title 'Confirmacao' --backtitle 'Exclusao de Usuario' --yesno 'Deseja excluir este usuario?' 0 0
     [ $? = 0 ] && {
-      samba-tool user delete "$validusr"
+      samba-tool user remove_shared "$validusr"
       dialog --title "Informacao" --msgbox "Usuario $validusr excluido com sucesso!" 7 25
     } || {
       echo "a" > /dev/null
@@ -431,7 +462,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menuI {
+function create_group {
 validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
@@ -441,14 +472,14 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   [ "$repeated" = "$validgrp" ] || [ "$repeated2" = "$validgrp" ] && {
     dialog --title "Informacao" --msgbox "Conflito detectado! O grupo $validgrp nao sera criado!" 8 40
   } || {
-    samba-tool group add "$validgrp"
+    samba-tool group create "$validgrp"
     dialog --title "Informacao" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
     }
 }
 
 }
 
-function menuJ {
+function add_user_group {
 validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
@@ -473,7 +504,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" -
   }
 }
 
-function menuK {
+function show_user_group {
 validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
@@ -490,7 +521,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menuL {
+function rm_user_group {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
@@ -516,7 +547,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menuM {
+function rm_group {
 validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
@@ -525,7 +556,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   [ "$repeated" = "$validgrp" ] && {  
     dialog --title 'Confirmacao' --backtitle 'Exclusao de Grupo' --yesno "Deseja excluir o grupo $validgrp?" 0 0
     [ $? = 0 ] && {
-      samba-tool group delete "$validgrp"
+      samba-tool group remove_shared "$validgrp"
       dialog --title "Informacao" --msgbox "Grupo $validgrp excluido com sucesso!" 7 25
     } || {
       echo "a" > /dev/null
@@ -537,7 +568,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menuN {
+function expiracy_usr_pass {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
@@ -558,7 +589,50 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menuO {
+
+function expiracy_now {
+validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] && {
+  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+} || {
+  repeated=$(samba-tool user list | grep -x "$validusr")
+  [ "$repeated" = "$validusr" ] && {
+    dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "O usuario $validusr deve trocar a senha imediatamente?" 0 0
+    [ $? = 0 ] && {
+      net sam set pwdmustchangenow $validusr yes
+      dialog --title "Informacao" --msgbox "O usuario deve trocar a senha imediatamente!" 8 40
+    } || {
+      echo "a" > /dev/null
+      }
+  } || {
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    }
+}
+
+}
+
+function expiracy_days {
+validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] && {
+  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+} || {
+  repeated=$(samba-tool user list | grep -x "$validusr")
+  [ "$repeated" = "$validusr" ] && {
+    daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina quando a senha vai expirar, em dias" 0 0 2>&1 > /dev/tty)
+    [ -z "$daystoexpire" ] && {
+      dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+    } || {
+      samba-tool user setexpiry $validusr --days=$daystoexpire
+      dialog --title "Confirmacao" --msgbox "O usuario $validusr devera trocar a senha em $daystoexpire dias!" 8 40
+    }
+  } || {
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  }
+}
+
+}
+
+function show_group_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
@@ -575,7 +649,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menuP {
+function check_user {
 validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario. \n
 Exemplo: joao_naves" 9 40 2>&1 > /dev/tty)
 [ -z "$validusr1" ] && {
@@ -596,7 +670,7 @@ Exemplo: joao_naves" 9 40 2>&1 > /dev/tty)
 
 }
 
-function menuQ {
+function check_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de grupo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 
@@ -618,15 +692,7 @@ validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
 
 }
 
-#######################################################################################
-# USER & GROUP MANAGEMENT MENUS! # /\
-#######################################################################################
-
-#######################################################################################
-# SAMBA MANAGEMENT! # \/
-#######################################################################################
-
-function menuR {
+function domain_details {
 smbv=$(samba --version)
 domainv=$(samba-tool domain level show)
 dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox "
@@ -636,15 +702,15 @@ $domainv \n \n
 " 0 0
 }
 
-function menuS {
+function show_pass_policy {
   dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
 }
 
-function menuT {
+function smb_process {
   dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox  "$(samba-tool processes)" 0 0
 }
 
-function menuautoadmin {
+function promote_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
@@ -670,7 +736,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menuremoadmin {
+function demote_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
@@ -696,7 +762,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function menupass {
+function test_pass {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
@@ -714,11 +780,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-#######################################################################################
-# COMPUTERS MANAGEMENT! # \/
-#######################################################################################
-
-function menupcou {
+function mv_pc_ou {
 validpc=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome do Computador" 0 0 2>&1 > /dev/tty)
 [ -z "$validpc" ] && {
   dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
@@ -743,14 +805,14 @@ validpc=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inpu
   }
 }
 
-function menuB {
+function show_pcs {
 dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os Computadores! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && return
 cmplist=$(samba-tool computer list)
 echo "$cmplist" | less
 }
 
-function menupcadd {
+function create_pc {
 validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty)
 [ -z "$validpc"\$ ] && {
   dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
@@ -766,7 +828,7 @@ validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o n
 
 }
 
-function menupcr {
+function rm_pc {
 validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty)
 [ -z "$validpc"\$ ] && {
   dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
@@ -775,7 +837,7 @@ validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o n
   [ "$repeated" = "$validpc"\$ ] && {
     dialog --title 'Confirmacao' --backtitle 'Exclusao de Computador' --yesno 'Deseja excluir este computador?' 0 0
     [ $? = 0 ] && {
-      samba-tool computer delete "$validpc"\$
+      samba-tool computer remove_shared "$validpc"\$
       dialog --title "Informacao" --msgbox "Computador $validpc\$ excluido com sucesso!" 7 25
     } || {
       echo "a" > /dev/null
@@ -787,7 +849,7 @@ validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o n
 
 }
 
-function checkpcc {
+function check_pc {
 validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty)
 [ -z "$validpc"\$ ] && {
   dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
@@ -807,15 +869,7 @@ validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o n
 
 }
 
-#######################################################################################
-# COMPUTERS MANAGEMENT! # /\
-#######################################################################################
-
-#######################################################################################
-# DOMAIN FOLDER MANAGER \/
-#######################################################################################
-
-function validation {
+function share_tools {
   result=$(grep -rnw /etc/samba/external/smb.conf -e 'include' 2>/dev/null 1>/dev/null && echo sim || echo nao)
   [ $result = sim ] && {
     menu
@@ -826,7 +880,7 @@ Por favor, configure-o manualmente e tente novamente." 10 50
   }
 }
 
-function list_all {
+function show_shared {
   [ -d "/etc/samba/external/smb.conf.d" ] && {
     listagem=$(ls /etc/samba/external/smb.conf.d/* | xargs -n 1 basename)
     dialog --title "Lista de Pastas Compartilhadas:" --msgbox "$listagem" 15 35
@@ -836,7 +890,7 @@ function list_all {
   }
 }
 
-function create {
+function create_shared {
 VALUE1="server"
 VALUE2="custom_folder"
 VALUE3="usuario, @grupo"
@@ -883,7 +937,7 @@ ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/exte
 smbcontrol all reload-config
 }
 
-function delete {
+function remove_shared {
 VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compartilhamento" 8 35 0 \
 "ShrName:" 1 1 "$VALUE0" 1 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -912,20 +966,12 @@ VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compa
   }
 }
 
-function revalidate {
+function revalid_shared {
   ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
   smbcontrol all reload-config
 }
 
-#######################################################################################
-# DOMAIN FOLDER MANAGER /\
-#######################################################################################
-
-#######################################################################################
-# START SCRIPT \/
-#######################################################################################
-
-function menuhelp {
+function faq_help {
 clear
 
 echo " "
@@ -938,8 +984,10 @@ echo " "
 }
 
 # Start all!
-menu04
+main_menu
 
-# EDITOR=nano ldbedit -H /var/lib/samba/private/sam.ldb --cross-ncs "(objectClass=nTDSDSA)" msDS-Behavior-Version
 # If any error...
 exit 1
+
+# COMMENTS if needed:
+# EDITOR=nano ldbedit -H /var/lib/samba/private/sam.ldb --cross-ncs "(objectClass=nTDSDSA)" msDS-Behavior-Version
