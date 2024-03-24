@@ -297,8 +297,13 @@ validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "In
   [ "$repeated" = "OU=$validou" ] && {
     dialog --title 'Confirmacao' --backtitle 'Exclusao de OU' --yesno 'Deseja excluir esta OU?' 0 0
     [ $? = 0 ] && {
-      samba-tool ou remove_shared OU="$validou"
-      dialog --title "Informacao" --msgbox "A OU=$validou removida com sucesso!" 7 25
+      samba-tool ou delete OU="$validou"
+      repeated2=$(samba-tool ou list | grep -x OU="$validou")
+      [ "$repeated2" = "OU=$validou" ] && {
+        dialog --title "Informacao" --msgbox "A OU=$validou possui Objetos e nao foi removida!" 8 40
+      } || {
+        dialog --title "Informacao" --msgbox "A OU=$validou foi removida com sucesso!" 7 25
+      }
     } || {
       echo "a" > /dev/null
       }
@@ -450,7 +455,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   [ "$repeated" = "$validusr" ] && {
     dialog --title 'Confirmacao' --backtitle 'Exclusao de Usuario' --yesno 'Deseja excluir este usuario?' 0 0
     [ $? = 0 ] && {
-      samba-tool user remove_shared "$validusr"
+      samba-tool user delete "$validusr"
       dialog --title "Informacao" --msgbox "Usuario $validusr excluido com sucesso!" 7 25
     } || {
       echo "a" > /dev/null
@@ -556,7 +561,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   [ "$repeated" = "$validgrp" ] && {  
     dialog --title 'Confirmacao' --backtitle 'Exclusao de Grupo' --yesno "Deseja excluir o grupo $validgrp?" 0 0
     [ $? = 0 ] && {
-      samba-tool group remove_shared "$validgrp"
+      samba-tool group delete "$validgrp"
       dialog --title "Informacao" --msgbox "Grupo $validgrp excluido com sucesso!" 7 25
     } || {
       echo "a" > /dev/null
@@ -814,7 +819,8 @@ echo "$cmplist" | less
 
 function create_pc {
 validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty)
-[ -z "$validpc"\$ ] && {
+[ $? -ne 0 ] && return
+[ -z "$validpc" ] && {
   dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
 } || {
   repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
@@ -830,14 +836,15 @@ validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o n
 
 function rm_pc {
 validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty)
-[ -z "$validpc"\$ ] && {
+[ $? -ne 0 ] && return
+[ -z "$validpc" ] && {
   dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
 } || {
   repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
   [ "$repeated" = "$validpc"\$ ] && {
     dialog --title 'Confirmacao' --backtitle 'Exclusao de Computador' --yesno 'Deseja excluir este computador?' 0 0
     [ $? = 0 ] && {
-      samba-tool computer remove_shared "$validpc"\$
+      samba-tool computer delete "$validpc"\$
       dialog --title "Informacao" --msgbox "Computador $validpc\$ excluido com sucesso!" 7 25
     } || {
       echo "a" > /dev/null
@@ -851,7 +858,7 @@ validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o n
 
 function check_pc {
 validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty)
-[ -z "$validpc"\$ ] && {
+[ -z "$validpc" ] && {
   dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
 } || {
   repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
