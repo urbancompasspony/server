@@ -19,15 +19,17 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 A 'Essentials' \
 B 'Servers' \
 C 'DataBases' \
-D 'Misc' \
-E 'Maintenance' \
+D 'Others' \
+E 'Not Tested!' \
+F 'Settings' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) essentials ; start ;;
 B) servers ; start ;;
 C) database ; start ;;
 D) others ; start ;;
-E) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
+E) misc ; start ;;
+F) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
 X) exit ;;
 esac
 }
@@ -36,19 +38,24 @@ function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole (L/W)' \
 2 'Dominio (W)' \
-3 'NextCloud (W)' \
-4 'Pentest (L/W)' \
-5 'FTP Server (W)' \
-6 'CUPS Printer (W)' \
+3 'Pentest (L/W)' \
+4 'XPRA Virt-Manager (L/W)' \
+5 'MySpeed: Tracker (W)' \
+6 'Kuma Ping: Tracker (W)' \
+7 'NextCloud (W)' \
+8 'OnlyOffice (W)' \
+9 'Apache2: Reverse Proxy (W)' \
 X '<' 2>&1 > /dev/tty )
-
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
 2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-4) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-5) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-6) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
+3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+4) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+5) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
+6) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
+7) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+9) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -57,21 +64,82 @@ function servers {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'UniFi (W)' \
 2 'OpenFire [+Spark] (W)' \
-3 'ntfy (W)' \
-4 'RustDesk (W)' \
-5 'Apache2 Standalone (W)' \
-6 'Apache2 Reverse Proxy (W)' \
-7 'GLPI (W)' \
+3 'RustDesk (W)' \
+4 'Apache2 Standalone (W)' \
+5 'GLPI (W)' \
+6 'ntfy (W)' \
 X '<' 2>&1 > /dev/tty )
-
 case "$var0" in
 1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
 2) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-3) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-4) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-5) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-6) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-7) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+3) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
+4) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
+5) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+6) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
+X) echo "." > /dev/null ;;
+esac
+}
+
+function others {
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
+1 'OpenSpeedTest Local (W)' \
+2 'StatPing-NG Tracker (W)' \
+3 'SSH DW: Backdoor (L)' \
+4 'SMB Server Standalone (W)' \
+5 'Windows VMs (L/W)' \
+6 'FTP Server Standalone (W)' \
+7 'CUPS Printer Standalone (W)' \
+8 'Syncthing: Client (L/W)' \
+9 'Ollama: IA (L)' \
+10 'Ollama: WebUI (L)' \
+11 'tmate server (L)' \
+X '<' 2>&1 > /dev/tty )
+case "$var0" in
+1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+2) wget "$github"50-statping-ng -O /tmp/statping; sudo bash /tmp/statping ;;
+3) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
+4) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
+5) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
+6) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+7) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
+8) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+9) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+10) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+11) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
+X) echo "." > /dev/null ;;
+esac
+}
+
+function misc {
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
+1 'LAN Cache' \
+2 'gitlab' \
+3 'android-x86' \
+4 'filebrowser' \
+5 'redroid' \
+6 'varnish' \
+7 'macOS VM' \
+8 'NO-IP' \
+9 'registry' \
+10 'xpra-ubuntu2204' \
+11 'wetty' \
+12 'zabbix' \
+13 'tor-privoxy' \
+X '<' 2>&1 > /dev/tty )
+case "$var0" in
+1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
+2) wget "$github"12-gitlab -O /tmp/gitlab; sudo bash /tmp/gitlab ;;
+3) wget "$github"13-android-x86 -O /tmp/android-x86; sudo bash /tmp/android-x86 ;;
+4) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
+5) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
+6) wget "$github"35-varnish -O /tmp/varnish; sudo bash /tmp/varnish ;;
+7) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
+8) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
+9) wget "$github"43-registry -O /tmp/registry; sudo bash /tmp/registry ;;
+10) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
+11) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
+12) wget "$github"47-zabbix -O /tmp/zabbix; sudo bash /tmp/zabbix ;;
+13) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -84,48 +152,12 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'Firebird (W)' \
 5 'PHPMyAdmin (L)' \
 X '<' 2>&1 > /dev/tty )
-
 case "$var0" in
 1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
 2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
 3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
 4) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
 5) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
-X) echo "." > /dev/null ;;
-esac
-}
-
-function others {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-0 'MySpeedTest Tracker (W)' \
-1 'OpenSpeedTest (W)' \
-2 'SSH DW (L)' \
-3 'Syncthing: Client (L/W)' \
-4 'xpra virt-manager (L/W)' \
-5 'Ollama: IA (L)' \
-6 'Ollama: WebUI (L)' \
-7 'SMB Server (W)' \
-8 'OnlyOffice (W)' \
-9 'Windows VMs (L/W)' \
-10 'tmate server (L)' \
-11 'Kuma Ping Tracker (W)' \
-12 'StatPing-NG Tracker (W)' \
-X '<' 2>&1 > /dev/tty )
-
-case "$var0" in
-0) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
-1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-4) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
-5) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-6) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-7) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
-8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-9) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
-10) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
-11) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-12) wget "$github"50-statping-ng -O /tmp/statping; sudo bash /tmp/statping ;;
 X) echo "." > /dev/null ;;
 esac
 }
