@@ -82,7 +82,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'MariaDB (W)' \
 3 'OracleXE 21C (W)' \
 4 'Firebird (W)' \
-5 'PHP My Admin (L)' \
+5 'PHPMyAdmin (L)' \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
@@ -97,7 +97,8 @@ esac
 
 function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'OpenSpeedtest (W)' \
+0 'MySpeedTest: Tracker (W)' \
+1 'OpenSpeedTest (W)' \
 2 'SSH DW (L)' \
 3 'Syncthing: Client (L/W)' \
 4 'xpra virt-manager (L/W)' \
@@ -110,6 +111,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 X '<' 2>&1 > /dev/tty )
 
 case "$var0" in
+0) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
 1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 3) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
