@@ -45,6 +45,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 7 'NextCloud (W)' \
 8 'OnlyOffice (W)' \
 9 'Apache2: Reverse Proxy (W)' \
+10 'Pottava Docker WebUI' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
@@ -56,6 +57,7 @@ case "$var0" in
 7) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
 8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 9) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+10) wget "$github"21-pottava-docker-ui -O /tmp/pottava; sudo bash /tmp/pottava ;;
 X) echo "." > /dev/null ;;
 esac
 }
