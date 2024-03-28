@@ -45,7 +45,6 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 7 'NextCloud (W)' \
 8 'OnlyOffice (W)' \
 9 'Apache2: Reverse Proxy (W)' \
-10 'Portainer Docker WebUI' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
@@ -57,7 +56,6 @@ case "$var0" in
 7) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
 8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 9) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-10) wget "$github"22-portainer-docker-ui -O /tmp/portainer; sudo bash /tmp/portainer ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -95,7 +93,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 9 'Ollama: IA (L)' \
 10 'Ollama: WebUI (L)' \
 11 'tmate server (L)' \
-12 'pottava' \
+12 'Pottava Docker WebUI' \
+13 'Portainer Docker WebUI' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
@@ -110,6 +109,7 @@ case "$var0" in
 10) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
 11) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
 12) wget "$github"21-pottava-docker-ui -O /tmp/pottava; sudo bash /tmp/pottava ;;
+13) wget "$github"22-portainer-docker-ui -O /tmp/portainer; sudo bash /tmp/portainer ;;
 X) echo "." > /dev/null ;;
 esac
 }
