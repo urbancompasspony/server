@@ -159,12 +159,17 @@ function s_settings {
 }
 
 function force_msi {
-admxurl=$(curl -s 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=103507' | grep -o -m1 -E "url=http.*msi" | cut -d '=' -f2) \
-    && wget -O admx.msi "$admxurl" \
+wget -O w11admx.msi "https://download.microsoft.com/download/8/d/d/8ddd685d-7d55-42e2-9555-6ab365050734/Administrative%20Templates%20(.admx)%20for%20Windows%2011%20September%202022%20Update.msi" \
     && mkdir /msifiles \
-    && msiextract -C /msifiles/ admx.msi
+    && msiextract -C /msifiles/ w11admx.msi
 
-samba-tool gpo admxload -U Administrator --admx-dir="/msifiles"
+wget -O w10admx.msi "https://download.microsoft.com/download/2/E/3/2E3A1E42-8F50-4396-9E7E-76209EA4F429/Windows10-ADMX.msi" \
+    && msiextract -C /msifiles/ w10admx.msi
+
+mv /msifiles/Program\ Files/Microsoft\ Group\ Policy/Windows\ 11\ September\ 2022\ Update\ \(22H2\)/PolicyDefinitions/ /msifiles/PolicyDefinitions/
+
+samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
+
 echo ""
 read -p "Regras carregadas. Ignore as mensagens de erro acima! Pressione Enter para continuar!"
 }
