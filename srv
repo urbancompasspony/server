@@ -11,6 +11,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Hash
 hash1="68b329da9893e34099c7d8ad5cb9c940"
+hash2="c357311ed3a47a08b423e1b42ec5c130"
 
 # Versão:
 version="v3.5"
@@ -29,11 +30,15 @@ hash0=$(echo "$password" | md5sum | awk '{print $1}')
     [ "$hash0" = "$hash1" ] && {
       start
     } || {
-      clear
-      dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
-      timeout=$((timeout+1)); sleep $timeout
-      init
+      [ "$hash0" = "$hash2" ] && {
+        startocult
+      } || {
+        clear
+        dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
+        timeout=$((timeout+1)); sleep $timeout
+        init
       }
+    }
   }
 }
 
@@ -57,17 +62,21 @@ X) exit ;;
 esac
 }
 
+function startocult {
+  managers ; startocult
+}
+
 function managers {
 var0=$(dialog --title ' ' --backtitle "Managers" --menu " " 0 0 0 \
-A 'TUI VM Manager' \
-B 'Active Directory' \
-C 'Samba Folder Mgr' \
+A 'VM Manager (TUI)' \
+B 'Docker Manager (TUI)' \
+C 'Active Directory' \
 D 'Start Desktop' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
-B) clear ; docker exec -it dominio bash ; exit ;;
-C) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/smb_folder_manager | bash ; managers ;;
+B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
+C) clear ; dialog --title "Informação" --msgbox "Digite domain para entrar no gestor de Domínios!" 5 50 ; exit ;;
 D) clear ; dialog --title "Informação" --msgbox "Digite startx para entrar no modo Desktop!" 5 50 ; exit ;;
 X) echo "." >/dev/null ;;
 esac
