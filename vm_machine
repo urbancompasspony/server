@@ -29,8 +29,6 @@ function menu02 {
   "$vm8" "$vm18" \
   "$vm9" "$vm19" \
   "$vm10" "$vm110" \
-  Iniciar "Todas!" \
-  Parar "Todas!" \
   "X Voltar" "" 2>&1 > /dev/tty )
   case $? in
     2) dialog --title "Ajuda" --msgbox "$TEXTAO11" 0 0 ; menu02 ;;
@@ -48,8 +46,6 @@ function menu02 {
   "$vm8") chkvm="$vm18"; nmvm="$vm8"; menu021 ;;
   "$vm9") chkvm="$vm19"; nmvm="$vm9"; menu021 ;;
   "$vm10") chkvm="$vm110"; nmvm="$vm10"; menu021 ;;
-  Iniciar) menu023 ;;
-  Parar) menu024 ;;
   "X Voltar") exit ;;
   esac
 } || {
