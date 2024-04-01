@@ -114,9 +114,9 @@ function misc {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'LAN Cache' \
 2 'gitlab' \
-3 'android-x86' \
+3 'Pottava Docker WebUI' \
 4 'filebrowser' \
-5 'redroid' \
+5 'androcker' \
 6 'varnish' \
 7 'macOS VM' \
 8 'NO-IP' \
@@ -125,13 +125,12 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 11 'wetty (L)' \
 12 'zabbix' \
 13 'tor-privoxy' \
-14 'Pottava Docker WebUI' \
-15 'tmate server (L)' \
+14 'tmate server (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
 2) wget "$github"12-gitlab -O /tmp/gitlab; sudo bash /tmp/gitlab ;;
-3) wget "$github"13-android-x86 -O /tmp/android-x86; sudo bash /tmp/android-x86 ;;
+3) wget "$github"21-pottava-docker-ui -O /tmp/pottava; sudo bash /tmp/pottava ;;
 4) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
 5) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
 6) wget "$github"35-varnish -O /tmp/varnish; sudo bash /tmp/varnish ;;
@@ -142,8 +141,7 @@ case "$var0" in
 11) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
 12) wget "$github"47-zabbix -O /tmp/zabbix; sudo bash /tmp/zabbix ;;
 13) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
-14) wget "$github"21-pottava-docker-ui -O /tmp/pottava; sudo bash /tmp/pottava ;;
-15) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
+14) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
 X) echo "." > /dev/null ;;
 esac
 }
