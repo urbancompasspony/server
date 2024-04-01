@@ -2,66 +2,141 @@
 
 function check {
   [ $(which docker 2>/dev/null) ] && {  
-    menu022 "1p" && nomeA=$cont0 && contA=$sts && IPLocalA=$IPLocal
-    menu022 "2p" && nomeB=$cont0 && contB=$sts && IPLocalB=$IPLocal
-    menu022 "3p" && nomeC=$cont0 && contC=$sts && IPLocalC=$IPLocal
-    menu022 "4p" && nomeD=$cont0 && contD=$sts && IPLocalD=$IPLocal
-    menu022 "5p" && nomeE=$cont0 && contE=$sts && IPLocalE=$IPLocal
-    menu022 "6p" && nomeF=$cont0 && contF=$sts && IPLocalF=$IPLocal
-    menu022 "7p" && nomeG=$cont0 && contG=$sts && IPLocalG=$IPLocal
-    menu022 "8p" && nomeH=$cont0 && contH=$sts && IPLocalH=$IPLocal
-    menu022 "9p" && nomeI=$cont0 && contI=$sts && IPLocalI=$IPLocal
-    menu022 "10p" && nomeJ=$cont0 && contJ=$sts && IPLocalJ=$IPLocal
-    menu022 "11p" && nomeK=$cont0 && contK=$sts && IPLocalK=$IPLocal
-    menu022 "12p" && nomeL=$cont0 && contL=$sts && IPLocalL=$IPLocal
-    menu022 "13p" && nomeM=$cont0 && contM=$sts && IPLocalM=$IPLocal
-    menu022 "14p" && nomeN=$cont0 && contN=$sts && IPLocalN=$IPLocal
-    menu022 "15p" && nomeO=$cont0 && contO=$sts && IPLocalO=$IPLocal
+    menu022 "1p" && nomeA1=$cont0 && contA1=$sts && IPLocalA1=$IPLocal
+    menu022 "2p" && nomeB1=$cont0 && contB1=$sts && IPLocalB1=$IPLocal
+    menu022 "3p" && nomeC1=$cont0 && contC1=$sts && IPLocalC1=$IPLocal
+    menu022 "4p" && nomeD1=$cont0 && contD1=$sts && IPLocalD1=$IPLocal
+    menu022 "5p" && nomeE1=$cont0 && contE1=$sts && IPLocalE1=$IPLocal
+    menu022 "6p" && nomeF1=$cont0 && contF1=$sts && IPLocalF1=$IPLocal
+    menu022 "7p" && nomeG1=$cont0 && contG1=$sts && IPLocalG1=$IPLocal
+    menu022 "8p" && nomeH1=$cont0 && contH1=$sts && IPLocalH1=$IPLocal
+    menu022 "9p" && nomeI1=$cont0 && contI1=$sts && IPLocalI1=$IPLocal
+    menu022 "10p" && nomeJ1=$cont0 && contJ1=$sts && IPLocalJ1=$IPLocal
+    menu022 "11p" && nomeK1=$cont0 && contK1=$sts && IPLocalK1=$IPLocal
+    menu022 "12p" && nomeL1=$cont0 && contL1=$sts && IPLocalL1=$IPLocal
+    menu022 "13p" && nomeM1=$cont0 && contM1=$sts && IPLocalM1=$IPLocal
+    menu022 "14p" && nomeN1=$cont0 && contN1=$sts && IPLocalN1=$IPLocal
+    menu022 "15p" && nomeO1=$cont0 && contO1=$sts && IPLocalO1=$IPLocal
+    menu022 "16p" && nomeP1=$cont0 && contP1=$sts && IPLocalP1=$IPLocal
+    menu022 "17p" && nomeQ1=$cont0 && contQ1=$sts && IPLocalQ1=$IPLocal
+    menu022 "18p" && nomeR1=$cont0 && contR1=$sts && IPLocalR1=$IPLocal
+    menu022 "19p" && nomeS1=$cont0 && contS1=$sts && IPLocalS1=$IPLocal
+    menu022 "20p" && nomeT1=$cont0 && contT1=$sts && IPLocalT1=$IPLocal
+    menu022 "21p" && nomeU1=$cont0 && contU1=$sts && IPLocalU1=$IPLocal
+    menu022 "22p" && nomeV1=$cont0 && contV1=$sts && IPLocalV1=$IPLocal
+    menu022 "23p" && nomeW1=$cont0 && contW1=$sts && IPLocalW1=$IPLocal
+    menu022 "24p" && nomeX1=$cont0 && contX1=$sts && IPLocalX1=$IPLocal
+    menu022 "25p" && nomeY1=$cont0 && contY1=$sts && IPLocalY1=$IPLocal
+    menu022 "26p" && nomeZ1=$cont0 && contZ1=$sts && IPLocalZ1=$IPLocal
+    menu022 "27p" && nomeA2=$cont0 && contA2=$sts && IPLocalA2=$IPLocal
+    menu022 "28p" && nomeB2=$cont0 && contB2=$sts && IPLocalB2=$IPLocal
+    menu022 "29p" && nomeC2=$cont0 && contC2=$sts && IPLocalC2=$IPLocal
+    menu022 "30p" && nomeD2=$cont0 && contD2=$sts && IPLocalD2=$IPLocal
+    menu022 "31p" && nomeE2=$cont0 && contE2=$sts && IPLocalE2=$IPLocal
+    menu022 "32p" && nomeF2=$cont0 && contF2=$sts && IPLocalF2=$IPLocal
+    menu022 "33p" && nomeG2=$cont0 && contG2=$sts && IPLocalG2=$IPLocal
+    menu022 "34p" && nomeH2=$cont0 && contH2=$sts && IPLocalH2=$IPLocal
+    menu022 "35p" && nomeI2=$cont0 && contI2=$sts && IPLocalI2=$IPLocal
+    menu022 "36p" && nomeJ2=$cont0 && contJ2=$sts && IPLocalJ2=$IPLocal
+    menu022 "37p" && nomeK2=$cont0 && contK2=$sts && IPLocalK2=$IPLocal
+    menu022 "38p" && nomeL2=$cont0 && contL2=$sts && IPLocalL2=$IPLocal
+    menu022 "39p" && nomeM2=$cont0 && contM2=$sts && IPLocalM2=$IPLocal
+    menu022 "40p" && nomeN2=$cont0 && contN2=$sts && IPLocalN2=$IPLocal
   } || {
-    dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "$bktitle" --msgbox "O Docker não foi encontrado neste sistema ou você não possui as permissões de acesso!" 7 50
+    dialog --cr-wrap --title 'ERRO DETECTADO' --backtitle "$bktitle" --msgbox "O Docker não foi encontrado neste sistema ou você não possui as permissoes de acesso!" 7 50
     exit
   }
 }
 
 function menu01 {
   menuxy=$(dialog --ok-label 'Ajustar' --backtitle "Bem-Vindo ao Gestor de Containers!" --title "Gestão de Containers" --menu " "  0 0 0 \
-"$nomeA" "$IPLocalA" \
-"$nomeB" "$IPLocalB" \
-"$nomeC" "$IPLocalC" \
-"$nomeD" "$IPLocalD" \
-"$nomeE" "$IPLocalE" \
-"$nomeF" "$IPLocalF" \
-"$nomeG" "$IPLocalG" \
-"$nomeH" "$IPLocalH" \
-"$nomeI" "$IPLocalI" \
-"$nomeJ" "$IPLocalJ" \
-"$nomeK" "$IPLocalK" \
-"$nomeL" "$IPLocalL" \
-"$nomeM" "$IPLocalM" \
-"$nomeN" "$IPLocalN" \
-"$nomeO" "$IPLocalO" \
-"X Voltar" "" 2>&1 > /dev/tty )
+"$nomeA1" "$IPLocalA1" \
+"$nomeB1" "$IPLocalB1" \
+"$nomeC1" "$IPLocalC1" \
+"$nomeD1" "$IPLocalD1" \
+"$nomeE1" "$IPLocalE1" \
+"$nomeF1" "$IPLocalF1" \
+"$nomeG1" "$IPLocalG1" \
+"$nomeH1" "$IPLocalH1" \
+"$nomeI1" "$IPLocalI1" \
+"$nomeJ1" "$IPLocalJ1" \
+"$nomeK1" "$IPLocalK1" \
+"$nomeL1" "$IPLocalL1" \
+"$nomeM1" "$IPLocalM1" \
+"$nomeN1" "$IPLocalN1" \
+"$nomeO1" "$IPLocalO1" \
+"$nomeP1" "$IPLocalP1" \
+"$nomeQ1" "$IPLocalQ1" \
+"$nomeR1" "$IPLocalR1" \
+"$nomeS1" "$IPLocalS1" \
+"$nomeT1" "$IPLocalT1" \
+"$nomeU1" "$IPLocalU1" \
+"$nomeV1" "$IPLocalV1" \
+"$nomeW1" "$IPLocalW1" \
+"$nomeX1" "$IPLocalX1" \
+"$nomeY1" "$IPLocalY1" \
+"$nomeZ1" "$IPLocalZ1" \
+"$nomeA2" "$IPLocalA2" \
+"$nomeB2" "$IPLocalB2" \
+"$nomeC2" "$IPLocalC2" \
+"$nomeD2" "$IPLocalD2" \
+"$nomeE2" "$IPLocalE2" \
+"$nomeF2" "$IPLocalF2" \
+"$nomeG2" "$IPLocalG2" \
+"$nomeH2" "$IPLocalH2" \
+"$nomeI2" "$IPLocalI2" \
+"$nomeJ2" "$IPLocalJ2" \
+"$nomeK2" "$IPLocalK2" \
+"$nomeL2" "$IPLocalL2" \
+"$nomeM2" "$IPLocalM2" \
+"$nomeN2" "$IPLocalN2" \
+"X VoltHar" "" 2>&1 > /dev/tty )
 
   [ $? -ne 0 ] && exit
   
   case "$menuxy" in
-  "$nomeA") chkcnt="$contA"; nmcnt="$nomeA"; menu02 ;;
-  "$nomeB") chkcnt="$contB"; nmcnt="$nomeB"; menu02 ;;
-  "$nomeC") chkcnt="$contC"; nmcnt="$nomeC"; menu02 ;;
-  "$nomeD") chkcnt="$contD"; nmcnt="$nomeD"; menu02 ;;
-  "$nomeE") chkcnt="$contE"; nmcnt="$nomeE"; menu02 ;;
-  "$nomeF") chkcnt="$contF"; nmcnt="$nomeF"; menu02 ;;
-  "$nomeG") chkcnt="$contG"; nmcnt="$nomeG"; menu02 ;;
-  "$nomeH") chkcnt="$contH"; nmcnt="$nomeH"; menu02 ;;
-  "$nomeI") chkcnt="$contI"; nmcnt="$nomeI"; menu02 ;;
-  "$nomeJ") chkcnt="$contJ"; nmcnt="$nomeJ"; menu02 ;;
-  "$nomeK") chkcnt="$contK"; nmcnt="$nomeK"; menu02 ;;
-  "$nomeL") chkcnt="$contL"; nmcnt="$nomeL"; menu02 ;;
-  "$nomeM") chkcnt="$contM"; nmcnt="$nomeM"; menu02 ;;
-  "$nomeN") chkcnt="$contN"; nmcnt="$nomeN"; menu02 ;;
-  "$nomeO") chkcnt="$contO"; nmcnt="$nomeO"; menu02 ;;
-  "X Voltar") exit ;;
-  esac
+  "$nomeA1") chkcnt="$contA1"; nmcnt="$nomeA1"; menu02 ;;
+  "$nomeB1") chkcnt="$contB1"; nmcnt="$nomeB1"; menu02 ;;
+  "$nomeC1") chkcnt="$contC1"; nmcnt="$nomeC1"; menu02 ;;
+  "$nomeD1") chkcnt="$contD1"; nmcnt="$nomeD1"; menu02 ;;
+  "$nomeE1") chkcnt="$contE1"; nmcnt="$nomeE1"; menu02 ;;
+  "$nomeF1") chkcnt="$contF1"; nmcnt="$nomeF1"; menu02 ;;
+  "$nomeG1") chkcnt="$contG1"; nmcnt="$nomeG1"; menu02 ;;
+  "$nomeH1") chkcnt="$contH1"; nmcnt="$nomeH1"; menu02 ;;
+  "$nomeI1") chkcnt="$contI1"; nmcnt="$nomeI1"; menu02 ;;
+  "$nomeJ1") chkcnt="$contJ1"; nmcnt="$nomeJ1"; menu02 ;;
+  "$nomeK1") chkcnt="$contK1"; nmcnt="$nomeK1"; menu02 ;;
+  "$nomeL1") chkcnt="$contL1"; nmcnt="$nomeL1"; menu02 ;;
+  "$nomeM1") chkcnt="$contM1"; nmcnt="$nomeM1"; menu02 ;;
+  "$nomeN1") chkcnt="$contN1"; nmcnt="$nomeN1"; menu02 ;;
+  "$nomeO1") chkcnt="$contO1"; nmcnt="$nomeO1"; menu02 ;;
+  "$nomeP1") chkcnt="$contP1"; nmcnt="$nomeP1"; menu02 ;;
+  "$nomeQ1") chkcnt="$contQ1"; nmcnt="$nomeQ1"; menu02 ;;
+  "$nomeR1") chkcnt="$contR1"; nmcnt="$nomeR1"; menu02 ;;
+  "$nomeS1") chkcnt="$contS1"; nmcnt="$nomeS1"; menu02 ;;
+  "$nomeT1") chkcnt="$contT1"; nmcnt="$nomeT1"; menu02 ;;
+  "$nomeU1") chkcnt="$contU1"; nmcnt="$nomeU1"; menu02 ;;
+  "$nomeV1") chkcnt="$contV1"; nmcnt="$nomeV1"; menu02 ;;
+  "$nomeW1") chkcnt="$contW1"; nmcnt="$nomeW1"; menu02 ;;
+  "$nomeX1") chkcnt="$contX1"; nmcnt="$nomeX1"; menu02 ;;
+  "$nomeY1") chkcnt="$contY1"; nmcnt="$nomeY1"; menu02 ;;
+  "$nomeZ1") chkcnt="$contZ1"; nmcnt="$nomeZ1"; menu02 ;;
+  "$nomeA2") chkcnt="$contA2"; nmcnt="$nomeA2"; menu02 ;;
+  "$nomeB2") chkcnt="$contB2"; nmcnt="$nomeB2"; menu02 ;;
+  "$nomeC2") chkcnt="$contC2"; nmcnt="$nomeC2"; menu02 ;;
+  "$nomeD2") chkcnt="$contD2"; nmcnt="$nomeD2"; menu02 ;;
+  "$nomeE2") chkcnt="$contE2"; nmcnt="$nomeE2"; menu02 ;;
+  "$nomeF2") chkcnt="$contF2"; nmcnt="$nomeF2"; menu02 ;;
+  "$nomeG2") chkcnt="$contG2"; nmcnt="$nomeG2"; menu02 ;;
+  "$nomeH2") chkcnt="$contH2"; nmcnt="$nomeH2"; menu02 ;;
+  "$nomeI2") chkcnt="$contI2"; nmcnt="$nomeI2"; menu02 ;;
+  "$nomeJ2") chkcnt="$contJ2"; nmcnt="$nomeJ2"; menu02 ;;
+  "$nomeK2") chkcnt="$contK2"; nmcnt="$nomeK2"; menu02 ;;
+  "$nomeL2") chkcnt="$contL2"; nmcnt="$nomeL2"; menu02 ;;
+  "$nomeM2") chkcnt="$contM2"; nmcnt="$nomeM2"; menu02 ;;
+  "$nomeN2") chkcnt="$contN2"; nmcnt="$nomeN2"; menu02 ;;
+  "X VoltHar") exit ;;
+  esaIc
 }
 
 function menu02 {
