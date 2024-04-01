@@ -90,10 +90,8 @@ function menu01 {
 "$nomeL2" "$IPLocalL2" \
 "$nomeM2" "$IPLocalM2" \
 "$nomeN2" "$IPLocalN2" \
-"X VoltHar" "" 2>&1 > /dev/tty )
-
+"X Voltar" "" 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
-  
   case "$menuxy" in
   "$nomeA1") chkcnt="$contA1"; nmcnt="$nomeA1"; menu02 ;;
   "$nomeB1") chkcnt="$contB1"; nmcnt="$nomeB1"; menu02 ;;
@@ -135,8 +133,8 @@ function menu01 {
   "$nomeL2") chkcnt="$contL2"; nmcnt="$nomeL2"; menu02 ;;
   "$nomeM2") chkcnt="$contM2"; nmcnt="$nomeM2"; menu02 ;;
   "$nomeN2") chkcnt="$contN2"; nmcnt="$nomeN2"; menu02 ;;
-  "X VoltHar") exit ;;
-  esaIc
+  "X Voltar") exit ;;
+  esac
 }
 
 function menu02 {
