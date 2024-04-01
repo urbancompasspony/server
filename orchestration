@@ -92,7 +92,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 8 'Syncthing: Client (L/W)' \
 9 'Ollama: IA (L)' \
 10 'Ollama: WebUI (L)' \
-12 'Portainer Docker WebUI (L/W)' \
+11 'Portainer Docker WebUI (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
