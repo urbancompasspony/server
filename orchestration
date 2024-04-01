@@ -92,9 +92,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 8 'Syncthing: Client (L/W)' \
 9 'Ollama: IA (L)' \
 10 'Ollama: WebUI (L)' \
-11 'tmate server (L)' \
-12 'Pottava Docker WebUI' \
-13 'Portainer Docker WebUI' \
+12 'Portainer Docker WebUI (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
@@ -107,9 +105,7 @@ case "$var0" in
 8) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 9) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
 10) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-11) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
-12) wget "$github"21-pottava-docker-ui -O /tmp/pottava; sudo bash /tmp/pottava ;;
-13) wget "$github"22-portainer-docker-ui -O /tmp/portainer; sudo bash /tmp/portainer ;;
+11) wget "$github"22-portainer-docker-ui -O /tmp/portainer; sudo bash /tmp/portainer ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -126,9 +122,11 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 8 'NO-IP' \
 9 'registry' \
 10 'xpra-ubuntu2204' \
-11 'wetty' \
+11 'wetty (L)' \
 12 'zabbix' \
 13 'tor-privoxy' \
+14 'Pottava Docker WebUI' \
+15 'tmate server (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
@@ -144,6 +142,8 @@ case "$var0" in
 11) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
 12) wget "$github"47-zabbix -O /tmp/zabbix; sudo bash /tmp/zabbix ;;
 13) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
+14) wget "$github"21-pottava-docker-ui -O /tmp/pottava; sudo bash /tmp/pottava ;;
+15) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
 X) echo "." > /dev/null ;;
 esac
 }
