@@ -143,16 +143,19 @@ function menu02 {
   [ $? = 0 ] && {
     docker restart "$nmcnt"
     dialog --title "$nmcnt" --msgbox "O container $nmcnt foi reiniciado!" 6 40
+    check
   } || {
     dialog --title "$nmcnt" --yesno "Deseja desligar o container $nmcnt?" 6 40
     [ $? = 0 ] && {
       docker stop "$nmcnt"
       dialog --title "$nmcnt" --msgbox "O container $nmcnt foi desligado!" 6 40
+      check
     } || {
-      dialog --title "$nmcnt" --yesno "Deseja desligar FORÇADAMENTE o container $nmcnt?" 6 40
+      dialog --title "$nmcnt" --yesno "Deseja desligar FORCADAMENTE o container $nmcnt?" 6 40
       [ $? = 0 ] && {
         docker kill "$nmcnt"
-        dialog --title "$nmcnt" --msgbox "O container $nmcnt foi desligado de forma forçada!" 6 40
+        dialog --title "$nmcnt" --msgbox "O container $nmcnt foi desligado de forma forcada!" 6 40
+        check
       } || {
         echo "a" > /dev/null
         }
@@ -161,12 +164,14 @@ function menu02 {
 } || {
   [ "$chkcnt" = "- - -" ] && {
     dialog --title "$nmcnt" --msgbox "O container $nmcnt não existe!" 6 40
+    check
   } || {
     [ "$chkcnt" = "Parado" ] && {
       dialog --title "$nmcnt" --yesno "Deseja tentar ligar o container $nmcnt?" 6 40
       [ $? = 0 ] && {
         docker start "$nmcnt"
         dialog --title "$nmcnt" --msgbox "Verifique se o container $nmcnt iniciou!" 6 40
+        check
       } || {
         echo "a" > /dev/null
         }
@@ -178,7 +183,6 @@ menu01
 }
 
 function menu022 {
-
   # Default
   cont0="None"
   sts="- - -"
