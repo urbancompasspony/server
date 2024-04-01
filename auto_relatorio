@@ -73,11 +73,11 @@ function backup0 {
   clear
   df -h; read
   clear
-  journalctl -b 0 | grep rsnap; read
+  journalctl -b 0 | grep rsnap | tail -n 5
   clear
-  journalctl -b 0 | grep rsync; read
+  journalctl -b 0 | grep rsync | tail -n 5
   clear
-  journalctl -b 0 | grep rclone; read
+  journalctl -b 0 | grep rclone | tail -n 5
   clear
   destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
   ls -la $destiny; read
@@ -112,7 +112,7 @@ Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notifica
 
 function syslog0 {
   clear
-  cat /srv/containers/*/log/syslog | grep renameat | tail; read
+  cat /srv/containers/*/log/syslog | grep renameat | tail -n 2
   echo "$datetime Foi realizada a verificação da integridade dos Logs de Eventos
 das pastas da rede e se os registros de uso, dos compartilhamentos, estão em dia.
 " >> "$file"
