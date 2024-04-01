@@ -72,13 +72,13 @@ A 'VM Manager (TUI)' \
 B 'Docker Manager (TUI)' \
 C 'Active Directory' \
 D 'Start Desktop' \
-X '<' 2>&1 > /dev/tty )
+X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
 C) clear ; dialog --title "Informação" --msgbox "Digite domain para entrar no gestor de Domínios!" 7 50 ; exit ;;
 D) clear ; dialog --title "Informação" --msgbox "Digite startx para entrar no modo Desktop!" 7 50 ; exit ;;
-X) echo "." >/dev/null ;;
+X) exit ;;
 esac
 }
 
