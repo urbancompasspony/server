@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# NEW ADMX!
+
+admxw10="https://download.microsoft.com/download/2/E/3/2E3A1E42-8F50-4396-9E7E-76209EA4F429/Windows10-ADMX.msi"
+admxw11="https://download.microsoft.com/download/8/d/d/8ddd685d-7d55-42e2-9555-6ab365050734/Administrative%20Templates%20(.admx)%20for%20Windows%2011%20September%202022%20Update.msi"
+
+# ============================================================================ #
+
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
@@ -141,8 +148,9 @@ function s_settings {
   D 'dbcheck: general' \
   E 'GPO: ACL Check (administrator)' \
   F 'GPUpdate /Force (via SMB)' \
-  G 'Force Upgrade .MSI Files' \
-  H 'Atualizar este Menu' \
+  G 'Force Upgrade .MSI Files (W10)' \
+  H 'Force Upgrade .MSI Files (W11)' \
+  I 'Atualizar este Menu' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -152,40 +160,54 @@ function s_settings {
   D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   F) clear ; samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  G) clear ; force_msi ; s_settings ;;
-  H) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; s_settings ;;
+  G) clear ; force_msi_w10 ; s_settings ;;
+  H) clear ; force_msi_w11 ; s_settings ;;
+  I) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
 }
 
-function force_msi {
-wget -O w11admx.msi "https://download.microsoft.com/download/8/d/d/8ddd685d-7d55-42e2-9555-6ab365050734/Administrative%20Templates%20(.admx)%20for%20Windows%2011%20September%202022%20Update.msi" \
+function force_msi_w10 {
+wget -O w10admx.msi "$admxw10" \
+    && msiextract -C /msifiles/ w10admx.msi
+
+rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions
+
+samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
+
+echo ""
+read -p "As regras do Windows 10 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
+}
+
+function force_msi_w11 {
+wget -O w11admx.msi "$admxw11" \
     && mkdir /msifiles \
     && msiextract -C /msifiles/ w11admx.msi
 
-wget -O w10admx.msi "https://download.microsoft.com/download/2/E/3/2E3A1E42-8F50-4396-9E7E-76209EA4F429/Windows10-ADMX.msi" \
-    && msiextract -C /msifiles/ w10admx.msi
+rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions
 
 mv /msifiles/Program\ Files/Microsoft\ Group\ Policy/Windows\ 11\ September\ 2022\ Update\ \(22H2\)/PolicyDefinitions/ /msifiles/PolicyDefinitions/
 
 samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
 
 echo ""
-read -p "Regras carregadas. Ignore as mensagens de erro acima! Pressione Enter para continuar!"
+read -p "As regras do Windows 11 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
 }
 
 function shared_folders {
 var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
 A 'Mostrar Pastas Compartilhadas' \
 B 'Criar Nova Pasta Compartilhada' \
-C 'Excluir Pasta Compartilhada' \
-D 'Revalidar Configuracoes' \
+C 'Criar Compartilhamento Anonimo' \
+D 'Excluir Compartilhamento' \
+E 'Revalidar Configuracoes' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) show_shared ; shared_folders ;;
 B) create_shared ; shared_folders ;;
-C) remove_shared ; shared_folders ;;
-D) revalid_shared ; shared_folders ;;
+C) create_anon ; shared_folders ;;
+D) remove_shared ; shared_folders ;;
+E) revalid_shared ; shared_folders ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -900,6 +922,12 @@ function show_shared {
     clear
     dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 5 40
   }
+}
+
+function create_anon {
+  clear
+  echo "em breve!"
+  sleep 2
 }
 
 function create_shared {
