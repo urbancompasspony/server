@@ -76,7 +76,7 @@ X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
-C) clear ; docker exec -it domain /root/.init ; exit ;;
+C) clear ; docker exec -it dominio /root/.init ; exit ;;
 D) clear ; dialog --title "Informação" --msgbox "Digite startx para entrar no modo Desktop!" 7 50 ; exit ;;
 X) exit ;;
 esac
