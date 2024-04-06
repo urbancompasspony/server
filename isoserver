@@ -32,30 +32,22 @@ fi
 
 function start {
 var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao ISO Downloader!" --menu " " 0 0 0 \
-A 'pfSense 2.7' \
-B 'pfSense 2.6' \
-C 'Ubuntu Server 22.04 LTS' \
-D 'Windows Server 2019 STD' \
-E 'Windows 10' \
-F 'Windows 11' \
-G 'ReviOS W10' \
-H 'ReviOS W11' \
-I 'virtio-win-0.1.185' \
-J 'virtio-win-0.1.229' \
-K 'pfSense IMG' \
+1 'pfSense 2.7' \
+2 'Windows Server 2019 STD' \
+3 'Windows 10 Pro/Works' \
+4 'Windows 11 Pro/Works' \
+5 'ReviOS W10' \
+6 'ReviOS W11' \
+7 'virtio-win-0.1.229' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-A) calling pfSense-2.7.iso ; setperma ; start ;;
-B) calling pfSense2.6.iso ; setperma ; start ;;
-C) calling ubuntuserver2204.iso ; setperma ; start ;;
-D) calling wserver2019STD.iso ; setperma ; start ;;
-E) calling Windows10.iso ; setperma ; start ;;
-F) calling Windows11.iso ; setperma ; start ;;
-G) calling ReviOSW10.iso ; setperma ; start ;;
-H) calling ReviOSW11.iso ; setperma ; start ;;
-I) calling virtio-win-0.1.185.iso ; setperma ; start ;;
-J) calling virtio-win-0.1.229.iso ; setperma ; start ;;
-K) calling pfsense.img ; setperma ; start ;;
+1) calling pfSense-2.7.iso ; setperma ; start ;;
+2) calling wserver2019STD.iso ; setperma ; start ;;
+3) calling Windows10.iso ; setperma ; start ;;
+4) calling Windows11.iso ; setperma ; start ;;
+5) calling ReviOSW10.iso ; setperma ; start ;;
+6) calling ReviOSW11.iso ; setperma ; start ;;
+7) calling virtio-win-0.1.229.iso ; setperma ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
