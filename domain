@@ -147,10 +147,9 @@ function s_settings {
   C 'dbcheck: well-known-acls' \
   D 'dbcheck: general' \
   E 'GPO: ACL Check (administrator)' \
-  F 'GPUpdate /Force (via SMB)' \
-  G 'Force Upgrade .MSI Files (W10)' \
-  H 'Force Upgrade .MSI Files (W11)' \
-  I 'Atualizar este Menu' \
+  F 'Upgrade ADMX Files for Windows 10' \
+  G 'Upgrade ADMX Files for Windows 11' \
+  H 'Atualizar este Menu' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -159,15 +158,17 @@ function s_settings {
   C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  F) clear ; samba-gpupdate -U administrator --force --rsop ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  G) clear ; force_msi_w10 ; s_settings ;;
-  H) clear ; force_msi_w11 ; s_settings ;;
-  I) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; s_settings ;;
+  F) clear ; force_msi_w10 ; s_settings ;;
+  G) clear ; force_msi_w11 ; s_settings ;;
+  H) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
 }
 
 function force_msi_w10 {
+dialog --title 'Confirmacao' --backtitle 'ADMX Windows 10' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0
+  [ $? = 0 ] && {
+
 wget -O w10admx.msi "$admxw10" \
     && msiextract -C /msifiles/ w10admx.msi
 
@@ -177,9 +178,15 @@ samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions
 
 echo ""
 read -p "As regras do Windows 10 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
+  } || {
+    echo "." > /dev/null
+  }
 }
 
 function force_msi_w11 {
+dialog --title 'Confirmacao' --backtitle 'ADMX Windows 11' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0
+  [ $? = 0 ] && {
+
 wget -O w11admx.msi "$admxw11" \
     && mkdir /msifiles \
     && msiextract -C /msifiles/ w11admx.msi
@@ -192,6 +199,9 @@ samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions
 
 echo ""
 read -p "As regras do Windows 11 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
+  } || {
+    echo "." > /dev/null
+  }
 }
 
 function shared_folders {
@@ -199,15 +209,17 @@ var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --
 A 'Mostrar Pastas Compartilhadas' \
 B 'Criar Nova Pasta Compartilhada' \
 C 'Criar Compartilhamento Anonimo' \
-D 'Excluir Compartilhamento' \
-E 'Revalidar Configuracoes' \
+D 'Compartilhamento Estruturado' \
+E 'Excluir Compartilhamento' \
+F 'Revalidar Configuracoes' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) show_shared ; shared_folders ;;
 B) create_shared ; shared_folders ;;
 C) create_anon ; shared_folders ;;
-D) remove_shared ; shared_folders ;;
-E) revalid_shared ; shared_folders ;;
+D) create_sync ; shared_folders ;;
+E) remove_shared ; shared_folders ;;
+F) revalid_shared ; shared_folders ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -926,8 +938,14 @@ function show_shared {
 
 function create_anon {
   clear
-  echo "em breve!"
-  sleep 2
+  echo "em breve mais uma ferramenta para agilizar o seu trabalho!"
+  sleep 3
+}
+
+function create_sync {
+  clear
+  echo "em breve mais uma ferramenta para agilizar o seu trabalho!"
+  sleep 3
 }
 
 function create_shared {
