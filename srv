@@ -84,7 +84,7 @@ C) clear ; dialog --title "Informação" --msgbox "Digite domain para ajustes do
 E) dnstest ; managers ;;
 D) clear ; dialog --title "Informação" --msgbox "Digite startx para entrar no modo Desktop!" 7 50 ; exit ;;
 E) dnstest ; managers ;;
-F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | bash ; managers ;;
+F) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers ;;
 G) reb00t ; managers ;;
 H) shutd0 ; managers ;;
 X) exit ;;
