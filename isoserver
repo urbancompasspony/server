@@ -38,7 +38,7 @@ var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao ISO Downloader!" --menu " " 
 4 'Windows 11 Pro/Works' \
 5 'ReviOS W10' \
 6 'ReviOS W11' \
-7 'virtio-win-0.1.229' \
+7 'Drivers VM VirtIO' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) calling pfSense-2.7.iso ; setperma ; start ;;
@@ -47,7 +47,7 @@ case "$var0" in
 4) calling Windows11.iso ; setperma ; start ;;
 5) calling ReviOSW10.iso ; setperma ; start ;;
 6) calling ReviOSW11.iso ; setperma ; start ;;
-7) calling virtio-win-0.1.229.iso ; setperma ; start ;;
+7) clear ; sudo wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso -O $destpath/$1 ; setperma ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
