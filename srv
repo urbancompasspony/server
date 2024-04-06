@@ -80,9 +80,9 @@ X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
 B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
-C) clear ; dialog --title "Informação" --msgbox "Digite domain para ajustes do Controlador de Dominio!" 7 50 ; exit ;;
+C) clear ; echo -e " \n Por motivos de seguranca, digite domain para entrar no menu de ajustes do Controlador de Dominio! \n " ; exit ;;
 E) dnstest ; managers ;;
-D) clear ; dialog --title "Informação" --msgbox "Digite startx para entrar no modo Desktop!" 7 50 ; exit ;;
+D) clear ; echo -e " \n SOMENTE NA MAQUINA SERVIDORA LOCAL: Digite startx para entrar no modo Desktop! \n " ; exit ;;
 E) dnstest ; managers ;;
 F) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers ;;
 G) reb00t ; managers ;;
