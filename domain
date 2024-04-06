@@ -931,18 +931,20 @@ function create_anon {
 }
 
 function create_shared {
-VALUE1="server"
-VALUE2="custom_folder"
-VALUE3="usuario, @grupo"
+VALUE1="nome_do_compartilhamento"
+VALUE2="/disk01/pasta_alvo"
+VALUE3="@grupo, usuario"
 VALUE4="yes"
 VALUE5="yes"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Compartilhamento" --form "Separe grupos e/ou usuarios com virgula." 12 45 0 \
-"ShrName :" 1 1 "$VALUE1" 1 10 34 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Compartilhamento" --form "Separe os grupos e/ou usuarios com virgula. \n
+Se a pasta nao existe ela sera criada. \n
+Use o modelo abaixo /pasta ou /disco/pasta" 0 0 0 \
+"Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
 "PathName:" 2 1 "$VALUE2" 2 10 34 0 \
 "Grp Name:" 3 1 "$VALUE3" 3 10 34 0 \
 "Writable:" 4 1 "$VALUE4" 4 10 34 0 \
-"Browser :" 5 1 "$VALUE5" 5 10 34 0 \
+"Browser.:" 5 1 "$VALUE5" 5 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && return
@@ -961,7 +963,7 @@ mkdir -p /mnt/$var2
 
 tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
-path = /mnt/$var2
+path = /mnt$var2
 valid users = $var3
 admin users = $var3
 writable = $var4
@@ -978,8 +980,11 @@ smbcontrol all reload-config
 }
 
 function remove_shared {
-VALUE0=$(dialog --ok-label "Ok" --title "Compartilhamento" --form "Nome do Compartilhamento" 8 35 0 \
-"ShrName:" 1 1 "$VALUE0" 1 11 30 0 \
+VALUE1=""
+
+VALUE0=$(dialog --ok-label "Ok" --title "Remover Compartilhamento" --form "Nome do Compartilhamento a ser removido. \n
+Seus dados nao sao apagados, apenas o compartilhamento sera removido!" 0 0 0 \
+"ShrName:" 1 1 "$VALUE1" 1 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
     case $? in
