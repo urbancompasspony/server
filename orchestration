@@ -39,12 +39,14 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole (L/W)' \
 2 'Dominio (W)' \
 3 'Pentest (L/W)' \
-4 'XPRA Virt-Manager (L/W)' \
+4 'XPRA VMs (L/W)' \
 5 'MySpeed: Tracker (W)' \
 6 'Kuma Ping: Tracker (W)' \
-7 'NextCloud (W)' \
-8 'OnlyOffice (W)' \
-9 'Apache2: Reverse Proxy (W)' \
+7 'OpenSpeedTest (W)' \
+8 'NextCloud (W)' \
+9 'OnlyOffice (W)' \
+10 'Apache2: ReverseProxy (W)' \
+11 'Syncthing: Client (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
@@ -53,9 +55,11 @@ case "$var0" in
 4) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
 5) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
 6) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-7) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-9) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+7) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+8) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+9) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+10) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+11) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -63,13 +67,14 @@ esac
 function servers {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'UniFi (W)' \
-2 'OpenFire [+Spark] (W)' \
+2 'Spark Msg [OpenFire] (W)' \
 3 'RustDesk (W)' \
 4 'Apache2 Standalone (W)' \
 5 'GLPI (W)' \
 6 'ntfy (W)' \
-7 'Portainer Docker WebUI (L/W)' \
-8 'OpenSpeedTest Local (W)' \
+7 'Portainer WebUI (L/W)' \
+8 'Netboot PXE (W)' \
+9 'WeTTY (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
@@ -79,37 +84,32 @@ case "$var0" in
 5) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
 6) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
 7) wget "$github"22-portainer-docker-ui -O /tmp/portainer; sudo bash /tmp/portainer ;;
-8) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+8) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
+9) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
 X) echo "." > /dev/null ;;
 esac
 }
 
 function others {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'StatPing-NG Tracker (W)' \
-2 'SSH DW: Backdoor (L)' \
-3 'SMB Server Standalone (W)' \
-4 'Windows VMs (L/W)' \
-5 'FTP Server Standalone (W)' \
-6 'CUPS Printer Standalone (W)' \
-7 'Syncthing: Client (L/W)' \
-8 'Ollama: IA (L)' \
-9 'Ollama: WebUI (L)' \
-10 'Netboot PXE (W)' \
-11 'WeTTY (L)' \
+1 'SSH DW: Backdoor (L)' \
+2 'SMB Server Standalone (W)' \
+3 'Windows VMs (L/W)' \
+4 'FTP Server Standalone (W)' \
+5 'CUPS Printer Standalone (W)' \
+7 'Ollama: IA (L)' \
+8 'Ollama: WebUI (L)' \
+9 'StatPing-NG Tracker (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-1) wget "$github"50-statping-ng -O /tmp/statping; sudo bash /tmp/statping ;;
-2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-3) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
-4) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
-5) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-6) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
-7) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-8) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-9) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-10) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
-11) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
+1) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
+2) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
+3) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
+4) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+5) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
+7) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+8) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+9) wget "$github"50-statping-ng -O /tmp/statping; sudo bash /tmp/statping ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -117,17 +117,17 @@ esac
 function misc {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'LAN Cache' \
-2 'gitlab' \
-3 'Pottava Docker WebUI' \
-4 'filebrowser' \
-5 'tmate server (L)' \
-6 'varnish' \
+2 'GitLab' \
+3 'Pottava WebUI' \
+4 'FileBrowser' \
+5 'Tmate Server (L)' \
+6 'Varnish' \
 7 'macOS VM' \
-8 'NO-IP' \
-9 'registry' \
-10 'xpra-ubuntu2204' \
-11 'zabbix' \
-12 'tor-privoxy' \
+8 'NO IP' \
+9 'Registry' \
+10 'XPRA (Ubuntu 2204)' \
+11 'Zabbix' \
+12 'TOR privoxy' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
