@@ -960,12 +960,12 @@ function create_sync {
 
 function create_shared {
 VALUE1="nome_do_compartilhamento"
-VALUE2="/disk01/pasta_alvo"
+VALUE2="/disco_se_existir/pasta_alvo"
 VALUE3="@grupo, usuario"
 VALUE4="yes"
 VALUE5="yes"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Compartilhamento" --form "Separe os grupos e/ou usuarios com virgula. \n
+  VALUE0=$(dialog --help-button --help-label 'Ajuda' --ok-label "Criar" --title "Compartilhamento" --form "Separe os grupos e/ou usuarios com virgula. \n
 Se a pasta nao existe ela sera criada. \n
 Use o modelo abaixo /pasta ou /disco/pasta" 0 0 0 \
 "Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
@@ -975,7 +975,11 @@ Use o modelo abaixo /pasta ou /disco/pasta" 0 0 0 \
 "Browser.:" 5 1 "$VALUE5" 5 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
-  [ $? -ne 0 ] && return
+case $? in
+   0) echo "." > /dev/null ;;
+   1) return ;;
+   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Discos Encontrados:' --msgbox "$mntshow1" 12 70 ; return ;;
+esac
 
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
@@ -1009,15 +1013,19 @@ smbcontrol all reload-config
 
 function create_anon {
 VALUE1="nome_do_compartilhamento"
-VALUE2="/disk01/pasta_alvo"
+VALUE2="/disco_se_existir/pasta_alvo"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Compartilhamento" --form "CUIDADO: Este acesso sera totalmente liberado sem usuarios ou senhas! \nSe a pasta nao existe ela sera criada. \n
+  VALUE0=$(dialog --help-button --help-label 'Ajuda' --ok-label "Criar" --title "Compartilhamento" --form "CUIDADO: Este acesso sera totalmente liberado sem usuarios ou senhas! \nSe a pasta nao existe ela sera criada. \n
 Use o modelo abaixo /pasta ou /disco/pasta" 0 0 0 \
 "Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
 "PathName:" 2 1 "$VALUE2" 2 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
-  [ $? -ne 0 ] && return
+case $? in
+   0) echo "." > /dev/null ;;
+   1) return ;;
+   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Discos Encontrados:' --msgbox "$mntshow1" 12 70 ; return ;;
+esac
 
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
