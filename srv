@@ -68,25 +68,24 @@ function startocult {
 
 function managers {
 var0=$(dialog --title ' ' --backtitle "Managers" --menu " " 0 0 0 \
-A 'Maquinas Virtuais (TUI)' \
-B 'Containers (TUI)' \
-C 'Active Directory' \
-D 'Iniciar Desktop' \
-E 'Test Ping DNS' \
-F 'Baixar Imagens .ISO' \
-G 'Reiniciar Servidor' \
-H 'Desligar Servidor' \
+1 'Maquinas Virtuais (TUI)' \
+2 'Containers (TUI)' \
+3 'Active Directory (TUI)' \
+4 'Test Ping DNS' \
+5 'Baixar Imagens .ISO' \
+6 'Iniciar Desktop' \
+7 'Reiniciar Servidor' \
+8 'Desligar Servidor' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
-A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
-C) clear ; echo -e " \n Por motivos de seguranca, digite domain para entrar no menu de ajustes do Controlador de Dominio! \n " ; exit ;;
-E) dnstest ; managers ;;
-D) clear ; echo -e " \n SOMENTE NA MAQUINA SERVIDORA LOCAL: Digite startx para entrar no modo Desktop! \n " ; exit ;;
-E) dnstest ; managers ;;
-F) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers ;;
-G) reb00t ; managers ;;
-H) shutd0 ; managers ;;
+1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
+2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
+3) domain ; managers ;;
+4) dnstest ; managers ;;
+5) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers ;;
+6) clear ; echo -e " \n SOMENTE NA MAQUINA SERVIDORA LOCAL: Digite startx para entrar no modo Desktop! \n " ; exit ;;
+7) reb00t ; managers ;;
+8) shutd0 ; managers ;;
 X) exit ;;
 esac
 }
