@@ -1054,7 +1054,7 @@ smbcontrol all reload-config
 }
 
 function remove_shared {
-VALUE1=""
+VALUE1="pasta_na_rede"
 
 VALUE0=$(dialog --ok-label "Ok" --title "Remover Compartilhamento" --form "Nome do Compartilhamento a ser removido. \n
 Seus dados nao sao apagados, apenas o compartilhamento sera removido!" 0 0 0 \
