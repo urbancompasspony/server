@@ -953,9 +953,50 @@ utilize o menu Excluir Compartilhamento!" 0 0 0 "${files[@]}")
 }
 
 function create_sync {
-  clear
-  echo "em breve mais uma ferramenta para agilizar o seu trabalho!"
-  sleep 3
+VALUE1="nome_do_compartilhamento"
+VALUE2="/DISCO_ALVO/pasta_alvo"
+VALUE3="@grupo, usuario"
+
+  VALUE0=$(dialog --help-button --help-label 'Ajuda' --ok-label "Criar" --title "Compartilhamento para Sync Center" --form "Separe os grupos e/ou usuarios com virgula. \n
+Se a pasta nao existe ela sera criada. \n
+A permissao da pasta sera do dono da mesma. \n
+Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
+"Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
+"     /mnt" 2 1 "$VALUE2" 2 10 34 0 \
+"Grp Name:" 3 1 "$VALUE3" 3 10 34 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+case $? in
+   0) echo "." > /dev/null ;;
+   1) return ;;
+   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Ajuda:' --msgbox "Ideal para Windows Sync Center! \n\nLegenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1 \n\nDica: Para compartilhamento Supervisor, use apenas / e tudo sera exposto a ele." 0 0 ; return ;;
+esac
+
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+
+[ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
+    dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 5 40
+  } || {
+    mkdir -p /mnt/$var2
+
+tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
+[$var1]
+path = /mnt$var2
+valid users = $var3
+force users = $var3
+writable = yes
+browsable = yes
+guest ok = no
+create mask = 0600
+force create mode = 0100
+directory mask = 0700
+force directory mode = 0700
+EOF
+
+revalid_shared
+  }
 }
 
 function create_shared {
@@ -1006,8 +1047,7 @@ directory mask = 0777
 force directory mode = 0777
 EOF
 
-ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
-smbcontrol all reload-config
+revalid_shared
   }
 }
 
@@ -1048,8 +1088,7 @@ directory mask = 0777
 force directory mode = 0777
 EOF
 
-ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
-smbcontrol all reload-config
+revalid_shared
   }
 }
 
