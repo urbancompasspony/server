@@ -67,7 +67,7 @@ function startocult {
 }
 
 function managers {
-var0=$(dialog --title ' ' --backtitle "Managers" --menu " " 0 0 0 \
+var0=$(dialog --title ' ' --backtitle "Managers" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
 1 'Maquinas Virtuais (TUI)' \
 2 'Containers (TUI)' \
 3 'Active Directory (TUI)' \
