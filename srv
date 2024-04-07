@@ -50,14 +50,12 @@ A 'Orchestra' \
 B 'Support Menu' \
 C 'Manut. & Relat.' \
 D 'Settings' \
-E 'Atualizar Bashrc' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
 B) managers ; start ;;
 C) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_relatorio | sudo bash ; start ;;
 D) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
 X) exit ;;
 esac
 }
@@ -213,7 +211,6 @@ function ping1 {
     echo ""
     echo -e "\033[39;5mPor favor, insira a senha do usuário $USER\033[0m"
     echo ""
-
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
     . .bashrc    
     sudo apt update
