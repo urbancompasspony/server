@@ -969,7 +969,7 @@ VALUE5="yes"
 Se a pasta nao existe ela sera criada. \n
 Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
 "Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
-"/mnt" 2 1 "$VALUE2" 2 10 34 0 \
+"     /mnt" 2 1 "$VALUE2" 2 10 34 0 \
 "Grp Name:" 3 1 "$VALUE3" 3 10 34 0 \
 "Writable:" 4 1 "$VALUE4" 4 10 34 0 \
 "Browser.:" 5 1 "$VALUE5" 5 10 34 0 \
@@ -978,7 +978,7 @@ Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
 case $? in
    0) echo "." > /dev/null ;;
    1) return ;;
-   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Ajuda:' --msgbox "Legenda:\n/disco_no_sistema /DISCO_ALVO outros,parametros 0 0 \n\nDiscos Encontrados: \n$mntshow1" 12 70 ; return ;;
+   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Ajuda:' --msgbox "Legenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1" 12 70 ; return ;;
 esac
 
   var1=$(echo "$VALUE0" | sed -n 1p)
@@ -1018,13 +1018,13 @@ VALUE2="/DISCO_ALVO/pasta_alvo"
   VALUE0=$(dialog --help-button --help-label 'Ajuda' --ok-label "Criar" --title "Compartilhamento Anonimo" --form "CUIDADO: Este acesso sera totalmente liberado sem usuarios ou senhas! \nSe a pasta nao existe ela sera criada. \n
 Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
 "Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
-"/mnt" 2 1 "$VALUE2" 2 10 34 0 \
+"     /mnt" 2 1 "$VALUE2" 2 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
 case $? in
    0) echo "." > /dev/null ;;
    1) return ;;
-   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Ajuda:' --msgbox "Legenda:\n/disco_no_sistema /DISCO_ALVO outros,parametros 0 0 \n\nDiscos Encontrados: \n$mntshow1" 12 70 ; return ;;
+   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Ajuda:' --msgbox "Legenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1" 12 70 ; return ;;
 esac
 
   var1=$(echo "$VALUE0" | sed -n 1p)
