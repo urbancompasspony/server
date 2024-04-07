@@ -927,12 +927,30 @@ Por favor, configure-o manualmente e tente novamente." 10 50
 }
 
 function show_shared {
-  [ -d "/etc/samba/external/smb.conf.d" ] && {
-    listagem=$(ls /etc/samba/external/smb.conf.d/* | xargs -n 1 basename)
-    dialog --title "Lista de Pastas Compartilhadas:" --msgbox "$listagem" 15 35
-  } || {
-    clear
-    dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 5 40
+  setfolder="/etc/samba/external/smb.conf.d/"
+
+  [ -d "$setfolder" ] && {
+  files=()
+  while IFS= read -r -d $'\0' file; do
+    files+=("$file" "")
+  done < <(find "$setfolder" -type f -name "*.conf" -print0)
+    [ ${#files[@]} -eq 0 ] && {
+      clear
+      echo "Nenhuma configuracao encontrada em $setfolder"
+      sleep 1
+    } || {
+      file=$(dialog --stdout --title "Escolha um compartilhamento para visualizar" --cancel-label "Voltar" --menu "Somente leitura. \nPara remover,
+utilize o menu Excluir Compartilhamento!" 0 0 0 "${files[@]}")
+      [ $? -ne 0 ] && return
+      clear
+      cat $file
+      echo ""
+      read -p "Pressione ENTER quando terminar de visualizar a configuracao!"
+      show_shared
+    } || {
+      clear
+      dialog --title "ERRO" --msgbox "Nenhum compartilhamento encontrado!" 5 40
+    }
   }
 }
 
