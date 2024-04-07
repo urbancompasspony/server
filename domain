@@ -936,12 +936,6 @@ function show_shared {
   }
 }
 
-function create_anon {
-  clear
-  echo "em breve mais uma ferramenta para agilizar o seu trabalho!"
-  sleep 3
-}
-
 function create_sync {
   clear
   echo "em breve mais uma ferramenta para agilizar o seu trabalho!"
@@ -974,10 +968,9 @@ Use o modelo abaixo /pasta ou /disco/pasta" 0 0 0 \
   var5=$(echo "$VALUE0" | sed -n 5p)
 
 [ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
-  dialog --title "ERRO" --msgbox "O compartilhamento ja existe! Saindo..." 5 40
-}
-
-mkdir -p /mnt/$var2
+    dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 5 40
+  } || {
+    mkdir -p /mnt/$var2
 
 tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
@@ -995,6 +988,45 @@ EOF
 
 ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
 smbcontrol all reload-config
+  }
+}
+
+function create_anon {
+VALUE1="nome_do_compartilhamento"
+VALUE2="/disk01/pasta_alvo"
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Compartilhamento" --form "CUIDADO: Este acesso sera totalmente liberado sem usuarios ou senhas! \nSe a pasta nao existe ela sera criada. \n
+Use o modelo abaixo /pasta ou /disco/pasta" 0 0 0 \
+"Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
+"PathName:" 2 1 "$VALUE2" 2 10 34 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && return
+
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+
+[ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
+    dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 5 40
+  } || {
+    mkdir -p /mnt/$var2
+
+tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
+[$var1]
+path = /mnt$var2
+writable = yes
+browsable = yes
+guest ok = yes
+force user = nobody
+create mask = 0777
+force create mode = 0777
+directory mask = 0777
+force directory mode = 0777
+EOF
+
+ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
+smbcontrol all reload-config
+  }
 }
 
 function remove_shared {
