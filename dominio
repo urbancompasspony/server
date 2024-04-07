@@ -967,7 +967,7 @@ VALUE5="yes"
 
   VALUE0=$(dialog --help-button --help-label 'Ajuda' --ok-label "Criar" --title "Compartilhamento Comum" --form "Separe os grupos e/ou usuarios com virgula. \n
 Se a pasta nao existe ela sera criada. \n
-Use o modelo abaixo /pasta ou /DISCO_ALVO/pasta" 0 0 0 \
+Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
 "Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
 "/mnt" 2 1 "$VALUE2" 2 10 34 0 \
 "Grp Name:" 3 1 "$VALUE3" 3 10 34 0 \
@@ -1016,7 +1016,7 @@ VALUE1="nome_do_compartilhamento"
 VALUE2="/DISCO_ALVO/pasta_alvo"
 
   VALUE0=$(dialog --help-button --help-label 'Ajuda' --ok-label "Criar" --title "Compartilhamento Anonimo" --form "CUIDADO: Este acesso sera totalmente liberado sem usuarios ou senhas! \nSe a pasta nao existe ela sera criada. \n
-Use o modelo abaixo /pasta ou /DISCO_ALVO/pasta" 0 0 0 \
+Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
 "Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
 "/mnt" 2 1 "$VALUE2" 2 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
