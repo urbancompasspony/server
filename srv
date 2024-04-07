@@ -83,7 +83,7 @@ case "$var0" in
 3) docker exec -it dominio /root/.init ; managers ;;
 4) dnstest ; managers ;;
 5) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers ;;
-6) clear ; echo -e " \n SOMENTE NA MAQUINA SERVIDORA LOCAL: Digite startx para entrar no modo Desktop! \n " ; exit ;;
+6) clear ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta acessando remotamente. Use esse comando localmente!" || startx ; sleep 3 ; managers ;;
 7) reb00t ; managers ;;
 8) shutd0 ; managers ;;
 X) exit ;;
