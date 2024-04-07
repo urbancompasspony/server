@@ -149,7 +149,6 @@ function s_settings {
   E 'GPO: ACL Check (administrator)' \
   F 'Upgrade ADMX Files for Windows 10' \
   G 'Upgrade ADMX Files for Windows 11' \
-  H 'Atualizar este Menu' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -160,7 +159,6 @@ function s_settings {
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   F) clear ; force_msi_w10 ; s_settings ;;
   G) clear ; force_msi_w11 ; s_settings ;;
-  H) wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -1096,7 +1094,18 @@ echo "SOLUCAO: Sair do Dominio e reingressar a maquina, pois esta perdeu a relac
 echo " "
 }
 
+function get_new {
+  if ping -c 1 google.com >/dev/null ; then
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/domain | tee /root/.init 2>&1>/dev/null
+    chmod +x /root/.init
+    bash /root/.init
+  else
+    bash /root/.init
+  fi
+}
+
 # Start all!
+get_new
 main_menu
 
 # If any error...
