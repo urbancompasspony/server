@@ -19,7 +19,7 @@ sudo chmod 777 -R "$destpath"
 
 serverip="172.20.0.22"
 lanhost="http://$serverip"
-wanhost="http://cs.linuxuniverse.com.br:3434"
+wanhost="http://z.net-freaks.com:3434"
 
 usern4me="admin"
 passw0rd="isorulez"
