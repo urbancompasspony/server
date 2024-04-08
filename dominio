@@ -148,8 +148,10 @@ function s_settings {
   D 'dbcheck: general' \
   E 'GPO: ACL Check (administrator)' \
   F 'Get ACLs from SYSVOL (fix first)' \
-  G 'Upgrade ADMX Files for Windows 10' \
-  H 'Upgrade ADMX Files for Windows 11' \
+  G 'Get ACLs from a SubFolder' \
+  H 'Set ACLs to a SubFolder (CAUTION!)' \
+  I 'Upgrade ADMX Files for Windows 10' \
+  J 'Upgrade ADMX Files for Windows 11' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -159,10 +161,47 @@ function s_settings {
   D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   F) clear ; echo "" ; samba-tool ntacl get --as-sddl /var/lib/samba/sysvol/$DOMAIN/scripts ; echo "" ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  G) clear ; force_msi_w10 ; s_settings ;;
-  H) clear ; force_msi_w11 ; s_settings ;;
+  G) getacls0 ; s_settings ;;
+  H) setacls0 ; s_settings ;;
+  I) clear ; force_msi_w10 ; s_settings ;;
+  J) clear ; force_msi_w11 ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
+}
+
+function getacls0 {
+VALUE1="/mnt"
+
+VALUE0=$(dialog --ok-label "Ok" --title "GET ACL" --form "Defina o alvo:" 9 40 0 \
+"Path: " 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && return
+var1=$(echo "$VALUE0" | sed -n 1p)
+
+clear
+echo ""
+samba-tool ntacl get --as-sddl "$var1"
+echo ""
+read -p "Pressione Enter para continuar!"
+}
+
+function setacls0 {
+VALUE1=""
+VALUE2="/mnt/"
+
+VALUE0=$(dialog --ok-label "Ok" --title "SET ACL" --form "Defina o alvo:" 9 40 0 \
+"ACL:  " 1 1 "$VALUE1" 1 11 150 0 \
+"Path: " 2 1 "$VALUE2" 2 11 50 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && return
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+
+clear
+echo ""
+samba-tool ntacl set "$var1" "$var2"
+echo ""
+read -p "Permissao aplicada! Pressione Enter para continuar."
 }
 
 function force_msi_w10 {
