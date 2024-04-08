@@ -985,7 +985,7 @@ tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
 path = /mnt$var2
 valid users = $var3
-force users = $var3
+force group = $var3
 writable = yes
 browsable = yes
 guest ok = no
