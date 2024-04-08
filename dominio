@@ -1010,7 +1010,7 @@ Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
 case $? in
    0) echo "." > /dev/null ;;
    1) return ;;
-   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Ajuda:' --msgbox "Ideal para Windows Sync Center! \n\nLegenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1 \n\nDica: Para compartilhamento Supervisor, use apenas / e tudo sera exposto a ele." 0 0 ; return ;;
+   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Ajuda:' --msgbox "Ideal para o Windows Sync Center! \n\nLegenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1 \n\nDica: Para compartilhamento Supervisor, use apenas / e tudo sera exposto a ele." 0 0 ; return ;;
 esac
 
   var1=$(echo "$VALUE0" | sed -n 1p)
@@ -1026,7 +1026,6 @@ tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
 path = /mnt$var2
 valid users = $var3
-force group = $var3
 writable = yes
 browsable = yes
 guest ok = no
