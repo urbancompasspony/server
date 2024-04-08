@@ -147,8 +147,9 @@ function s_settings {
   C 'dbcheck: well-known-acls' \
   D 'dbcheck: general' \
   E 'GPO: ACL Check (administrator)' \
-  F 'Upgrade ADMX Files for Windows 10' \
-  G 'Upgrade ADMX Files for Windows 11' \
+  F 'Get ACLs from SYSVOL (fix first)' \
+  G 'Upgrade ADMX Files for Windows 10' \
+  H 'Upgrade ADMX Files for Windows 11' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -157,8 +158,9 @@ function s_settings {
   C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  F) clear ; force_msi_w10 ; s_settings ;;
-  G) clear ; force_msi_w11 ; s_settings ;;
+  F) clear ; echo "" ; samba-tool ntacl get --as-sddl /var/lib/samba/sysvol/$DOMAIN/scripts ; echo "" ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  G) clear ; force_msi_w10 ; s_settings ;;
+  H) clear ; force_msi_w11 ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
 }
