@@ -1030,11 +1030,14 @@ force group = $var3
 writable = yes
 browsable = yes
 guest ok = no
-create mask = 0600
-force create mode = 0100
-directory mask = 0700
-force directory mode = 0700
+inherit permissions = yes
+inherit acls = yes
 EOF
+
+#create mask = 0600
+#force create mode = 0100
+#directory mask = 0700
+#force directory mode = 0700
 
 revalid_shared
   }
