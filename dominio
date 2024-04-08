@@ -1030,8 +1030,9 @@ force group = $var3
 writable = yes
 browsable = yes
 guest ok = no
-inherit permissions = yes
-inherit acls = yes
+inherit acls = Yes
+inherit owner = Yes
+inherit permissions = Yes
 EOF
 
 #create mask = 0600
