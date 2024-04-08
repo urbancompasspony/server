@@ -1035,7 +1035,7 @@ directory mask = 0700
 force directory mode = 0700
 EOF
 
-# Apply 777 but do not with -R flag!
+# Apply 777 but without -R flag!
 sudo chmod 777 /mnt$var2
 
 revalid_shared
