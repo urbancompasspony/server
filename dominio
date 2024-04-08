@@ -997,14 +997,16 @@ function create_sync {
 VALUE1="nome_do_compartilhamento"
 VALUE2="/DISCO_ALVO/pasta_alvo"
 VALUE3="@grupo, usuario"
+VALUE3="no"
 
   VALUE0=$(dialog --help-button --help-label 'Ajuda' --ok-label "Criar" --title "Compartilhamento para Sync Center" --form "Separe os grupos e/ou usuarios com virgula. \n
-Se a pasta nao existe ela sera criada. \n
-A permissao da pasta sera do dono da mesma. \n
+Se a pasta nao existir ela sera criada e ficara oculta. \n
+A permissao da pasta sera do dono da mesma! \n
 Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
 "Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
 "     /mnt" 2 1 "$VALUE2" 2 10 34 0 \
 "Grp Name:" 3 1 "$VALUE3" 3 10 34 0 \
+"Browser.:" 4 1 "$VALUE4" 4 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
 case $? in
@@ -1016,6 +1018,7 @@ esac
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
   var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
 
 [ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
     dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 5 40
@@ -1026,8 +1029,8 @@ tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
 path = /mnt$var2
 valid users = $var3
+browsable = $var4
 writable = yes
-browsable = yes
 guest ok = no
 create mask = 0700
 force create mode = 0700
