@@ -173,7 +173,7 @@ function getacls0 {
 VALUE1="/mnt"
 
 VALUE0=$(dialog --ok-label "Ok" --title "GET ACL" --form "Defina o alvo:" 9 40 0 \
-"Path: " 1 1 "$VALUE1" 1 11 30 0 \
+"Path: " 1 1 "$VALUE1" 1 6 70 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && return
 var1=$(echo "$VALUE0" | sed -n 1p)
@@ -189,9 +189,9 @@ function setacls0 {
 VALUE1=""
 VALUE2="/mnt/"
 
-VALUE0=$(dialog --ok-label "Ok" --title "SET ACL" --form "Defina o alvo:" 9 40 0 \
-"ACL:  " 1 1 "$VALUE1" 1 11 150 0 \
-"Path: " 2 1 "$VALUE2" 2 11 50 0 \
+VALUE0=$(dialog --ok-label "Ok" --title "SET ACL" --form "Defina o alvo e a permissao:" 9 40 0 \
+"ACL :" 1 1 "$VALUE1" 1 7 150 0 \
+"Path:" 2 1 "$VALUE2" 2 7 70 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && return
 var1=$(echo "$VALUE0" | sed -n 1p)
@@ -997,7 +997,7 @@ function create_sync {
 VALUE1="nome_do_compartilhamento"
 VALUE2="/DISCO_ALVO/pasta_alvo"
 VALUE3="@grupo, usuario"
-VALUE3="no"
+VALUE4="no"
 
   VALUE0=$(dialog --help-button --help-label 'Ajuda' --ok-label "Criar" --title "Compartilhamento para Sync Center" --form "Separe os grupos e/ou usuarios com virgula. \n
 Se a pasta nao existir ela sera criada e ficara oculta. \n
