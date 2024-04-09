@@ -248,7 +248,7 @@ var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --
 A 'Mostrar Pastas Compartilhadas' \
 B 'Criar Nova Pasta Compartilhada' \
 C 'Criar Compartilhamento Anonimo' \
-D 'Compartilhamento Estruturado' \
+D 'Criar Compartilhamento Estruturado' \
 E 'Excluir Compartilhamento' \
 F 'Revalidar Configuracoes' \
 X '<' 2>&1 > /dev/tty )
