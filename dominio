@@ -997,7 +997,7 @@ function create_sync {
 VALUE1="nome_do_compartilhamento"
 VALUE2="/DISCO_ALVO/pasta_alvo"
 VALUE3="@grupo, usuario"
-VALUE4=""
+VALUE4="yes"
 
   VALUE0=$(dialog --help-button --help-label 'Ajuda' --ok-label "Criar" --title "Compartilhamento para Sync Center" --form "Separe os grupos e/ou usuarios com virgula. \n
 Se a pasta nao existir ela sera criada e ficara oculta. \n
