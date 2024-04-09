@@ -1048,7 +1048,7 @@ Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
 case $? in
    0) echo "." > /dev/null ;;
    1) return ;;
-   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Ajuda:' --msgbox "Ideal para o Windows Sync Center! \n\nLegenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1 \n\nDica: Para compartilhamento Supervisor, use apenas / e tudo sera exposto a ele." 0 0 ; return ;;
+   2) mntshow1=$(tree -d -L 2 /mnt); dialog --title 'Ajuda:' --msgbox "Ideal para o Windows Sync Center! \n\nLegenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1 \n\nDica: Para compartilhamento Supervisor, use apenas / e tudo sera exposto a ele." 0 0 ; return ;;
 esac
 
   var1=$(echo "$VALUE0" | sed -n 1p)
@@ -1101,7 +1101,7 @@ Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
 case $? in
    0) echo "." > /dev/null ;;
    1) return ;;
-   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Ajuda:' --msgbox "Legenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1 \n\nDica: Para compartilhamento Supervisor, use apenas / e tudo sera exposto a ele." 0 0 ; return ;;
+   2) mntshow1=$(tree -d -L 2 /mnt); dialog --title 'Ajuda:' --msgbox "Legenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1 \n\nDica: Para compartilhamento Supervisor, use apenas / e tudo sera exposto a ele." 0 0 ; return ;;
 esac
 
   var1=$(echo "$VALUE0" | sed -n 1p)
@@ -1146,7 +1146,7 @@ Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
 case $? in
    0) echo "." > /dev/null ;;
    1) return ;;
-   2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'Ajuda:' --msgbox "Legenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1 \n\nCUIDADO: Se usar apenas / tudo sera exposto publicamente!" 0 0 ; return ;;
+   2) mntshow1=$(tree -d -L 2 /mnt); dialog --title 'Ajuda:' --msgbox "Legenda:\n/dev/disco_no_sistema /mnt/DISCO_ALVO outros,parametros,extras 0 0 \n\nDiscos Encontrados: \n$mntshow1 \n\nCUIDADO: Se usar apenas / tudo sera exposto publicamente!" 0 0 ; return ;;
 esac
 
   var1=$(echo "$VALUE0" | sed -n 1p)
