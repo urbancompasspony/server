@@ -146,10 +146,14 @@ function s_settings {
   B 'SysVol Reset' \
   C 'dbcheck: well-known-acls' \
   D 'dbcheck: general' \
-  E 'GPO: ACL Check (administrator)' \
-  F 'Get FACL from Files or Folders' \
-  G 'Upgrade ADMX Files for Windows 10' \
-  H 'Upgrade ADMX Files for Windows 11' \
+  E 'GPO: ACL Check (Administrator)' \
+  F 'Get ACLs from SYSVOL (fix first!)' \
+  G 'Get ACLs from a SubFolder' \
+  H 'Set ACLs to a SubFolder (CAUTION!)' \
+  I 'Get FACLs from Files or Folders' \
+  J 'Set FACLs to Files or Folders (CAUTION!)' \
+  K 'Upgrade ADMX Files for Windows 10' \
+  L 'Upgrade ADMX Files for Windows 11' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -158,9 +162,13 @@ function s_settings {
   C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  F) getfacl0 ; s_settings ;;
-  G) clear ; force_msi_w10 ; s_settings ;;
-  H) clear ; force_msi_w11 ; s_settings ;;
+  F) clear ; echo "" ; samba-tool ntacl get --as-sddl /var/lib/samba/sysvol/$DOMAIN/scripts ; echo "" ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  G) getacls0 ; s_settings ;;
+  H) setacls0 ; s_settings ;;
+  I) getfacl0 ; s_settings ;;
+  J) setfacls0 ; s_settings ;;
+  K) clear ; force_msi_w10 ; s_settings ;;
+  L) clear ; force_msi_w11 ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -185,6 +193,25 @@ getfacl "$var1"
 echo ""
 
 read -p "Pressione Enter para continuar!"
+}
+
+function setfacls0 {
+VALUE1=""
+VALUE2="/mnt/"
+
+VALUE0=$(dialog --ok-label "Ok" --title "SET FACL" --form "Defina o alvo e a permissao:" 9 40 0 \
+"FACL:" 1 1 "$VALUE1" 1 7 150 0 \
+"Path:" 2 1 "$VALUE2" 2 7 70 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && return
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+
+clear
+echo ""
+setfacl "$var1" "$var2"
+echo ""
+read -p "Permissao aplicada! Pressione Enter para continuar."
 }
 
 function copyfacl0 {
@@ -1204,9 +1231,7 @@ Seus dados nao sao apagados, apenas o compartilhamento sera removido!" 0 0 0 \
     dialog --title 'Confirmacao' --backtitle 'Remover Compartilhamento' --yesno 'Deseja excluir este compartilhamento?' 0 0
     [ $? = 0 ] && {
       rm /etc/samba/external/smb.conf.d/$varaqui.conf
-      ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf
-      smbcontrol all reload-config
-
+      revalid_shared
       dialog --title "Confirmacao" --msgbox "Compartilhamento removido!" 5 40
     } || {
       echo "." > /dev/null
