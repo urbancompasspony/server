@@ -147,11 +147,10 @@ function s_settings {
   C 'dbcheck: well-known-acls' \
   D 'dbcheck: general' \
   E 'GPO: ACL Check (administrator)' \
-  F 'Get ACLs from SYSVOL (fix first)' \
-  G 'Get ACLs from a SubFolder' \
-  H 'Set ACLs to a SubFolder (CAUTION!)' \
-  I 'Upgrade ADMX Files for Windows 10' \
-  J 'Upgrade ADMX Files for Windows 11' \
+  F 'Get FACL from Folder' \
+  G 'Copy FACL from Folder to Folder' \
+  H 'Upgrade ADMX Files for Windows 10' \
+  I 'Upgrade ADMX Files for Windows 11' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -160,13 +159,50 @@ function s_settings {
   C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  F) clear ; echo "" ; samba-tool ntacl get --as-sddl /var/lib/samba/sysvol/$DOMAIN/scripts ; echo "" ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  G) getacls0 ; s_settings ;;
-  H) setacls0 ; s_settings ;;
-  I) clear ; force_msi_w10 ; s_settings ;;
-  J) clear ; force_msi_w11 ; s_settings ;;
+  F) getfacl0 ; s_settings ;;
+  G) copyfacl0 ; s_settings ;;
+  H) clear ; force_msi_w10 ; s_settings ;;
+  I) clear ; force_msi_w11 ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
+}
+
+function getfacl0 {
+VALUE1="/mnt"
+
+VALUE0=$(dialog --ok-label "Ok" --title "GET FACL" --form "Defina o alvo:" 9 40 0 \
+"Path: " 1 1 "$VALUE1" 1 6 70 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && return
+var1=$(echo "$VALUE0" | sed -n 1p)
+
+clear
+echo ""
+getfacl "$var1"
+echo ""
+read -p "Pressione Enter para continuar!"
+}
+
+function copyfacl0 {
+VALUE1="/mnt/"
+VALUE2="/mnt/"
+VALUE3="-R"
+
+VALUE0=$(dialog --ok-label "Ok" --title "COPY FACL" --form "Defina a Origem e o Destino:" 10 40 0 \
+"Origem :" 1 1 "$VALUE1" 1 10 70 0 \
+"Destino:" 2 1 "$VALUE2" 2 10 70 0 \
+"Recurs?:" 3 1 "$VALUE3" 3 10 10 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && return
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+
+clear
+echo ""
+getfacl "$var1" | setfacl "$var3" --set-file = - "$var2"
+echo ""
+read -p "Permissao copiada de $var1 para $var2! Pressione Enter para continuar."
 }
 
 function getacls0 {
@@ -1183,8 +1219,12 @@ echo "CUIDADO:"
 echo "Se usar uma versao modificada do Windows, tipo o ReviCC ou W10Lite, tem uma grande chance de causar problemas/imprevistos!"
 echo " "
 echo "PROBLEMA: Nao consigo adicionar usuarios ou grupos ao Filtro de Seguranca!"
-echo "SOLUCAO: Sair do Dominio e reingressar a maquina, pois esta perdeu a relacao de confianca com o AD."
+echo "SOLUCAO: Sair do Dominio e reingressar a maquina, pois esta perdeu a relacao de confianca com o AD. (ou aguarde umas boas horas o AD reverberar!)"
 echo " "
+echo "PROBLEMA: Permissoes ACLs incorretas para determinada pasta na rede; ou o compartilhamento foi feito com admin_users=yes; ou ainda nao quer funcionar SYNC CENTER."
+echo "SOLUCAO: Crie uma nova pasta compartilhada estruturada temporaria com outro nome, crie pastas la dentro baseado em cada usuario; e copie as FACLs entre elas."
+echo "Via SSH nao se esqueca de que a pasta /mnt/pasta_compartilhada sempre 777 e subpastas 0700."
+echo ""
 }
 
 # Start all!
