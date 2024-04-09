@@ -1083,7 +1083,7 @@ force directory mode = 0700
 EOF
 
 # Apply 777 but without -R flag!
-sudo chmod 777 /mnt$var2
+chmod 777 /mnt$var2
 
 revalid_shared
   }
@@ -1220,7 +1220,7 @@ function revalid_shared {
 }
 
 function dica0 {
-  clear ; mntshow1=$(tree -d -L 2 /mnt); echo -e "Discos Encontrados: \n$mntshow1 \n\nCUIDADO: Para compartilhamento Supervisor, use apenas / e tudo sera exposto a ele. \n" ; read -p "Quando concluir a visualizacao, pressione Enter!"
+  clear ; mntshow1=$(find /mnt -mindepth 1 -maxdepth 3 -type d); echo -e "Discos Encontrados: \n$mntshow1 \n\nCUIDADO: Para compartilhamento Supervisor, use apenas / e tudo sera exposto a ele. \n" ; read -p "Quando concluir a visualizacao, pressione Enter!"
 }
 
 function faq_help {
