@@ -146,14 +146,15 @@ function s_settings {
   B 'SysVol Reset' \
   C 'dbcheck: well-known-acls' \
   D 'dbcheck: general' \
-  E 'GPO: ACL Check (Administrator)' \
-  F 'Get ACLs from SYSVOL (fix first!)' \
-  G 'Get ACLs from a SubFolder' \
-  H 'Set ACLs to a SubFolder (CAUTION!)' \
-  I 'Get FACLs from Files or Folders' \
-  J 'Set FACLs to Files or Folders (CAUTION!)' \
-  K 'Upgrade ADMX Files for Windows 10' \
-  L 'Upgrade ADMX Files for Windows 11' \
+  E 'GPO ACL Check (Administrator)' \
+  F 'Get ACL from SYSVOL (fix first!)' \
+  G 'Get ACL from a SubFolder' \
+  H 'Set ACL as Administrator (CAUTION!)' \
+  I 'Set ACL to a SubFolder (CAUTION!)' \
+  J 'Get FACL from Files or Folders' \
+  K 'Set FACL to Files or Folders (CAUTION!)' \
+  L 'Upgrade ADMX Files for Windows 10' \
+  M 'Upgrade ADMX Files for Windows 11' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -164,11 +165,12 @@ function s_settings {
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   F) clear ; echo "" ; samba-tool ntacl get --as-sddl /var/lib/samba/sysvol/$DOMAIN/scripts ; echo "" ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   G) getacls0 ; s_settings ;;
-  H) setacls0 ; s_settings ;;
-  I) getfacl0 ; s_settings ;;
-  J) setfacls0 ; s_settings ;;
-  K) clear ; force_msi_w10 ; s_settings ;;
-  L) clear ; force_msi_w11 ; s_settings ;;
+  H) setacladmin0 ; s_settings ;;
+  I) setacls0 ; s_settings ;;
+  J) getfacl0 ; s_settings ;;
+  K) setfacls0 ; s_settings ;;
+  L) clear ; force_msi_w10 ; s_settings ;;
+  M) clear ; force_msi_w11 ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -238,6 +240,24 @@ getfacl "$var1" | setfacl "$var3" --set-file = - "$var2"
 echo ""
 
 read -p "Permissao copiada de $var1 para $var2! Pressione Enter para continuar."
+}
+
+function setacladmin0 {
+VALUE1="/mnt"
+
+VALUE0=$(dialog --ok-label "Ok" --title "SET ACL as ADMINISTRATOR" --form "Defina o alvo:" 9 40 0 \
+"Path: " 1 1 "$VALUE1" 1 6 70 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && return
+var1=$(echo "$VALUE0" | sed -n 1p)
+
+aclhere=$(samba-tool ntacl get --as-sddl /var/lib/samba/sysvol/$DOMAIN/scripts)
+
+clear
+echo ""
+samba-tool ntacl set "$aclhere" "$var1"
+echo ""
+read -p "Pressione Enter para continuar!"
 }
 
 function getacls0 {
