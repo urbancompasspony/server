@@ -32,7 +32,11 @@ autoinstall:
   version: 1
   interactive-sections:
    - storage
+  storage:
+    layout:
+      name: direct
   locale: en_US.UTF-8
+  timezone: America/Bahia
   keyboard:
     layout: us
   identity:
@@ -50,13 +54,17 @@ autoinstall:
     - build-essential
     - dialog
     - curl
+    - wget
   package_update: true
   package_upgrade: true
-  late-commands:
-    - mkdir -p /home/administrador
-    - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /etc/skel/.bashrc
-    - wget https://www.dwservice.net/download/dwagent_x86.sh -O /etc/skel/dwagent_x86.sh
+  runcmd:
+    - mkdir /home/administrador
+    - [ wget, "https://www.dwservice.net/download/dwagent_x86.sh", -O, /home/administrador/dwagent_x86.sh ]
+    - [ wget, "https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc", -O, /home/administrador/.bashrc ]
+    - [ wget, "https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc", -O, /root/.bashrc ]
+    - echo ""
     - echo "Instalacao Concluida! Pode apertar o botao REBOOT abaixo."
+    - echo ""
 
 # password: ubuntu
 # change it, plz
