@@ -32,9 +32,6 @@ autoinstall:
   version: 1
   interactive-sections:
    - storage
-  storage:
-    layout:
-      name: direct
   locale: en_US.UTF-8
   timezone: America/Bahia
   keyboard:
