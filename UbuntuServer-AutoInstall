@@ -53,6 +53,7 @@ autoinstall:
   package_update: true
   package_upgrade: true
   late-commands:
+    - mkdir -p /home/administrador
     - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /home/administrador/.bashrc
     - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /root/.bashrc
     - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /etc/bash.bashrc
