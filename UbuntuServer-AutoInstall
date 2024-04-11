@@ -77,4 +77,7 @@ xorriso -as mkisofs -r \
   -no-emul-boot \
   .
 
-9) Enjoy!
+9) 
+sudo cp ../ubuntu-22.04-autoinstall.iso /var/lib/libvirt/images/
+
+Enjoy!
