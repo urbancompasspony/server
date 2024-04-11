@@ -62,9 +62,7 @@ autoinstall:
     - [ wget, "https://www.dwservice.net/download/dwagent_x86.sh", -O, /home/administrador/dwagent_x86.sh ]
     - [ wget, "https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc", -O, /home/administrador/.bashrc ]
     - [ wget, "https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc", -O, /root/.bashrc ]
-    - echo ""
-    - echo "Instalacao Concluida! Pode apertar o botao REBOOT abaixo."
-    - echo ""
+    - [ reboot ]
 
 # password: ubuntu
 # change it, plz
