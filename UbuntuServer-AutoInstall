@@ -54,10 +54,6 @@ autoinstall:
     - curl
     - wget
   package_upgrade: true
-  runcmd:
-    - wget "https://www.dwservice.net/download/dwagent_x86.sh" -O /opt/dwagent_x86.sh
-    - wget "https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc" -O /home/administrador/.bashrc
-    - wget "https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc" -O /root/.bashrc
 
 # password: ubuntu
 # change it, plz
