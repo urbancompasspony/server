@@ -53,7 +53,16 @@ autoinstall:
   package_update: true
   package_upgrade: true
   late-commands:
-    - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+    - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /home/administrador/.bashrc
+    - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /root/.bashrc
+    - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /etc/bash.bashrc
+    - wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
+    - clear
+    - echo ""
+    - echo "Instalacao Concluida! Pode apertar o botao REBOOT abaixo."
+
+# password: ubuntu
+# change it, plz
 
 7)
 xorriso -indev jammy-live-server-amd64.iso -report_el_torito as_mkisofs
