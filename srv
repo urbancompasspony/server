@@ -51,6 +51,7 @@ B 'Support Menu' \
 C 'Manut. & Relat.' \
 D 'Settings' \
 E 'Atualizar Bashrc' \
+F 'BETA: Support Menu' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
@@ -58,6 +59,7 @@ B) managers ; start ;;
 C) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_relatorio | sudo bash ; start ;;
 D) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
 E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
+F) managers_testes ; start ;;
 X) exit ;;
 esac
 }
@@ -71,11 +73,12 @@ var0=$(dialog --title ' ' --backtitle "Managers" --ok-label "Acessar" --cancel-l
 1 'Maquinas Virtuais (TUI)' \
 2 'Containers (TUI)' \
 3 'Active Directory (TUI)' \
-4 'Test Ping DNS' \
-5 'Baixar Imagens .ISO' \
-6 'Iniciar Desktop' \
-7 'Reiniciar Servidor' \
-8 'Desligar Servidor' \
+4 'Testar Ping DNS' \
+5 'Baixar Imagens .ISO (XPRA)' \
+6 'Iniciar Area de Trabalho' \
+7 'Instalar DWService' \
+8 'Reiniciar Servidor' \
+9 'Desligar Servidor' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
@@ -84,8 +87,41 @@ case "$var0" in
 4) dnstest ; managers ;;
 5) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers ;;
 6) clear ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela do servidor local!" || startx ; sleep 3 ; managers ;;
-7) reb00t ; managers ;;
-8) shutd0 ; managers ;;
+7) dwservice0 ; managers ;;
+8) reb00t ; managers ;;
+9) shutd0 ; managers ;;
+X) exit ;;
+esac
+}
+
+function managers_testes {
+var0=$(dialog --title ' ' --backtitle "Managers" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
+1 'Maquinas Virtuais (TUI)' \
+2 'Containers (TUI)' \
+3 'Active Directory (TUI)' \
+4 'Testar Ping DNS' \
+5 'Baixar Imagens .ISO (XPRA)' \
+6 'Iniciar Area de Trabalho' \
+7 'Instalar DWService' \
+8 'Solucao de Problemas' \
+9 'Restaurar Servicos Local' \
+10 'Restaurar Servicos Nuvem' \
+11 'Reiniciar Servidor' \
+12 'Desligar Servidor' \
+X 'Sair' 2>&1 > /dev/tty )
+case "$var0" in
+1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers_testes ;;
+2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers_testes ;;
+3) docker exec -it dominio /root/.init ; managers_testes ;;
+4) dnstest ; managers_testes ;;
+5) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers_testes ;;
+6) clear ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela do servidor local!" || startx ; sleep 3 ; managers_testes ;;
+7) dwservice0 ; managers_testes ;;
+8) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | bash ; managers_testes ;;
+9) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; managers_testes ;;
+10) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-cloud | bash ; managers_testes ;;
+11) reb00t ; managers_testes ;;
+12) shutd0 ; managers_testes ;;
 X) exit ;;
 esac
 }
@@ -110,6 +146,13 @@ function shutd0 {
   } || {
     echo "." >/dev/null
   }
+}
+
+function dwservice0 {
+  startx
+  wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh
+  chmod +x dwagent_generic.sh
+  bash dwagent_generic.sh
 }
 
 function dnstest {
