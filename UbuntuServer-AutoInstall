@@ -54,22 +54,18 @@ autoinstall:
   package_upgrade: true
   late-commands:
     - mkdir -p /home/administrador
-    - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /home/administrador/.bashrc
-    - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /root/.bashrc
-    - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /etc/bash.bashrc
-    - wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
-    - echo ""
+    - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /etc/skel/.bashrc
+    - wget https://www.dwservice.net/download/dwagent_x86.sh -O /etc/skel/dwagent_x86.sh
     - echo "Instalacao Concluida! Pode apertar o botao REBOOT abaixo."
 
 # password: ubuntu
 # change it, plz
 
 7)
-xorriso -indev jammy-live-server-amd64.iso -report_el_torito as_mkisofs
+cd ..; xorriso -indev jammy-live-server-amd64.iso -report_el_torito as_mkisofs
 
 8)
-cd source-files
-xorriso -as mkisofs -r \
+cd source-files; xorriso -as mkisofs -r \
   -V 'Ubuntu 22.04 LTS AUTO (EFIBIOS)' \
   -o ../ubuntu-22.04-autoinstall.iso \
   --grub2-mbr ../BOOT/1-Boot-NoEmul.img \
