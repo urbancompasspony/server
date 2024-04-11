@@ -35,11 +35,11 @@ autoinstall:
   locale: en_US.UTF-8
   timezone: America/Bahia
   keyboard:
-    layout: us
+    layout: br
   identity:
+    username: administrador
     hostname: servidor
     password: $6$LEK7PAkjOFTjik2o$dZZJwvayF8rh1bFUPXU1vmXAu8EMCHJPhgLwaLdjEnP/sRRiZ4JdYgXXATpHLKhHkja31S8umlbW9uRjualO/0
-    username: administrador
   ssh:
     allow-pw: true
     install-server: true
@@ -47,18 +47,17 @@ autoinstall:
     primary:
       - arches: [default]
         uri: http://archive.ubuntu.com/ubuntu/
-  packages: 
+  package_update: true
+  packages:
     - build-essential
     - dialog
     - curl
     - wget
-  package_update: true
   package_upgrade: true
   runcmd:
-    - mkdir /home/administrador
-    - [ wget, "https://www.dwservice.net/download/dwagent_x86.sh", -O, /home/administrador/dwagent_x86.sh ]
-    - [ wget, "https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc", -O, /home/administrador/.bashrc ]
-    - [ wget, "https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc", -O, /root/.bashrc ]
+    - wget "https://www.dwservice.net/download/dwagent_x86.sh" -O /opt/dwagent_x86.sh
+    - wget "https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc" -O /home/administrador/.bashrc
+    - wget "https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc" -O /root/.bashrc
 
 # password: ubuntu
 # change it, plz
