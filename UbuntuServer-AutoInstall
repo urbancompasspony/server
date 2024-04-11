@@ -13,6 +13,7 @@ wget https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/jammy-liv
 cd source-files
 mv  '[BOOT]' ../BOOT
 
+5)
 cd ..
 nano source-files/boot/grub/grub.cfg
 menuentry "Autoinstall Ubuntu Server" {
@@ -21,6 +22,7 @@ menuentry "Autoinstall Ubuntu Server" {
     initrd  /casper/initrd
 }
 
+6)
 mkdir source-files/server
 touch source-files/server/meta-data
 
@@ -69,10 +71,11 @@ autoinstall:
   bootcmd:
    - curl -sSL https://linite.linuxuniverse.com.br | bash
 
+7)
 xorriso -indev jammy-live-server-amd64.iso -report_el_torito as_mkisofs
 
+8)
 cd source-files
-
 xorriso -as mkisofs -r \
   -V 'Ubuntu 22.04 LTS AUTO (EFIBIOS)' \
   -o ../ubuntu-22.04-autoinstall.iso \
