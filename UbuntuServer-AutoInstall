@@ -58,7 +58,6 @@ autoinstall:
     - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /root/.bashrc
     - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/.bashrc | tee /etc/bash.bashrc
     - wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
-    - clear
     - echo ""
     - echo "Instalacao Concluida! Pode apertar o botao REBOOT abaixo."
 
