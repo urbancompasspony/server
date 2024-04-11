@@ -149,10 +149,9 @@ function shutd0 {
 }
 
 function dwservice0 {
-  startx
   wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh
   chmod +x dwagent_generic.sh
-  bash dwagent_generic.sh
+  sudo bash dwagent_generic.sh
 }
 
 function dnstest {
