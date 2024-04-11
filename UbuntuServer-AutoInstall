@@ -55,12 +55,6 @@ autoinstall:
   late-commands:
     - curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
 
-  storage:
-    layout:
-      name: lvm
-      match:
-        size: largest
-
 7)
 xorriso -indev jammy-live-server-amd64.iso -report_el_torito as_mkisofs
 
