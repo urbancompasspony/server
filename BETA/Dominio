@@ -11,7 +11,7 @@ export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
 export bktitle="Active Directory & Domain Controller"
-export ttitle=" Server Menu v6.0 "
+export ttitle=" Server Menu v7.0 "
 
 function main_menu {
   var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
@@ -172,37 +172,29 @@ function s_settings {
 }
 
 function setacladmin0 {
-VALUE1="/mnt"
-
-VALUE0=$(dialog --ok-label "Ok" --title "SET ACL as ADMINISTRATOR" --form "Defina o alvo:" 9 40 0 \
-"Path: " 1 1 "$VALUE1" 1 6 70 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+VALUE0=$(dialog --stdout --title "SET ACL as ADMINISTRATOR" --fselect "/mnt" 15 40)
 [ $? -ne 0 ] && return
 var1=$(echo "$VALUE0" | sed -n 1p)
 
+dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "Voce escolheu a pasta $var1." 7 40
 aclhere=$(samba-tool ntacl get --as-sddl /var/lib/samba/sysvol/$DOMAIN/scripts)
 
-clear
-echo ""
 samba-tool ntacl set "$aclhere" "$var1"
-echo ""
-read -p "Pressione Enter para continuar!"
+dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta $var1 recebeu as seguintes ACLs: \n\n$aclhere \n\nReferente ao Administrator!" 10 70
 }
 
 function getacls0 {
-VALUE1="/mnt"
-
-VALUE0=$(dialog --ok-label "Ok" --title "GET ACL" --form "Defina o alvo:" 9 40 0 \
-"Path: " 1 1 "$VALUE1" 1 6 70 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+VALUE0=$(dialog --stdout --title "GET ACL" --fselect "/mnt" 15 40)
 [ $? -ne 0 ] && return
 var1=$(echo "$VALUE0" | sed -n 1p)
 
-clear
-echo ""
+dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "Voce escolheu a pasta $var1." 7 40
 acl00=$(samba-tool ntacl get --as-sddl "$var1")
+
+clear
 echo "$acl00" | tee /tmp/temp01
 echo ""
+
 read -p "Pressione Enter para continuar!"
 }
 
@@ -210,24 +202,23 @@ function setacls0 {
 VALUE1="$(cat /tmp/temp01)"
 VALUE2="$(cat /tmp/path01)"
 
-VALUE0=$(dialog --ok-label "Ok" --title "SET ACL" --form "Defina o alvo e a permissao:" 9 40 0 \
+VALUE0=$(dialog --ok-label "Ok" --title "SET ACL" --form "Defina a ACL..." 9 60 0 \
 "ACL :" 1 1 "$VALUE1" 1 7 300 0 \
-"Path:" 2 1 "$VALUE2" 2 7 70 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && return
 var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-echo "$var2"| tee /tmp/path01
 
-clear
-echo ""
+VALUE00=$(dialog --stdout --title "SET FOLDER" --fselect "/mnt" 15 40)
+[ $? -ne 0 ] && return
+var2=$(echo "$VALUE00" | sed -n 1p)
+
+echo "$var2"| tee /tmp/path01
 samba-tool ntacl set "$var1" "$var2"
-echo ""
-read -p "Permissao aplicada! Pressione Enter para continuar."
+dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "ACLs aplicadas para a pasta $var2! \n\nPressione Enter para continuar." 10 40
 }
 
 function force_msi_w10 {
-dialog --title 'Confirmacao' --backtitle 'ADMX Windows 10' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0
+dialog --title 'Confirmacao' --backtitle 'Windows 10' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0
   [ $? = 0 ] && {
 
 wget -O w10admx.msi "$admxw10" \
@@ -245,7 +236,7 @@ read -p "As regras do Windows 10 foram carregadas. Ignore as mensagens de erro a
 }
 
 function force_msi_w11 {
-dialog --title 'Confirmacao' --backtitle 'ADMX Windows 11' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0
+dialog --title 'Confirmacao' --backtitle 'Windows 11' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0
   [ $? = 0 ] && {
 
 wget -O w11admx.msi "$admxw11" \
@@ -1012,14 +1003,13 @@ utilize o menu Excluir Compartilhamento!" 0 0 0 "${files[@]}")
 
 function create_sync {
 VALUE1="nome_do_compartilhamento"
-VALUE2="/DISCO_ALVO/pasta_alvo"
 VALUE3="@grupo, usuario"
 VALUE4="yes"
 
   VALUE0=$(dialog --help-button --help-label 'Dica' --ok-label "Criar" --title "Compartilhamento para Sync Center" --form "Separe os grupos e/ou usuarios com virgula. \n
 Se a pasta nao existir ela sera criada e ficara oculta. \n
 A permissao da pasta sera do dono da mesma! \n
-Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
+Use a Dica para achar a pasta!" 0 0 0 \
 "Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
 "     /mnt" 2 1 "$VALUE2" 2 10 34 0 \
 "Grp Name:" 3 1 "$VALUE3" 3 10 34 0 \
@@ -1064,14 +1054,13 @@ revalid_shared
 
 function create_shared {
 VALUE1="nome_do_compartilhamento"
-VALUE2="/DISCO_ALVO/pasta_alvo"
 VALUE3="@grupo, usuario"
 VALUE4="yes"
 VALUE5="yes"
 
   VALUE0=$(dialog --help-button --help-label 'Dica' --ok-label "Criar" --title "Compartilhamento Comum" --form "Separe os grupos e/ou usuarios com virgula. \n
 Se a pasta nao existe ela sera criada. \n
-Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
+Use a Dica para achar a pasta!" 0 0 0 \
 "Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
 "     /mnt" 2 1 "$VALUE2" 2 10 34 0 \
 "Grp Name:" 3 1 "$VALUE3" 3 10 34 0 \
@@ -1119,10 +1108,9 @@ revalid_shared
 
 function create_anon {
 VALUE1="nome_do_compartilhamento"
-VALUE2="/DISCO_ALVO/pasta_alvo"
 
   VALUE0=$(dialog --help-button --help-label 'Dica' --ok-label "Criar" --title "Compartilhamento Anonimo" --form "CUIDADO: Este acesso sera totalmente liberado sem usuarios ou senhas! \nSe a pasta nao existe ela sera criada. \n
-Use o modelo abaixo /mnt/pasta ou /mnt/DISCO_ALVO/pasta" 0 0 0 \
+Use a Dica para achar a pasta!" 0 0 0 \
 "Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
 "     /mnt" 2 1 "$VALUE2" 2 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -1197,7 +1185,7 @@ function revalid_shared {
 }
 
 function dica0 {
-  clear ; mntshow1=$(find /mnt -mindepth 1 -maxdepth 3 -type d); echo -e "Discos Encontrados: \n$mntshow1 \n\nCUIDADO: Para compartilhamento Supervisor, use apenas / e tudo sera exposto a ele. \n" ; read -p "Quando concluir a visualizacao, pressione Enter!"
+  VALUE2=$(dialog --stdout --title "Escolha a pasta alvo!" --fselect "/mnt" 15 40 | tail -c +5)
 }
 
 function faq_help {
