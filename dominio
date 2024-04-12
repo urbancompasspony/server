@@ -218,6 +218,8 @@ dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "ACLs aplicadas p
 }
 
 function force_msi_w10 {
+dpkg --list | grep msitools && {
+
 dialog --title 'Confirmacao' --backtitle 'Windows 10' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0
   [ $? = 0 ] && {
 
@@ -233,9 +235,16 @@ read -p "As regras do Windows 10 foram carregadas. Ignore as mensagens de erro a
   } || {
     echo "." > /dev/null
   }
+} || {
+clear
+echo "Pacote MSITOOLS nao encontrado!"
+sleep 3
+}
 }
 
 function force_msi_w11 {
+dpkg --list | grep msitools && {
+
 dialog --title 'Confirmacao' --backtitle 'Windows 11' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0
   [ $? = 0 ] && {
 
@@ -254,6 +263,11 @@ read -p "As regras do Windows 11 foram carregadas. Ignore as mensagens de erro a
   } || {
     echo "." > /dev/null
   }
+} || {
+clear
+echo "Pacote MSITOOLS nao encontrado!"
+sleep 3
+}
 }
 
 function shared_folders {
