@@ -1151,6 +1151,9 @@ directory mask = 0777
 force directory mode = 0777
 EOF
 
+# Set permissions!
+chmod 777 /mnt$var2
+
 revalid_shared
   }
 }
