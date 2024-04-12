@@ -1110,6 +1110,9 @@ directory mask = 0777
 force directory mode = 0777
 EOF
 
+# Apply 777 but without -R flag!
+chmod 777 /mnt$var2
+
 revalid_shared
   }
 }
@@ -1151,7 +1154,7 @@ directory mask = 0777
 force directory mode = 0777
 EOF
 
-# Set permissions!
+# Apply 777 but without -R flag!
 chmod 777 /mnt$var2
 
 revalid_shared
