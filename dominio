@@ -220,7 +220,7 @@ dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "ACLs aplicadas p
 function force_msi_w10 {
 dpkg --list | grep msitools && {
 
-dialog --title 'Confirmacao' --backtitle 'Windows 10' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0
+dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0
   [ $? = 0 ] && {
 
 wget -O w10admx.msi "$admxw10" \
@@ -245,7 +245,7 @@ sleep 3
 function force_msi_w11 {
 dpkg --list | grep msitools && {
 
-dialog --title 'Confirmacao' --backtitle 'Windows 11' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0
+dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0
   [ $? = 0 ] && {
 
 wget -O w11admx.msi "$admxw11" \
