@@ -6,24 +6,26 @@ function start {
 var0=$(dialog --title 'Ferramentas' --backtitle "Ferramentas e Utilidades" --menu " " 0 0 0 \
 1 'Instalar o DWService' \
 2 'Baixar Imagens .ISO (XPRA)' \
-3 'Testar Ping DNS' \
-4 'Cliente SAMBA' \
-5 'Testar o Beep' \
-6 'Sync SATAs' \
-7 'Qual meu IP WAN?' \
-8 'SpeedTest by Ookla' \
-9 'Explorar o conteudo de /mnt' \
+3 'Atualizar Driver VirtIO (XPRA)' \
+4 'Testar Ping DNS' \
+5 'Cliente SAMBA' \
+6 'Testar o Beep' \
+7 'Sync SATAs' \
+8 'Qual meu IP WAN?' \
+9 'SpeedTest by Ookla' \
+10 'Explorar o conteudo de /mnt' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) dwservice0 ; start ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; start ;;
-3) clear ; dnstest ; start ;;
-4) sambaclient ; start ;;
-5) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
-6) clear ; satas ; start ;;
-7) meuip=$(dig @resolver4.opendns.com myip.opendns.com +short) ; dialog --title "Informacao" --msgbox "\n$meuip" 7 25 ; start ;;
-8) clear; echo ""; echo "Aguarde a conclusao do teste!"; echo ""; curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 ; echo ""; sleep 3; read -p "Teste concluido! Pressione Enter para fechar" ; start ;;
-9) dialog --stdout --title "Veja as pastas da raiz dos discos!" --dselect "/mnt" 15 40; start ;;
+3) clear; sudo wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso -O /var/lib/libvirt/images/virtio-win.iso ; start ;;
+4) clear ; dnstest ; start ;;
+5) sambaclient ; start ;;
+6) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
+7) clear ; satas ; start ;;
+8) meuip=$(dig @resolver4.opendns.com myip.opendns.com +short) ; dialog --title "Informacao" --msgbox "\n$meuip" 7 25 ; start ;;
+9) clear; echo ""; echo "Aguarde a conclusao do teste!"; echo ""; curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 ; echo ""; sleep 3; read -p "Teste concluido! Pressione Enter para fechar" ; start ;;
+10) dialog --stdout --title "Veja as pastas da raiz dos discos!" --dselect "/mnt" 15 40; start ;;
 X) echo "." >/dev/null ;;
 esac
 }
