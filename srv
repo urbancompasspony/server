@@ -94,8 +94,8 @@ var0=$(dialog --title ' ' --backtitle "Urgencias & Emergencias" --ok-label "Aces
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; urgencies0 ;;
-2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | bash ; urgencies0 ;;
-3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-AutoRestoreCloud | bash ; urgencies0 ;;
+2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; bash /home/administrador/.sp ; urgencies0 ;;
+3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-AutoRestoreCloud | tee /home/administrador/.rc ; chmod +x /home/administrador/.rc ; clear ; bash /home/administrador/.rc ; urgencies0 ;;
 X) echo "." >/dev/null ;;
 esac
 }
