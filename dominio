@@ -1199,7 +1199,7 @@ function revalid_shared {
 }
 
 function dica0 {
-  VALUE2=$(dialog --stdout --title "Escolha a pasta alvo!" --fselect "/mnt" 15 40 | tail -c +5)
+  VALUE2=$(dialog --stdout --title "Escolha a pasta alvo!" --dselect "/mnt" 15 40 | tail -c +5)
 }
 
 function faq_help {
