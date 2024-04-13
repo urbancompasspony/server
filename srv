@@ -44,18 +44,16 @@ function start {
 var0=$(dialog --title "SUPERVISOR" --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
 1 'Orchestration' \
 2 'Support & Help Desk' \
-3 'Atualizar o .bashrc' \
-4 'Auto-Relatorio' \
-5 'BETA: Support Menus' \
-6 'First Configuration' \
+3 'Auto-Relatorio' \
+4 'Atualizar o .bashrc' \
+5 'First Configuration' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
 2) managers ; start ;;
-3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
-4) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_relatorio | tee /home/administrador/.autorelat ; chmod +x /home/administrador/.autorelat ; sudo bash /home/administrador/.autorelat ; start ;;
-5) managers_testes ; start ;;
-6) firstconfig ; start ;;
+3) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_relatorio | tee /home/administrador/.autorelat ; chmod +x /home/administrador/.autorelat ; sudo bash /home/administrador/.autorelat ; start ;;
+4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
+5) firstconfig ; start ;;
 X) exit ;;
 esac
 }
@@ -93,24 +91,12 @@ var0=$(dialog --title ' ' --backtitle "Urgencias & Emergencias" --ok-label "Aces
 1 'Restauracao de Containers Locais' \
 2 'Solucao de Problemas Comuns' \
 3 'Reinstalar Servicos a partir da Nuvem' \
-X 'Sair' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; urgencies0 ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | bash ; urgencies0 ;;
 3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-cloud | bash ; urgencies0 ;;
-X) exit ;;
-esac
-}
-
-function managers_testes {
-var0=$(dialog --title ' ' --backtitle "Managers" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-1 'Solucao de Problemas' \
-2 'Restaurar Servicos (Nuvem)' \
-X 'Sair' 2>&1 > /dev/tty )
-case "$var0" in
-1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | bash ; managers_testes ;;
-2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-cloud | bash ; managers_testes ;;
-X) exit ;;
+X) echo "." >/dev/null ;;
 esac
 }
 
