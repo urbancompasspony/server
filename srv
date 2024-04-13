@@ -95,7 +95,7 @@ X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; urgencies0 ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | bash ; urgencies0 ;;
-3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-cloud | bash ; urgencies0 ;;
+3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-AutoRestoreCloud | bash ; urgencies0 ;;
 X) echo "." >/dev/null ;;
 esac
 }
