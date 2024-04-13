@@ -55,6 +55,9 @@ esac
 function calling {
   clear
   sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
+
+# curl -u admin:isorulez -s http://172.20.0.22 | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g'
+
 }
 
 function setperma {
