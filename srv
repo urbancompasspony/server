@@ -76,7 +76,7 @@ X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
 2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
-3) docker exec -it dominio /root/.init ; managers ;;
+3) domain00 ; managers ;;
 4) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; managers ;;
 5) clear ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!" || startx ; sleep 3 ; managers ;;
 6) urgencies0 ; managers ;;
@@ -134,6 +134,14 @@ case "$var0" in
 3) dwgeneric0 ; firstconfig ;;
 X) echo "." >/dev/null ;;
 esac
+}
+
+function domain00 {
+  docker ps -a | grep dominio 1> /dev/null && {
+    docker exec -it dominio /root/.init
+  } || {
+    clear; echo ""; echo "Nenhum Controlador de Dominio encontrado neste sistema!" >/dev/null; echo ""; sleep 3
+  }
 }
 
 function dwgeneric0 {
