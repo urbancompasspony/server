@@ -137,10 +137,10 @@ esac
 }
 
 function domain00 {
-  docker ps -a | grep dominio 1> /dev/null && {
+  docker ps -a | grep dominio 1>&2 >/dev/null && {
     docker exec -it dominio /root/.init
   } || {
-    clear; echo ""; echo "Nenhum Controlador de Dominio encontrado neste sistema!" >/dev/null; echo ""; sleep 3
+    clear; echo ""; echo "Nenhum Controlador de Dominio encontrado neste sistema!"; echo ""; sleep 3
   }
 }
 
