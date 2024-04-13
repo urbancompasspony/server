@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# WIP
+# curl -u admin:isorulez -s http://172.20.0.22 | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g'
+
 # CREATE NETWORK DEVICES AS BRIDGE, NEVER AS VEPA, 'CUZ THIS CONFLICTS WITH MACVLAN DOCKER!
 
 ##############
