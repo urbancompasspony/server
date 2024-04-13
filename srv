@@ -70,15 +70,16 @@ function startocult {
 
 function managers {
 var0=$(dialog --title ' ' --backtitle "Managers" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-1 'Maquinas Virtuais (TUI)' \
-2 'Containers (TUI)' \
-3 'Active Directory (TUI)' \
+1 'Maquinas Virtuais' \
+2 'Containers' \
+3 'Active Directory' \
 4 'Testar Ping DNS' \
 5 'Baixar Imagens .ISO (XPRA)' \
 6 'Iniciar Area de Trabalho' \
 7 'Instalar DWService' \
-8 'Reiniciar Servidor' \
-9 'Desligar Servidor' \
+8 'Restauracao de Servicos (Local)' \
+9 'Reiniciar Servidor' \
+10 'Desligar Servidor' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
@@ -88,8 +89,9 @@ case "$var0" in
 5) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers ;;
 6) clear ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela do servidor local!" || startx ; sleep 3 ; managers ;;
 7) dwservice0 ; managers ;;
-8) reb00t ; managers ;;
-9) shutd0 ; managers ;;
+8) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; managers ;;
+9) reb00t ; managers ;;
+10) shutd0 ; managers ;;
 X) exit ;;
 esac
 }
@@ -104,8 +106,7 @@ var0=$(dialog --title ' ' --backtitle "Managers" --ok-label "Acessar" --cancel-l
 6 'Iniciar Area de Trabalho' \
 7 'Instalar DWService' \
 8 'Solucao de Problemas' \
-9 'Restaurar Servicos Local' \
-10 'Restaurar Servicos Nuvem' \
+10 'Restaurar Servicos (Nuvem)' \
 11 'Reiniciar Servidor' \
 12 'Desligar Servidor' \
 X 'Sair' 2>&1 > /dev/tty )
@@ -118,7 +119,6 @@ case "$var0" in
 6) clear ; echo "" ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela do servidor local!" || startx ; echo "" ; sleep 3 ; managers_testes ;;
 7) dwservice0 ; managers_testes ;;
 8) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | bash ; managers_testes ;;
-9) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; managers_testes ;;
 10) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-cloud | bash ; managers_testes ;;
 11) reb00t ; managers_testes ;;
 12) shutd0 ; managers_testes ;;
