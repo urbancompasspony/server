@@ -1,21 +1,10 @@
 #!/bin/bash
 
-# For Ubuntu!
 export pty=True
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
-function check {
-  [ "$EUID" -ne 0 ] && {
-    echo "Execute esse script como Root!"
-    exit
-    }
-}
-
 destpath="/var/lib/libvirt/images"
-
-sudo mkdir -p "$destpath"
-sudo chmod 777 -R "$destpath"
 
 serverip="172.20.0.22"
 lanhost="http://$serverip"
@@ -25,44 +14,37 @@ usern4me="admin"
 passw0rd="isorulez"
 
 if ping -c 1 $serverip >/dev/null; then
-    webadress="$lanhost"
+  webadress="$lanhost"
 else
-    webadress="$wanhost"
+  webadress="$wanhost"
 fi
 
-function start {
-var0=$(dialog --title ' ' --backtitle "Bem-Vindo ao ISO Downloader!" --menu " " 0 0 0 \
-1 'pfSense 2.7' \
-2 'Windows Server 2019 STD' \
-3 'Windows 10 Pro/Works' \
-4 'Windows 11 Pro/Works' \
-5 'ReviOS W10' \
-6 'ReviOS W11' \
-7 'Drivers VM VirtIO' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) calling pfSense-2.7.iso ; setperma ; start ;;
-2) calling wserver2019STD.iso ; setperma ; start ;;
-3) calling Windows10.iso ; setperma ; start ;;
-4) calling Windows11.iso ; setperma ; start ;;
-5) calling ReviOSW10.iso ; setperma ; start ;;
-6) calling ReviOSW11.iso ; setperma ; start ;;
-7) clear ; sudo wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso -O $destpath/virtio-win.iso ; setperma ; start ;;
-X) echo "Saindo..." ;;
-esac
+function check {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
 }
 
-function calling {
-  clear
-  sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
+function init {
+  URLG1=$(curl -ku "$usern4me":"$passw0rd" "$webadress" | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g')
+  IFS=$'\n' read -rd '' -a options <<< "$URLG1"
+  cmd=(dialog --keep-tite --menu "Selecione uma ISO:" 0 0 0)
+  menu_options=()
 
-# curl -u admin:isorulez -s http://172.20.0.22 | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g'
+  for ((i = 0; i < ${#options[@]}; i++)); do
+    menu_options+=("$((i + 1))" "${options[i]}")
+  done
 
-}
+  choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
+  [ $? -ne 0 ] && return
 
-function setperma {
+  sudo mkdir -p "$destpath"
+  wget --user $usern4me --password $passw0rd $webadress/${options[choice - 1]} -O $destpath/${options[choice - 1]}
   sudo chmod 777 -R "$destpath"
 }
 
 check
-start
+init
+
+exit 1
