@@ -1,8 +1,4 @@
-#!/bin/bash -i
-
-# # # # # # #  #
-# SRV MGR Menu #
-# # # # # # #  # 
+#!/bin/bash
 
 # For Ubuntu!
 export pty=True
@@ -14,7 +10,7 @@ hash1="68b329da9893e34099c7d8ad5cb9c940"
 hash2="c357311ed3a47a08b423e1b42ec5c130"
 
 # Versão:
-version="v3.5"
+version="v4"
 
 # ------------------------------------------------------------------------------
 
@@ -45,21 +41,21 @@ hash0=$(echo "$password" | md5sum | awk '{print $1}')
 hash1="fe5dfdd991450623c39efc7705e47ad5"
 
 function start {
-var0=$(dialog --title "Escolha um sub menu" --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
-A 'Orchestra' \
-B 'Support Menu' \
-C 'Manut. & Relat.' \
-D 'Settings' \
-E 'Atualizar Bashrc' \
-F 'BETA: Support Menu' \
+var0=$(dialog --title "SUPERVISOR" --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
+1 'Orchestration' \
+2 'Support & Help Desk' \
+3 'Atualizar o .bashrc' \
+4 'Auto-Relatorio' \
+5 'BETA: Support Menus' \
+6 'First Configuration' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
-A) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
-B) managers ; start ;;
-C) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_relatorio | sudo bash ; start ;;
-D) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; start ;;
-E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
-F) managers_testes ; start ;;
+1) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
+2) managers ; start ;;
+3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
+4) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_relatorio | tee /home/administrador/.autorelat ; chmod +x /home/administrador/.autorelat ; sudo bash /home/administrador/.autorelat ; start ;;
+5) managers_testes ; start ;;
+6) firstconfig ; start ;;
 X) exit ;;
 esac
 }
@@ -69,59 +65,51 @@ function startocult {
 }
 
 function managers {
-var0=$(dialog --title ' ' --backtitle "Managers" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-1 'Maquinas Virtuais' \
-2 'Containers' \
-3 'Active Directory' \
-4 'Testar Ping DNS' \
-5 'Baixar Imagens .ISO (XPRA)' \
-6 'Iniciar Area de Trabalho' \
-7 'Instalar DWService' \
-8 'Reiniciar Servidor' \
-9 'Desligar Servidor' \
-10 'Restauracao de Containers' \
+var0=$(dialog --title 'Suporte & Help Desk' --backtitle "Suporte & Help Desk" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
+1 'Gerir Maquinas Virtuais' \
+2 'Gerir Containers' \
+3 'Gerir Active Directory' \
+4 'Ferramentas & Utilidades' \
+5 'Iniciar Area de Trabalho' \
+6 'Urgencias & Emergencias' \
+7 'Reiniciar Servidor' \
+8 'Desligar Servidor' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
 2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
 3) docker exec -it dominio /root/.init ; managers ;;
-4) dnstest ; managers ;;
-5) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers ;;
-6) clear ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!" || startx ; sleep 3 ; managers ;;
-7) dwservice0 ; managers ;;
-8) reb00t ; managers ;;
-9) shutd0 ; managers ;;
-10) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; managers ;;
+4) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; managers ;;
+5) clear ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!" || startx ; sleep 3 ; managers ;;
+6) urgencies0 ; managers ;;
+7) reb00t ; managers ;;
+8) shutd0 ; managers ;;
+X) exit ;;
+esac
+}
+
+function urgencies0 {
+var0=$(dialog --title ' ' --backtitle "Urgencias & Emergencias" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
+1 'Restauracao de Containers Locais' \
+2 'Solucao de Problemas Comuns' \
+3 'Reinstalar Servicos a partir da Nuvem' \
+X 'Sair' 2>&1 > /dev/tty )
+case "$var0" in
+1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; urgencies0 ;;
+2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | bash ; urgencies0 ;;
+3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-cloud | bash ; urgencies0 ;;
 X) exit ;;
 esac
 }
 
 function managers_testes {
 var0=$(dialog --title ' ' --backtitle "Managers" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-1 'Maquinas Virtuais (TUI)' \
-2 'Containers (TUI)' \
-3 'Active Directory (TUI)' \
-4 'Testar Ping DNS' \
-5 'Baixar Imagens .ISO (XPRA)' \
-6 'Iniciar Area de Trabalho' \
-7 'Instalar DWService' \
-8 'Solucao de Problemas' \
-10 'Restaurar Servicos (Nuvem)' \
-11 'Reiniciar Servidor' \
-12 'Desligar Servidor' \
+1 'Solucao de Problemas' \
+2 'Restaurar Servicos (Nuvem)' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
-1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers_testes ;;
-2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers_testes ;;
-3) docker exec -it dominio /root/.init ; managers_testes ;;
-4) dnstest ; managers_testes ;;
-5) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers_testes ;;
-6) clear ; echo "" ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela do servidor local!" || startx ; echo "" ; sleep 3 ; managers_testes ;;
-7) dwservice0 ; managers_testes ;;
-8) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | bash ; managers_testes ;;
-10) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-cloud | bash ; managers_testes ;;
-11) reb00t ; managers_testes ;;
-12) shutd0 ; managers_testes ;;
+1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | bash ; managers_testes ;;
+2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-cloud | bash ; managers_testes ;;
 X) exit ;;
 esac
 }
@@ -129,7 +117,7 @@ esac
 hash1="e4439267203fb5277d347e6cd6e440b5"
 
 function reb00t {
-  dialog --title 'Reiniciar' --backtitle "Reinício" --yesno 'Deseja reiniciar este sistema?' 0 0
+  dialog --title 'Reiniciar' --backtitle "Reinicio" --yesno 'Deseja reiniciar este sistema?' 0 0
   [ $? = 0 ] && {
     sudo reboot
   } || {
@@ -148,89 +136,25 @@ function shutd0 {
   }
 }
 
-function dwservice0 {
+function firstconfig {
+var0=$(dialog --title ' ' --backtitle "Fiest Configuration!" --menu " " 0 0 0 \
+1 'Linite' \
+2 'AutoConfig pfSense (VM)' \
+3 'DWAgent (ARM)' \
+X '<' 2>&1 > /dev/tty )
+case "$var0" in
+1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite.menu | bash ; firstconfig ;;
+2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; firstconfig ;;
+3) dwgeneric0 ; firstconfig ;;
+X) echo "." >/dev/null ;;
+esac
+}
+
+function dwgeneric0 {
   wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh
   chmod +x dwagent_generic.sh
   sudo bash dwagent_generic.sh
 }
-
-function dnstest {
-Google_P=$(ping1 "8.8.4.4")
-gauge1 "8" "Testando ping para 8.8.4.4"
-Google_S=$(ping1 "8.8.8.8")
-gauge1 "14" "Testando ping para 8.8.8.8"
-OpenDNS_P=$(ping1 "208.67.222.222")
-gauge1 "19" "Testando ping para 208.67.222.222"
-OpenDNS_S=$(ping1 "208.67.220.220")
-gauge1 "22" "Testando ping para 208.67.220.220"
-Level3_P=$(ping1 "4.2.2.1")
-gauge1 "24" "Testando ping para 4.2.2.1"
-Level3_S=$(ping1 "4.2.2.2")
-gauge1 "28" "Testando ping para 4.2.2.2"
-Comodo_P=$(ping1 "8.26.56.26")
-gauge1 "32" "Testando ping para 8.26.56.26"
-Comodo_S=$(ping1 "8.20.247.20")
-gauge1 "36" "Testando ping para 8.20.247.20"
-DNSWATCH_P=$(ping1 "84.200.69.80")
-gauge1 "42" "Testando ping para 84.200.69.80"
-DNSWATCH_S=$(ping1 "84.200.70.40")
-gauge1 "46" "Testando ping para 84.200.70.40"
-Quad9_P=$(ping1 "9.9.9.9")
-gauge1 "50" "Testando ping para 9.9.9.9"
-Quad9_S=$(ping1 "149.112.112.112")
-gauge1 "57" "Testando ping para 149.112.112.112"
-Cloudflare_P=$(ping1 "1.1.1.1")
-gauge1 "67" "Testando ping para 1.1.1.1"
-Cloudflare_S=$(ping1 "1.0.0.1")
-gauge1 "74" "Testando ping para 1.0.0.1"
-Algar_P=$(ping1 "200.225.197.34")
-gauge1 "79" "Testando ping para 200.225.197.34"
-Algar_S=$(ping1 "200.225.197.37")
-gauge1 "85" "Testando ping para 200.225.197.37"
-GIGA_P=$(ping1 "189.38.95.95")
-gauge1 "88" "Testando ping para 189.38.95.95"
-GIGA_S=$(ping1 "189.38.95.96")
-gauge1 "93" "Testando ping para 189.38.95.96"
-CLARO_P=$(ping1 "181.213.132.2")
-gauge1 "98" "Testando ping para 181.213.132.2"
-CLARO_S=$(ping1 "181.213.132.3")
-gauge1 "100" "Testando ping para 181.213.132.3"
-
-TEXTAO01="Google ..... 8.8.4.4 .........: $Google_P
-Google ..... 8.8.8.8 .........: $Google_S
-OpenDNS .... 208.67.222.222 ..: $OpenDNS_P
-OpenDNS .... 208.67.220.220 ..: $OpenDNS_S
-Level3 ..... 4.2.2.1 .........: $Level3_P
-Level3 ..... 4.2.2.2 .........: $Level3_S
-Comodo ..... 8.26.56.26 ......: $Comodo_P
-Comodo ..... 8.20.247.20 .....: $Comodo_S
-DNSWATCH ... 84.200.69.80 ....: $DNSWATCH_P
-DNSWATCH ... 84.200.70.40 ....: $DNSWATCH_S
-Quad9 ...... 9.9.9.9 .........: $Quad9_P
-Quad9 ...... 149.112.112.112 .: $Quad9_S
-Cloudflare . 1.1.1.1 .........: $Cloudflare_P
-Cloudflare . 1.0.0.1 .........: $Cloudflare_S
-Algar ...... 200.225.197.34 ..: $Algar_P
-Algar ...... 200.225.197.37 ..: $Algar_S
-GigaDNS .... 189.38.95.95 ....: $GIGA_P
-GigaDNS .... 189.38.95.96 ....: $GIGA_S
-Claro ...... 181.213.132.2 ...: $CLARO_P
-Claro ...... 181.213.132.3 ...: $CLARO_S"
-
-dialog --title 'Resultados do Teste Ping:' --msgbox "$TEXTAO01" 0 0
-}
-
-function gauge1 {
-  clear
-  echo  "$1" | dialog --title "Aguarde!" --gauge "$2" 8 40
-  sleep 0.5
-}
-
-function ping1 {
-  ping -c 1 "$1" | awk 'NR==2{print $7,$8}' |  cut -c7-
-}
-
-# ------------------------------------------------------------------------------
 
 [ "$EUID" -ne 0 ] || {
   echo "Não execute esse script com sudo! Saindo..."
