@@ -99,7 +99,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'CUPS Printer Standalone (W)' \
 7 'Ollama: IA (L)' \
 8 'Ollama: WebUI (L)' \
-9 'StatPing-NG Tracker (W)' \
+9 'RustDesk WebUI (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
@@ -109,7 +109,7 @@ case "$var0" in
 5) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
 7) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
 8) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-9) wget "$github"50-statping-ng -O /tmp/statping; sudo bash /tmp/statping ;;
+9) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -121,14 +121,12 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'Pottava WebUI' \
 4 'FileBrowser' \
 5 'Tmate Server (L)' \
-6 'Varnish' \
-7 'macOS VM' \
-8 'NO IP' \
-9 'Registry' \
-10 'XPRA (Ubuntu 2204)' \
-11 'Zabbix' \
-12 'TOR privoxy' \
-13 'RustDesk WebUI (W)' \
+6 'macOS VM' \
+7 'NO IP' \
+8 'Registry' \
+9 'XPRA (Ubuntu 2204)' \
+10 'Zabbix' \
+11 'TOR privoxy' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
@@ -136,14 +134,12 @@ case "$var0" in
 3) wget "$github"21-pottava-docker-ui -O /tmp/pottava; sudo bash /tmp/pottava ;;
 4) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
 5) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
-6) wget "$github"35-varnish -O /tmp/varnish; sudo bash /tmp/varnish ;;
-7) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
-8) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
-9) wget "$github"43-registry -O /tmp/registry; sudo bash /tmp/registry ;;
-10) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
-11) wget "$github"47-zabbix -O /tmp/zabbix; sudo bash /tmp/zabbix ;;
-12) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
-13) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
+6) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
+7) wget "$github"41-noip -O /tmp/noip; sudo bash /tmp/noip ;;
+8) wget "$github"43-registry -O /tmp/registry; sudo bash /tmp/registry ;;
+9) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
+10) wget "$github"47-zabbix -O /tmp/zabbix; sudo bash /tmp/zabbix ;;
+11) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
 X) echo "." > /dev/null ;;
 esac
 }
