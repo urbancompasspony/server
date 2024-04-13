@@ -29,6 +29,7 @@ esac
 }
 
 function udpcast0 {
+# WIP: Add set interface menu option...
 var2=$(dialog --title 'UDPCast' --backtitle "$bktitle" --menu "Escolha o modo!" 0 0 0 \
 A 'Client' \
 B 'Server' \
