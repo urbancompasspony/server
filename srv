@@ -77,9 +77,9 @@ var0=$(dialog --title ' ' --backtitle "Managers" --ok-label "Acessar" --cancel-l
 5 'Baixar Imagens .ISO (XPRA)' \
 6 'Iniciar Area de Trabalho' \
 7 'Instalar DWService' \
-8 'Restauracao de Servicos (Local)' \
-9 'Reiniciar Servidor' \
-10 'Desligar Servidor' \
+8 'Reiniciar Servidor' \
+9 'Desligar Servidor' \
+10 'Restauracao de Containers' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
@@ -87,11 +87,11 @@ case "$var0" in
 3) docker exec -it dominio /root/.init ; managers ;;
 4) dnstest ; managers ;;
 5) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; managers ;;
-6) clear ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela do servidor local!" || startx ; sleep 3 ; managers ;;
+6) clear ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!" || startx ; sleep 3 ; managers ;;
 7) dwservice0 ; managers ;;
-8) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; managers ;;
-9) reb00t ; managers ;;
-10) shutd0 ; managers ;;
+8) reb00t ; managers ;;
+9) shutd0 ; managers ;;
+10) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; managers ;;
 X) exit ;;
 esac
 }
