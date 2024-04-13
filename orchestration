@@ -143,7 +143,7 @@ case "$var0" in
 10) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
 11) wget "$github"47-zabbix -O /tmp/zabbix; sudo bash /tmp/zabbix ;;
 12) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
-12) wget "$github"24-rustdesk-web -O /tmp/desk-web; sudo bash /tmp/desk-web ;;
+13) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
 X) echo "." > /dev/null ;;
 esac
 }
