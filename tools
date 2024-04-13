@@ -4,32 +4,28 @@ pathmount="/tmp/pathmount"
 
 function start {
 var0=$(dialog --title 'Tools' --backtitle "Ferramentas úteis!" --menu " " 0 0 0 \
-A 'First Configuration' \
-B 'SMB Client' \
-C 'Test Beep' \
-D 'Sync all SATA' \
-E 'DNS Tester' \
-F 'ISO Downloader' \
-G 'Set Time & Date' \
-H 'SMART Dump' \
-I 'Tunnel SSH' \
-J 'RansomExt' \
-K 'Install Beep' \
+1 'Instalar o DWService' \
+2 'Cliente SAMBA' \
+3 'Testar o Beep' \
+4 'Sync SATAs' \
+5 'Testar Ping DNS' \
+6 'Baixar Imagens .ISO (XPRA)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-A) firstconfig ; start ;;
-B) sambaclient ; start ;;
-C) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
-D) clear ; satas ; start ;;
-E) clear ; dnstest ; start ;;
-F) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | bash ; start ;;
-G) clear ; sudo timedatectl set-timezone America/Bahia ; date ; sleep 3 ; start ;;
-H) clear ; smartdump ; start ;;
-I) clear ; synctunnel ; start ;;
-J) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/ransomext | sudo bash ; start ;;
-K) clear ; beep ; start ;;
+1) dwservice0 ; start ;;
+2) sambaclient ; start ;;
+3) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
+4) clear ; satas ; start ;;
+5) clear ; dnstest ; start ;;
+6) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; start ;;
 X) echo "." >/dev/null ;;
 esac
+}
+
+function dwservice0 {
+  wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
+  chmod +x dwagent_x86.sh
+  sudo bash dwagent_x86.sh
 }
 
 function beep {
@@ -37,24 +33,6 @@ function beep {
   sudo bash /home/administrador/.beep.sh
   echo "@reboot sleep 60; bash /home/administrador/.beep.sh" >> /tmp/crontab_new
   sudo crontab -l | cat - /tmp/crontab_new > crontab.txt && sudo crontab crontab.txt
-}
-
-function firstconfig {
-var0=$(dialog --title ' ' --backtitle "Fiest Configuration!" --menu " " 0 0 0 \
-A 'Linite' \
-B 'AutoConfig pfSense' \
-C 'DWAgent [x86]' \
-D 'DWAgent [ARM]' \
-E 'Atualizar Bashrc' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite.menu | bash ; firstconfig ;;
-B) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; firstconfig ;;
-C) wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh ; firstconfig ;;
-D) wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh ; firstconfig ;;
-E) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; firstconfig ;;
-X) echo "." >/dev/null ;;
-esac
 }
 
 function sambaclient {
@@ -198,70 +176,6 @@ function gauge1 {
 
 function ping1 {
   ping -c 1 "$1" | awk 'NR==2{print $7,$8}' |  cut -c7-
-}
-
-function xpraset {
-sudo mkdir -p /srv/containers/scripts
-passs="0"
-
-  sudo apt install -y \
-    software-properties-common \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    dpkg \
-    gcc \
-    sed \
-    sudo \
-    grep \
-    wget \
-    xterm \
-    less \
-    gpgv \
-    libfuse2 \
-    libglib2.0-0 \
-    libxext6 \
-    libsm6 \
-    libxrender1 \
-    lsb-release \
-    mesa-utils \
-    xvfb \
-    ssh-askpass \
-    virt-manager \
-    dbus-x11 \
-    libglib2.0-bin \
-    gir1.2-spiceclientgtk-3.0
-
-sudo apt-get install -y wget && \
-    wget -q https://xpra.org/gpg.asc -O- | sudo apt-key add - &&  \
-    echo "deb https://xpra.org/ $(lsb_release -c | awk {'print $2'}) main" | sudo tee -a /etc/apt/sources.list.d/xpra.list && \
-    sudo apt-get update && \
-    sudo apt-get install -y xpra
-
-VALUE0=$(dialog --title "Definição de Senha" --form "" 8 40 0 \
-"Senha: " 1 1 "" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-passs=$(echo "$VALUE0" | sed -n 1p)
-
-[ $passs = "0" ] && {
-  clear
-  echo "Não deixe o campo em branco! Cancelando..."
-  sleep 3
-} || {
-  echo -e "while true;
-do
-xpra start --bind-tcp=0.0.0.0:9876,auth=password:value=$passs --html=on --start=virt-manager --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 "1360x768"x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
-sleep 5
-done" | sudo tee /srv/containers/scripts/xpra
-
-  sudo chmod +x /srv/containers/scripts/xpra
-  echo "@reboot sleep 15; bash /srv/containers/scripts/xpra" > /tmp/crontab_new
-  crontab -l | cat - /tmp/crontab_new > crontab.txt && crontab crontab.txt
-  rm crontab.txt
-
-  bash /srv/containers/scripts/xpra &
-  }
 }
 
 function smartdump {
