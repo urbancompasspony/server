@@ -88,16 +88,19 @@ esac
 
 function urgencies0 {
 var0=$(dialog --title ' ' --backtitle "Urgencias & Emergencias" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-1 'Local: Restauracao de Containers' \
-2 'Solucao de Problemas Comuns' \
-3 'Nuvem: Baixar Backups de Containers (A)' \
-4 'Nuvem: Restauracao de Containers (B)' \
+1 'Solucao de Problemas Comuns' \
+2 'Local A: Restauracao de Containers' \
+3 'Local B: Limpar Backup Provisorio' \
+4 'Nuvem A: Baixar Backups de Containers' \
+5 'Nuvem B: Restauracao de Containers' \
+6 'Nuvem C: Limpar Backup Provisorio' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; urgencies0 ;;
-2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; bash /home/administrador/.sp ; urgencies0 ;;
-3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-AutoRestoreCloud | tee /home/administrador/.rc ; chmod +x /home/administrador/.rc ; clear ; bash /home/administrador/.rc ; urgencies0 ;;
-4) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/05-AutoRestoreBKPCloud | bash ; urgencies0 ;;
+1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; bash /home/administrador/.sp ; urgencies0 ;;
+2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; urgencies0 ;;
+3) clear ; sudo rm -R /srv/backup4restore ; clear echo ""; echo "A pasta backup4restore foi limpa!"; sleep 3 ; urgencies0 ;;
+4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-AutoRestoreCloud | tee /home/administrador/.rc ; chmod +x /home/administrador/.rc ; clear ; bash /home/administrador/.rc ; urgencies0 ;;4) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/05-AutoRestoreBKPCloud | bash ; urgencies0 ;;
+5) clear ; sudo rm -R /srv/restoredcloud ; clear echo ""; echo "A pasta restoredcloud/ foi limpa!"; sleep 3 ; urgencies0 ;;
 X) echo "." >/dev/null ;;
 esac
 }
