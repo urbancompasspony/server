@@ -88,14 +88,16 @@ esac
 
 function urgencies0 {
 var0=$(dialog --title ' ' --backtitle "Urgencias & Emergencias" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-1 'Restauracao de Containers Locais' \
+1 'Local: Restauracao de Containers' \
 2 'Solucao de Problemas Comuns' \
-3 'Reinstalar Servicos a partir da Nuvem' \
+3 'Nuvem: Baixar Backups de Containers (A)' \
+4 'Nuvem: Restauracao de Containers (B)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; urgencies0 ;;
 2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; bash /home/administrador/.sp ; urgencies0 ;;
 3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-AutoRestoreCloud | tee /home/administrador/.rc ; chmod +x /home/administrador/.rc ; clear ; bash /home/administrador/.rc ; urgencies0 ;;
+4) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/05-AutoRestoreBKPCloud | bash ; urgencies0 ;;
 X) echo "." >/dev/null ;;
 esac
 }
