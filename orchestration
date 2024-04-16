@@ -21,7 +21,6 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'DataBases' \
 4 'Others' \
 5 'Not Tested!' \
-6 'Settings' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) essentials ; start ;;
@@ -29,7 +28,6 @@ case "$var0" in
 3) database ; start ;;
 4) others ; start ;;
 5) misc ; start ;;
-6) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
 X) exit ;;
 esac
 }
