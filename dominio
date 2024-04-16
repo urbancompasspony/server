@@ -172,7 +172,7 @@ function s_settings {
 }
 
 function setacladmin0 {
-VALUE0=$(dialog --stdout --title "SET ACL as ADMINISTRATOR" --fselect "/mnt" 15 40)
+VALUE0=$(dialog --stdout --title "SET ACL as ADMINISTRATOR" --dselect "/mnt" 15 40)
 [ $? -ne 0 ] && return
 var1=$(echo "$VALUE0" | sed -n 1p)
 
@@ -184,7 +184,7 @@ dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta $var1 re
 }
 
 function getacls0 {
-VALUE0=$(dialog --stdout --title "GET ACL" --fselect "/mnt" 15 40)
+VALUE0=$(dialog --stdout --title "GET ACL" --dselect "/mnt" 15 40)
 [ $? -ne 0 ] && return
 var1=$(echo "$VALUE0" | sed -n 1p)
 
@@ -208,7 +208,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "SET ACL" --form "Defina a ACL..." 9 60 
 [ $? -ne 0 ] && return
 var1=$(echo "$VALUE0" | sed -n 1p)
 
-VALUE00=$(dialog --stdout --title "SET FOLDER" --fselect "/mnt" 15 40)
+VALUE00=$(dialog --stdout --title "SET FOLDER" --dselect "/mnt" 15 40)
 [ $? -ne 0 ] && return
 var2=$(echo "$VALUE00" | sed -n 1p)
 
