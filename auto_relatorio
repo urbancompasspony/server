@@ -62,7 +62,8 @@ function smartdump0 {
   smartdump
   clear
   cat /home/administrador/SMART_DUMP
-  read
+  echo ""
+  enter0
   echo "$datetime Foi realizada a verificação da saúde dos discos rígidos.
 Mais informações no anexo SMART_DUMP do e-mail.
 " >> "$file"
@@ -70,17 +71,26 @@ Mais informações no anexo SMART_DUMP do e-mail.
 
 function backup0 {
   clear
-  df -h; read
+  df -h
+  enter0
+
   clear
   journalctl -b 0 | grep rsnap | tail -n 5
+  enter0
+
   clear
   journalctl -b 0 | grep rsync | tail -n 5
+  enter0
+
   clear
   journalctl -b 0 | grep rclone | tail -n 5
+  enter0
+
   clear
   destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
   ls -la $destiny; read
-  clear
+  enter0
+
   echo "$datetime Foi realizada a verificação das rotinas de backup do servidor.
 O backup em nuvem, se existente, também foi verificado.
 " >> "$file"
@@ -89,9 +99,12 @@ O backup em nuvem, se existente, também foi verificado.
 function domain0 {
   clear
   docker exec dominio samba-tool ntacl sysvolreset -U Administrator
-  sleep 3
+  enter0
+
+  clear
   docker exec dominio samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes
-  sleep 3
+  enter0
+
   echo "$datetime Foi realizada a verificação da integridade do Domínio.
 " >> "$file"
 }
@@ -99,6 +112,8 @@ function domain0 {
 function pihole0 {
   clear
   piholemnt
+  enter0
+
   echo "$datetime Nesta data o serviço de DNS foi atualizado e as listas de bloqueio
 foram revalidadas.
 " >> "$file"
@@ -110,7 +125,9 @@ function pentest0 {
     clear
     echo "Acess: $var6/Likely_Vulnerable/"
     echo ""
-    ls -la /srv/containers/pentest/Pentests/Likely_Vulnerable; read
+    ls -la /srv/containers/pentest/Pentests/Likely_Vulnerable
+    enter0
+
     echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
 Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notificados.
 " >> "$file"
@@ -121,7 +138,9 @@ Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notifica
 
 function syslog0 {
   clear
-  cat /srv/containers/*/log/syslog | grep renameat | tail -n 2
+  cat /srv/containers/*/log/syslog | grep renameat | tail -n 3
+  enter0
+
   echo "$datetime Foi realizada a verificação da integridade dos Logs de Eventos
 das pastas da rede e se os registros de uso, dos compartilhamentos, estão em dia.
 " >> "$file"
@@ -131,7 +150,7 @@ function custom0 {
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Relatório" --form "Customizado" 8 40 0 \
 "Relat:" 1 1 "$VALUE1" 1 8 100 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-#[ $? -ne 0 ] && relat0 # Não precisa disso se já chamou a função lá em cima
+[ $? -ne 0 ] && return
 var1=$(echo "$VALUE0" | sed -n 1p)
 
   echo "$datetime $var1
@@ -151,7 +170,7 @@ done < <(find "$setfolder" -maxdepth 2 -type f -name "*.txt" -print0)
     echo "Nenhum arquivo encontrado em $directory"
   } || {
     file=$(dialog --stdout --title "Escolha um documento" --cancel-label "Sair" --menu "Escolha:" 0 0 0 "${files[@]}")
-    [ $? -ne 0 ] && exit # Se pressionar Voltar nesta tela, ele sai do programa!
+    [ $? -ne 0 ] && return
     clear
 
     relat0
@@ -191,6 +210,10 @@ function smartdump {
 
 echo "" >> SMART_DUMP
 echo "Verificacao concluida em $datetime ! Pressione Enter para sair." >> SMART_DUMP
+}
+
+function enter0 {
+  echo ""; read -p "Pressione Enter para continuar!"
 }
 
 function piholemnt {
