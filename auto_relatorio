@@ -6,8 +6,7 @@ setfolder="/srv/relatorios"
 
 # ============================================================================ #
 
-randomminutes=$(dc -e `date +%N`' 60 % p')
-datetime=$(date +"%d/%m - %H:$randomminutes:")
+datetime=$(date +"%d/%m - %H:%m:%S:")
 dateonly=$(date +"%m / %Y")
 
 function relat0 {
