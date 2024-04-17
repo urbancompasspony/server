@@ -1,13 +1,9 @@
 #!/bin/bash
 
 setfolder="/srv/relatorios"
-
-#setfolder=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
+dateonly=$(date +"%m / %Y")
 
 # ============================================================================ #
-
-datetime=$(date +"%d/%m - %H:%m:%S:")
-dateonly=$(date +"%m / %Y")
 
 function relat0 {
 var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
@@ -37,6 +33,7 @@ esac
 }
 
 function cabecalho {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
   echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA
 Conforme estipulado em contrato mensal de prestação de serviços na área de
@@ -48,6 +45,7 @@ corretivas executados no período de $dateonly:
 }
 
 function upgrade0 {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
   export DEBIAN_FRONTEND=noninteractive
   clear
   apt update -y &&
@@ -58,6 +56,7 @@ function upgrade0 {
 }
 
 function smartdump0 {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
   smartdump
   clear
@@ -70,6 +69,7 @@ Mais informações no anexo SMART_DUMP do e-mail.
 }
 
 function backup0 {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
   df -h
   enter0
@@ -97,6 +97,7 @@ O backup em nuvem, se existente, também foi verificado.
 }
 
 function domain0 {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
   docker exec dominio samba-tool ntacl sysvolreset -U Administrator
   enter0
@@ -110,6 +111,7 @@ function domain0 {
 }
 
 function pihole0 {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
   piholemnt
   enter0
@@ -120,6 +122,7 @@ foram revalidadas.
 }
 
 function pentest0 {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
   [ -d "/srv/containers/pentest" ] && {
     var6=$(sed -n '6p' /srv/containers/pentest/Information)
     clear
@@ -137,6 +140,7 @@ Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notifica
 }
 
 function syslog0 {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
   cat /srv/containers/*/log/syslog | grep renameat | tail -n 3
   enter0
@@ -147,6 +151,7 @@ das pastas da rede e se os registros de uso, dos compartilhamentos, estão em di
 }
 
 function custom0 {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Relatório" --form "Customizado" 8 40 0 \
 "Relat:" 1 1 "$VALUE1" 1 8 100 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -157,27 +162,8 @@ var1=$(echo "$VALUE0" | sed -n 1p)
 " >> "$file"
 }
 
-function start {
-  files=() # Esvaziar a variável; Loop pasta, adicionar arquivos ao array
-while IFS= read -r -d $'\0' file; do
-    files+=("$file" "")
-done < <(find "$setfolder" -maxdepth 2 -type f -name "*.txt" -print0)
-# para todos os arquivos: done < <(find "/home" -maxdepth 1 -type f -print0)
-
-# Verificar se há pelo menos 1 arquivo ou gerar erro.
-  [ ${#files[@]} -eq 0 ] && {
-    clear
-    echo "Nenhum arquivo encontrado em $directory"
-  } || {
-    file=$(dialog --stdout --title "Escolha um documento" --cancel-label "Sair" --menu "Escolha:" 0 0 0 "${files[@]}")
-    [ $? -ne 0 ] && return
-    clear
-
-    relat0
-  }
-}
-
 function smartdump {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
   # Clear SMART_DUMP File
   rm SMART_DUMP
   touch SMART_DUMP
@@ -217,6 +203,7 @@ function enter0 {
 }
 
 function piholemnt {
+datetime=$(date +"%d/%m - %H:%m:%S:")
 VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
 "NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -233,6 +220,8 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
     docker restart "$var1"
 }
 
+# ============================================================================ #
+
 [ "$EUID" -ne 0 ] && {
   echo "Execute esse script com sudo! Saindo..."
   exit
@@ -240,6 +229,21 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
 
 sudo mkdir -p $setfolder
 sudo touch $setfolder/relatorio.txt
-start
 
-exit 0
+datetime=$(date +"%d/%m - %H:%m:%S:")
+files=() # Esvaziar a variável; Loop pasta, adicionar arquivos ao array
+  while IFS= read -r -d $'\0' file; do
+files+=("$file" "")
+done < <(find "$setfolder" -maxdepth 2 -type f -name "*.txt" -print0)
+[ ${#files[@]} -eq 0 ] && {
+  clear
+  echo "Nenhum arquivo encontrado em $directory"
+} || {
+  file=$(dialog --stdout --title "Escolha um documento" --cancel-label "Sair" --menu "Escolha:" 0 0 0 "${files[@]}")
+  [ $? -ne 0 ] && return
+  clear
+
+  relat0
+}
+
+exit 1
