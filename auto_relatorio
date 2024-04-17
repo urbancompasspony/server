@@ -105,11 +105,18 @@ foram revalidadas.
 }
 
 function pentest0 {
-  clear
-  ls -la /srv/containers/pentest/Pentests/Likely_Vulnerable; read
-  echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
+  [ -d "/srv/containers/pentest" ] && {
+    var6=$(sed -n '6p' /srv/containers/pentest/Information)
+    clear
+    echo "Acess: $var6/Likely_Vulnerable/"
+    echo ""
+    ls -la /srv/containers/pentest/Pentests/Likely_Vulnerable; read
+    echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
 Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notificados.
 " >> "$file"
+  } || {
+    echo "." > /dev/null
+  }
 }
 
 function syslog0 {
