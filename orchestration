@@ -38,8 +38,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'Dominio (W)' \
 3 'Pentest (L/W)' \
 4 'XPRA VMs (L/W)' \
-5 'MySpeed: Tracker (W)' \
-6 'Kuma Ping: Tracker (W)' \
+5 'MySpeed: Tracker (L/W)' \
+6 'Kuma Ping: Tracker (L/W)' \
 7 'OpenSpeedTest (W)' \
 8 'NextCloud (W)' \
 9 'OnlyOffice (W)' \
@@ -65,7 +65,7 @@ esac
 function servers {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'UniFi (W)' \
-2 'Spark Msg [OpenFire] (W)' \
+2 'Spark [OpenFire] (W)' \
 3 'RustDesk (W)' \
 4 'Apache2 Standalone (W)' \
 5 'GLPI (W)' \
