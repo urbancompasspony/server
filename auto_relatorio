@@ -88,7 +88,10 @@ O backup em nuvem, se existente, também foi verificado.
 
 function domain0 {
   clear
-  docker exec -it dominio bash
+  docker exec dominio samba-tool ntacl sysvolreset -U Administrator
+  sleep 3
+  docker exec dominio samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes
+  sleep 3
   echo "$datetime Foi realizada a verificação da integridade do Domínio.
 " >> "$file"
 }
