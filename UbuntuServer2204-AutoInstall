@@ -7,7 +7,7 @@ mkdir source-files
 wget https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/jammy-live-server-amd64.iso
 
 3)
-7z -y x jammy-live-server-amd64.iso -o source-files
+7z -y x jammy-live-server-amd64.iso -osource-files
 
 4)
 cd source-files
