@@ -131,6 +131,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 9 'XPRA (Ubuntu 2204)' \
 10 'Zabbix' \
 11 'TOR privoxy' \
+12 'DDClient' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
@@ -144,6 +145,7 @@ case "$var0" in
 9) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
 10) wget "$github"47-zabbix -O /tmp/zabbix; sudo bash /tmp/zabbix ;;
 11) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
+12) wget "$github"55-ddclient -O /tmp/ddclient; sudo bash /tmp/ddclient ;;
 X) echo "." > /dev/null ;;
 esac
 }
