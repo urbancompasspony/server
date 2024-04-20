@@ -98,6 +98,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 7 'Ollama: IA (L)' \
 8 'Ollama: WebUI (L)' \
 9 'RustDesk WebUI (W)' \
+10 'Altus Whatsapp' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
@@ -108,6 +109,7 @@ case "$var0" in
 7) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
 8) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
 9) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
+10) wget "$github"35-altus-whatsapp -O /tmp/altus; sudo bash /tmp/altus ;;
 X) echo "." > /dev/null ;;
 esac
 }
