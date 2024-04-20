@@ -45,6 +45,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 9 'OnlyOffice (W)' \
 10 'Apache2: ReverseProxy (W)' \
 11 'Syncthing: Client (L/W)' \
+12 'Heimdall - Favorites' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
@@ -58,6 +59,7 @@ case "$var0" in
 9) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 10) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
 11) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+12) wget "$github"54-heimdall-favorites -O /tmp/heimdall; sudo bash /tmp/heimdall ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -72,7 +74,6 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'ntfy (W)' \
 7 'Portainer WebUI (L/W)' \
 8 'Netboot PXE (W)' \
-9 'WeTTY (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
@@ -83,7 +84,6 @@ case "$var0" in
 6) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
 7) wget "$github"22-portainer-docker-ui -O /tmp/portainer; sudo bash /tmp/portainer ;;
 8) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
-9) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -100,6 +100,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 9 'RustDesk WebUI (W)' \
 10 'Altus: Whatsapp' \
 11 'Ferdium: RAMBOX-like' \
+12 'WeTTY (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
@@ -112,6 +113,7 @@ case "$var0" in
 9) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
 10) wget "$github"35-altus-whatsapp -O /tmp/altus; sudo bash /tmp/altus ;;
 11) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
+12) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
 X) echo "." > /dev/null ;;
 esac
 }
