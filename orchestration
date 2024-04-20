@@ -94,26 +94,24 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'SMB Server Standalone (W)' \
 3 'Windows VMs (L/W)' \
 4 'FTP Server Standalone (W)' \
-5 'CUPS Printer Standalone (W)' \
-7 'Ollama: IA (L)' \
-8 'Ollama: WebUI (L)' \
-9 'RustDesk WebUI (W)' \
-10 'Altus: Whatsapp' \
-11 'Ferdium: RAMBOX-like' \
-12 'WeTTY (L)' \
+5 'Ollama: IA (L)' \
+6 'Ollama: WebUI (L)' \
+7 'RustDesk WebUI (W)' \
+8 'Altus: Whatsapp' \
+9 'Ferdium: RAMBOX-like' \
+10 'WeTTY (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 2) wget "$github"06-samba -O /tmp/sambash; sudo bash /tmp/sambash ;;
 3) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
 4) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-5) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
-7) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-8) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-9) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
-10) wget "$github"35-altus-whatsapp -O /tmp/altus; sudo bash /tmp/altus ;;
-11) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
-12) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
+5) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+6) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+7) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
+8) wget "$github"35-altus-whatsapp -O /tmp/altus; sudo bash /tmp/altus ;;
+9) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
+10) wget "$github"46-wetty -O /tmp/wetty; sudo bash /tmp/wetty ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -132,6 +130,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 10 'Zabbix' \
 11 'TOR privoxy' \
 12 'DDClient' \
+13 'CUPS Printer Standalone (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
@@ -146,6 +145,7 @@ case "$var0" in
 10) wget "$github"47-zabbix -O /tmp/zabbix; sudo bash /tmp/zabbix ;;
 11) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
 12) wget "$github"55-ddclient -O /tmp/ddclient; sudo bash /tmp/ddclient ;;
+13) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
 X) echo "." > /dev/null ;;
 esac
 }
