@@ -45,7 +45,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 9 'OnlyOffice (W)' \
 10 'Apache2: ReverseProxy (W)' \
 11 'Syncthing: Client (L/W)' \
-12 'Heimdall - Favorites' \
+12 'Heimdall - Favorites (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
