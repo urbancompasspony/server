@@ -323,7 +323,6 @@ Conforme estipulado em contrato mensal de prestação de serviços na área de
 informática, segue abaixo o relatório de suporte, manutenções preventivas e
 corretivas executados no período de $dateonly:
 " | sudo tee "$file"
-    cat $file
     sleep 1
   } && {
     echo "." > /dev/null
