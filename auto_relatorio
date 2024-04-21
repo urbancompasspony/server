@@ -43,7 +43,7 @@ function relatfull {
 }
 
 function upgrade0 {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
+  datetime0
   export DEBIAN_FRONTEND=noninteractive
   clear
   sudo apt update -y &&
@@ -54,7 +54,7 @@ function upgrade0 {
 }
 
 function smartdump0 {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
+  datetime0
   clear
   smartdump1
   cat $smartdumplocal
@@ -65,7 +65,7 @@ Mais informações no anexo SMART_DUMP no e-mail!
 }
 
 function smartdump1 {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
+  datetime0
 
   # Clear SMART_DUMP File
   rm $smartdumplocal
@@ -103,7 +103,7 @@ echo "Verificacao concluida em $datetime !" | sudo tee -a $smartdumplocal
 
 function domain0 {
   [ -d "/srv/containers/dominio" ] && {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
+  datetime0
 
   clear
   docker exec dominio samba-tool ntacl sysvolreset -U Administrator
@@ -115,6 +115,7 @@ function domain0 {
 
   echo "$datetime Foi realizada a verificação da integridade do Controlador de Domínio.
 " | sudo tee -a "$file"
+
   } || {
     echo "." >/dev/null
   }
@@ -124,8 +125,8 @@ function pihole0 {
   testpihole=$(docker image ls | grep pihole)
 
   [ "$testpihole" = "" ] || {
-    datetime=$(date +"%d/%m - %H:%m:%S:"); clear
-    echo ""; echo "Checando por updates do PiHole"
+    datetime0
+    clear; echo ""; echo "Checando por updates do PiHole"
     docker pull "$docker_repo"
     clear
 
@@ -226,7 +227,7 @@ $docker_repo
 
 function pentest0 {
   [ -d "/srv/containers/pentest" ] && {
-    datetime=$(date +"%d/%m - %H:%m:%S:")
+    datetime0
 
     [ -f /srv/containers/pentest/Pentests/Ransomware_Detectado ] && {
       clear
@@ -255,7 +256,7 @@ Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notifica
 }
 
 function syslog0 {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
+  datetime0
   clear
 
   for i in $(ls /srv/containers/*/log/syslog); do
@@ -271,7 +272,7 @@ das pastas da rede e se os registros de uso, dos compartilhamentos, estão em di
 }
 
 function backup0 {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
+  datetime0
   clear; echo ""; echo "Checando armazenamento geral!"; echo ""
   df -h
   enter0
@@ -312,7 +313,7 @@ imagens obsoletas dos serviços, objetivando reduzir o consumo de armazenamento.
 }
 
 function custom0 {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
+  datetime0
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Relatório" --form "Customizado" 8 40 0 \
 "Relat:" 1 1 "$VALUE1" 1 8 100 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -325,18 +326,22 @@ var1=$(echo "$VALUE0" | sed -n 1p)
 
 function cabecalho {
   [ -f "$file" ] || {
-    sudo touch $setfolder/relatorio-$dateonly.txt
+    sudo touch $setfolder/relatorio-$monthonly.txt
 
     clear
     echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA
 Conforme estipulado em contrato mensal de prestação de serviços na área de
 informática, segue abaixo o relatório de suporte, manutenções preventivas e
-corretivas executados no período de $dateonly:
+corretivas executados no período de $monthonly:
 " | sudo tee "$file"
     sleep 1
   } && {
     echo "." > /dev/null
   }
+}
+
+function datetime0 {
+  datetime=$(date +"%d/%m - %H:%m:%S")
 }
 
 function enter0 {
@@ -357,8 +362,8 @@ smartdumplocal="$setfolder/SMART_DUMP"
 docker_repo="pihole/pihole:latest"
 
 sudo mkdir -p $setfolder
-dateonly=$(date +"%m-%Y")
-file="$setfolder/relatorio-$dateonly.txt"
+monthonly=$(date +"%m-%Y")
+file="$setfolder/relatorio-$monthonly.txt"
 
 relat0
 
