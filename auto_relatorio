@@ -102,7 +102,9 @@ echo "Verificacao concluida em $datetime !" | sudo tee -a $smartdumplocal
 }
 
 function domain0 {
+  [ -d "/srv/containers/dominio" ] && {
   datetime=$(date +"%d/%m - %H:%m:%S:")
+
   clear
   docker exec dominio samba-tool ntacl sysvolreset -U Administrator
   enter0
@@ -113,6 +115,9 @@ function domain0 {
 
   echo "$datetime Foi realizada a verificação da integridade do Controlador de Domínio.
 " | sudo tee -a "$file"
+  } || {
+    echo "." >/dev/null
+  }
 }
 
 function pihole0 {
@@ -285,8 +290,13 @@ function backup0 {
 
   clear; echo ""; echo "Checando backups dos containers!"; echo ""
   destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
-  ls -la $destiny
-  enter0
+  [ -d "$destiny" ] && {
+    ls -la $destiny
+    enter0
+  } || {
+    clear; echo ""; echo "Não existem backups de containers neste servidor! Verifique se esta situação está correta!"; echo ""
+    enter0
+  }
 
   echo "$datetime Foi realizada a verificação das rotinas de backup do servidor.
 O backup para a nuvem, se existente, também foi verificado.
