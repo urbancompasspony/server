@@ -38,7 +38,7 @@ function relatfull {
   pentest0
   syslog0
   backup0
-  docker image prune -a -f
+  contclean0
   relat0
 }
 
@@ -267,32 +267,37 @@ das pastas da rede e se os registros de uso, dos compartilhamentos, estão em di
 
 function backup0 {
   datetime=$(date +"%d/%m - %H:%m:%S:")
-  clear
+  clear; echo ""; echo "Checando armazenamento geral!"; echo ""
   df -h
   enter0
 
-  clear
+  clear; echo ""; echo "DUMP de RSnapshots!"; echo ""
   journalctl -b 0 | grep rsnap | tail -n 5
   enter0
 
-  clear
+  clear; echo ""; echo "DUMP de RSYNC!"; echo ""
   journalctl -b 0 | grep rsync | tail -n 5
   enter0
 
-  clear
+  clear; echo ""; echo "DUMP do RClone (se existente)!"; echo ""
   journalctl -b 0 | grep rclone | tail -n 5
   enter0
 
-  clear
-  echo ""
-  echo "Chegando backups dos containers!"
-  echo ""
+  clear; echo ""; echo "Checando backups dos containers!"; echo ""
   destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
   ls -la $destiny
   enter0
 
   echo "$datetime Foi realizada a verificação das rotinas de backup do servidor.
-O backup em nuvem, se existente, também foi verificado.
+O backup para a nuvem, se existente, também foi verificado.
+" | sudo tee -a "$file"
+}
+
+function contclean0 {
+  docker image prune -a -f
+
+  echo "$datetime Foi realizada a limpeza do sistema com remoção de somente pacotes e
+imagens obsoletas dos serviços, objetivando reduzir o consumo de armazenamento.
 " | sudo tee -a "$file"
 }
 
