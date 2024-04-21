@@ -1,47 +1,61 @@
 #!/bin/bash
 
 setfolder="/srv/relatorios"
-dateonly=$(date +"%m / %Y")
 
 # ============================================================================ #
 
 function relat0 {
 var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
-A 'Atualizacao de Sistema' \
-B 'Gerar SMART_DUMP' \
-C 'Manutencao do Dominio' \
-D 'Manutencao do PiHole' \
-E 'Status Pentesting' \
-F 'SysLogs do SAMBA' \
-G 'Status dos Backups' \
-H 'Relat. Custom' \
-I 'CUIDADO: Cabecalho' \
+0 'Full!' \
+1 'Atualizacao de Sistema' \
+2 'Gerar SMART_DUMP' \
+3 'Manutencao do Dominio' \
+4 'Manutencao do PiHole' \
+5 'Status Pentesting' \
+6 'SysLogs do SAMBA' \
+7 'Status dos Backups' \
+8 'Relat. Custom' \
+9 'CUIDADO: Cabecalho' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var0" in
-A) upgrade0 ; relat0 ;;
-B) smartdump0 ; relat0 ;;
-C) domain0 ; relat0 ;;
-D) pihole0 ; relat0 ;;
-E) pentest0 ; relat0 ;;
-F) syslog0 ; relat0 ;;
-G) backup0 ; relat0 ;;
-H) custom0 ; relat0 ;;
-I) cabecalho ; relat0 ;;
+0) relatfull ; relat0 ;;
+1) upgrade0 ; relat0 ;;
+2) smartdump0 ; relat0 ;;
+3) domain0 ; relat0 ;;
+4) pihole0 ; relat0 ;;
+5) pentest0 ; relat0 ;;
+6) syslog0 ; relat0 ;;
+7) backup0 ; relat0 ;;
+8) custom0 ; relat0 ;;
+9) cabecalho ; relat0 ;;
 X) echo a > /dev/null ;;
 esac
 }
 
+function relatfull {
+  cabecalho
+  upgrade0
+  smartdump0
+  domain0
+  pihole0
+  pentest0
+  syslog0
+  backup0
+  custom0
+  relat0
+}
+
 function cabecalho {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
+  dateonly=$(date +"%m/%Y")
   clear
   echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA
 Conforme estipulado em contrato mensal de prestação de serviços na área de
 informática, segue abaixo o relatório de suporte, manutenções preventivas e
 corretivas executados no período de $dateonly:
-" > "$file"
+" | tee "$file"
   cat $file
-  sleep 3
+  sleep 1
 }
 
 function upgrade0 {
@@ -52,20 +66,18 @@ function upgrade0 {
   apt upgrade -y &&
   apt autoremove -y &&
   echo "$datetime Nesta data o servidor foi atualizado e está em dia com a segurança digital.
-" >> "$file"
+" | tee -a "$file"
 }
 
 function smartdump0 {
   datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
   smartdump
-  clear
   cat /home/administrador/SMART_DUMP
-  echo ""
   enter0
   echo "$datetime Foi realizada a verificação da saúde dos discos rígidos.
 Mais informações no anexo SMART_DUMP do e-mail.
-" >> "$file"
+" | tee -a "$file"
 }
 
 function backup0 {
@@ -93,7 +105,7 @@ function backup0 {
 
   echo "$datetime Foi realizada a verificação das rotinas de backup do servidor.
 O backup em nuvem, se existente, também foi verificado.
-" >> "$file"
+" | tee -a "$file"
 }
 
 function domain0 {
@@ -106,34 +118,54 @@ function domain0 {
   docker exec dominio samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes
   enter0
 
-  echo "$datetime Foi realizada a verificação da integridade do Domínio.
-" >> "$file"
+  echo "$datetime Foi realizada a verificação da integridade do Controlador de Domínio.
+" | tee -a "$file"
 }
 
 function pihole0 {
   datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
-  piholemnt
+
+  for i in $(find /srv/containers -maxdepth 1 -name '*pihole*'); do
+    i2=$(basename "$i")
+    docker exec "$i2" bash -c "pihole -g -r recover"
+    docker exec "$i2" bash -c "rm /etc/pihole/pihole-FTL.db"
+    sleep 1
+    docker restart "$i2"
+  done
+
   enter0
 
-  echo "$datetime Nesta data o serviço de DNS foi atualizado e as listas de bloqueio
-foram revalidadas.
-" >> "$file"
+  echo "$datetime Nesta data o(s) serviço(s) de DNS e bloqueios de sites foi(foram) atualizado(s) e as listas de bloqueio
+foram revalidadas!
+" | tee -a "$file"
 }
 
 function pentest0 {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
   [ -d "/srv/containers/pentest" ] && {
+    datetime=$(date +"%d/%m - %H:%m:%S:")
+
+    [ -f /srv/containers/pentest/Pentests/Ransomware_Detectado ] && {
+      clear
+      echo ""
+      cat /srv/containers/pentest/Pentests/Ransomware_Detectado
+      enter0
+    } || {
+      echo "." > /dev/null
+    }
+
     var6=$(sed -n '6p' /srv/containers/pentest/Information)
     clear
-    echo "Acess: $var6/Likely_Vulnerable/"
-    echo ""
-    ls -la /srv/containers/pentest/Pentests/Likely_Vulnerable
-    enter0
+
+    for i in $(find /srv/containers/pentest/Pentests/Likely_Vulnerable -name '*1*'); do
+      clear
+      cat "$i"
+      enter0
+    done
 
     echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
 Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notificados.
-" >> "$file"
+" | tee -a "$file"
   } || {
     echo "." > /dev/null
   }
@@ -142,12 +174,12 @@ Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notifica
 function syslog0 {
   datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
-  cat /srv/containers/*/log/syslog | grep renameat | tail -n 3
+  cat /srv/containers/*/log/syslog | grep renameat | tail -n 5
   enter0
 
   echo "$datetime Foi realizada a verificação da integridade dos Logs de Eventos
 das pastas da rede e se os registros de uso, dos compartilhamentos, estão em dia.
-" >> "$file"
+" | tee -a "$file"
 }
 
 function custom0 {
@@ -159,7 +191,7 @@ function custom0 {
 var1=$(echo "$VALUE0" | sed -n 1p)
 
   echo "$datetime $var1
-" >> "$file"
+" | tee -a "$file"
 }
 
 function smartdump {
@@ -171,14 +203,14 @@ function smartdump {
   # Check SMART of block devices /dev/sdX
   for i in a b c d e f g h i j k l m n o p
     do
-      sudo skdump /dev/sd$i >> SMART_DUMP
+      sudo skdump /dev/sd$i | tee -a SMART_DUMP
     done
 
   # Check if there is NVME
   [ -b /dev/nvme0n1 ] && {
     for i in 1 2 3 4 5 6 7 8
       do
-        sudo smartctl -a /dev/nvme0n1p$i >> SMART_DUMP
+        sudo smartctl -a /dev/nvme0n1p$i | tee -a SMART_DUMP
       done
   } || {
     echo "NVME not present."
@@ -188,36 +220,18 @@ function smartdump {
   [ $4 = 1 ] && {
     for i in 0 1 2 3 4 5 6 7 8
       do
-        sudo smartctl -d megaraid,$i -a /dev/sg$5 >> SMART_DUMP
+        sudo smartctl -d megaraid,$i -a /dev/sg$5 | tee -a SMART_DUMP
       done
     } || {
       echo "MegaRAID not present."
     }
 
-echo "" >> SMART_DUMP
-echo "Verificacao concluida em $datetime ! Pressione Enter para sair." >> SMART_DUMP
+echo "" | tee -a SMART_DUMP
+echo "Verificacao concluida em $datetime ! Pressione Enter para sair." | tee -a SMART_DUMP
 }
 
 function enter0 {
   echo ""; read -p "Pressione Enter para continuar!"
-}
-
-function piholemnt {
-datetime=$(date +"%d/%m - %H:%m:%S:")
-VALUE0=$(dialog --ok-label "Ok" --title "Manutenção" --form "PiHole" 8 35 0 \
-"NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
-
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    clear
-    docker exec "$var1" bash -c "pihole -g -r recover"
-    docker exec "$var1" bash -c "rm /etc/pihole/pihole-FTL.db"
-    docker restart "$var1"
 }
 
 # ============================================================================ #
@@ -231,7 +245,7 @@ sudo mkdir -p $setfolder
 sudo touch $setfolder/relatorio.txt
 
 datetime=$(date +"%d/%m - %H:%m:%S:")
-files=() # Esvaziar a variável; Loop pasta, adicionar arquivos ao array
+files=()
   while IFS= read -r -d $'\0' file; do
 files+=("$file" "")
 done < <(find "$setfolder" -maxdepth 2 -type f -name "*.txt" -print0)
