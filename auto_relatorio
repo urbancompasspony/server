@@ -4,14 +4,14 @@ function relat0 {
 var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
 0 'PROCESSAR TODOS!' \
 1 'Atualizacao de Sistema' \
-2 'Gerar SMART_DUMP' \
-3 'Manutencao do Dominio' \
-4 'Manutencao do PiHole' \
-5 'Status Pentesting' \
-6 'SysLogs do SAMBA' \
+2 'Gerar SMART DUMP' \
+3 'Manutencao .db Dominio' \
+4 'Manutencao .db PiHole' \
+5 'Status Pentests' \
+6 'Status SYSLOGs' \
 7 'Status dos Backups' \
 8 'Relatorio Customizado' \
-9 'CUIDADO: Refazer Cabecalho' \
+9 'Refazer Cabecalho (CUIDADO)' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var0" in
@@ -38,26 +38,8 @@ function relatfull {
   pentest0
   syslog0
   backup0
-  custom0
   docker image prune -a -f
   relat0
-}
-
-function cabecalho {
-  [ -f "$file" ] || {
-    sudo touch $setfolder/relatorio-$dateonly.txt
-
-    clear
-    echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA
-Conforme estipulado em contrato mensal de prestação de serviços na área de
-informática, segue abaixo o relatório de suporte, manutenções preventivas e
-corretivas executados no período de $dateonly:
-" | sudo tee "$file"
-    cat $file
-    sleep 1
-  } && {
-    echo "." > /dev/null
-  }
 }
 
 function upgrade0 {
@@ -67,47 +49,56 @@ function upgrade0 {
   sudo apt update -y &&
   sudo apt upgrade -y &&
   sudo apt autoremove -y &&
-  echo "$datetime Nesta data o servidor foi atualizado e está em dia com a segurança digital.
+  echo "$datetime Nesta data o sistema do servidor foi atualizado e está em dia com a segurança digital.
 " | sudo tee -a "$file"
 }
 
 function smartdump0 {
   datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
-  smartdump
-  cat /home/administrador/SMART_DUMP
+  smartdump1
+  cat $smartdumplocal
   enter0
   echo "$datetime Foi realizada a verificação da saúde dos discos rígidos.
-Mais informações no anexo SMART_DUMP do e-mail.
+Mais informações no anexo SMART_DUMP no e-mail!
 " | sudo tee -a "$file"
 }
 
-function backup0 {
+function smartdump1 {
   datetime=$(date +"%d/%m - %H:%m:%S:")
-  clear
-  df -h
-  enter0
 
-  clear
-  journalctl -b 0 | grep rsnap | tail -n 5
-  enter0
+  # Clear SMART_DUMP File
+  rm $smartdumplocal
+  touch $smartdumplocal
+  
+  # Check SMART of block devices /dev/sdX
+  for i in a b c d e f g h i j k l m n o p
+    do
+      sudo skdump /dev/sd$i | sudo tee -a $smartdumplocal
+    done
 
-  clear
-  journalctl -b 0 | grep rsync | tail -n 5
-  enter0
+  # Check if there is NVME
+  [ -b /dev/nvme0n1 ] && {
+    for i in 1 2 3 4 5 6 7 8
+      do
+        sudo smartctl -a /dev/nvme0n1p$i | sudo tee -a $smartdumplocal
+      done
+  } || {
+    echo "NVME not present."
+  }
 
-  clear
-  journalctl -b 0 | grep rclone | tail -n 5
-  enter0
+  # Check if there is MegaRAID
+  [ $4 = 1 ] && {
+    for i in 0 1 2 3 4 5 6 7 8
+      do
+        sudo smartctl -d megaraid,$i -a /dev/sg$5 | sudo tee -a $smartdumplocal
+      done
+    } || {
+      echo "MegaRAID not present."
+    }
 
-  clear
-  destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
-  ls -la $destiny; read
-  enter0
-
-  echo "$datetime Foi realizada a verificação das rotinas de backup do servidor.
-O backup em nuvem, se existente, também foi verificado.
-" | sudo tee -a "$file"
+echo "" | sudo tee -a $smartdumplocal
+echo "Verificacao concluida em $datetime !" | sudo tee -a $smartdumplocal
 }
 
 function domain0 {
@@ -261,11 +252,47 @@ Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notifica
 function syslog0 {
   datetime=$(date +"%d/%m - %H:%m:%S:")
   clear
-  cat /srv/containers/*/log/syslog | grep renameat | tail -n 5
-  enter0
+
+  for i in $(ls /srv/containers/*/log/syslog); do
+    clear
+    echo ""; echo "$i"; echo ""
+    cat $i | grep renameat | tail -n 5
+    enter0
+  done 
 
   echo "$datetime Foi realizada a verificação da integridade dos Logs de Eventos
 das pastas da rede e se os registros de uso, dos compartilhamentos, estão em dia.
+" | sudo tee -a "$file"
+}
+
+function backup0 {
+  datetime=$(date +"%d/%m - %H:%m:%S:")
+  clear
+  df -h
+  enter0
+
+  clear
+  journalctl -b 0 | grep rsnap | tail -n 5
+  enter0
+
+  clear
+  journalctl -b 0 | grep rsync | tail -n 5
+  enter0
+
+  clear
+  journalctl -b 0 | grep rclone | tail -n 5
+  enter0
+
+  clear
+  echo ""
+  echo "Chegando backups dos containers!"
+  echo ""
+  destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
+  ls -la $destiny
+  enter0
+
+  echo "$datetime Foi realizada a verificação das rotinas de backup do servidor.
+O backup em nuvem, se existente, também foi verificado.
 " | sudo tee -a "$file"
 }
 
@@ -281,41 +308,21 @@ var1=$(echo "$VALUE0" | sed -n 1p)
 " | sudo tee -a "$file"
 }
 
-function smartdump {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
+function cabecalho {
+  [ -f "$file" ] || {
+    sudo touch $setfolder/relatorio-$dateonly.txt
 
-  # Clear SMART_DUMP File
-  rm $setfolder/SMART_DUMP
-  touch $setfolder/SMART_DUMP
-  
-  # Check SMART of block devices /dev/sdX
-  for i in a b c d e f g h i j k l m n o p
-    do
-      sudo skdump /dev/sd$i | sudo tee -a $setfolder/SMART_DUMP
-    done
-
-  # Check if there is NVME
-  [ -b /dev/nvme0n1 ] && {
-    for i in 1 2 3 4 5 6 7 8
-      do
-        sudo smartctl -a /dev/nvme0n1p$i | sudo tee -a $setfolder/SMART_DUMP
-      done
-  } || {
-    echo "NVME not present."
+    clear
+    echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA
+Conforme estipulado em contrato mensal de prestação de serviços na área de
+informática, segue abaixo o relatório de suporte, manutenções preventivas e
+corretivas executados no período de $dateonly:
+" | sudo tee "$file"
+    cat $file
+    sleep 1
+  } && {
+    echo "." > /dev/null
   }
-
-  # Check if there is MegaRAID
-  [ $4 = 1 ] && {
-    for i in 0 1 2 3 4 5 6 7 8
-      do
-        sudo smartctl -d megaraid,$i -a /dev/sg$5 | sudo tee -a $setfolder/SMART_DUMP
-      done
-    } || {
-      echo "MegaRAID not present."
-    }
-
-echo "" | sudo tee -a SMART_DUMP
-echo "Verificacao concluida em $datetime ! Pressione Enter para sair." | sudo tee -a $setfolder/SMART_DUMP
 }
 
 function enter0 {
@@ -332,7 +339,9 @@ function enter0 {
   }
 
 setfolder="/srv/relatorios"
+smartdumplocal="$setfolder/SMART_DUMP"
 docker_repo="pihole/pihole:latest"
+
 sudo mkdir -p $setfolder
 dateonly=$(date +"%m-%Y")
 file="$setfolder/relatorio-$dateonly.txt"
