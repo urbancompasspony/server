@@ -1018,7 +1018,7 @@ utilize o menu Excluir Compartilhamento!" 0 0 0 "${files[@]}")
 function create_sync {
 VALUE1="nome_do_compartilhamento"
 VALUE3="@grupo, usuario"
-VALUE4="yes"
+VALUE4="no"
 
   VALUE0=$(dialog --help-button --help-label 'Dica' --ok-label "Criar" --title "Compartilhamento para Sync Center" --form "Separe os grupos e/ou usuarios com virgula. \n
 Se a pasta nao existir ela sera criada e ficara oculta. \n
