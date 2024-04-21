@@ -1,12 +1,8 @@
 #!/bin/bash
 
-setfolder="/srv/relatorios"
-
-# ============================================================================ #
-
 function relat0 {
 var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
-0 'Full!' \
+0 'PROCESSAR TODOS!' \
 1 'Atualizacao de Sistema' \
 2 'Gerar SMART_DUMP' \
 3 'Manutencao do Dominio' \
@@ -14,8 +10,8 @@ var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador
 5 'Status Pentesting' \
 6 'SysLogs do SAMBA' \
 7 'Status dos Backups' \
-8 'Relat. Custom' \
-9 'CUIDADO: Cabecalho' \
+8 'Relatorio Customizado' \
+9 'CUIDADO: Refazer Cabecalho' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var0" in
@@ -43,30 +39,36 @@ function relatfull {
   syslog0
   backup0
   custom0
+  docker image prune -a -f
   relat0
 }
 
 function cabecalho {
-  dateonly=$(date +"%m/%Y")
-  clear
-  echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA
+  [ -f "$file" ] || {
+    sudo touch $setfolder/relatorio-$dateonly.txt
+
+    clear
+    echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA
 Conforme estipulado em contrato mensal de prestação de serviços na área de
 informática, segue abaixo o relatório de suporte, manutenções preventivas e
 corretivas executados no período de $dateonly:
-" | tee "$file"
-  cat $file
-  sleep 1
+" | sudo tee "$file"
+    cat $file
+    sleep 1
+  } && {
+    echo "." > /dev/null
+  }
 }
 
 function upgrade0 {
   datetime=$(date +"%d/%m - %H:%m:%S:")
   export DEBIAN_FRONTEND=noninteractive
   clear
-  apt update -y &&
-  apt upgrade -y &&
-  apt autoremove -y &&
+  sudo apt update -y &&
+  sudo apt upgrade -y &&
+  sudo apt autoremove -y &&
   echo "$datetime Nesta data o servidor foi atualizado e está em dia com a segurança digital.
-" | tee -a "$file"
+" | sudo tee -a "$file"
 }
 
 function smartdump0 {
@@ -77,7 +79,7 @@ function smartdump0 {
   enter0
   echo "$datetime Foi realizada a verificação da saúde dos discos rígidos.
 Mais informações no anexo SMART_DUMP do e-mail.
-" | tee -a "$file"
+" | sudo tee -a "$file"
 }
 
 function backup0 {
@@ -105,7 +107,7 @@ function backup0 {
 
   echo "$datetime Foi realizada a verificação das rotinas de backup do servidor.
 O backup em nuvem, se existente, também foi verificado.
-" | tee -a "$file"
+" | sudo tee -a "$file"
 }
 
 function domain0 {
@@ -119,26 +121,111 @@ function domain0 {
   enter0
 
   echo "$datetime Foi realizada a verificação da integridade do Controlador de Domínio.
-" | tee -a "$file"
+" | sudo tee -a "$file"
 }
 
 function pihole0 {
-  datetime=$(date +"%d/%m - %H:%m:%S:")
-  clear
+  testpihole=$(docker image ls | grep pihole)
 
-  for i in $(find /srv/containers -maxdepth 1 -name '*pihole*'); do
-    i2=$(basename "$i")
-    docker exec "$i2" bash -c "pihole -g -r recover"
-    docker exec "$i2" bash -c "rm /etc/pihole/pihole-FTL.db"
-    sleep 1
-    docker restart "$i2"
-  done
+  [ "$testpihole" = "" ] || {
+    datetime=$(date +"%d/%m - %H:%m:%S:"); clear
+    echo ""; echo "Checando por updates do PiHole"
+    docker pull "$docker_repo"
+    clear
 
-  enter0
+    for i in $(find /srv/containers -maxdepth 1 -name '*pihole*'); do
+      i2=$(basename "$i")
 
-  echo "$datetime Nesta data o(s) serviço(s) de DNS e bloqueios de sites foi(foram) atualizado(s) e as listas de bloqueio
+      var1=$(sed -n '1p' /srv/containers/"$i2"/Information)
+      var2=$(sed -n '2p' /srv/containers/"$i2"/Information)
+      var3=$(sed -n '3p' /srv/containers/"$i2"/Information)
+      var4=$(sed -n '4p' /srv/containers/"$i2"/Information)
+      var5=$(sed -n '5p' /srv/containers/"$i2"/Information)
+
+      pihole1
+
+      docker exec "$i2" rm /etc/pihole/pihole-FTL.conf
+      docker exec "$i2" touch /etc/pihole/pihole-FTL.conf
+      docker exec "$i2" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
+      docker exec "$i2" bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
+
+      [ -f /srv/containers/"$i2"/dnsmasq.d/02-custom-settings.conf ] || {
+        docker exec "$i2" bash -c "echo '# domain forward lookups' > /etc/dnsmasq.d/02-custom-settings.conf"
+        docker exec "$i2" bash -c "echo '#server=/ad.domain.local/191.168.0.10' >> /etc/dnsmasq.d/02-custom-settings.conf"
+        docker exec "$i2" bash -c "echo '# domain PTR/reverse lookups' >> /etc/dnsmasq.d/02-custom-settings.conf"
+        docker exec "$i2" bash -c "echo '#server=/0.168.192.in-addr.arpa/192.168.0.10' >> /etc/dnsmasq.d/02-custom-settings.conf"
+        docker exec "$i2" bash -c "echo '# Custom DNS Max Queries and Cache' >> /etc/dnsmasq.d/02-custom-settings.conf"
+        docker exec "$i2" bash -c "echo 'dns-forward-max=5096' >> /etc/dnsmasq.d/02-custom-settings.conf"
+        docker exec "$i2" bash -c "echo 'min-cache-ttl=300' >> /etc/dnsmasq.d/02-custom-settings.conf"
+        docker exec "$i2" bash -c "echo 'rebind-domain-ok=' >> /etc/dnsmasq.d/02-custom-settings.conf"
+      } && {
+        echo "." >/dev/null
+      }
+
+      docker exec "$i2" bash -c "pihole -g -r recover"
+      docker exec "$i2" bash -c "rm /etc/pihole/pihole-FTL.db"
+
+      docker restart "$i2"
+
+    echo "$datetime Nesta data os serviços de DNS e bloqueios de sites do $i2 foram atualizados e suas listas
 foram revalidadas!
-" | tee -a "$file"
+" | sudo tee -a "$file"
+    done
+    enter0
+  } && {
+    echo "." > /dev/null
+  }
+}
+
+function pihole1 {
+  docker stop "$i2" &&
+  docker rm "$i2" &&
+
+  [ "$var1" = "host" ] || [ "$var1" = "Host" ] || [ "$var1" = "HOST" ] || [ "$var1" = "hostname" ] || [ "$var1" = "localhost" ] && {
+  docker run -d \
+--name="$i2" \
+--network host \
+--hostname="$var4" \
+--no-healthcheck \
+--restart=unless-stopped \
+--shm-size=512m \
+-e SERVERIP=$var3 \
+-e WEBPASSWORD=$var2 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$i2"/etc/:/etc/pihole \
+-v /srv/containers/"$i2"/dnsmasq.d/:/etc/dnsmasq.d \
+-v /srv/containers/"$i2"/log/:/var/log/pihole \
+-p 80:80 \
+-p 443:443 \
+-p 67:67/tcp \
+-p 67:67/udp \
+-p 53:53/tcp \
+-p 53:53/udp \
+$docker_repo
+  } || {
+  docker run -d \
+--name="$i2" \
+--network $var5 \
+--ip=$var1 \
+--dns=1.1.1.1  \
+--hostname="var4" \
+--no-healthcheck \
+--restart=unless-stopped \
+--shm-size=512m \
+-e SERVERIP=$var1 \
+-e WEBPASSWORD=$var2 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$i2"/etc/:/etc/pihole \
+-v /srv/containers/"$i2"/dnsmasq.d/:/etc/dnsmasq.d \
+-v /srv/containers/"$i2"/log/:/var/log/pihole \
+-p 80:80 \
+-p 443:443 \
+-p 67:67/tcp \
+-p 67:67/udp \
+-p 53:53/tcp \
+-p 53:53/udp \
+$docker_repo
+  }
 }
 
 function pentest0 {
@@ -165,7 +252,7 @@ function pentest0 {
 
     echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
 Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notificados.
-" | tee -a "$file"
+" | sudo tee -a "$file"
   } || {
     echo "." > /dev/null
   }
@@ -179,7 +266,7 @@ function syslog0 {
 
   echo "$datetime Foi realizada a verificação da integridade dos Logs de Eventos
 das pastas da rede e se os registros de uso, dos compartilhamentos, estão em dia.
-" | tee -a "$file"
+" | sudo tee -a "$file"
 }
 
 function custom0 {
@@ -191,26 +278,27 @@ function custom0 {
 var1=$(echo "$VALUE0" | sed -n 1p)
 
   echo "$datetime $var1
-" | tee -a "$file"
+" | sudo tee -a "$file"
 }
 
 function smartdump {
   datetime=$(date +"%d/%m - %H:%m:%S:")
+
   # Clear SMART_DUMP File
-  rm SMART_DUMP
-  touch SMART_DUMP
+  rm $setfolder/SMART_DUMP
+  touch $setfolder/SMART_DUMP
   
   # Check SMART of block devices /dev/sdX
   for i in a b c d e f g h i j k l m n o p
     do
-      sudo skdump /dev/sd$i | tee -a SMART_DUMP
+      sudo skdump /dev/sd$i | sudo tee -a $setfolder/SMART_DUMP
     done
 
   # Check if there is NVME
   [ -b /dev/nvme0n1 ] && {
     for i in 1 2 3 4 5 6 7 8
       do
-        sudo smartctl -a /dev/nvme0n1p$i | tee -a SMART_DUMP
+        sudo smartctl -a /dev/nvme0n1p$i | sudo tee -a $setfolder/SMART_DUMP
       done
   } || {
     echo "NVME not present."
@@ -220,44 +308,35 @@ function smartdump {
   [ $4 = 1 ] && {
     for i in 0 1 2 3 4 5 6 7 8
       do
-        sudo smartctl -d megaraid,$i -a /dev/sg$5 | tee -a SMART_DUMP
+        sudo smartctl -d megaraid,$i -a /dev/sg$5 | sudo tee -a $setfolder/SMART_DUMP
       done
     } || {
       echo "MegaRAID not present."
     }
 
-echo "" | tee -a SMART_DUMP
-echo "Verificacao concluida em $datetime ! Pressione Enter para sair." | tee -a SMART_DUMP
+echo "" | sudo tee -a SMART_DUMP
+echo "Verificacao concluida em $datetime ! Pressione Enter para sair." | sudo tee -a $setfolder/SMART_DUMP
 }
 
 function enter0 {
   echo ""; read -p "Pressione Enter para continuar!"
 }
 
-# ============================================================================ #
+###############
+# Start here! #
+###############
 
 [ "$EUID" -ne 0 ] && {
   echo "Execute esse script com sudo! Saindo..."
   exit
   }
 
+setfolder="/srv/relatorios"
+docker_repo="pihole/pihole:latest"
 sudo mkdir -p $setfolder
-sudo touch $setfolder/relatorio.txt
+dateonly=$(date +"%m-%Y")
+file="$setfolder/relatorio-$dateonly.txt"
 
-datetime=$(date +"%d/%m - %H:%m:%S:")
-files=()
-  while IFS= read -r -d $'\0' file; do
-files+=("$file" "")
-done < <(find "$setfolder" -maxdepth 2 -type f -name "*.txt" -print0)
-[ ${#files[@]} -eq 0 ] && {
-  clear
-  echo "Nenhum arquivo encontrado em $directory"
-} || {
-  file=$(dialog --stdout --title "Escolha um documento" --cancel-label "Sair" --menu "Escolha:" 0 0 0 "${files[@]}")
-  [ $? -ne 0 ] && return
-  clear
-
-  relat0
-}
+relat0
 
 exit 1
