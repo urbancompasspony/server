@@ -1044,7 +1044,7 @@ esac
 [ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
     dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 5 40
   } || {
-    mkdir -p /mnt/$var2
+    mkdir -p /mnt$var2
 
 tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
@@ -1097,7 +1097,7 @@ esac
 [ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
     dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 5 40
   } || {
-    mkdir -p /mnt/$var2
+    mkdir -p /mnt$var2
 
 tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
@@ -1141,7 +1141,7 @@ esac
 [ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
     dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 5 40
   } || {
-    mkdir -p /mnt/$var2
+    mkdir -p /mnt$var2
 
 tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
