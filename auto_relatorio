@@ -39,7 +39,6 @@ function relatfull {
   syslog0
   backup0
   contclean0
-  relat0
 }
 
 function upgrade0 {
