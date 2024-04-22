@@ -65,38 +65,39 @@ Mais informações no anexo SMART_DUMP no e-mail!
 
 function smartdump1 {
   datetime0
-
-  # Clear SMART_DUMP File
   rm $smartdumplocal
   touch $smartdumplocal
   
-  # Check SMART of block devices /dev/sdX
-  for i in a b c d e f g h i j k l m n o p
+  for i in {a..z}
   do
-    sudo skdump /dev/sd$i | sudo tee -a $smartdumplocal
+    [ -b /dev/sd$i ] && {
+      sudo skdump /dev/sd$i | sudo tee -a $smartdumplocal
+    } || {
+      echo "." >/dev/null
+    }
+  done
+ 
+  for i in {1..10}
+  do
+    [ -b /dev/nvme0n1p$i ] && {
+      sudo smartctl -a /dev/nvme0n1p$i | sudo tee -a $smartdumplocal
+    } || {
+      echo "." >/dev/null
+    }    
   done
 
-  # Check if there is NVME
-  [ -b /dev/nvme0n1 ] && {
-    for i in 1 2 3 4 5 6 7 8
-    do
-      sudo smartctl -a /dev/nvme0n1p$i | sudo tee -a $smartdumplocal
-    done
-  } || {
-    echo "NVME not present."
-  }
-
-  # Check if there is MegaRAID
-  for i in 0 1 2 3 4 5 6 7 8
+  for i in {1..10}
   do
-    for j in 0 1 2 3 4 5 6 7 8
-    do
-      sudo smartctl -d megaraid,$i -a /dev/sg$j | sudo tee -a $smartdumplocal
-    done
+    [ -b /dev/sg$i ] && {
+    for j in {1..10}
+      sudo smartctl -d megaraid,$j -a /dev/sg$i | sudo tee -a $smartdumplocal
+    } || {
+      echo "." >/dev/null
+    }
   done
 
 echo "" | sudo tee -a $smartdumplocal
-echo "Verificacao concluida em $datetime !" | sudo tee -a $smartdumplocal
+echo "Verificacao concluida em $datetime!" | sudo tee -a $smartdumplocal
 }
 
 function domain0 {
