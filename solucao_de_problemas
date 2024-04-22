@@ -5,3 +5,21 @@ echo ""
 echo "Em breve!"
 echo ""
 sleep 3
+
+
+
+# touch file on disk to check if it exists and is ok!
+# test it on rclone sharing
+# test it on samba sharing.... nice toush here, if it spawns on smb!
+
+# ping through every network adapter
+
+# look for errors on hardware, PCIe, etc
+
+# test uptime, how long server is online
+
+# check if there is a power_button log event on journalctl and cause of last shutdown
+
+# check if some process is running, like docker, libvirt and more
+
+# check if 
