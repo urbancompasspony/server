@@ -70,6 +70,7 @@ function smartdump1 {
   
   for i in {a..z}
   do
+    # Check if block device exist
     [ -b /dev/sd$i ] && {
       echo ""; echo "############################################################################"; echo "Armazenamento: /dev/sd$i"; echo ""
       sudo smartctl -a -T permissive -T permissive /dev/sd$i | grep -a "Model Family:" | sudo tee -a $smartdumplocal
@@ -85,10 +86,10 @@ function smartdump1 {
  
   for i in {0..10}
   do
+    # Check if block device exist
     [ -b /dev/nvme0n1p$i ] && {
         echo ""; echo "############################################################################"; echo "Armazenamento: /dev/nvme0n1p$i"; echo ""
-        sudo smartctl -a -T permissive -T permissive /dev/nvme0n1p$i | grep -a "Model Family:" | sudo tee -a $smartdumplocal
-        sudo smartctl -a -T permissive -T permissive /dev/nvme0n1p$i | grep -a "Device Model:" | sudo tee -a $smartdumplocal
+        sudo smartctl -a -T permissive -T permissive /dev/nvme0n1p$i | grep -a "Model Number:" | sudo tee -a $smartdumplocal
         sudo smartctl -a -T permissive -T permissive /dev/nvme0n1p$i | grep -a "Serial Number:" | sudo tee -a $smartdumplocal
         echo ""
         sudo smartctl -A -T permissive -T permissive /dev/nvme0n1p$i | sudo tee -a $smartdumplocal
@@ -98,26 +99,30 @@ function smartdump1 {
     }    
   done
 
-  [ -c /dev/sg0 ] && {
-  for i in {0..10}
-    do
-      testraid=$(sudo smartctl -d megaraid,$i -A -T permissive -T permissive /dev/sg0 | grep failed)
-
-      [ "$testraid" = "" ] && {
-        echo ""; echo "############################################################################"; echo ""; echo "RAID ID: $i"; echo ""
-        sudo smartctl -d megaraid,$i -a -T permissive -T permissive /dev/sg0 | grep -a "Model Family:" | sudo tee -a $smartdumplocal
-        sudo smartctl -d megaraid,$i -a -T permissive -T permissive /dev/sg0 | grep -a "Device Model:" | sudo tee -a $smartdumplocal
-        sudo smartctl -d megaraid,$i -a -T permissive -T permissive /dev/sg0 | grep -a "Serial Number:" | sudo tee -a $smartdumplocal
-        echo ""
-        sudo smartctl -d megaraid,$i -A -T permissive -T permissive /dev/sg0 | sudo tee -a $smartdumplocal
-        echo ""
-      } || {
-        echo "." >/dev/null
-      }
-    done
-  } || {
-    echo "." >/dev/null
-  }
+  for i in {0..5}
+  do
+    # Check if block device exist
+    [ -c /dev/sg$i ] && {
+    for j in {0..10}
+      do
+        testraid=$(sudo smartctl -d megaraid,$j -A -T permissive -T permissive /dev/sg$i | grep failed)
+        # Check if SMART data exist for that block device
+        [ "$testraid" = "" ] && {
+          echo ""; echo "############################################################################"; echo ""; echo "RAID ID: $j"; echo ""
+          sudo smartctl -d megaraid,$j -a -T permissive -T permissive /dev/sg$i | grep -a "Model Family:" | sudo tee -a $smartdumplocal
+          sudo smartctl -d megaraid,$j -a -T permissive -T permissive /dev/sg$i | grep -a "Device Model:" | sudo tee -a $smartdumplocal
+          sudo smartctl -d megaraid,$j -a -T permissive -T permissive /dev/sg$i | grep -a "Serial Number:" | sudo tee -a $smartdumplocal
+          echo ""
+          sudo smartctl -d megaraid,$j -A -T permissive -T permissive /dev/sg$i | sudo tee -a $smartdumplocal
+          echo ""
+        } || {
+          echo "." >/dev/null
+        }
+      done
+    } || {
+      echo "." >/dev/null
+    }
+done
 
 echo "" | sudo tee -a $smartdumplocal
 echo "Verificacao concluida em $datetime!" | sudo tee -a $smartdumplocal
