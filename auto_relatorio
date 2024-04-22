@@ -57,7 +57,6 @@ function smartdump0 {
   datetime0
   clear
   smartdump1
-  cat $smartdumplocal
   enter0
   echo "$datetime Foi realizada a verificação da saúde dos discos rígidos.
 Mais informações no anexo SMART_DUMP no e-mail!
@@ -73,29 +72,28 @@ function smartdump1 {
   
   # Check SMART of block devices /dev/sdX
   for i in a b c d e f g h i j k l m n o p
-    do
-      sudo skdump /dev/sd$i | sudo tee -a $smartdumplocal
-    done
+  do
+    sudo skdump /dev/sd$i | sudo tee -a $smartdumplocal
+  done
 
   # Check if there is NVME
   [ -b /dev/nvme0n1 ] && {
     for i in 1 2 3 4 5 6 7 8
-      do
-        sudo smartctl -a /dev/nvme0n1p$i | sudo tee -a $smartdumplocal
-      done
+    do
+      sudo smartctl -a /dev/nvme0n1p$i | sudo tee -a $smartdumplocal
+    done
   } || {
     echo "NVME not present."
   }
 
   # Check if there is MegaRAID
-  [ $4 = 1 ] && {
-    for i in 0 1 2 3 4 5 6 7 8
-      do
-        sudo smartctl -d megaraid,$i -a /dev/sg$5 | sudo tee -a $smartdumplocal
-      done
-    } || {
-      echo "MegaRAID not present."
-    }
+  for i in 0 1 2 3 4 5 6 7 8
+  do
+    for j in 0 1 2 3 4 5 6 7 8
+    do
+      sudo smartctl -d megaraid,$i -a /dev/sg$j | sudo tee -a $smartdumplocal
+    done
+  done
 
 echo "" | sudo tee -a $smartdumplocal
 echo "Verificacao concluida em $datetime !" | sudo tee -a $smartdumplocal
