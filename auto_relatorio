@@ -371,7 +371,8 @@ function datetime0 {
 }
 
 function enter0 {
-  echo ""; read -p "Pressione Enter para continuar!"
+  echo ""; echo "Pressione Enter 2x para continuar!"; echo ""
+  read -N 2
 }
 
 ###############
