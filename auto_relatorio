@@ -71,7 +71,8 @@ function smartdump1 {
   for i in {a..z}
   do
     [ -b /dev/sd$i ] && {
-      sudo skdump /dev/sd$i | sudo tee -a $smartdumplocal
+      echo ""; echo "############################################################################"; echo "Disco: /dev/sd$i"; echo ""
+      sudo smartctl -a /dev/sd$i | sudo tee -a $smartdumplocal
     } || {
       echo "." >/dev/null
     }
@@ -80,6 +81,7 @@ function smartdump1 {
   for i in {0..10}
   do
     [ -b /dev/nvme0n1p$i ] && {
+      echo ""; echo "############################################################################"; echo "Disco: /dev/nvme0n1p$i"; echo ""
       sudo smartctl -a /dev/nvme0n1p$i | sudo tee -a $smartdumplocal
     } || {
       echo "." >/dev/null
@@ -91,6 +93,7 @@ function smartdump1 {
     [ -c /dev/sg$i ] && {
     for j in {0..4}
       do
+        echo ""; echo "############################################################################"; echo "Dispositivo: /dev/sg$i"; echo ""
         sudo smartctl -d megaraid,$j -a /dev/sg$i | grep -a "Device Model:" | sudo tee -a $smartdumplocal
         sudo smartctl -d megaraid,$j -a /dev/sg$i | grep -a "Serial Number:" | sudo tee -a $smartdumplocal
         echo ""
