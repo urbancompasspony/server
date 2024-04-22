@@ -90,7 +90,9 @@ function smartdump1 {
   do
     [ -b /dev/sg$i ] && {
     for j in {1..10}
-      sudo smartctl -d megaraid,$j -a /dev/sg$i | sudo tee -a $smartdumplocal
+      do
+        sudo smartctl -d megaraid,$j -a /dev/sg$i | sudo tee -a $smartdumplocal
+      done
     } || {
       echo "." >/dev/null
     }
