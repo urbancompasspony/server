@@ -202,7 +202,7 @@ $docker_repo
 --network $var5 \
 --ip=$var1 \
 --dns=1.1.1.1  \
---hostname="var4" \
+--hostname="$var4" \
 --no-healthcheck \
 --restart=unless-stopped \
 --shm-size=512m \
