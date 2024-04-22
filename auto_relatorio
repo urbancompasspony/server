@@ -345,7 +345,8 @@ corretivas executados no período de $monthonly:
 }
 
 function datetime0 {
-  datetime=$(date +"%d/%m - %H:%m:%S")
+  datetime=$(date +"%d/%m")
+  #datetime=$(date +"%d/%m - %H:%m:%S")
 }
 
 function enter0 {
