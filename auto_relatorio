@@ -46,6 +46,7 @@ function upgrade0 {
   datetime0
   export DEBIAN_FRONTEND=noninteractive
   clear
+  echo ""; echo "Atualizando o sistema!"; echo ""
   sudo apt update -y &&
   sudo apt upgrade -y &&
   sudo apt autoremove -y &&
