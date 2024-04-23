@@ -18,25 +18,27 @@ function start {
 }
 
 function teste01 {
-  dialog --backtitle "$version" --title "Teste 01" --msgbox "Verificando se algum armazenamento do sistema esta em estado de erro e/ou se não está acessível." 8 60
+  dialog --backtitle "$version" --title "Teste 01" --msgbox "Verificando se algum armazenamento esta em estado de erro e/ou se não está acessível." 8 60
   diskmount=$(sudo mount -a 1&>2 >/dev/null && echo yes || echo no)
+  sleep 1
   [ "$diskfull" = "" ] || {
-    dialog --backtitle "ATENÇÃO" --title "Teste 01" --msgbox "Foi identificado um armazenamento ausente ou em estado de erro!" 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 01" --msgbox "Foi identificado um armazenamento ausente ou em estado de erro!" 6 40
     dialog --backtitle "ATENÇÃO" --title "Teste 01" --msgbox "Isso significa que um disco ou SSD (interno ou externo) está ausente, corrompido ou mesmo com BAD_BLOCKS." 8 60
-    dialog --backtitle "ATENÇÃO" --title "Teste 01" --msgbox "$diskmount" 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 01" --msgbox "$diskmount" 30 80
   } && {
-    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, nenhum disco em estado de erro. Próximo teste!" 8 60
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, nenhum disco em estado de erro. Próximo teste!" 6 40
     teste02
   }
 }
 
 function teste02 {
-  dialog --backtitle "$version" --title "Teste 02" --msgbox "Verificando se algum armazenamento do sistema está lotado!" 8 60
+  dialog --backtitle "$version" --title "Teste 02" --msgbox "Verificando se algum armazenamento do sistema está lotado!" 6 40
   diskfull=$(df -h | grep -a "100%")
   diskifneeded=$(df -h)
+  sleep 1
   [ "$diskfull" = "" ] || {
-    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "Foi identificado um armazenamento com 100% de uso!" 8 60
-    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "$diskifneeded" 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "Foi identificado um armazenamento com 100% de uso!" 6 40
+    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "$diskifneeded" 30 80
     dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "Tenta liberar o espaço no armazenamento e em seguida reinicie o servidor." 8 60
   } && {
     dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, nenhum disco lotado identificado. Próximo teste!" 6 40
@@ -47,18 +49,53 @@ function teste02 {
 function teste03 {
   dialog --backtitle "$version" --title "Teste 03" --msgbox "Verificando se há conectividade de rede!" 8 60
   nettest=$(ip route get 1.1.1.1 | grep -oPq 'via \K\S+' && echo yes || echo no)
-  [ "$nettest" = "no" ] || {
+  sleep 1
+  [ "$nettest" = "no" ] && {
     dialog --backtitle "ATENÇÃO" --title "Teste 03" --msgbox "O servidor esta sem conectividade de internet!" 8 60
-
-
-  } && {
+  } || {
     dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, o servidor esta conectado à internet. Próximo teste!" 6 40
-    testeX
+    teste04
   }
 }
 
+function teste04 {
+  dialog --backtitle "$version" --title "Teste 04" --msgbox "Faremos uma série de testes se os serviços essenciais estão executando!" 8 60
+
+  testdocker=$(ps aux | pgrep dockerd)
+  testlibvirt=$(ps aux | pgrep libvirtd)
+
+  testcontainers1=$(docker ps -f status=exited | grep -qa "Exited")
+  testcontainers2=$(docker ps -f status=restarting | grep -qa "Restarting")
+
+  [ "$testdocker" = "" ] && {
+    dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "O serviço do DOCKER está ausente/parado!" 8 60
+  } || {
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, Docker OK. Próximo teste!" 6 40
+  }
+
+  [ "$testlibvirt" = "" ] || {
+    dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "O serviço de MAQUINAS VIRTUAIS está ausente/parado!" 8 60
+  } || {
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, Maquinas Virtuais OK. Próximo teste!" 6 40
+  }
+
+  [ "$testcontainers1" = "" ] && {
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, nenhum container EXITED identificado. Próximo teste!" 6 40
+  } || {
+    dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "Há containers em estado de EXITED! Favor verificar" 8 60
+  }
+
+  [ "$testcontainers2" = "" ] && {
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, nenhum container RESTARTING identificado. Próximo teste!" 6 40
+  } || {
+    dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "Há containers em estado de RESTARTING! Favor verificar" 8 60
+  }
+
+testeX
+}
+
 function testeX {
-  dialog --backtitle "Conclusão" --title "Fim" --msgbox "Teste Concluidos!" 6 40
+  dialog --backtitle "Conclusão" --title "Fim" --msgbox "Todos os Testes foram Concluidos!" 6 40
 }
 
 # IDEIAS
