@@ -11,10 +11,10 @@ var0=$(dialog --title 'Ferramentas' --backtitle "Ferramentas e Utilidades" --men
 5 'Cliente SAMBA' \
 6 'Testar o Beep' \
 7 'Sync SATAs' \
-8 'Qual meu IP WAN?' \
-9 'Qual meu IP LAN?' \
-10 'SpeedTest by Ookla' \
-11 'Explorar o conteudo de /mnt' \
+8 'Dados Completos da Rede' \
+9 'SpeedTest by Ookla' \
+10 'Explorar o conteudo de /mnt' \
+11 'Teste de Placa de Rede' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) dwservice0 ; start ;;
@@ -24,12 +24,50 @@ case "$var0" in
 5) sambaclient ; start ;;
 6) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
 7) clear ; satas ; start ;;
-8) meuip=$(dig @resolver4.opendns.com myip.opendns.com +short) ; dialog --title "Informacao" --msgbox "\n$meuip" 7 25 ; start ;;
-9) meuip=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+'); dialog --title "Informacao" --msgbox "\n$meuip" 7 25 ; start ;;
-10) clear; echo ""; echo "Aguarde a conclusao do teste!"; echo ""; curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 ; echo ""; sleep 3; read -p "Teste concluido! Pressione Enter para fechar" ; start ;;
-11) dialog --stdout --title "Veja as pastas da raiz dos discos!" --dselect "/mnt" 15 40; start ;;
+8) networkdata ; start ;;
+9) clear; echo ""; echo "Aguarde a conclusao do teste!"; echo ""; curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 ; echo ""; sleep 3; read -p "Teste concluido! Pressione Enter para fechar" ; start ;;
+10) dialog --stdout --title "Veja as pastas da raiz dos discos!" --dselect "/mnt" 15 40; start ;;
+11) iperftest ; start ;;
 X) echo "." >/dev/null ;;
 esac
+}
+
+function iperftest {
+var0=$(dialog --title 'iperf' --backtitle "" --menu "Escolha o modo!" 0 0 0 \
+1 'Cliente' \
+2 'Servidor' \
+X '<' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && return
+case "$var0" in
+1) iperfclnt ; start ;;
+2) iperfsrv ; start ;;
+X) echo "." > /dev/null ;;
+esac
+}
+
+function iperfclnt {
+  clear; echo ""
+  read -a ipcc -p "Digite o IP do Servidor: "
+  clear; echo "Entrando no modo Cliente. Para sair antes do teste concluir, tecle 'CTRL Esquerdo' + C duas vezes seguidas!"; echo ""
+  iperf -c "$ipcc" &&
+  read -r -p "Teste finalizado, tecle Enter para sair!"
+}
+
+function iperfsrv {
+  clear; echo "Entrando no modo Servidor. Para sair antes do teste concluir, tecle 'CTRL Esquerdo' + C"; echo ""
+  meuiplocal=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+'); echo "Identifiquei que o IP Servidor é $meuiplocal!"
+  iperf -s &&
+  read -r -p "Teste finalizado, tecle Enter para sair!"
+}
+
+function networkdata {
+  meuipwan=$(dig @resolver4.opendns.com myip.opendns.com +short)
+  meugateway=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+')
+  meudevice=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
+  meuiplan=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
+  minhasubnet="${meugateway%.*}.0"
+
+  dialog --title "Informacao da Rede" --msgbox "IP WAN   : $meuipwan \nIP LAN   : $meuiplan \nGateway  : $meugateway \nSubnet   : $minhasubnet \nInterface: $meudevice" 9 30
 }
 
 function udpcast0 {
