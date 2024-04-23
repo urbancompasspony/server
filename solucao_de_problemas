@@ -1,25 +1,87 @@
 #!/bin/bash
 
-clear
-echo ""
-echo "Em breve!"
-echo ""
-sleep 3
+version="1.0"
 
+function start {
+  dialog --backtitle "$version" --title "Diagnostico do Sistema" --yesno "A seguir executarei uma série de testes e darei o resultado do que possa estar em erro. \n\nDeseja continuar?" 10 40
+  [ $? = 0 ] && {
+    clear
+    echo ""
+    echo  -e "\033[39;5m============================================\033[0m"
+    echo  -e "\033[39;5mDigite sua senha de administrador por favor!\033[0m"
+    echo  -e "\033[39;5m============================================\033[0m"
+    echo ""
+    sudo echo "." >/dev/null
 
+    teste01
+  }
+}
 
-# touch file on disk to check if it exists and is ok!
+function test01 {
+  dialog --backtitle "$version" --title "Teste 01" --msgbox "Verificando se algum armazenamento do sistema esta em estado de erro e/ou se não está acessível." 8 60
+  diskmount=$(sudo mount -a 1&>2 >/dev/null && echo yes || echo no)
+  [ "$diskfull" = "" ] || {
+    dialog --backtitle "ATENÇÃO" --title "Teste 01" --msgbox "Foi identificado um armazenamento ausente ou em estado de erro!" 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 01" --msgbox "Isso significa que um disco ou SSD (interno ou externo) está ausente, corrompido ou mesmo com BAD_BLOCKS." 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 01" --msgbox "$diskmount" 8 60
+  } && {
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar. Próximo teste!" 8 60
+    teste02
+  }
+}
+
+function test02 {
+  dialog --backtitle "$version" --title "Teste 02" --msgbox "Verificando se algum armazenamento do sistema está lotado!" 8 60
+  diskfull=$(df -h | grep -a "100%")
+  diskifneeded=$(df -h)
+  [ "$diskfull" = "" ] || {
+    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "Foi identificado um armazenamento com 100% de uso!" 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "$diskifneeded" 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "Tenta liberar o espaço no armazenamento e em seguida reinicie o servidor." 8 60
+  } && {
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar. Próximo teste!" 6 40
+    teste03
+  }
+}
+
+function test03 {
+  dialog --backtitle "$version" --title "Teste 03" --msgbox "Verificando se algum armazenamento do sistema está lotado!" 8 60
+  diskfull=$(df -h | grep -a "100%")
+  diskifneeded=$(df -h)
+  [ "$diskfull" = "" ] || {
+    dialog --backtitle "ATENÇÃO" --title "Teste 03" --msgbox "Foi identificado um armazenamento com 100% de uso!" 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 03" --msgbox "$diskifneeded" 8 60
+  } && {
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar. Próximo teste!" 6 40
+    teste04
+  }
+}
+
+function test04 {
+  dialog --backtitle "$version" --title "Teste 04" --msgbox "Verificando se há conectividade de rede!" 8 60
+  
+  [ "$diskfull" = "" ] || {
+    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "Foi identificado um armazenamento com 100% de uso!" 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "$diskifneeded" 8 60
+  } && {
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar. Próximo teste!" 6 40
+    testeX
+  }
+}
+
+function testeX {
+  dialog --backtitle "Conclusão" --title "Fim" --msgbox "Teste Concluidos!" 6 40
+}
+
+# IDEIAS
+
 # test it on rclone sharing
 # test it on samba sharing.... nice toush here, if it spawns on smb!
-
-# ping through every network adapter
-
 # look for errors on hardware, PCIe, etc
-
 # test uptime, how long server is online
-
 # check if there is a power_button log event on journalctl and cause of last shutdown
-
 # check if some process is running, like docker, libvirt and more
 
-# check if 
+start
+
+exit 1
