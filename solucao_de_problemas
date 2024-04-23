@@ -25,7 +25,7 @@ function test01 {
     dialog --backtitle "ATENÇÃO" --title "Teste 01" --msgbox "Isso significa que um disco ou SSD (interno ou externo) está ausente, corrompido ou mesmo com BAD_BLOCKS." 8 60
     dialog --backtitle "ATENÇÃO" --title "Teste 01" --msgbox "$diskmount" 8 60
   } && {
-    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar. Próximo teste!" 8 60
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, nenhum disco em estado de erro. Próximo teste!" 8 60
     teste02
   }
 }
@@ -39,32 +39,20 @@ function test02 {
     dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "$diskifneeded" 8 60
     dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "Tenta liberar o espaço no armazenamento e em seguida reinicie o servidor." 8 60
   } && {
-    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar. Próximo teste!" 6 40
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, nenhum disco lotado identificado. Próximo teste!" 6 40
     teste03
   }
 }
 
 function test03 {
-  dialog --backtitle "$version" --title "Teste 03" --msgbox "Verificando se algum armazenamento do sistema está lotado!" 8 60
-  diskfull=$(df -h | grep -a "100%")
-  diskifneeded=$(df -h)
-  [ "$diskfull" = "" ] || {
-    dialog --backtitle "ATENÇÃO" --title "Teste 03" --msgbox "Foi identificado um armazenamento com 100% de uso!" 8 60
-    dialog --backtitle "ATENÇÃO" --title "Teste 03" --msgbox "$diskifneeded" 8 60
-  } && {
-    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar. Próximo teste!" 6 40
-    teste04
-  }
-}
+  dialog --backtitle "$version" --title "Teste 03" --msgbox "Verificando se há conectividade de rede!" 8 60
+  nettest=$(ip route get 1.1.1.1 | grep -oPq 'via \K\S+' && echo yes || echo no)
+  [ "$nettest" = "no" ] || {
+    dialog --backtitle "ATENÇÃO" --title "Teste 03" --msgbox "O servidor esta sem conectividade de internet!" 8 60
 
-function test04 {
-  dialog --backtitle "$version" --title "Teste 04" --msgbox "Verificando se há conectividade de rede!" 8 60
-  
-  [ "$diskfull" = "" ] || {
-    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "Foi identificado um armazenamento com 100% de uso!" 8 60
-    dialog --backtitle "ATENÇÃO" --title "Teste 02" --msgbox "$diskifneeded" 8 60
+
   } && {
-    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar. Próximo teste!" 6 40
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, o servidor esta conectado à internet. Próximo teste!" 6 40
     testeX
   }
 }
