@@ -156,7 +156,12 @@ function macvland {
     sleep 2
 
     var1="0"; var2="0"; var3="0"
-    VALUE1="XXX.YYY.ZZ.0"; VALUE2="XXX.YYY.ZZ.1-254?" ; VALUE3="enpXsY"
+
+    minhasubnet="${meugateway%.*}.0"
+    meugateway=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+')
+    meudevice=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
+
+    VALUE1="$minhasubnet"; VALUE2="$meugateway" ; VALUE3="$meudevice"
 
     VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Criar novo MACVLAN" --form "MACVLAN for Containers" 10 40 0 \
 "Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
@@ -182,7 +187,7 @@ function macvland {
       docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" macvlan
     }
   } || {
-    echo "." > /dev/null
+    echo "Macvlan existente. Saindo..."
   }
 }
 
