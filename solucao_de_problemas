@@ -53,7 +53,7 @@ function teste03 {
   [ "$nettest" = "no" ] && {
     dialog --backtitle "ATENÇÃO" --title "Teste 03" --msgbox "O servidor esta sem conectividade de internet!" 8 60
   } || {
-    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, o servidor esta conectado à internet. Próximo teste!" 6 40
+    dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, o servidor está conectado à internet. Próximo teste!" 6 40
     teste04
   }
 }
@@ -63,9 +63,10 @@ function teste04 {
 
   testdocker=$(ps aux | pgrep dockerd)
   testlibvirt=$(ps aux | pgrep libvirtd)
-
   testcontainers1=$(docker ps -f status=exited | grep -qa "Exited")
   testcontainers2=$(docker ps -f status=restarting | grep -qa "Restarting")
+
+  sleep 1
 
   [ "$testdocker" = "" ] && {
     dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "O serviço do DOCKER está ausente/parado!" 8 60
@@ -73,8 +74,8 @@ function teste04 {
     dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, Docker OK. Próximo teste!" 6 40
   }
 
-  [ "$testlibvirt" = "" ] || {
-    dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "O serviço de MAQUINAS VIRTUAIS está ausente/parado!" 8 60
+  [ "$testlibvirt" = "" ] && {
+    dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "O serviço de MAQUINAS VIRTUAIS está ausente/parado! Verifique se isso é desejado." 8 60
   } || {
     dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, Maquinas Virtuais OK. Próximo teste!" 6 40
   }
@@ -82,31 +83,21 @@ function teste04 {
   [ "$testcontainers1" = "" ] && {
     dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, nenhum container EXITED identificado. Próximo teste!" 6 40
   } || {
-    dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "Há containers em estado de EXITED! Favor verificar" 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "Há containers em estado de EXITED, ou seja, que pararam sem razão aparente! Favor verificar." 8 60
   }
 
   [ "$testcontainers2" = "" ] && {
     dialog --backtitle "$version" --title "OK" --msgbox "Nada a relatar, nenhum container RESTARTING identificado. Próximo teste!" 6 40
   } || {
-    dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "Há containers em estado de RESTARTING! Favor verificar" 8 60
+    dialog --backtitle "ATENÇÃO" --title "Teste 04" --msgbox "Há containers em estado de RESTARTING, ou seja, que estão reiniciando infinitamente! Favor verificar." 8 60
   }
 
 testeX
 }
 
 function testeX {
-  dialog --backtitle "Conclusão" --title "Fim" --msgbox "Todos os Testes foram Concluidos!" 6 40
+  dialog --backtitle "Conclusão" --title "Fim" --msgbox "Todos os Testes Essenciais foram Concluidos!" 6 40
 }
 
-# IDEIAS
-
-# test it on rclone sharing
-# test it on samba sharing.... nice toush here, if it spawns on smb!
-# look for errors on hardware, PCIe, etc
-# test uptime, how long server is online
-# check if there is a power_button log event on journalctl and cause of last shutdown
-# check if some process is running, like docker, libvirt and more
-
 start
-
 exit 1
