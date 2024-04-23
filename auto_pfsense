@@ -59,7 +59,17 @@ function setperma {
 }
 
 function setinter {
-  VALUE1="enp1s0"; VALUE2="enp2s0"; VALUE3="0"; VALUE4="0"
+  # Get my main LAN (usually motherboard)
+  mylan=$(ip route get 1.1.1.1 2>/dev/null | grep -oP 'dev \K\S+')
+
+  # Create an Array but eliminating docker, veth, lo, tun, virbr, macv and myself (mylan) from that!
+  myarray=($(ls /sys/class/net/ | grep -v "docker" | grep -v "veth" | grep -v "lo" | grep -v "virbr" | grep -v "macv" | grep -v "tun" | grep -v "$mylan"))
+  
+  # With the remaining connection interfaces, create the aspects of menu
+  VALUE1="${myarray[0]}"
+  VALUE2="${myarray[1]}"
+  VALUE3="${myarray[2]}"
+  VALUE4="${myarray[3]}"
 
   VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Definir Interfaces" --form "Networking for pfSense on VM" 11 40 0 \
 "IF LAN 1:" 1 1 "$VALUE1" 1 11 30 0 \
