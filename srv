@@ -90,7 +90,7 @@ esac
 
 function urgencies0 {
 var0=$(dialog --title ' ' --backtitle "Urgencias & Emergencias" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-1 'Solucao de Problemas Comuns' \
+1 'Diagnostico do Sistema' \
 2 'Local A: Restauracao de Containers' \
 3 'Local B: Limpar Backup Provisorio' \
 4 'Nuvem A: Baixar Backups de Containers' \
