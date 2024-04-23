@@ -17,7 +17,7 @@ function start {
   }
 }
 
-function test01 {
+function teste01 {
   dialog --backtitle "$version" --title "Teste 01" --msgbox "Verificando se algum armazenamento do sistema esta em estado de erro e/ou se não está acessível." 8 60
   diskmount=$(sudo mount -a 1&>2 >/dev/null && echo yes || echo no)
   [ "$diskfull" = "" ] || {
@@ -30,7 +30,7 @@ function test01 {
   }
 }
 
-function test02 {
+function teste02 {
   dialog --backtitle "$version" --title "Teste 02" --msgbox "Verificando se algum armazenamento do sistema está lotado!" 8 60
   diskfull=$(df -h | grep -a "100%")
   diskifneeded=$(df -h)
@@ -44,7 +44,7 @@ function test02 {
   }
 }
 
-function test03 {
+function teste03 {
   dialog --backtitle "$version" --title "Teste 03" --msgbox "Verificando se há conectividade de rede!" 8 60
   nettest=$(ip route get 1.1.1.1 | grep -oPq 'via \K\S+' && echo yes || echo no)
   [ "$nettest" = "no" ] || {
