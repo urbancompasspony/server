@@ -176,8 +176,8 @@ esac
   macvland
   start
 } || {
-  IPMachine=$(hostname -I | awk '{print $1}')
-  MyIPNF=$(dialog --title 'MyIP!' --backtitle "Sugestão: $IPMachine" --inputbox "MyIP não encontrado. \nQual o IP do Servidor?" 10 40 2>&1 > /dev/tty)
+  IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
+  MyIPNF=$(dialog --title 'MyIP!' --backtitle "Sugestão: $IPMachine" --inputbox "Este IP não foi definido. \nQual o IP deste Servidor?" 10 40 2>&1 > /dev/tty)
   sudo mkdir -p /srv/containers/scripts/config
 
   sudo touch /srv/containers/scripts/config/backupcont
