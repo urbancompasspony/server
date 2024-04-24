@@ -71,7 +71,7 @@ function setinter {
   [ "${myarray[2]}" = "" ] && { VALUE3="0"; } || { echo "." >/dev/null ; }
   [ "${myarray[3]}" = "" ] && { VALUE4="0"; } || { echo "." >/dev/null ; }
 
-  VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Definir Interfaces" --form "O que estiver zero nao sera utilizado!" 11 40 0 \
+  VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Definir Interfaces" --form "O que estiver zero nao sera utilizado!" 13 40 0 \
 "IP LAN 1:" 1 1 "$VALUE1" 1 11 30 0 \
 "IP LAN 2:" 2 1 "$VALUE2" 2 11 30 0 \
 "IP LAN 3:" 3 1 "$VALUE3" 3 11 30 0 \
