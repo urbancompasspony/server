@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# WIP
-# curl -u admin:isorulez -s http://172.20.0.22 | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g'
-
 # CREATE NETWORK DEVICES AS BRIDGE, NEVER AS VEPA, 'CUZ THIS CONFLICTS WITH MACVLAN DOCKER!
 
 ##############
@@ -16,7 +13,7 @@ sudo chmod 777 -R "$destpath"
 
 serverip="172.20.0.22"
 lanhost="http://$serverip"
-wanhost="http://cs.linuxuniverse.com.br:3434"
+wanhost="http://z.net-freaks.com:3434"
 
 usern4me="admin"
 passw0rd="isorulez"
@@ -65,27 +62,25 @@ function setinter {
   # Create an Array but eliminating docker, veth, lo, tun, virbr, macv and myself (mylan) from that!
   myarray=($(ls /sys/class/net/ | grep -v "docker" | grep -v "veth" | grep -v "lo" | grep -v "virbr" | grep -v "macv" | grep -v "tun" | grep -v "$mylan"))
   
-  # With the remaining connection interfaces, create the aspects of menu
-  VALUE1="${myarray[0]}"
-  VALUE2="${myarray[1]}"
-  VALUE3="${myarray[2]}"
-  VALUE4="${myarray[3]}"
+  # With the remaining connection interfaces, create the aspects of menu. (Do not try to set order based on appliance pfsense!
+  VALUE1="${myarray[0]}"; VALUE2="${myarray[1]}"; VALUE3="${myarray[2]}"; VALUE4="${myarray[3]}"
 
+  # If array is empty, fill with zero!
   [ "${myarray[0]}" = "" ] && { VALUE1="0"; } || { echo "." >/dev/null ; }
   [ "${myarray[1]}" = "" ] && { VALUE2="0"; } || { echo "." >/dev/null ; }
   [ "${myarray[2]}" = "" ] && { VALUE3="0"; } || { echo "." >/dev/null ; }
   [ "${myarray[3]}" = "" ] && { VALUE4="0"; } || { echo "." >/dev/null ; }
 
-  VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Definir Interfaces" --form "Networking for pfSense on VM" 11 40 0 \
-"IF LAN 1:" 1 1 "$VALUE1" 1 11 30 0 \
-"IF LAN 2:" 2 1 "$VALUE2" 2 11 30 0 \
-"IF LAN 3:" 3 1 "$VALUE3" 3 11 30 0 \
-"IF LAN 4:" 4 1 "$VALUE4" 4 11 30 0 \
+  VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Definir Interfaces" --form "O que estiver zero nao sera utilizado!" 11 40 0 \
+"IP LAN 1:" 1 1 "$VALUE1" 1 11 30 0 \
+"IP LAN 2:" 2 1 "$VALUE2" 2 11 30 0 \
+"IP LAN 3:" 3 1 "$VALUE3" 3 11 30 0 \
+"IP LAN 4:" 4 1 "$VALUE4" 4 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   case $? in
     0) echo "." > /dev/null ;;
-    1) exit ;;
+    1) return ;;
     2) dialognet ; setinter ;;
   esac
 
