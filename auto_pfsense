@@ -71,6 +71,11 @@ function setinter {
   VALUE3="${myarray[2]}"
   VALUE4="${myarray[3]}"
 
+  [ "${myarray[0]}" = "" ] && { VALUE1="0"; } || { echo "." >/dev/null ; }
+  [ "${myarray[1]}" = "" ] && { VALUE2="0"; } || { echo "." >/dev/null ; }
+  [ "${myarray[2]}" = "" ] && { VALUE3="0"; } || { echo "." >/dev/null ; }
+  [ "${myarray[3]}" = "" ] && { VALUE4="0"; } || { echo "." >/dev/null ; }
+
   VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Definir Interfaces" --form "Networking for pfSense on VM" 11 40 0 \
 "IF LAN 1:" 1 1 "$VALUE1" 1 11 30 0 \
 "IF LAN 2:" 2 1 "$VALUE2" 2 11 30 0 \
