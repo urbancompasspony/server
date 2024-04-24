@@ -39,6 +39,7 @@ function check {
 function start {
   [ -f /var/lib/libvirt/images/pfsense.img ] && {
     setinter
+    echo "." >/dev/null
   } || {
     calling pfsense.img
     setperma
@@ -72,10 +73,10 @@ function setinter {
   [ "${myarray[3]}" = "" ] && { VALUE4="0"; } || { echo "." >/dev/null ; }
 
   VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Definir Interfaces" --form "O que estiver zero nao sera utilizado!" 13 40 0 \
-"IP LAN 1:" 1 1 "$VALUE1" 1 11 30 0 \
-"IP LAN 2:" 2 1 "$VALUE2" 2 11 30 0 \
-"IP LAN 3:" 3 1 "$VALUE3" 3 11 30 0 \
-"IP LAN 4:" 4 1 "$VALUE4" 4 11 30 0 \
+"IP LAN 0:" 1 1 "$VALUE1" 1 11 30 0 \
+"IP LAN 1:" 2 1 "$VALUE2" 2 11 30 0 \
+"IP LAN 2:" 3 1 "$VALUE3" 3 11 30 0 \
+"IP LAN 3:" 4 1 "$VALUE4" 4 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   case $? in
