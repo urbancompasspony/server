@@ -13,6 +13,8 @@ export DEBIAN_FRONTEND=noninteractive
 export bktitle="Active Directory & Domain Controller"
 export ttitle=" Server Menu v7.0 "
 
+export PathFolder0
+
 function main_menu {
   var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
   A 'Ferramentas de Usuarios' \
@@ -144,15 +146,14 @@ function s_settings {
   var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
   A 'SYSVOL CHECK' \
   B 'SysVol Reset' \
-  C 'dbcheck: well-known-acls' \
-  D 'dbcheck: general' \
-  E 'Check ACL GPOs (Administrator)' \
-  F 'Get ACL as Administrator (fix SYSVOL first!)' \
-  G 'Set ACL as Administrator (CAUTION!)' \
-  H 'Get ACL from a File or Folder' \
-  I 'Set ACL to a File or Folder (CAUTION!)' \
-  J 'Upgrade ADMX Files for Windows 10' \
-  K 'Upgrade ADMX Files for Windows 11' \
+  C 'samba db check: well-known-acls' \
+  D 'samba db check: general' \
+  E 'Check ACLs of GPOs (Administrator)' \
+  F 'CAUTION! Set ACL as Administrator' \
+  G 'Get ACL from a File or Folder' \
+  H 'CAUTION! Set ACL to a File or Folder' \
+  I 'Upgrade ADMX Files for Windows 10' \
+  J 'Upgrade ADMX Files for Windows 11' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -161,60 +162,92 @@ function s_settings {
   C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  F) clear ; echo "" ; samba-tool ntacl get --as-sddl /var/lib/samba/sysvol/$DOMAIN/scripts ; echo "" ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  G) setacladmin0 ; s_settings ;;
-  H) getacls0 ; s_settings ;;
-  I) setacls0 ; s_settings ;;
-  J) clear ; force_msi_w10 ; s_settings ;;
-  K) clear ; force_msi_w11 ; s_settings ;;
+  F) setacladmin0 ; s_settings ;;
+  G) getacls0 ; s_settings ;;
+  H) setacls0 ; s_settings ;;
+  I) clear ; force_msi_w10 ; s_settings ;;
+  J) clear ; force_msi_w11 ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
 }
 
-function setacladmin0 {
-VALUE0=$(dialog --stdout --title "SET ACL as ADMINISTRATOR" --dselect "/mnt" 15 40)
+function getacls0 {
+VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Get ACL" --dselect "/mnt" 15 40)
 [ $? -ne 0 ] && return
-var1=$(echo "$VALUE0" | sed -n 1p)
+Pathtemp0=$(echo "$VALUE0" | sed -n 1p)
 
-dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "Voce escolheu a pasta $var1." 7 40
-aclhere=$(samba-tool ntacl get --as-sddl /var/lib/samba/sysvol/$DOMAIN/scripts)
+acl00=$(samba-tool ntacl get --as-sddl "$Pathtemp0")
+echo "$acl00" | tee /tmp/acl01 >/dev/null
+echo "$Pathtemp0" | tee /tmp/pathtemp00 >/dev/null
 
-samba-tool ntacl set "$aclhere" "$var1"
-dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta $var1 recebeu as seguintes ACLs: \n\n$aclhere \n\nReferente ao Administrator!" 10 70
+dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes ACLs da pasta \n$Pathtemp0\nforam coletadas: \n\n$acl00" 14 70
 }
 
-function getacls0 {
-VALUE0=$(dialog --stdout --title "GET ACL" --fselect "/mnt" 15 40)
+function setacladmin0 {
+checkpathfolder
+
+VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Set ACL as Administrator:" --dselect "$PathFolder0" 15 40)
 [ $? -ne 0 ] && return
-var1=$(echo "$VALUE0" | sed -n 1p)
+PathFolder0new=$(echo "$VALUE0" | sed -n 1p)
 
-dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "Voce escolheu a pasta $var1." 7 40
-acl00=$(samba-tool ntacl get --as-sddl "$var1")
+aclhere=$(samba-tool ntacl get --as-sddl /var/lib/samba/sysvol/$DOMAIN/scripts)
 
-clear
-echo "$acl00" | tee /tmp/temp01
-echo ""
+samba-tool ntacl set "$aclhere" "$PathFolder0new"
+echo "$PathFolder0new" | tee /tmp/path01 >/dev/null
 
-read -p "Pressione Enter para continuar!"
+dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta \n$PathFolder0new\nrecebeu as seguintes ACLs: \n\n$aclhere \n\nreferentes ao Administrator!" 14 70
+
+changemoreacls
 }
 
 function setacls0 {
-VALUE1="$(cat /tmp/temp01)"
-VALUE2="$(cat /tmp/path01)"
+acl00="$(cat /tmp/acl01)"
+pathtempacl0="$(cat /tmp/pathtemp00)"
 
-VALUE0=$(dialog --ok-label "Ok" --title "SET ACL" --form "Defina a ACL..." 9 60 0 \
-"ACL :" 1 1 "$VALUE1" 1 7 300 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes ACLs coletadas da pasta previamente definida\n$pathtempacl0\nserao utilizadas: \n\n$acl00" 12 70
+
+checkpathfolder
+
+VALUE00=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Set Folder" --dselect "$PathFolder0" 15 40)
 [ $? -ne 0 ] && return
-var1=$(echo "$VALUE0" | sed -n 1p)
+PathFolder0new=$(echo "$VALUE00" | sed -n 1p)
 
-VALUE00=$(dialog --stdout --title "SET FOLDER" --dselect "/mnt" 15 40)
-[ $? -ne 0 ] && return
-var2=$(echo "$VALUE00" | sed -n 1p)
+samba-tool ntacl set "$acl00" "$PathFolder0new"
+echo "$PathFolder0new"| tee /tmp/path01 >/dev/null
 
-echo "$var2"| tee /tmp/path01
-samba-tool ntacl set "$var1" "$var2"
-dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "ACLs aplicadas para a pasta $var2! \n\nPressione Enter para continuar." 10 40
+dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta \n$PathFolder0new\nrecebeu as seguintes ACLs: \n\n$acl00\n\nficando com as mesmas permissoes da pasta \n$pathtempacl0!" 16 70
+
+changemoreacls
+}
+
+function changemoreacls {
+  dialog --title 'Confirmacao' --backtitle 'Informacao' --yesno 'Deseja trocar a ACL de outra pasta?' 0 0
+  [ $? = 0 ] && {
+  acl00="$(cat /tmp/acl01)"
+  PathFolder0="$(cat /tmp/path01)"
+  pathtempacl0="$(cat /tmp/pathtemp00)"
+
+  VALUE00=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Set Folder" --dselect "$PathFolder0" 15 40)
+  [ $? -ne 0 ] && return
+  PathFolder0new=$(echo "$VALUE00" | sed -n 1p)
+
+  echo "$PathFolder0new"| tee /tmp/path01 >/dev/null
+  samba-tool ntacl set "$acl00" "$PathFolder0new"
+
+  dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta \n$PathFolder0new\nrecebeu as seguintes ACLs: \n\n$acl00\n\nficando com as mesmas permissoes da pasta \n$pathtempacl0!" 16 70
+
+  changemoreacls
+  }
+}
+
+function checkpathfolder {
+  PathFolder0="$(cat /tmp/path01)"
+
+  [ "$PathFolder0" = "" ] && {
+    PathFolder0="/mnt"
+  } || {
+    echo "." >/dev/null
+  }
 }
 
 function force_msi_w10 {
@@ -1199,7 +1232,7 @@ function revalid_shared {
 }
 
 function dica0 {
-  VALUE2=$(dialog --stdout --title "Escolha a pasta alvo!" --dselect "/mnt" 15 40 | tail -c +5)
+  VALUE2=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Escolha a pasta alvo!" --dselect "/mnt" 15 40 | tail -c +5)
 }
 
 function faq_help {
