@@ -1,39 +1,41 @@
-
-WIP!
-Link out.
-
-1) sudo apt install p7zip-full p7zip 7zip wget xorriso
+1)
+sudo apt install p7zip-full p7zip 7zip wget xorriso
 
 2)
-mkdir u2404-autoinstall-ISO
-cd u2404-autoinstall-ISO
-
-wget https://cdimage.ubuntu.com/ubuntu-server/daily-live/current/noble-live-server-amd64.iso
+mkdir u2404-autoinstall-ISO; cd u2404-autoinstall-ISO
+wget https://releases.ubuntu.com/24.04/ubuntu-24.04-live-server-amd64.iso
 
 3)
-7z -y x jammy-live-server-amd64.iso -osource-files
+7z -y x ubuntu-24.04-live-server-amd64.iso -osource-files
 
 4)
-cd source-files
-mv  '[BOOT]' ../BOOT
+cd source-files; mv  '[BOOT]' ../BOOT
 
 5)
-cd ..
-nano source-files/boot/grub/grub.cfg
+cd ..; nano source-files/boot/grub/grub.cfg
+
 set timeout=30
 loadfont unicode
 set menu_color_normal=white/black
 set menu_color_highlight=black/light-gray
-menuentry "Auto Instalador" {
+menuentry "Auto Installer Ubuntu Server 24.04 LTS" {
     set gfxpayload=keep
     linux   /casper/vmlinuz quiet autoinstall ds=nocloud\;s=/cdrom/server/  ---
     initrd  /casper/initrd
 }
+menuentry " " {set gfxpayload=keep}
+menuentry "Try or Install Ubuntu Server 24.04 LTS" {
+        set gfxpayload=keep
+        linux   /casper/vmlinuz  ---
+        initrd  /casper/initrd
+}
+menuentry " " {set gfxpayload=keep}
+menuentry "Reboot" {reboot}
+menuentry "Shutdown" {halt}
 grub_platform
 
 6)
-mkdir source-files/server
-touch source-files/server/meta-data
+mkdir source-files/server; touch source-files/server/meta-data
 
 nano source-files/server/user-data
 #cloud-config
@@ -65,15 +67,15 @@ autoinstall:
   package_upgrade: true
 
 # password: ubuntu
-# change it, plz
+# change it after install plz
 
 7)
-cd ..; xorriso -indev jammy-live-server-amd64.iso -report_el_torito as_mkisofs
+xorriso -indev ubuntu-24.04-live-server-amd64.iso -report_el_torito as_mkisofs
 
 8)
 cd source-files; xorriso -as mkisofs -r \
-  -V 'Ubuntu 22.04 LTS AUTO (EFIBIOS)' \
-  -o ../ubuntu-22.04-autoinstall.iso \
+  -V 'Ubuntu 24.04 LTS AUTO' \
+  -o ../ubuntu-24.04-autoinstall.iso \
   --grub2-mbr ../BOOT/1-Boot-NoEmul.img \
   -partition_offset 16 \
   --mbr-force-bootable \
@@ -88,7 +90,9 @@ cd source-files; xorriso -as mkisofs -r \
   -no-emul-boot \
   .
 
+THERE IS A DOT AT THE END!
+
 9) 
-sudo cp ../ubuntu-22.04-autoinstall.iso /var/lib/libvirt/images/
+sudo cp ../ubuntu-24.04-autoinstall.iso /var/lib/libvirt/images/
 
 Enjoy!
