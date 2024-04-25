@@ -2,8 +2,7 @@
 sudo apt install p7zip-full p7zip 7zip wget xorriso
 
 2)
-mkdir u2404-autoinstall-ISO; cd u2404-autoinstall-ISO
-wget https://releases.ubuntu.com/24.04/ubuntu-24.04-live-server-amd64.iso
+mkdir u2404-autoinstall-ISO; cd u2404-autoinstall-ISO; wget https://releases.ubuntu.com/24.04/ubuntu-24.04-live-server-amd64.iso
 
 3)
 7z -y x ubuntu-24.04-live-server-amd64.iso -osource-files
