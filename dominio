@@ -152,8 +152,9 @@ function s_settings {
   F 'CAUTION! Set ACL as Administrator' \
   G 'Get ACL from a File or Folder' \
   H 'CAUTION! Set ACL to a File or Folder' \
-  I 'Upgrade ADMX Files for Windows 10' \
-  J 'Upgrade ADMX Files for Windows 11' \
+  I 'CAUTION! Remove ACLs from a Folder' \
+  J 'Upgrade ADMX Files for Windows 10' \
+  K 'Upgrade ADMX Files for Windows 11' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -165,10 +166,27 @@ function s_settings {
   F) setacladmin0 ; s_settings ;;
   G) getacls0 ; s_settings ;;
   H) setacls0 ; s_settings ;;
-  I) clear ; force_msi_w10 ; s_settings ;;
-  J) clear ; force_msi_w11 ; s_settings ;;
+  I) removeacls0 ; s_settings ;;
+  J) clear ; force_msi_w10 ; s_settings ;;
+  K) clear ; force_msi_w11 ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
+}
+
+function removeacls0 {
+checkpathfolder
+
+VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "REMOVE ACLs from Folder:" --dselect "$PathFolder0" 15 40)
+[ $? -ne 0 ] && return
+PathFolder0=$(echo "$VALUE0" | sed -n 1p)
+
+setfacl -b -R -d "$PathFolder0"
+setfacl -b -R "$PathFolder0"
+setfacl -Rbk "$PathFolder0"
+
+acl00=$(samba-tool ntacl get --as-sddl "$PathFolder0")
+
+dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes ACLs da pasta \n$PathFolder0\nforam zeradas: \n\n$acl00" 14 70
 }
 
 function getacls0 {
