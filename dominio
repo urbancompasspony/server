@@ -87,8 +87,9 @@ A 'Procurar/Verificar um Grupo' \
 B 'Criar Grupo' \
 C 'Exibir todos os Grupos' \
 D 'Exibir Usuarios de um Grupo' \
-E 'Mover Grupo para OU' \
-F 'Excluir um Grupo' \
+E 'Adicionar Grupo 1 a um Grupo 2' \
+F 'Mover Grupo para OU' \
+G 'Excluir um Grupo' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
@@ -96,8 +97,9 @@ A) check_group ; group_tools ;;
 B) create_group ; group_tools ;;
 C) show_groups ; group_tools ;;
 D) show_user_group ; group_tools ;;
-E) mv_group_ou ; group_tools ;;
-F) rm_group ; group_tools ;;
+E) add_group_group ; group_tools ;;
+F) mv_group_ou ; group_tools ;;
+G) rm_group ; group_tools ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -620,6 +622,31 @@ validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" -
         }
     } || {
       dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+      }
+    }
+  }
+}
+
+function add_group_group {
+validgrp1=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
+[ -z "$validgrp1" ] && {
+  dialog --title "ERRO" --msgbox "Grupo 1 nao pode ficar em branco!" 8 40
+} || {  
+  validgrp2=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
+  [ -z "$validgrp2" ] && {
+    dialog --title "ERRO" --msgbox "Grupo 2 nao pode ficar em branco!" 8 40
+  } || {
+    repeated=$(samba-tool group list | grep -x "$validgrp1")
+    [ "$repeated" = "$validgrp1" ] && {
+    repeated2=$(samba-tool group list | grep -x "$validgrp2")
+      [ "$repeated2" = "$validgrp2" ] && {
+        samba-tool group addmembers "$validgrp2" "$validgrp1"
+        dialog --title "Informacao" --msgbox "O grupo $validgrp1 foi adicionado ao grupo $validgrp2!" 8 40
+      } || {
+        dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+        }
+    } || {
+      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
       }
     }
   }
