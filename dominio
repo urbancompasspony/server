@@ -175,6 +175,43 @@ function s_settings {
   esac
 }
 
+function shared_folders {
+var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
+A 'Mostrar Pastas Compartilhadas' \
+B 'Criar Nova Pasta Compartilhada' \
+C 'Criar Compartilhamento Anonimo' \
+D 'Criar Compartilhamento Estruturado' \
+E 'Excluir Compartilhamento' \
+F 'Revalidar Configuracoes' \
+X '<' 2>&1 > /dev/tty )
+case "$var0" in
+A) show_shared ; shared_folders ;;
+B) create_shared ; shared_folders ;;
+C) create_anon ; shared_folders ;;
+D) create_sync ; shared_folders ;;
+E) remove_shared ; shared_folders ;;
+F) revalid_shared ; shared_folders ;;
+X) echo "." >/dev/null ;;
+esac
+}
+
+function ou_tools {
+  var12=$(dialog --title "$ttitle" --backtitle "Unidades Organizacionais" --menu " " 0 0 0 \
+  A 'Listar todas as OUs' \
+  B 'Criar uma OU' \
+  C 'Listar Objetos de OU' \
+  D 'Excluir uma OU' \
+  X '<' 2>&1 > /dev/tty )
+  [ $? -ne 0 ] && return
+  case "$var12" in
+  A) show_ous ; ou_tools ;;
+  B) create_ou ; ou_tools ;;
+  C) list_obj_ou ; ou_tools ;;
+  D) rm_ou ; ou_tools ;;
+  X) echo "." >/dev/null ;;
+  esac
+}
+
 function getacls0 {
 VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Get ACL" --dselect "/mnt" 15 40)
 [ $? -ne 0 ] && return
@@ -288,43 +325,6 @@ clear
 echo "Pacote MSITOOLS nao encontrado!"
 sleep 3
 }
-}
-
-function shared_folders {
-var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
-A 'Mostrar Pastas Compartilhadas' \
-B 'Criar Nova Pasta Compartilhada' \
-C 'Criar Compartilhamento Anonimo' \
-D 'Criar Compartilhamento Estruturado' \
-E 'Excluir Compartilhamento' \
-F 'Revalidar Configuracoes' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-A) show_shared ; shared_folders ;;
-B) create_shared ; shared_folders ;;
-C) create_anon ; shared_folders ;;
-D) create_sync ; shared_folders ;;
-E) remove_shared ; shared_folders ;;
-F) revalid_shared ; shared_folders ;;
-X) echo "." >/dev/null ;;
-esac
-}
-
-function ou_tools {
-  var12=$(dialog --title "$ttitle" --backtitle "Unidades Organizacionais" --menu " " 0 0 0 \
-  A 'Listar todas as OUs' \
-  B 'Criar uma OU' \
-  C 'Listar Objetos de OU' \
-  D 'Excluir uma OU' \
-  X '<' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && return
-  case "$var12" in
-  A) show_ous ; ou_tools ;;
-  B) create_ou ; ou_tools ;;
-  C) list_obj_ou ; ou_tools ;;
-  D) rm_ou ; ou_tools ;;
-  X) echo "." >/dev/null ;;
-  esac
 }
 
 function active_shares {
@@ -1087,7 +1087,7 @@ utilize o menu Excluir Compartilhamento!" 0 0 0 "${files[@]}")
 
 function create_sync {
 VALUE1="nome_do_compartilhamento"
-VALUE3="@grupo, usuario"
+VALUE3="@Sync, @Desativar_Sync"
 VALUE4="no"
 
   VALUE0=$(dialog --help-button --help-label 'Dica' --ok-label "Criar" --title "Compartilhamento para Sync Center" --form "Separe os grupos e/ou usuarios com virgula. \n
