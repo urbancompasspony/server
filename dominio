@@ -86,7 +86,7 @@ var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Grupos" --menu " " 
 A 'Procurar/Verificar um Grupo' \
 B 'Criar Grupo' \
 C 'Exibir todos os Grupos' \
-D 'Exibir Usuarios de um Grupo' \
+D 'Exibir Membros de um Grupo' \
 E 'Adicionar Grupo 1 a um Grupo 2' \
 F 'Mover Grupo para OU' \
 G 'Excluir um Grupo' \
