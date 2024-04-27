@@ -144,18 +144,16 @@ function info_domain {
 
 function s_settings {
   var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
-  A 'SYSVOL CHECK' \
+  A 'SysVol Check' \
   B 'SysVol Reset' \
-  C 'samba db check: well-known-acls' \
-  D 'samba db check: general' \
-  E 'Check ACLs of GPOs (as Administrator)' \
-  F 'Get ACL from a File or Folder' \
+  C 'samba-ad-dc db check: well-known-acls' \
+  D 'samba-ad-dc db check: general' \
+  E 'ACL Check of GPOs (as Administrator)' \
+  F 'Get ACLs from a File or Folder' \
   G 'CAUTION! Set ACL to a File or Folder' \
-  H 'CAUTION! Remove ACLs from a Folder' \
-  I 'CAUTION! Set 0700 to a Folder' \
-  J 'CAUTION! Set 0777 to a Folder' \
-  K 'Upgrade ADMX Files for Windows 10' \
-  L 'Upgrade ADMX Files for Windows 11' \
+  H 'Install ADMX Templates for Windows 10' \
+  I 'Install ADMX Templates for Windows 11' \
+  J 'Remove ADMX Templates' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -166,56 +164,11 @@ function s_settings {
   E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   F) getacls0 ; s_settings ;;
   G) setacls0 ; s_settings ;;
-  H) removeacls0 ; s_settings ;;
-  I) setchmod00 ; s_settings ;;
-  J) setchmod01 ; s_settings ;;
-  K) clear ; force_msi_w10 ; s_settings ;;
-  L) clear ; force_msi_w11 ; s_settings ;;
+  H) clear ; force_msi_w10 ; s_settings ;;
+  I) clear ; force_msi_w11 ; s_settings ;;
+  J) clear ; rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions ; read -p "ADMX Templates removidas. Pressione Enter para continuar!" ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
-}
-
-function setchmod00 {
-checkpathfolder
-
-VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "REMOVE ACLs from Folder:" --dselect "$PathFolder0" 15 40)
-[ $? -ne 0 ] && return
-PathFolder0=$(echo "$VALUE0" | sed -n 1p)
-
-chmod 0700 -R "$PathFolder0"
-
-dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes permissoes da pasta e subpastas em \n$PathFolder0\nforam redefinidas para 0700!" 14 70
-}
-
-function setchmod01 {
-checkpathfolder
-
-VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "REMOVE ACLs from Folder:" --dselect "$PathFolder0" 15 40)
-[ $? -ne 0 ] && return
-PathFolder0=$(echo "$VALUE0" | sed -n 1p)
-
-chmod 0777 "$PathFolder0"
-
-acl00=$(samba-tool ntacl get --as-sddl "$PathFolder0")
-
-dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes permissoes da pasta \n$PathFolder0\nforam redefinidas para 0777!" 14 70
-}
-
-function removeacls0 {
-checkpathfolder
-
-VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "REMOVE ACLs from Folder:" --dselect "$PathFolder0" 15 40)
-[ $? -ne 0 ] && return
-PathFolder0=$(echo "$VALUE0" | sed -n 1p)
-
-setfacl -b -R -d "$PathFolder0"
-setfacl -Rbk "$PathFolder0"
-setfacl -b -R "$PathFolder0"
-chmod 0700 -R "$PathFolder0"
-
-acl00=$(samba-tool ntacl get --as-sddl "$PathFolder0")
-
-dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes ACLs da pasta \n$PathFolder0\nforam zeradas: \n\n$acl00" 14 70
 }
 
 function getacls0 {
