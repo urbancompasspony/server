@@ -22,8 +22,9 @@ function main_menu {
   C 'Ferramentas de Computadores' \
   D 'Gestao de Pastas Compartilhadas' \
   E 'Unidades Organizacionais' \
-  F 'Informacoes do Dominio' \
-  G 'Manutencao Geral do Dominio' \
+  F 'Silos de Autenticacao' \
+  G 'Informacoes do Dominio' \
+  H 'Manutencao Geral do Dominio' \
   X 'Sair' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && exit
   case "$var4" in
@@ -32,8 +33,9 @@ function main_menu {
   C) pc_tools ; main_menu ;;
   D) shared_folders ; main_menu ;;
   E) ou_tools ; main_menu ;;
-  F) info_domain ; main_menu ;;
-  G) s_settings ; main_menu ;;
+  F) checksilos0 ; main_menu ;;
+  G) info_domain ; main_menu ;;
+  H) s_settings ; main_menu ;;
   X) exit ;;
   esac
 }
@@ -210,6 +212,124 @@ function ou_tools {
   D) rm_ou ; ou_tools ;;
   X) echo "." >/dev/null ;;
   esac
+}
+
+function checksilos0 {
+  test01=$(samba-tool domain level show | grep -q 2012 && echo yes || echo no)
+  test02=$(samba-tool domain level show | grep -q 2016 && echo yes || echo no)
+  [ "$test01" = "yes" ] || [ "$test02" = "yes" ] && {
+    menusilo
+  } || {
+    dialog --title "Tentando acessar Silos" --backtitle "Informacao" --msgbox "Nivel funcional muito baixo! \nSAMBA Incompativel." 7 40
+  }
+}
+
+function menusilo {
+  var12=$(dialog --title "$ttitle" --backtitle "Silos de Autenticacao" --menu " " 0 0 0 \
+  A 'Procurar/Verificar um silo' \
+  B 'Listar todos os silos' \
+  C 'Criar um silo' \
+  D 'Listar usuarios do silo' \
+  E 'Adicionar um usuario a um silo' \
+  F 'Remover um usuario de um silo' \
+  G 'Excluir um silo' \
+  X '<' 2>&1 > /dev/tty )
+  [ $? -ne 0 ] && return
+  case "$var12" in
+  A) check_silo ; menusilo ;;
+  B) show_silos ; menusilo ;;
+  C) create_silos ; menusilo ;;
+  D) list_usr_silo ; menusilo ;;
+  E) add_usr_silo ; menusilo ;;
+  F) rm_usr_silo ; menusilo ;;
+  G) rm_silo ; menusilo ;;
+  X) echo "." >/dev/null ;;
+  esac
+}
+
+function checksilo {
+validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && return
+[ -z "$validsilo" ] && {
+  dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+} || {
+  repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
+  [ "$repeated" = "$validsilo" ] && {    
+    dialog --title "Informacao" --msgbox "O silo "$validsilo" existe!" 8 40
+    clear
+    dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os dados! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
+    [ $? -ne 0 ] && return
+    silodata=$(samba-tool domain auth silo view --name "$validsilo")
+    echo "$silodata" | less
+  } || {
+    dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
+  }
+}
+
+}
+
+function show_silos {
+dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os Silos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
+[ $? -ne 0 ] && return
+silolist=$(samba-tool domain auth silo list)
+echo "$silolist" | less  
+}
+
+function create_silos {
+validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && return
+[ -z "$validsilo" ] && {
+  dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+} || {
+  repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
+  [ "$repeated" = "$validsilo" ] && {
+    dialog --title "ERROR" --msgbox "Silo $validsilo ja existe!" 7 25
+  } || {
+    samba-tool domain auth silo create --name "$validsilo"
+    dialog --title "Informacao" --msgbox "Silo $validsilo criado com sucesso!" 7 25
+  }
+}
+
+}
+
+function list_usr_silo {
+validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && return
+[ -z "$validsilo" ] && {
+  dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+} || {
+  repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
+  [ "$repeated" = "$validsilo" ] && {
+    dialog --title "$ttitle" --backtitle "Listagem de Grupos" --msgbox "Pressione Enter para visualizar os Usuarios! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 0 0
+    silomembers=$(samba-tool domain auth silo member list --name "$validsilo")
+    echo "$silomembers" | less
+  } || {
+    dialog --title "ERRO" --msgbox "Silo invalido!" 8 40
+    }
+}
+
+}
+
+function rm_silo {
+validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty)
+[ $? -ne 0 ] && return
+[ -z "$validsilo" ] && {
+  dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+} || {
+  repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
+  [ "$repeated" = "$validsilo" ] && {
+    dialog --title 'Confirmacao' --backtitle 'Exclusao de Silo' --yesno 'Deseja excluir este silo?' 0 0
+    [ $? = 0 ] && {
+      samba-tool domain auth silo delete --name "$validsilo"
+      dialog --title "Informacao" --msgbox "Silo $validsilo excluido com sucesso!" 7 25
+    } || {
+      echo "a" > /dev/null
+      }
+  } || {
+    dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
+  }
+}
+
 }
 
 function getacls0 {
