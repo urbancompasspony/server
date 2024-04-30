@@ -229,8 +229,8 @@ function menusilo {
   A 'Procurar/Verificar um silo' \
   B 'Listar todos os silos' \
   C 'Criar um silo' \
-  D 'Listar usuarios do silo' \
-  E 'Promover um usuario a um silo' \
+  D 'Listar usuarios de um silo' \
+  E 'Adicionar um usuario a um silo' \
   F 'Remover um usuario de um silo' \
   G 'Excluir um silo' \
   X '<' 2>&1 > /dev/tty )
@@ -247,59 +247,7 @@ function menusilo {
   esac
 }
 
-function add_usr_silo {
-validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
-} || {  
-  validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
-  [ -z "$validsilo" ] && {
-    dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
-  } || {
-    repeated=$(samba-tool user list | grep -x "$validusr")
-    [ "$repeated" = "$validusr" ] && {
-    repeated2=$(samba-tool domain auth silo list | grep -x "$validsilo")
-    [ "$repeated2" = "$validsilo" ] && {
-      samba-tool domain auth silo member add --name "$validsilo" --member "$validusr"
-      dialog --title "Informacao" --msgbox "O usuario $validusr foi promovido ao silo $validsilo!" 8 40
-    } || {
-      dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
-    }
-  } || {
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-    }
-  }
-}
-
-}
-
-function rm_usr_silo {
-validusr=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
-} || {  
-  validsilo=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
-  [ -z "$validsilo" ] && {
-    dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
-  } || {
-    repeated=$(samba-tool user list | grep -x "$validusr")
-    [ "$repeated" = "$validusr" ] && {
-    repeated2=$(samba-tool domain auth silo list | grep -x "$validsilo")
-    [ "$repeated2" = "$validsilo" ] && {
-      samba-tool domain auth silo member remove --name "$validsilo" --member "$validusr"
-      dialog --title "Informacao" --msgbox "O usuario $validusr foi removido do silo $validsilo!" 8 40
-    } || {
-      dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
-    }
-  } || {
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-    }
-  }
-}
-
-}
-
-function checksilo {
+function check_silo {
 validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validsilo" ] && {
@@ -358,6 +306,59 @@ validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
   } || {
     dialog --title "ERRO" --msgbox "Silo invalido!" 8 40
     }
+}
+
+}
+
+
+function add_usr_silo {
+validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] && {
+  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+} || {  
+  validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
+  [ -z "$validsilo" ] && {
+    dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+  } || {
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    [ "$repeated" = "$validusr" ] && {
+    repeated2=$(samba-tool domain auth silo list | grep -x "$validsilo")
+    [ "$repeated2" = "$validsilo" ] && {
+      samba-tool domain auth silo member add --name "$validsilo" --member "$validusr"
+      dialog --title "Informacao" --msgbox "O usuario $validusr foi promovido ao silo $validsilo!" 8 40
+    } || {
+      dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
+    }
+  } || {
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    }
+  }
+}
+
+}
+
+function rm_usr_silo {
+validusr=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] && {
+  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+} || {  
+  validsilo=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
+  [ -z "$validsilo" ] && {
+    dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+  } || {
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    [ "$repeated" = "$validusr" ] && {
+    repeated2=$(samba-tool domain auth silo list | grep -x "$validsilo")
+    [ "$repeated2" = "$validsilo" ] && {
+      samba-tool domain auth silo member remove --name "$validsilo" --member "$validusr"
+      dialog --title "Informacao" --msgbox "O usuario $validusr foi removido do silo $validsilo!" 8 40
+    } || {
+      dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
+    }
+  } || {
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    }
+  }
 }
 
 }
