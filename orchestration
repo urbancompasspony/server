@@ -35,7 +35,7 @@ esac
 function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole (L/W)' \
-2 'Dominio (W)' \
+2 'Dominio 4.15 (W)' \
 3 'Pentest (L/W)' \
 4 'XPRA VMs (L/W)' \
 5 'MySpeed: Tracker (L/W)' \
@@ -131,6 +131,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 11 'TOR privoxy' \
 12 'DDClient' \
 13 'CUPS Printer Standalone (W)' \
+14 'Domain 4.19 (Test) (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
@@ -146,6 +147,7 @@ case "$var0" in
 11) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
 12) wget "$github"55-ddclient -O /tmp/ddclient; sudo bash /tmp/ddclient ;;
 13) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
+14) wget "$github"58-domain-test -O /tmp/domain-test; sudo bash /tmp/domain-test ;;
 X) echo "." > /dev/null ;;
 esac
 }
