@@ -187,8 +187,7 @@ function pihole0 {
         echo "." >/dev/null
       }
 
-    echo "$datetime Nesta data os serviços de DNS e bloqueios de sites do $i2 foram atualizados e suas listas
-foram revalidadas!
+    echo "$datetime Nesta data os serviços de DNS e bloqueios de sites do $i2 foram atualizados e suas listas foram revalidadas!
 " | sudo tee -a "$file"
     done
     enter0
