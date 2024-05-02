@@ -250,18 +250,15 @@ $docker_repo
 function pentest0 {
   [ -d "/srv/containers/pentest" ] && {
     datetime0
-
     [ -f /srv/containers/pentest/Pentests/Ransomware_Detectado ] && {
-      clear
-      echo ""
+      clear; echo ""
       cat /srv/containers/pentest/Pentests/Ransomware_Detectado
       enter0
     } || {
       echo "." > /dev/null
     }
 
-    var6=$(sed -n '6p' /srv/containers/pentest/Information)
-    clear
+    var6=$(sed -n '6p' /srv/containers/pentest/Information); clear
 
     for i in $(find /srv/containers/pentest/Pentests/Likely_Vulnerable -name '*1*'); do
       clear
@@ -272,8 +269,10 @@ function pentest0 {
     echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
 Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notificados.
 " | sudo tee -a "$file"
+
   } || {
-    echo "." > /dev/null
+    clear; echo ""; echo "Pentest não configurado. Ignorando."
+    sleep 3
   }
 }
 
