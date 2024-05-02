@@ -134,10 +134,9 @@ function domain0 {
 
   clear
   docker exec dominio samba-tool ntacl sysvolreset -U Administrator
-  enter0
-
   clear
   docker exec dominio samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes
+
   enter0
 
   echo "$datetime Foi realizada a verificação da integridade do Controlador de Domínio.
