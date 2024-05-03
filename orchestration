@@ -132,6 +132,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 12 'DDClient' \
 13 'CUPS Printer Standalone (W)' \
 14 'Domain (4.19 Beta) (W)' \
+15 'Remotely (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
@@ -148,6 +149,7 @@ case "$var0" in
 12) wget "$github"55-ddclient -O /tmp/ddclient; sudo bash /tmp/ddclient ;;
 13) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
 14) wget "$github"58-domain-test -O /tmp/domain-test; sudo bash /tmp/domain-test ;;
+15) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
 X) echo "." > /dev/null ;;
 esac
 }
