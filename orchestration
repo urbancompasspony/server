@@ -38,9 +38,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'Dominio (4.15 Stable) (W)' \
 3 'Pentest (L/W)' \
 4 'XPRA VMs (L/W)' \
-5 'MySpeed: Tracker (L/W)' \
-6 'Uptime Kuma: Tracker (L/W)' \
-7 'OpenSpeedTest (W)' \
+5 'MySpeed Test WAN (L/W)' \
+6 'OpenSpeedTest LAN (W)' \
+7 'Uptime Kuma (L/W)' \
 8 'NextCloud (W)' \
 9 'OnlyOffice (W)' \
 10 'Apache2: ReverseProxy (W)' \
@@ -53,8 +53,8 @@ case "$var0" in
 3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 4) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
 5) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
-6) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-7) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+6) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+7) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
 8) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
 9) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 10) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
@@ -72,7 +72,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'Apache2 Standalone (W)' \
 5 'GLPI (W)' \
 6 'ntfy (W)' \
-7 'Netboot PXE (W)' \
+7 'Portainer (L/W)' \
+8 'Netboot PXE (W)' \
+9 'Heimdall Favorites (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
@@ -81,7 +83,9 @@ case "$var0" in
 4) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
 5) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
 6) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-7) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
+7) wget "$github"22-portainer-docker-ui -O /tmp/portainer; sudo bash /tmp/portainer ;;
+8) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
+9) wget "$github"54-heimdall-favorites -O /tmp/heimdall; sudo bash /tmp/heimdall ;;
 X) echo "." > /dev/null ;;
 esac
 }
