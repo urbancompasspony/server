@@ -39,13 +39,13 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'Pentest (L/W)' \
 4 'XPRA VMs (L/W)' \
 5 'MySpeed: Tracker (L/W)' \
-6 'Kuma Ping: Tracker (L/W)' \
+6 'Uptime Kuma: Tracker (L/W)' \
 7 'OpenSpeedTest (W)' \
 8 'NextCloud (W)' \
 9 'OnlyOffice (W)' \
 10 'Apache2: ReverseProxy (W)' \
 11 'Syncthing: Client (L/W)' \
-12 'Heimdall - Favorites (W)' \
+12 'Homarr Favorites + Docker (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
@@ -59,7 +59,7 @@ case "$var0" in
 9) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 10) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
 11) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-12) wget "$github"54-heimdall-favorites -O /tmp/heimdall; sudo bash /tmp/heimdall ;;
+12) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -72,8 +72,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'Apache2 Standalone (W)' \
 5 'GLPI (W)' \
 6 'ntfy (W)' \
-7 'Portainer WebUI (L/W)' \
-8 'Netboot PXE (W)' \
+7 'Netboot PXE (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
@@ -82,8 +81,7 @@ case "$var0" in
 4) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
 5) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
 6) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-7) wget "$github"22-portainer-docker-ui -O /tmp/portainer; sudo bash /tmp/portainer ;;
-8) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
+7) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
 X) echo "." > /dev/null ;;
 esac
 }
