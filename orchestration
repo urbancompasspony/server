@@ -43,9 +43,10 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 7 'Uptime Kuma (L/W)' \
 8 'NextCloud (W)' \
 9 'OnlyOffice (W)' \
-10 'Apache2: ReverseProxy (W)' \
-11 'Syncthing: Client (L/W)' \
-12 'Homarr (Favorites + Docker) (L/W)' \
+10 'Reverse Proxy (W)' \
+11 'Syncthing Client (L/W)' \
+12 'Homarr Dashboard (L/W)' \
+13 'DashDot Dashboard (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
@@ -60,6 +61,7 @@ case "$var0" in
 10) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
 11) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 12) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
+13) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -72,9 +74,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'Apache2 Standalone (W)' \
 5 'GLPI (W)' \
 6 'ntfy (W)' \
-7 'Portainer (Advanced) (L/W)' \
+7 'Portainer (L/W)' \
 8 'Netboot PXE (W)' \
-9 'Heimdall Favorites (W)' \
+9 'Heimdall Dashboard (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
@@ -99,8 +101,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'Ollama: IA (L)' \
 6 'Ollama: WebUI (L)' \
 7 'RustDesk WebUI (W)' \
-8 'Altus: Whatsapp' \
-9 'Ferdium: RAMBOX-like' \
+8 'Altus: Whatsapp (W)' \
+9 'Ferdium: RAMBOX-like (W)' \
 10 'WeTTY (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
@@ -132,7 +134,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 10 'Zabbix' \
 11 'TOR privoxy' \
 12 'DDClient' \
-13 'CUPS Printer Standalone (W)' \
+13 'CUPS Standalone (W)' \
 14 'Domain (4.19 Beta) (W)' \
 15 'Remotely (W)' \
 X '<' 2>&1 > /dev/tty )
