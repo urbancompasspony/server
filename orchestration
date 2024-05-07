@@ -35,33 +35,35 @@ esac
 function essentials {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'PiHole (L/W)' \
-2 'Dominio (4.15 Stable) (W)' \
-3 'Pentest (L/W)' \
-4 'XPRA VMs (L/W)' \
-5 'MySpeed Test WAN (L/W)' \
-6 'OpenSpeedTest LAN (W)' \
-7 'Uptime Kuma (L/W)' \
-8 'NextCloud (W)' \
-9 'OnlyOffice (W)' \
-10 'Reverse Proxy (W)' \
-11 'Syncthing Client (L/W)' \
-12 'Homarr Dashboard (L/W)' \
-13 'DashDot Dashboard (L/W)' \
+2 'Dominio (4.15) (W)' \
+3 'Dominio (4.19) (W)' \
+4 'Pentest (L/W)' \
+5 'XPRA VMs (L/W)' \
+6 'MySpeed Test WAN (L/W)' \
+7 'OpenSpeedTest LAN (W)' \
+8 'Uptime Kuma (L/W)' \
+9 'NextCloud (W)' \
+10 'OnlyOffice (W)' \
+11 'Reverse Proxy (W)' \
+12 'Syncthing Client (L/W)' \
+13 'Homarr Dashboard (L/W)' \
+14 'DashDot Dashboard (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
 2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-4) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
-5) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
-6) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-7) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-8) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-9) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-10) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-11) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-12) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
-13) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
+3) wget "$github"58-domain-test -O /tmp/domain-test; sudo bash /tmp/domain-test ;;
+4) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+5) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+6) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
+7) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+8) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
+9) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+10) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+11) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+12) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+13) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
+14) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -135,8 +137,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 11 'TOR privoxy' \
 12 'DDClient' \
 13 'CUPS Standalone (W)' \
-14 'Domain (4.19 Beta) (W)' \
-15 'Remotely (W)' \
+14 'Remotely (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"11-lancache -O /tmp/lancache; sudo bash /tmp/lancache ;;
@@ -152,8 +153,7 @@ case "$var0" in
 11) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
 12) wget "$github"55-ddclient -O /tmp/ddclient; sudo bash /tmp/ddclient ;;
 13) wget "$github"10-cups -O /tmp/cupsd; sudo bash /tmp/cupsd ;;
-14) wget "$github"58-domain-test -O /tmp/domain-test; sudo bash /tmp/domain-test ;;
-15) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
+14) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
 X) echo "." > /dev/null ;;
 esac
 }
