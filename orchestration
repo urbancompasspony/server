@@ -42,11 +42,10 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'MySpeed Test WAN (L/W)' \
 7 'OpenSpeedTest LAN (W)' \
 8 'Uptime Kuma (L/W)' \
-9 'Syncthing Client (L/W)' \
-10 'Homarr Dashboard (L/W)' \
-11 'DashDot SysMon (L/W)' \
-12 'SSH Tunnel (A) (W)' \
-13 'WeTTY      (B) (W)' \
+9 'Homarr Dashboard (L/W)' \
+10 'DashDot SysMon (L/W)' \
+11 'SSH Tunnel (A) (W)' \
+12 'WeTTY      (B) (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
@@ -57,11 +56,10 @@ case "$var0" in
 6) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
 7) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 8) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-9) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-10) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
-11) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
-12) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
-13) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
+9) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
+10) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
+11) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
+12) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -75,6 +73,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'Spark [OpenFire] (W)' \
 6 'RustDesk (W)' \
 7 'RustDesk WebUI (W)' \
+8 'Syncthing Client (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
@@ -84,6 +83,7 @@ case "$var0" in
 5) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
 6) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
 7) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
+8) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 X) echo "." > /dev/null ;;
 esac
 }
