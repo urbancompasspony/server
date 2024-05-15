@@ -31,19 +31,19 @@ esac
 function modelstools {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'DashDot (L/W)' \
-2 'Dominio (4.15) (W)' \
+2 'Dominio        (4.15) (W)' \
 3 'Dominio & CUPS (4.19) (W)' \
-4 'File Browser (L/W)' \
-5 'Homarr Dashboard (L/W)' \
+4 '(C) File Browser (L/W)' \
+5 'Homarr (L/W)' \
 6 'Kuma (L/W)' \
-7 'MySpeed Test WAN (L/W)' \
+7 'MySpeed  Test WAN (L/W)' \
 8 'OpenSpeedTest LAN (W)' \
 9 'PenTest & PentApache (L/W)' \
 10 'PiHole (L/W)' \
 11 '(C) Scrutiny SMART (W)' \
 12 '(C) SSH Tunnel (A) (W)' \
 13 '(C) WeTTY      (B) (W)' \
-14 'XPRA VMs (L/W)' \
+14 'XPRA (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
@@ -81,9 +81,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 13 'Servidor RustDesk (W)' \
 14 'Servidor SAMBA (L/W)' \
 15 'Servidor OpenFire (Spark) (W)' \
-16 'Syncthing Client (L/W)' \
+16 'Syncthing (L/W)' \
 17 'OnlyOffice (W)' \
-18 'SSH DW (Backdoor) (L)' \
+18 'SSH DW (as Backdoor) (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
@@ -116,9 +116,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'Headscale (W)' \
 5 'LittleLink (W)' \
 6 'macOS (VM) (L)' \
-7 'Ollama: IA    (A) (L)' \
-8 'Ollama: WebUI (B) (L)' \
-9 'Piper IA T2S' \
+7 'Ollama IA   (A) (L)' \
+8 'Ollama Web  (B) (L)' \
+9 'Piper IA t2s' \
 10 'Rocket.Chat (W)' \
 11 'Syncthing Relay (W)' \
 12 'Windows (ESD) (L/W)' \
