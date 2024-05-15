@@ -16,34 +16,34 @@ github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
 function start {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Modelo Padrão' \
-2 'Serviços' \
-3 'Contratos' \
-4 'Outros' \
-5 'Experimental' \
+1 'Sistema Modelo & Ferramentas Técnicas' \
+2 'Serviços Gerais' \
+3 'Experimental' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
-1) essentials ; start ;;
-2) servers ; start ;;
-3) contratos ; start ;;
-4) others ; start ;;
-5) misc ; start ;;
+1) modelstools ; start ;;
+2) general ; start ;;
+3) experimental ; start ;;
 X) exit ;;
 esac
 }
 
-function essentials {
+function modelstools {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'PiHole (L/W)' \
+9 'DashDot (L/W)' \
 2 'Dominio (4.15) (W)' \
-3 'Dominio (4.19) (W)' \
-4 'Pentest (L/W)' \
-5 'XPRA VMs (L/W)' \
+3 'Dominio & CUPS (4.19) (W)' \
+13 'File Browser (L/W)' \
+14 'Homarr Dashboard (L/W)' \
+8 'Kuma (L/W)' \
 6 'MySpeed Test WAN (L/W)' \
 7 'OpenSpeedTest LAN (W)' \
-8 'Kuma (L/W)' \
-9 'DashDot (L/W)' \
-10 'Homarr Dashboard (L/W)' \
+4 'PenTest & PentApache (L/W)' \
+1 'PiHole (L/W)' \
+10 '(C) Scrutiny SMART (W)' \
+11 '(C) SSH Tunnel (A) (W)' \
+12 '(C) WeTTY      (B) (W)' \
+5 'XPRA VMs (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
@@ -55,117 +55,105 @@ case "$var0" in
 7) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 8) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
 9) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
-10) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
+10) wget "$github"14-scrutiny -O /tmp/scrutiny; sudo bash /tmp/scrutiny ;;
+11) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
+12) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
+13) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
+14) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
 X) echo "." > /dev/null ;;
 esac
 }
 
-function servers {
+function general {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'NextCloud (W)' \
-2 'OnlyOffice (W)' \
-3 'Reverse Proxy (W)' \
-4 'UniFi (W)' \
-5 'Spark [OpenFire] (W)' \
-6 'RustDesk (W)' \
-7 'RustDesk WebUI (W)' \
-8 'Syncthing Client (L/W)' \
-9 'MySQL (W)' \
-10 'MariaDB (W)' \
-11 'Firebird (W)' \
-12 'OracleXE 21C (W)' \
-13 'PHPMyAdmin (L)' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-2) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-3) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-4) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
-5) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-6) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-7) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
-8) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-9) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
-10) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
-11) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
-12) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
-13) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
-X) echo "." > /dev/null ;;
-esac
-}
-
-function others {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'SSH DW Service (L)' \
-2 'Apache Standalone (W)' \
-3 'FTP Standalone (W)' \
-4 'CUPS Standalone (W)' \
-5 'SAMBA Standalone (L/W)' \
-6 'Ollama: IA    (A) (L)' \
-7 'Ollama: WebUI (B) (L)' \
-8 'Altus: Whatsapp (W)' \
-9 'Ferdium: RAMBOX-like (W)' \
-10 'GLPI (W)' \
-11 'ntfy (W)' \
-12 'Portainer (L/W)' \
-13 'Netboot PXE (W)' \
-14 'File Browser (L/W)' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-2) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-3) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-4) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-5) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
-6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-8) wget "$github"35-altus-whatsapp -O /tmp/altus; sudo bash /tmp/altus ;;
-9) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
-10) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-11) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-12) wget "$github"22-portainer-docker-ui -O /tmp/portainer; sudo bash /tmp/portainer ;;
-13) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
-14) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
-X) echo "." > /dev/null ;;
-esac
-}
-
-function misc {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Windows (VM) (L/W)' \
-2 'Tmate Server (L)' \
-3 'macOS (VM) (L)' \
-4 'Registry' \
-5 'TOR privoxy' \
-6 'DD Client' \
+1 'Bancos de Dados' \
+2 'Gestor UniFi (W)' \
+3 'GLPI (W)' \
+4 'Netboot PXE (W)' \
+5 'NextCloud (W)' \
+6 'ntfy (W)' \
 7 'Remotely (W)' \
-8 'Rocket.Chat (W)' \
-9 'Android (VM) (L)' \
+8 'Reverse Proxy (W)' \
+9 'RustDesk Web Client (W)' \
+10 'Servidor Apache (W)' \
+11 'Servidor CUPS (W)' \
+12 'Servidor FTP (W)' \
+13 'Servidor RustDesk (W)' \
+14 'Servidor SAMBA (L/W)' \
+15 'Servidor OpenFire (Spark) (W)' \
+16 'Syncthing Client (L/W)' \
+17 'OnlyOffice (W)' \
+18 'SSH DW (Backdoor) (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-1) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
-2) wget "$github"18-tmate -O /tmp/tmate; sudo bash /tmp/tmate ;;
-3) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
-4) wget "$github"43-registry -O /tmp/registry; sudo bash /tmp/registry ;;
-5) wget "$github"53-tor-privoxy -O /tmp/privoxy; sudo bash /tmp/privoxy ;;
-6) wget "$github"55-ddclient -O /tmp/ddclient; sudo bash /tmp/ddclient ;;
+1) database ; general ;;
+2) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
+3) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+4) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
+5) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+6) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
 7) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
-8) wget "$github"65-rocketchat -O /tmp/rocketchat; sudo bash /tmp/rocketchat ;;
-9) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
+8) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+9) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
+10) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
+11) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
+12) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+13) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
+14) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
+15) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+16) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+17) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+18) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 X) echo "." > /dev/null ;;
 esac
 }
 
-function contratos {
+function experimental {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Scrutiny SMART (W)' \
-2 'SSH Tunnel (A) (W)' \
-3 'WeTTY      (B) (W)' \
+1 'Altus: Whatsapp (W)' \
+2 'Android (VM) (L)' \
+3 'Ferdium (RAMBOX) (W)' \
+4 'Headscale (W)' \
+5 'LittleLink (W)' \
+6 'macOS (VM) (L)' \
+7 'Ollama: IA    (A) (L)' \
+8 'Ollama: WebUI (B) (L)' \
+9 'Piper IA T2S' \
+10 'Rocket.Chat (W)' \
+11 'Syncthing Relay (W)' \
+12 'Windows (ESD) (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-1) wget "$github"14-scrutiny -O /tmp/scrutiny; sudo bash /tmp/scrutiny ;;
-2) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
-3) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
+1) wget "$github"35-altus-whatsapp -O /tmp/altus; sudo bash /tmp/altus ;;
+2) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
+3) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
+4) wget "$github"25-headscale -O /tmp/headscale; sudo bash /tmp/headscale ;;
+5) wget "$github"25-littlelink -O /tmp/littlelink; sudo bash /tmp/littlelink ;;
+6) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
+7) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+8) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+9) wget "$github"52-piper -O /tmp/piper; sudo bash /tmp/piper ;;
+10) wget "$github"65-rocketchat -O /tmp/rocketchat; sudo bash /tmp/rocketchat ;;
+11) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
+12) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
+X) echo "." > /dev/null ;;
+esac
+}
+
+function database {
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
+1 'MySQL (W)' \
+2 'MariaDB (W)' \
+3 'OracleXE 21C (W)' \
+4 'Firebird (W)' \
+5 'PHPMyAdmin (L)' \
+X '<' 2>&1 > /dev/tty )
+case "$var0" in
+1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
+2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
+3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
+4) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
+5) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
 X) echo "." > /dev/null ;;
 esac
 }
