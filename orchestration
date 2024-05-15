@@ -16,7 +16,7 @@ github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
 function start {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Sistema Modelo & Ferramentas Técnicas' \
+1 'Modelo & Ferramentas' \
 2 'Serviços Gerais' \
 3 'Experimental' \
 X 'Sair' 2>&1 > /dev/tty )
