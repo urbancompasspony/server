@@ -110,32 +110,30 @@ esac
 
 function experimental {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Altus: Whatsapp (W)' \
-2 'Android (VM) (L)' \
-3 'Ferdium (RAMBOX) (W)' \
-4 'Headscale (W)' \
-5 'LittleLink (W)' \
-6 'macOS (VM) (L)' \
-7 'Ollama IA   (A) (L)' \
-8 'Ollama Web  (B) (L)' \
-9 'Piper IA t2s' \
-10 'Rocket.Chat (W)' \
-11 'Syncthing Relay (W)' \
-12 'Windows (ESD) (L/W)' \
+1 'Android (VM) (L)' \
+2 'Ferdium (RAMBOX) (W)' \
+3 'Headscale (W)' \
+4 'LittleLink (W)' \
+5 'macOS (VM) (L)' \
+6 'Ollama IA   (A) (L)' \
+7 'Ollama Web  (B) (L)' \
+8 'Piper IA t2s' \
+9 'Rocket.Chat (W)' \
+10 'Syncthing Relay (W)' \
+11 'Windows (ESD) (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-1) wget "$github"35-altus-whatsapp -O /tmp/altus; sudo bash /tmp/altus ;;
-2) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
-3) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
-4) wget "$github"25-headscale -O /tmp/headscale; sudo bash /tmp/headscale ;;
-5) wget "$github"25-littlelink -O /tmp/littlelink; sudo bash /tmp/littlelink ;;
-6) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
-7) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-8) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-9) wget "$github"52-piper -O /tmp/piper; sudo bash /tmp/piper ;;
-10) wget "$github"65-rocketchat -O /tmp/rocketchat; sudo bash /tmp/rocketchat ;;
-11) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
-12) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
+1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
+2) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
+3) wget "$github"25-headscale -O /tmp/headscale; sudo bash /tmp/headscale ;;
+4) wget "$github"25-littlelink -O /tmp/littlelink; sudo bash /tmp/littlelink ;;
+5) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
+6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+8) wget "$github"52-piper -O /tmp/piper; sudo bash /tmp/piper ;;
+9) wget "$github"65-rocketchat -O /tmp/rocketchat; sudo bash /tmp/rocketchat ;;
+10) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
+11) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
 X) echo "." > /dev/null ;;
 esac
 }
