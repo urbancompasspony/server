@@ -67,43 +67,45 @@ esac
 function general {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Bancos de Dados' \
-2 'Gestor UniFi (W)' \
-3 'GLPI (W)' \
-4 'Netboot PXE (W)' \
-5 'NextCloud (W)' \
-6 'ntfy (W)' \
-7 'Remotely (W)' \
-8 'Reverse Proxy (W)' \
-9 'RustDesk Web Client (W)' \
-10 'Servidor Apache (W)' \
-11 'Servidor CUPS (W)' \
-12 'Servidor FTP (W)' \
-13 'Servidor RustDesk (W)' \
-14 'Servidor SAMBA (L/W)' \
-15 'Servidor OpenFire (Spark) (W)' \
-16 'Syncthing (L/W)' \
-17 'OnlyOffice (W)' \
-18 'SSH DW (as Backdoor) (L)' \
+2 'Ferdium (RAMBOX) (W)' \
+3 'Gestor UniFi (W)' \
+4 'GLPI (W)' \
+5 'Netboot PXE (W)' \
+6 'NextCloud (W)' \
+7 'ntfy (W)' \
+8 'Remotely (W)' \
+9 'Reverse Proxy (W)' \
+10 'RustDesk Web Client (W)' \
+11 'Servidor Apache (W)' \
+12 'Servidor CUPS (W)' \
+13 'Servidor FTP (W)' \
+14 'Servidor RustDesk (W)' \
+15 'Servidor SAMBA (L/W)' \
+16 'Servidor OpenFire (Spark) (W)' \
+17 'Syncthing (L/W)' \
+18 'OnlyOffice (W)' \
+19 'SSH DW (as Backdoor) (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
-2) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
-3) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-4) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
-5) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-6) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-7) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
-8) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-9) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
-10) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-11) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-12) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-13) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-14) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
-15) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-16) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-17) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-18) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
+2) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
+3) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
+4) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+5) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
+6) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+7) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
+8) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
+9) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+10) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
+11) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
+12) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
+13) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+14) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
+15) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
+16) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+17) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+18) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+19) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 X) echo "." > /dev/null ;;
 esac
 }
