@@ -19,11 +19,13 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Modelo & Ferramentas' \
 2 'Serviços Gerais' \
 3 'Experimental' \
+4 'Pessoal' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) modelstools ; start ;;
 2) general ; start ;;
 3) experimental ; start ;;
+4) personal ; start ;;
 X) exit ;;
 esac
 }
@@ -84,7 +86,6 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 16 'Servidor OpenFire (Spark) (W)' \
 17 'Syncthing (L/W)' \
 18 'OnlyOffice (W)' \
-19 'SSH DW (as Backdoor) (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
@@ -105,7 +106,6 @@ case "$var0" in
 16) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
 17) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 18) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-19) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -113,29 +113,27 @@ esac
 function experimental {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Android (VM) (L)' \
-2 'Ferdium (RAMBOX) (W)' \
-3 'Headscale (W)' \
-4 'LittleLink (W)' \
-5 'macOS (VM) (L)' \
-6 'Ollama IA   (A) (L)' \
-7 'Ollama Web  (B) (L)' \
-8 'Piper IA t2s' \
-9 'Rocket.Chat (W)' \
-10 'Syncthing Relay (W)' \
-11 'Windows (ESD) (L/W)' \
+2 'Headscale (W)' \
+3 'LittleLink (W)' \
+4 'macOS (VM) (L)' \
+5 'Ollama IA   (A) (L)' \
+6 'Ollama Web  (B) (L)' \
+7 'Piper IA t2s' \
+8 'Rocket.Chat (W)' \
+9 'Syncthing Relay (W)' \
+10 'Windows (ESD) (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
-2) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
-3) wget "$github"25-headscale -O /tmp/headscale; sudo bash /tmp/headscale ;;
-4) wget "$github"25-littlelink -O /tmp/littlelink; sudo bash /tmp/littlelink ;;
-5) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
-6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-8) wget "$github"52-piper -O /tmp/piper; sudo bash /tmp/piper ;;
-9) wget "$github"65-rocketchat -O /tmp/rocketchat; sudo bash /tmp/rocketchat ;;
-10) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
-11) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
+2) wget "$github"25-headscale -O /tmp/headscale; sudo bash /tmp/headscale ;;
+3) wget "$github"25-littlelink -O /tmp/littlelink; sudo bash /tmp/littlelink ;;
+4) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
+5) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+6) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+7) wget "$github"52-piper -O /tmp/piper; sudo bash /tmp/piper ;;
+8) wget "$github"65-rocketchat -O /tmp/rocketchat; sudo bash /tmp/rocketchat ;;
+9) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
+10) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -154,6 +152,22 @@ case "$var0" in
 3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
 4) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
 5) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
+X) echo "." > /dev/null ;;
+esac
+}
+
+function personal {
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
+1 'Minetest Server (W)' \
+2 'SSH DW (Backdoor) (L)' \
+3 'eDEX UI (W)' \
+4 'Ubuntu 22.04 WebUI (W)' \
+X '<' 2>&1 > /dev/tty )
+case "$var0" in
+1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
+2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
+3) wget "$github"11-eDex-UI -O /tmp/eDex; sudo bash /tmp/eDex ;;
+4) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
 X) echo "." > /dev/null ;;
 esac
 }
