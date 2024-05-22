@@ -86,6 +86,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 16 'Servidor OpenFire (Spark) (W)' \
 17 'Syncthing (L/W)' \
 18 'OnlyOffice (W)' \
+19 'Tailscale VPN (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
@@ -106,6 +107,7 @@ case "$var0" in
 16) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
 17) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 18) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+19) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -125,7 +127,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
-2) wget "$github"25-headscale -O /tmp/headscale; sudo bash /tmp/headscale ;;
+2) wget "$github"25-headscale-server -O /tmp/headscale; sudo bash /tmp/headscale ;;
 3) wget "$github"25-littlelink -O /tmp/littlelink; sudo bash /tmp/littlelink ;;
 4) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
 5) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
