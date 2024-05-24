@@ -115,7 +115,6 @@ esac
 function experimental {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Android (VM) (L)' \
-2 'LittleLink (W)' \
 3 'macOS (VM) (L)' \
 4 'Ollama IA  (A) (L)' \
 5 'Ollama Web (B) (L)' \
@@ -128,7 +127,6 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
-2) wget "$github"25-littlelink -O /tmp/littlelink; sudo bash /tmp/littlelink ;;
 3) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
 4) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
 5) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
