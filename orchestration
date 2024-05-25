@@ -166,6 +166,11 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'Ubuntu 22.04 WebUI (W)' \
 5 'Jellyfin (L/W)' \
 6 'qBitTorrent (w)' \
+7 'Endlessh (W)' \
+8 'ChangeDetection (W)' \
+9 'WireShark (W)' \
+10 'KeepassXC (W)' \
+11 'SnipeIT (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
@@ -174,6 +179,11 @@ case "$var0" in
 4) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
 5) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
 6) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
+7) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
+8) wget "$github"53-changedetection -O /tmp/changedetection; sudo bash /tmp/changedetection ;;
+9) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
+10) wget "$github"55-keepassxc -O /tmp/keepassxc; sudo bash /tmp/keepassxc ;;
+11) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
 X) echo "." > /dev/null ;;
 esac
 }
