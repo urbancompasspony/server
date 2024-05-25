@@ -165,6 +165,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'eDEX UI (W)' \
 4 'Ubuntu 22.04 WebUI (W)' \
 5 'Jellyfin (L/W)' \
+6 'qBitTorrent (w)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
@@ -172,6 +173,7 @@ case "$var0" in
 3) wget "$github"11-eDex-UI -O /tmp/eDex; sudo bash /tmp/eDex ;;
 4) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
 5) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
+6) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
 X) echo "." > /dev/null ;;
 esac
 }
