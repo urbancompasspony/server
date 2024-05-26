@@ -88,6 +88,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 18 'OnlyOffice (W)' \
 19 '(C) Tailscale VPN MESH (W)' \
 20 '(C) Syncthing Relay (W)' \
+21 'Endlessh (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
@@ -110,6 +111,7 @@ case "$var0" in
 18) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 19) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
 20) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
+21) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -121,8 +123,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'Piper IA t2s' \
 5 'Headscale Server (A) (W)' \
 6 'Headscale WebUI  (B) (W)' \
-7 'Endlessh (W)' \
-8 'SnipeIT (W)' \
+7 'SnipeIT (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
@@ -130,8 +131,7 @@ case "$var0" in
 3) wget "$github"52-piper -O /tmp/piper; sudo bash /tmp/piper ;;
 5) wget "$github"57.0-headscale-server -O /tmp/headscale; sudo bash /tmp/headscale ;;
 6) wget "$github"57.1-headscale-ui -O /tmp/headscaleui; sudo bash /tmp/headscaleui ;;
-7) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
-8) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
+7) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
 X) echo "." > /dev/null ;;
 esac
 }
