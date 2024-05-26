@@ -86,7 +86,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 16 'Servidor OpenFire (Spark) (W)' \
 17 'Syncthing (L/W)' \
 18 'OnlyOffice (W)' \
-19 'Tailscale VPN (W)' \
+19 'Tailscale VPN MESH (W)' \
+20 'Syncthing Relay (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
@@ -108,6 +109,7 @@ case "$var0" in
 17) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 18) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 19) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+20) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -118,20 +120,26 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'macOS (VM) (L)' \
 3 'Piper IA t2s' \
 4 'Rocket.Chat (W)' \
-5 'Syncthing Relay (W)' \
-6 'Windows (ESD) (L/W)' \
-7 'Headscale Server (A) (W)' \
-8 'Headscale WebUI  (B) (W)' \
+5 'Headscale Server (A) (W)' \
+6 'Headscale WebUI  (B) (W)' \
+7 'Endlessh (W)' \
+8 'ChangeDetection (W)' \
+9 'WireShark (W)' \
+10 'KeepassXC (W)' \
+11 'SnipeIT (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
 2) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
 3) wget "$github"52-piper -O /tmp/piper; sudo bash /tmp/piper ;;
 4) wget "$github"65-rocketchat -O /tmp/rocketchat; sudo bash /tmp/rocketchat ;;
-5) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
-6) wget "$github"17-windows -O /tmp/windows; sudo bash /tmp/windows ;;
-7) wget "$github"57.0-headscale-server -O /tmp/headscale; sudo bash /tmp/headscale ;;
-8) wget "$github"57.1-headscale-ui -O /tmp/headscaleui; sudo bash /tmp/headscaleui ;;
+5) wget "$github"57.0-headscale-server -O /tmp/headscale; sudo bash /tmp/headscale ;;
+6) wget "$github"57.1-headscale-ui -O /tmp/headscaleui; sudo bash /tmp/headscaleui ;;
+7) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
+8) wget "$github"53-changedetection -O /tmp/changedetection; sudo bash /tmp/changedetection ;;
+9) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
+10) wget "$github"55-keepassxc -O /tmp/keepassxc; sudo bash /tmp/keepassxc ;;
+11) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -158,32 +166,20 @@ function personal {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Minetest Server (W)' \
 2 'SSH DW (Backdoor) (L)' \
-3 'eDEX UI (W)' \
-4 'Ubuntu 22.04 WebUI (W)' \
-5 'Jellyfin (L/W)' \
-6 'qBitTorrent (w)' \
-7 'Endlessh (W)' \
-8 'ChangeDetection (W)' \
-9 'WireShark (W)' \
-10 'KeepassXC (W)' \
-11 'SnipeIT (W)' \
-12 'Ollama IA  (A) (L)' \
-13 'Ollama Web (B) (L)' \
+3 'Ubuntu 22.04 WebUI (W)' \
+4 'Jellyfin (L/W)' \
+5 'qBitTorrent (w)' \
+6 'Ollama IA  (A) (L)' \
+7 'Ollama Web (B) (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-3) wget "$github"11-eDex-UI -O /tmp/eDex; sudo bash /tmp/eDex ;;
-4) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
-5) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
-6) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
-7) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
-8) wget "$github"53-changedetection -O /tmp/changedetection; sudo bash /tmp/changedetection ;;
-9) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
-10) wget "$github"55-keepassxc -O /tmp/keepassxc; sudo bash /tmp/keepassxc ;;
-11) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
-12) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-13) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+3) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
+4) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
+5) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
+6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
 X) echo "." > /dev/null ;;
 esac
 }
