@@ -84,10 +84,10 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 14 'Servidor RustDesk (W)' \
 15 'Servidor SAMBA (L/W)' \
 16 'Servidor OpenFire (Spark) (W)' \
-17 'Syncthing (L/W)' \
+17 'Syncthing Client (L/W)' \
 18 'OnlyOffice (W)' \
-19 'Tailscale VPN MESH (W)' \
-20 'Syncthing Relay (W)' \
+19 '(C) Tailscale VPN MESH (W)' \
+20 '(C) Syncthing Relay (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
