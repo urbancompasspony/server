@@ -89,6 +89,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 19 '(C) Tailscale VPN MESH (W)' \
 20 '(C) Syncthing Relay (W)' \
 21 'Endlessh (W)' \
+22 '(C) Duplicati (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
@@ -112,6 +113,7 @@ case "$var0" in
 19) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
 20) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
 21) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
+22) wget "$github"35-duplicati -O /tmp/duplicati; sudo bash /tmp/duplicati ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -124,8 +126,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'Headscale Server (A) (W)' \
 6 'Headscale WebUI  (B) (W)' \
 7 'SnipeIT (W)' \
-8 'Duplicati (W)' \
-9 'PwnDrop (W)' \
+8 'PwnDrop (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
@@ -134,8 +135,7 @@ case "$var0" in
 5) wget "$github"57.0-headscale-server -O /tmp/headscale; sudo bash /tmp/headscale ;;
 6) wget "$github"57.1-headscale-ui -O /tmp/headscaleui; sudo bash /tmp/headscaleui ;;
 7) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
-8) wget "$github"35-duplicati -O /tmp/duplicati; sudo bash /tmp/duplicati ;;
-9) wget "$github"47-pwndrop -O /tmp/pwndrop; sudo bash /tmp/pwndrop ;;
+8) wget "$github"47-pwndrop -O /tmp/pwndrop; sudo bash /tmp/pwndrop ;;
 X) echo "." > /dev/null ;;
 esac
 }
