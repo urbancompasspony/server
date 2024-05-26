@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # For Ubuntu!
-export pty=True
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
