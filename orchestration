@@ -122,8 +122,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'Headscale Server (A) (W)' \
 6 'Headscale WebUI  (B) (W)' \
 7 'Endlessh (W)' \
-8 'WireShark (W)' \
-9 'SnipeIT (W)' \
+8 'SnipeIT (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
@@ -132,8 +131,7 @@ case "$var0" in
 5) wget "$github"57.0-headscale-server -O /tmp/headscale; sudo bash /tmp/headscale ;;
 6) wget "$github"57.1-headscale-ui -O /tmp/headscaleui; sudo bash /tmp/headscaleui ;;
 7) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
-8) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
-9) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
+8) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -165,6 +163,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 5 'qBitTorrent (w)' \
 6 'Ollama IA  (A) (L)' \
 7 'Ollama Web (B) (L)' \
+8 'WireShark (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
@@ -174,6 +173,7 @@ case "$var0" in
 5) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
 6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
 7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+8) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
 X) echo "." > /dev/null ;;
 esac
 }
