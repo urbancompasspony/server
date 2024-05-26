@@ -119,7 +119,6 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Android (VM) (L)' \
 2 'macOS (VM) (L)' \
 3 'Piper IA t2s' \
-4 'Rocket.Chat (W)' \
 5 'Headscale Server (A) (W)' \
 6 'Headscale WebUI  (B) (W)' \
 7 'Endlessh (W)' \
@@ -131,7 +130,6 @@ case "$var0" in
 1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
 2) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
 3) wget "$github"52-piper -O /tmp/piper; sudo bash /tmp/piper ;;
-4) wget "$github"65-rocketchat -O /tmp/rocketchat; sudo bash /tmp/rocketchat ;;
 5) wget "$github"57.0-headscale-server -O /tmp/headscale; sudo bash /tmp/headscale ;;
 6) wget "$github"57.1-headscale-ui -O /tmp/headscaleui; sudo bash /tmp/headscaleui ;;
 7) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
