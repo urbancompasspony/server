@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export pty=True
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
