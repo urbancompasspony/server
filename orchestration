@@ -86,7 +86,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 16 'Servidor OpenFire (Spark) (W)' \
 17 'Syncthing Client (L/W)' \
 18 'OnlyOffice (W)' \
-19 '(C) Tailscale VPN MESH (W)' \
+19 '(C) Tailscale VPN-MESH (L/W)' \
 20 '(C) Syncthing Relay (W)' \
 21 'Endlessh (W)' \
 22 '(C) Duplicati (W)' \
