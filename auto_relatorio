@@ -260,7 +260,7 @@ function pentest0 {
 
     var6=$(sed -n '6p' /srv/containers/pentest/Information); clear
 
-    for i in $(find /srv/containers/pentest/Pentests/Likely_Vulnerable -name '*1*'); do
+    for i in $(find /srv/containers/pentest/Pentests/Ataques_Bem-sucedidos -name '*1*'); do
       clear
       cat "$i"
       enter0
