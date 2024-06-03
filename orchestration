@@ -88,9 +88,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 18 'OnlyOffice (W)' \
 19 '(C) Tailscale VPN-MESH (L/W)' \
 20 '(C) Syncthing Relay (W)' \
-21 'Endlessh (W)' \
-22 '(C) Duplicati (W)' \
-23 '(C) OpenVPN (W)' \
+21 '(C) Duplicati (W)' \
+22 '(C) OpenVPN (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
@@ -113,9 +112,8 @@ case "$var0" in
 18) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 19) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
 20) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
-21) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
-22) wget "$github"35-duplicati -O /tmp/duplicati; sudo bash /tmp/duplicati ;;
-23) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+21) wget "$github"35-duplicati -O /tmp/duplicati; sudo bash /tmp/duplicati ;;
+22) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -172,6 +170,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'Ollama IA  (A) (L)' \
 7 'Ollama Web (B) (L)' \
 8 'WireShark (W)' \
+9 'Endlessh (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
@@ -182,6 +181,7 @@ case "$var0" in
 6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
 7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
 8) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
+9) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
 X) echo "." > /dev/null ;;
 esac
 }
