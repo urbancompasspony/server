@@ -35,7 +35,6 @@ esac
 function modelstools {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'DashDot (L/W)' \
-2 'Dominio        (4.15) (W)' \
 3 'Dominio & CUPS (4.19) (W)' \
 4 '(C) File Browser (L/W)' \
 5 'Homarr (L/W)' \
@@ -51,7 +50,6 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
-2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
 3) wget "$github"58-domain-test -O /tmp/domain-test; sudo bash /tmp/domain-test ;;
 4) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
 5) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
@@ -198,8 +196,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'PiHole (L/W)' \
 7 '(C) Tailscale VPN-MESH (L/W)' \
 8 '(C) OpenVPN (L/W)' \
-9 'Dominio (W) (NEED REBUILD)' \
-10 'PenTest & PentApache (L/W) (NEED REBUILD)' \
+9 'PenTest & PentApache (L/W)' \
+10 'Dominio & CUPS (W) (NEED REBUILD)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
@@ -210,8 +208,8 @@ case "$var0" in
 6) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
 7) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
 8) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-9) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-10) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+9) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+10) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
 X) echo "." > /dev/null ;;
 esac
 }
