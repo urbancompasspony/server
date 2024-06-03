@@ -19,13 +19,15 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Modelo & Ferramentas' \
 2 'Serviços Gerais' \
 3 'Experimental' \
-4 'Pessoal' \
+4 'Support ARM64' \
+5 'Pessoal' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) modelstools ; start ;;
 2) general ; start ;;
 3) experimental ; start ;;
-4) personal ; start ;;
+4) arm640 ; start ;;
+5) personal ; start ;;
 X) exit ;;
 esac
 }
@@ -182,6 +184,34 @@ case "$var0" in
 7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
 8) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
 9) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
+X) echo "." > /dev/null ;;
+esac
+}
+
+function arm640 {
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
+1 'DashDot (L/W)' \
+2 'Homarr (L/W)' \
+3 'Kuma (L/W)' \
+4 'MySpeed  Test WAN (L/W)' \
+5 'OpenSpeedTest LAN (W)' \
+6 'PiHole (L/W)' \
+7 '(C) Tailscale VPN-MESH (L/W)' \
+8 '(C) OpenVPN (L/W)' \
+9 'Dominio (W) (NEED REBUILD)' \
+10 'PenTest & PentApache (L/W) (NEED REBUILD)' \
+X '<' 2>&1 > /dev/tty )
+case "$var0" in
+1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
+2) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
+3) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
+4) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
+5) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+6) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
+7) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+8) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+9) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
+10) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 X) echo "." > /dev/null ;;
 esac
 }
