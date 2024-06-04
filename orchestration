@@ -194,12 +194,13 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'Homarr (L/W)' \
 3 'Kuma (L/W)' \
 4 'MySpeed  Test WAN (L/W)' \
-5 'OpenSpeedTest LAN (W)' \
+5 'OpenSpeedTest LAN (L/W)' \
 6 'PiHole (L/W)' \
 7 '(C) Tailscale VPN-MESH (L/W)' \
 8 '(C) OpenVPN (L/W)' \
 9 'PenTest & PentApache (L/W)' \
 10 'Dominio & CUPS (W)' \
+11 'SSH DW (Backdoor) (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
@@ -212,6 +213,7 @@ case "$var0" in
 8) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
 9) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 10) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
+11) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 X) echo "." > /dev/null ;;
 esac
 }
