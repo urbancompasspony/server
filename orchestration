@@ -40,7 +40,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 4 'Homarr (L/W)' \
 5 'Kuma (L/W)' \
 6 'MySpeed  Test WAN (L/W)' \
-7 'OpenSpeedTest LAN (W)' \
+7 'OpenSpeedTest LAN (L/W)' \
 8 'PenTest & PentApache (L/W)' \
 9 'PiHole (L/W)' \
 10 '(C) Scrutiny SMART (W)' \
