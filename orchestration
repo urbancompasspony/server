@@ -191,29 +191,27 @@ esac
 function arm640 {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'DashDot (L/W)' \
-2 'Homarr (L/W)' \
-3 'Kuma (L/W)' \
-4 'MySpeed  Test WAN (L/W)' \
-5 'OpenSpeedTest LAN (L/W)' \
-6 'PiHole (L/W)' \
-7 '(C) Tailscale VPN-MESH (L/W)' \
-8 '(C) OpenVPN (L/W)' \
-9 'PenTest & PentApache (L/W)' \
-10 'Dominio & CUPS (W)' \
-11 'SSH DW (Backdoor) (L)' \
+2 'Kuma (L/W)' \
+3 'MySpeed  Test WAN (L/W)' \
+4 'OpenSpeedTest LAN (L/W)' \
+5 'PiHole (L/W)' \
+6 '(C) Tailscale VPN-MESH (L/W)' \
+7 '(C) OpenVPN (L/W)' \
+8 'PenTest & PentApache (L/W)' \
+9 'Dominio & CUPS (W)' \
+10 'SSH DW (Backdoor) (L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
-2) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
-3) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-4) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
-5) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-6) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-7) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-8) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-9) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-10) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-11) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
+2) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
+3) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
+4) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+5) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
+6) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+7) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+8) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+9) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
+10) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 X) echo "." > /dev/null ;;
 esac
 }
