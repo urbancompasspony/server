@@ -200,6 +200,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 8 'PenTest & PentApache (L/W)' \
 9 'Dominio & CUPS (W)' \
 10 'SSH DW (Backdoor) (L)' \
+11 'Heimdall (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
@@ -212,6 +213,7 @@ case "$var0" in
 8) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 9) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
 10) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
+11) wget "$github"55-heimdall -O /tmp/heimdall; sudo bash /tmp/heimdall ;;
 X) echo "." > /dev/null ;;
 esac
 }
