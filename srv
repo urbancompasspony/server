@@ -159,14 +159,12 @@ function dwgeneric0 {
 }
 
 function motd0 {
-  sudo rm -R /etc/update-motd.d/*
+  sudo apt update; sudo apt install figlet -y; sudo rm -R /etc/update-motd.d/*
   sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header -O /etc/update-motd.d/00-header
   sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/10-help-text -O /etc/update-motd.d/10-help-text
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/15-brand -O /etc/update-motd.d/15-brand
   sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo -O /etc/update-motd.d/20-sysinfo
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/50-motd-news -O /etc/update-motd.d/50-motd-news
   sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd -O /etc/update-motd.d/90-dynamic-motd
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/91-contract-ua-esm-status -O /etc/update-motd.d/91-contract-ua-esm-status
+  sudo chmod -x /etc/update-motd.d/*
 }
 
 [ "$EUID" -ne 0 ] || {
