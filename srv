@@ -164,7 +164,7 @@ function motd0 {
   sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/10-help-text -O /etc/update-motd.d/10-help-text
   sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo -O /etc/update-motd.d/20-sysinfo
   sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd -O /etc/update-motd.d/90-dynamic-motd
-  sudo chmod -x /etc/update-motd.d/*
+  sudo chmod +x /etc/update-motd.d/*
 }
 
 [ "$EUID" -ne 0 ] || {
