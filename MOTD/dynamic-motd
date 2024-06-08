@@ -1,0 +1,9 @@
+#/etc/default/dynamic-motd
+# DYNAMIC MOTD VARIABLES
+H_POS="-c"
+B_POS="-r"
+BRANDING="false"
+MOTD="Ubuntu Server"
+T_FONT="small"
+T_FILTER="metal"
+MENUCONFIG="false"
