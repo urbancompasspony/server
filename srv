@@ -133,11 +133,13 @@ var0=$(dialog --title ' ' --backtitle "Fiest Configuration!" --menu " " 0 0 0 \
 1 'Linite' \
 2 'AutoConfig pfSense (VM)' \
 3 'DWAgent (ARM)' \
+4 'Set MOTD & Menu-Config' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite.menu | bash ; firstconfig ;;
 2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; firstconfig ;;
 3) dwgeneric0 ; firstconfig ;;
+4) motd0 ; firstconfig ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -154,6 +156,17 @@ function dwgeneric0 {
   wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh
   chmod +x dwagent_generic.sh
   sudo bash dwagent_generic.sh
+}
+
+function motd0 {
+  sudo rm -R /etc/update-motd.d/*
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header -O /etc/update-motd.d/00-header
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/10-help-text -O /etc/update-motd.d/10-help-text
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/15-brand -O /etc/update-motd.d/15-brand
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo -O /etc/update-motd.d/20-sysinfo
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/50-motd-news -O /etc/update-motd.d/50-motd-news
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd -O /etc/update-motd.d/90-dynamic-motd
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/91-contract-ua-esm-status -O /etc/update-motd.d/91-contract-ua-esm-status
 }
 
 [ "$EUID" -ne 0 ] || {
