@@ -2,4 +2,5 @@
 
 echo "";
 echo -e "Para gerenciar o servidor digite 'srv'";
+echo "";
 #echo -e "Se desejar configurar o servidor, digite 'menu-config'";
