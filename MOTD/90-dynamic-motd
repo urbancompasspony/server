@@ -1,4 +1,5 @@
 #!/bin/bash
 
 echo "";
-echo -e "Para entrar no menu do servidor digite 'srv'";
+echo -e "Para gerenciar o servidor digite 'srv'";
+#echo -e "Se desejar configurar o servidor, digite 'menu-config'";
