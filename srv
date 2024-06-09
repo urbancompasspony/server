@@ -107,16 +107,17 @@ esac
 }
 
 function desktop00 {
-  clear
-  pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!" || desktop01
+  pstree -s $$ | grep sshd 1>&2 >/dev/null && clear; echo ""; echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!" || desktop01
   sleep 3
 }
 
 function desktop01 {
   [ -f /usr/bin/startx ] && {
     startx
+    return
   } || {
     sway
+    return
   }
   clear; echo ""; echo "Voce esta na tela local do servidor porem nenhum servidor grafico foi localizado!"
   sleep 2
@@ -163,6 +164,7 @@ esac
 function domain00 {
   docker ps -a | grep dominio 1>&2 >/dev/null && {
     docker exec -it dominio /root/.init
+    return
   } || {
     clear; echo ""; echo "Nenhum Controlador de Dominio encontrado neste sistema!"; echo ""; sleep 3
   }
