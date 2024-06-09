@@ -156,7 +156,7 @@ var0=$(dialog --title ' ' --backtitle "Fiest Configuration!" --menu " " 0 0 0 \
 3 'DWAgent (ARM)' \
 4 'Set MOTD' \
 5 'Set Wayland (labwc 24.04+)' \
-6 'Set OpenBox Better Menu' \
+6 'Set OpenBox ObaMenu' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite.menu | bash ; firstconfig ;;
@@ -164,7 +164,7 @@ case "$var0" in
 3) dwgeneric0 ; firstconfig ;;
 4) motd0 ; firstconfig ;;
 5) wayland00 ; firstconfig ;;
-6) wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O .config/openbox/menu.xml ; firstconfig ;;
+6) clear ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; firstconfig ;;
 X) echo "." >/dev/null ;;
 esac
 }
