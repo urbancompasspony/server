@@ -116,7 +116,7 @@ function desktop01 {
     startx
     return
   } || {
-    sway
+    labwc
     return
   }
   clear; echo ""; echo "Voce esta na tela local do servidor porem nenhum servidor grafico foi localizado!"
