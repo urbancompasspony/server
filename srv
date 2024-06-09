@@ -154,19 +154,28 @@ var0=$(dialog --title ' ' --backtitle "Fiest Configuration!" --menu " " 0 0 0 \
 1 'Linite' \
 2 'AutoConfig pfSense (VM)' \
 3 'DWAgent (ARM)' \
-4 'Set MOTD & Menu-Config' \
-5 'Set Wayland & OpenBox (for 24.04)' \
-6 'Set OpenBox Menu' \
+4 'Set MOTD' \
+5 'Set Wayland (labwc 24.04+)' \
+6 'Set OpenBox Better Menu' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite.menu | bash ; firstconfig ;;
 2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; firstconfig ;;
 3) dwgeneric0 ; firstconfig ;;
 4) motd0 ; firstconfig ;;
-5) clear ; sudo apt update ; sudo apt install openbox wayland-utils labwc obconf -y ; mkdir -p /home/administrador/.config/labwc ; rsync -va /etc/xdg/openbox/ .config/labwc/ ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O .config/labwc/menu.xml ; firstconfig ;;
+5) wayland00 ; firstconfig ;;
 6) wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O .config/openbox/menu.xml ; firstconfig ;;
 X) echo "." >/dev/null ;;
 esac
+}
+
+function wayland00 {
+  clear
+  sudo apt update
+  sudo apt install openbox wayland-utils labwc obconf -y
+  mkdir -p /home/administrador/.config/labwc
+  rsync -va /etc/xdg/openbox/ .config/labwc/
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O .config/labwc/menu.xml
 }
 
 function domain00 {
