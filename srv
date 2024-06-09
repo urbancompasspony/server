@@ -79,7 +79,7 @@ case "$var0" in
 2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
 3) domain00 ; managers ;;
 4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | tee /home/administrador/.t00lz ; chmod +x /home/administrador/.t00lz ; clear ; sudo bash /home/administrador/.t00lz ; managers ;;
-5) clear ; pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!" || startx ; sleep 3 ; managers ;;
+5) desktop00 ; managers ;;
 6) urgencies0 ; managers ;;
 7) reb00t ; managers ;;
 8) shutd0 ; managers ;;
@@ -104,6 +104,22 @@ case "$var0" in
 5) clear ; sudo rm -R /srv/restoredcloud ; clear echo ""; echo "A pasta restoredcloud/ foi limpa!"; sleep 3 ; urgencies0 ;;
 X) echo "." >/dev/null ;;
 esac
+}
+
+function desktop00 {
+  clear
+  pstree -s $$ | grep sshd 1>&2 >/dev/null && echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!" || desktop01
+  sleep 3
+}
+
+function desktop01 {
+  [ -f /usr/bin/startx ] && {
+    startx
+  } || {
+    sway
+  }
+  clear; echo ""; echo "Voce esta na tela local do servidor porem nenhum servidor grafico foi localizado!"
+  sleep 2
 }
 
 hash1="e4439267203fb5277d347e6cd6e440b5"
