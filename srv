@@ -162,7 +162,7 @@ case "$var0" in
 2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; firstconfig ;;
 3) dwgeneric0 ; firstconfig ;;
 4) motd0 ; firstconfig ;;
-5) clear ; sudo apt update ; sudo apt install openbox wayland labwc obconf -y ; rsync -va /etc/xdg/openbox/ .config/labwc/ ; firstconfig ;;
+5) clear ; sudo apt update ; sudo apt install openbox wayland-utils labwc obconf -y ; rsync -va /etc/xdg/openbox/ .config/labwc/ ; firstconfig ;;
 X) echo "." >/dev/null ;;
 esac
 }
