@@ -107,7 +107,11 @@ esac
 }
 
 function desktop00 {
-  pstree -s $$ | grep sshd 1>&2 >/dev/null && clear; echo ""; echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!" || desktop01
+  pstree -s $$ | grep sshd 1>&2 >/dev/null && {
+    clear; echo ""; echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!"
+  } ||{ 
+    desktop01
+  }
   sleep 3
 }
 
