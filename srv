@@ -116,14 +116,14 @@ function desktop00 {
 }
 
 function desktop01 {
-  [ -f /usr/bin/startx ] && {
-    startx
-    return
-  } || {
+  [ -f /usr/bin/labwc ] && {
     labwc
     return
+  } || {
+    startx
+    return
   }
-  clear; echo ""; echo "Voce esta na tela local do servidor porem nenhum servidor grafico foi localizado!"
+  clear; echo ""; echo "Nenhum servidor grafico foi localizado! Verifique seu sistema."
   sleep 2
 }
 
