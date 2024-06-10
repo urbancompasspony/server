@@ -83,8 +83,8 @@ fi
 }
 
 # display
-#echo -e "── \e[1mDISK\e[0m"
-#df -h | egrep '(Filesystem)|(/dev/mmc)|(/dev/root)|(/dev/sd)|(/dev/nvme)'
+echo -e "── \e[1mDISK\e[0m"
+df -h | egrep '(Filesystem)|(/dev/mmc)|(/dev/root)|(/dev/sd)|(/dev/nvme)'
 echo ""
 echo -e "── \e[1mNETWORK\e[0m"
 echo -e "Hostname:    $(hostname)"
