@@ -169,7 +169,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 2 'SSH DW (Backdoor) (L)' \
 3 'Ubuntu 22.04 WebUI (W)' \
 4 'Jellyfin (L/W)' \
-5 'qBitTorrent (w)' \
+5 'qBitTorrent (W)' \
 6 'Ollama IA  (A) (L)' \
 7 'Ollama Web (B) (L)' \
 8 'WireShark (W)' \
