@@ -127,7 +127,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'Headscale WebUI  (B) (W)' \
 7 'SnipeIT (W)' \
 8 'PwnDrop (W)' \
-9 'System Base (W)' \
+9 'System Base (L/W)' \
 10 'Chromium to Web (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
