@@ -1,0 +1,13 @@
+#!/bin/bash
+
+function start {
+  if ping -c 1 google.com >/dev/null ; then
+    wget -q https://raw.githubusercontent.com/urbancompasspony/server/main/escalacabeca -O /root/.escalacabeca
+    chmod +x /root/.escalacabeca
+    bash /root/.escalacabeca
+  else
+    bash /root/.escalacabeca
+  fi
+}
+
+start
