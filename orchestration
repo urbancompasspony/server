@@ -193,13 +193,13 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'MySpeed  Test WAN (L/W)' \
 4 'OpenSpeedTest LAN (L/W)' \
 5 'PiHole (L/W)' \
-6 '(C) Tailscale VPN-MESH (L/W)' \
-7 '(C) OpenVPN (L/W)' \
-8 'PenTest & PentApache (L/W)' \
-9 'Dominio & CUPS (W)' \
-10 'SSH DW (Backdoor) (L)' \
-11 'Heimdall (L/W)' \
-12 '(C) Headscale VPN-MESH FOSS (L/W)' \
+6 '(C) Tailscale CLIENT (L/W)' \
+7 '(C) Headscale SERVER (L/W)' \
+8 '(C) OpenVPN (L/W)' \
+9 'PenTest & PentApache (L/W)' \
+10 'Dominio & CUPS (W)' \
+11 'SSH DW (Backdoor) (L)' \
+12 'Heimdall (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
@@ -208,12 +208,12 @@ case "$var0" in
 4) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
 5) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
 6) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-7) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-8) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-9) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-10) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-11) wget "$github"55-heimdall -O /tmp/heimdall; sudo bash /tmp/heimdall ;;
-12) wget "$github"57-headscale-server -O /tmp/headscale-server; sudo bash /tmp/headscale-server ;;
+7) wget "$github"57-headscale-server -O /tmp/headscale-server; sudo bash /tmp/headscale-server ;;
+8) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+9) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+10) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
+11) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
+12) wget "$github"55-heimdall -O /tmp/heimdall; sudo bash /tmp/heimdall ;;
 X) echo "." > /dev/null ;;
 esac
 }
