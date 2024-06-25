@@ -86,11 +86,11 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 16 'Servidor OpenFire (Spark) (W)' \
 17 'Syncthing Client (L/W)' \
 18 'OnlyOffice (W)' \
-19 '(C) Tailscale VPN-MESH (L/W)' \
-20 '(C) Syncthing Relay (W)' \
-21 '(C) Duplicati (W)' \
-22 '(C) OpenVPN (L/W)' \
-23 '(C) Headscale VPN-MESH FOSS (L/W)' \
+19 '(C) Tailscale CLIENT (L/W)' \
+20 '(C) Headscale SERVER (L/W)' \
+21 '(C) Syncthing Relay (W)' \
+22 '(C) Duplicati (W)' \
+23 '(C) OpenVPN (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
@@ -112,10 +112,10 @@ case "$var0" in
 17) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 18) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 19) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-20) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
-21) wget "$github"35-duplicati -O /tmp/duplicati; sudo bash /tmp/duplicati ;;
-22) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-23) wget "$github"57-headscale-server -O /tmp/headscale-server; sudo bash /tmp/headscale-server ;;
+20) wget "$github"57-headscale-server -O /tmp/headscale-server; sudo bash /tmp/headscale-server ;;
+21) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
+22) wget "$github"35-duplicati -O /tmp/duplicati; sudo bash /tmp/duplicati ;;
+23) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
 X) echo "." > /dev/null ;;
 esac
 }
