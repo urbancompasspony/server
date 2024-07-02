@@ -90,7 +90,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 20 '(C) Headscale SERVER (L/W)' \
 21 '(C) Syncthing Relay (W)' \
 22 '(C) Duplicati (W)' \
-23 '(C) OpenVPN (L/W)' \
+23 '(C) OpenVPN Server (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) database ; general ;;
