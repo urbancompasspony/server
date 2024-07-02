@@ -127,6 +127,8 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'SnipeIT (W)' \
 4 'PwnDrop (W)' \
 5 'Chromium to Web (L/W)' \
+6 'OpenVPN Client' \
+7 'Wireguard' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
@@ -134,6 +136,8 @@ case "$var0" in
 3) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
 4) wget "$github"47-pwndrop -O /tmp/pwndrop; sudo bash /tmp/pwndrop ;;
 5) wget "$github"65-chromium -O /tmp/chromium; sudo bash /tmp/chromium ;;
+6) wget "$github"66-openvpnc -O /tmp/openvpnc; sudo bash /tmp/openvpnc ;;
+7) wget "$github"67-wireguard -O /tmp/wireguard; sudo bash /tmp/wireguard ;;
 X) echo "." > /dev/null ;;
 esac
 }
