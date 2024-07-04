@@ -136,7 +136,7 @@ case "$var0" in
 3) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
 4) wget "$github"47-pwndrop -O /tmp/pwndrop; sudo bash /tmp/pwndrop ;;
 5) wget "$github"65-chromium -O /tmp/chromium; sudo bash /tmp/chromium ;;
-6) wget "$github"66-openvpnc -O /tmp/openvpnc; sudo bash /tmp/openvpnc ;;
+6) wget "$github"66-openvpn-client -O /tmp/openvpnc; sudo bash /tmp/openvpnc ;;
 7) wget "$github"67-wireguard -O /tmp/wireguard; sudo bash /tmp/wireguard ;;
 X) echo "." > /dev/null ;;
 esac
