@@ -40,6 +40,7 @@ function relatfull {
   backup0
   contclean0
 }
+# myspeed0
 
 function upgrade0 {
   datetime0
@@ -153,7 +154,7 @@ function pihole0 {
   [ "$testpihole" = "" ] || {
     datetime0
     clear; echo ""; echo "Checando por updates do PiHole"
-    docker pull "$docker_repo"
+    docker pull pihole/pihole:latest
     clear
 
     for i in $(find /srv/containers -maxdepth 1 -name '*pihole*'); do
@@ -220,7 +221,7 @@ function pihole1 {
 -p 67:67/udp \
 -p 53:53/tcp \
 -p 53:53/udp \
-$docker_repo
+pihole/pihole:latest
   } || {
   docker run -d \
 --name="$i2" \
@@ -243,7 +244,59 @@ $docker_repo
 -p 67:67/udp \
 -p 53:53/tcp \
 -p 53:53/udp \
-$docker_repo
+pihole/pihole:latest
+  }
+}
+
+function myspeed0 {
+testmyspeed=$(docker image ls | grep -a "myspeed")
+
+  [ "$testmyspeed" = "" ] || {
+    clear; echo ""; echo "Checando por updates do MySpeed"
+    docker pull germannewsmaker/myspeed
+
+    for i in $(find /srv/containers -maxdepth 1 -name '*myspeed*'); do
+      i2=$(basename "$i")
+
+      var1=$(sed -n '1p' /srv/containers/"$i2"/Information)
+      var2=$(sed -n '2p' /srv/containers/"$i2"/Information)
+
+      myspeed1
+    done
+  } && {
+    echo . > /dev/null
+  }
+}
+
+function myspeed1 {
+  docker stop "$i2" &&
+  docker rm "$i2" &&
+
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 5216:5216 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/data:/myspeed/data \
+germannewsmaker/myspeed
+  } || {
+docker run -d \
+--name=$var1 \
+--network macvlan \
+--ip=$var2 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 5216:5216 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/data:/myspeed/data \
+germannewsmaker/myspeed
   }
 }
 
@@ -382,7 +435,6 @@ function enter0 {
 
 setfolder="/srv/relatorios"
 smartdumplocal="$setfolder/SMART_DUMP"
-docker_repo="pihole/pihole:latest"
 
 sudo mkdir -p $setfolder
 monthonly=$(date +"%m-%Y")
