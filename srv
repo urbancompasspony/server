@@ -7,6 +7,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Hash
 hash1="68b329da9893e34099c7d8ad5cb9c940"
 hash2="c357311ed3a47a08b423e1b42ec5c130"
+hash3="c357311ed3a47a08b423e1b42ec5c130"
 
 # Versão:
 version="v4"
@@ -28,10 +29,14 @@ hash0=$(echo "$password" | md5sum | awk '{print $1}')
       [ "$hash0" = "$hash2" ] && {
         startocult
       } || {
-        clear
-        dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
-        timeout=$((timeout+1)); sleep $timeout
-        init
+        [ "$hash0" = "$hash3" ] && {
+          startocult
+        } || {
+          clear
+          dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
+          timeout=$((timeout+1)); sleep $timeout
+          init
+        }
       }
     }
   }
