@@ -7,7 +7,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Hash
 hash1="68b329da9893e34099c7d8ad5cb9c940"
 hash2="c357311ed3a47a08b423e1b42ec5c130"
-hash3="c357311ed3a47a08b423e1b42ec5c130"
+hash3="d41d8cd98f00b204e9800998ecf8427e"
 
 # Versão:
 version="v4"
