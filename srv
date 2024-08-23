@@ -165,6 +165,7 @@ var0=$(dialog --title ' ' --backtitle "Fiest Configuration!" --menu " " 0 0 0 \
 4 'Set MOTD' \
 5 'Set Wayland (labwc 24.04+)' \
 6 'Set OpenBox ObaMenu' \
+7 'Waydroid (EndeavourOS)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/linite.menu | bash ; firstconfig ;;
@@ -173,8 +174,22 @@ case "$var0" in
 4) motd0 ; firstconfig ;;
 5) wayland00 ; firstconfig ;;
 6) clear ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; firstconfig ;;
+7) waydroid0 ; firstconfig ;;
 X) echo "." >/dev/null ;;
 esac
+}
+
+function waydroid0 {
+  clear
+  yay -Syyu
+  sudo pacman -S lzip radeontop nvtop
+  yay -S binder_linux-dkms
+  sudo modprobe binder-linux device=binder,hwbinder,vndbinder
+  yay -S waydroid
+  sudo firewall-cmd --zone=trusted --add-port=67/udp; sudo firewall-cmd --zone=trusted --add-port=53/udp; sudo firewall-cmd --zone=trusted --add-forward; sudo firewall-cmd --zone=trusted --add-interface=waydroid0; sudo firewall-cmd --runtime-to-permanent
+  sudo waydroid init -s GAPPS
+  clear
+  echo "Tudo pronto!"; sleep 5
 }
 
 function wayland00 {
