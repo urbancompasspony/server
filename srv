@@ -182,11 +182,17 @@ esac
 function waydroid0 {
   clear
   yay -Syyu
+  clear
   sudo pacman -S lzip radeontop nvtop
+  clear
   yay -S binder_linux-dkms
-  sudo modprobe binder-linux device=binder,hwbinder,vndbinder
+  clear
+  sudo modprobe binder-linux devices=binder,hwbinder,vndbinder
+  clear
   yay -S waydroid
+  clear
   sudo firewall-cmd --zone=trusted --add-port=67/udp; sudo firewall-cmd --zone=trusted --add-port=53/udp; sudo firewall-cmd --zone=trusted --add-forward; sudo firewall-cmd --zone=trusted --add-interface=waydroid0; sudo firewall-cmd --runtime-to-permanent
+  clear
   sudo waydroid init -s GAPPS
   clear
   echo "Tudo pronto!"; sleep 5
