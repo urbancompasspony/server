@@ -187,6 +187,12 @@ function waydroid0 {
   clear
   yay -S binder_linux-dkms
   clear
+  sudo systemctl stop waydroid-container.service
+  clear
+  sudo rm -rf /var/lib/waydroid
+  clear
+  sudo modprobe -r binder-linux
+  clear
   sudo modprobe binder-linux devices=binder,hwbinder,vndbinder
   clear
   yay -S waydroid
