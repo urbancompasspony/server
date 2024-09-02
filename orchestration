@@ -168,6 +168,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 7 'Ollama Web (B) (L)' \
 8 'WireShark (W)' \
 9 'Endlessh (W)' \
+10 'Ejabberd-chat-server (W/L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 0) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
@@ -180,6 +181,7 @@ case "$var0" in
 7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
 8) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
 9) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
+10) wget "$github"55-ejabberd-chatserver -O /tmp/55-ejabberd-chatserver; sudo bash /tmp/55-ejabberd-chatserver ;;
 X) echo "." > /dev/null ;;
 esac
 }
