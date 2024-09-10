@@ -42,23 +42,24 @@ function main_menu {
 
 function user_tools {
 var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Usuarios" --menu " " 0 0 0 \
-A 'Procurar/Verificar um Usuario' \
-B 'Criar Usuario' \
-C 'Exibir todos os Usuarios' \
-D 'Bloquear Usuario' \
-E 'Desbloquear Usuario' \
-F 'Adicionar Usuario a um Grupo' \
-G 'Exibir Grupos de Usuario' \
-H 'Remover Usuario de um Grupo' \
-I 'Promote Usuario a Admin' \
-J 'Demote Usuario de Admin' \
-K 'Alterar Senha de um Usuario' \
-L 'Testar Senha de Usuario' \
-M 'Senha de Usuario deve Expirar?' \
-N 'Quando a Senha vai Expirar?' \
-O 'Forcar Troca de Senha Imediata!' \
-P 'Mover Usuario para OU' \
-Q 'Excluir um Usuario' \
+A 'Procurar/Verificar um usuario' \
+B 'Criar usuario' \
+C 'Exibir todos os usuarios' \
+D 'Bloquear usuario' \
+E 'Desbloquear usuario' \
+F 'Adicionar usuario a um grupo' \
+G 'Exibir grupos de usuario' \
+H 'Remover usuario de um grupo' \
+I 'Promote usuario a admin' \
+J 'Demote usuario de admin' \
+K 'Alterar a senha de um usuario' \
+L 'Testar a senha de um usuario' \
+M 'Senha de usuario deve expirar?' \
+N 'Quando senha usuario vai expirar?' \
+O 'Forcar troca de senha imediata!' \
+P 'Definir quando expira senha global.' \
+Q 'Mover usuario para OU' \
+R 'Excluir um usuario' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
@@ -77,8 +78,9 @@ L) test_pass ; user_tools ;;
 M) expiracy_usr_pass ; user_tools ;;
 N) expiracy_days ; user_tools ;;
 O) expiracy_now ; user_tools ;;
-P) mv_user_ou ; user_tools ;; 
-Q) rm_user ; user_tools ;;
+P) expiracy_global ; user_tools ;;
+Q) mv_user_ou ; user_tools ;; 
+R) rm_user ; user_tools ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -86,13 +88,13 @@ esac
 function group_tools {
 var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Grupos" --menu " " 0 0 0 \
 A 'Procurar/Verificar um Grupo' \
-B 'Criar Grupo' \
-C 'Exibir todos os Grupos' \
-D 'Exibir Membros de um Grupo' \
-E 'Adicionar Grupo 1 a um Grupo 2' \
-F 'Remover Grupo 1 de um Grupo 2' \
-G 'Mover Grupo para OU' \
-H 'Excluir um Grupo' \
+B 'Criar grupo' \
+C 'Exibir todos os grupos' \
+D 'Exibir membros de um grupo' \
+E 'Adicionar grupo 1 a um grupo 2' \
+F 'Remover grupo 1 de um grupo 2' \
+G 'Mover grupo para OU' \
+H 'Excluir um grupo' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
@@ -110,11 +112,11 @@ esac
 
 function pc_tools {
 var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Computadores" --menu " " 0 0 0 \
-A 'Procurar/Verificar um Computador' \
-B 'Exibir todos os Computadores' \
-C 'Criar/Adicionar um Computador' \
-D 'Mover Computador para OU' \
-E 'Excluir um Computador' \
+A 'Procurar/Verificar um computador' \
+B 'Exibir todos os computadores' \
+C 'Criar/Adicionar um computador' \
+D 'Mover computador para OU' \
+E 'Excluir um computador' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
@@ -130,10 +132,10 @@ esac
 function info_domain {
   var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
   A 'Detalhes do Dominio' \
-  B 'Requisitos de Senhas' \
-  C 'Processos do SMB.service' \
-  D 'Status das Sessoes Ativas' \
-  E 'Status dos Compartilhamentos' \
+  B 'Complexidade das senhas' \
+  C 'Processos do SAMBA' \
+  D 'Status de todas sessoes ativas' \
+  E 'Status dos compartilhamentos' \
   F 'F.A.Q. & Ajuda!' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
@@ -150,13 +152,13 @@ function info_domain {
 
 function s_settings {
   var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
-  A 'SysVol Check' \
-  B 'SysVol Reset' \
+  A 'SysVol check' \
+  B 'SysVol reset' \
   C 'samba-ad-dc db check: well-known-acls' \
   D 'samba-ad-dc db check: general' \
-  E 'ACL Check of GPOs (as Administrator)' \
+  E 'ACL check of GPOs (as Administrator!)' \
   F 'Get ACLs from a File or Folder' \
-  G 'CAUTION! Set ACL to a File or Folder' \
+  G 'PERIGO! Set ACL to a File or Folder' \
   H 'Install ADMX Templates for Windows 10' \
   I 'Install ADMX Templates for Windows 11' \
   J 'Remove ADMX Templates' \
@@ -179,12 +181,12 @@ function s_settings {
 
 function shared_folders {
 var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
-A 'Mostrar Pastas Compartilhadas' \
-B 'Criar Nova Pasta Compartilhada' \
-C 'Criar Compartilhamento Anonimo' \
-D 'Criar Compartilhamento Estruturado' \
-E 'Excluir Compartilhamento' \
-F 'Revalidar Configuracoes' \
+A 'Mostrar pastas compartilhadas' \
+B 'Criar nova pasta compartilhada' \
+C 'Criar compartilhamento anonimo' \
+D 'Criar compartilhamento estruturado' \
+E 'Excluir compartilhamento' \
+F 'Revalidar configuracoes' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) show_shared ; shared_folders ;;
@@ -201,7 +203,7 @@ function ou_tools {
   var12=$(dialog --title "$ttitle" --backtitle "Unidades Organizacionais" --menu " " 0 0 0 \
   A 'Listar todas as OUs' \
   B 'Criar uma OU' \
-  C 'Listar Objetos de OU' \
+  C 'Listar objetos de OU' \
   D 'Excluir uma OU' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
@@ -226,7 +228,7 @@ function checksilos0 {
 
 function menusilo {
   var12=$(dialog --title "$ttitle" --backtitle "Silos de Autenticacao" --menu " " 0 0 0 \
-  A 'Procurar/Verificar um silo' \
+  A 'Procurar/verificar um silo' \
   B 'Listar todos os silos' \
   C 'Criar um silo' \
   D 'Listar usuarios de um silo' \
@@ -937,6 +939,17 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
+function expiracy_global {
+daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina quando TODAS AS senhas vao expirar, em dias" 0 0 2>&1 > /dev/tty)
+[ -z "$daystoexpire" ] && {
+  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+} || {
+  samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire
+  sleep 1
+  dialog --title "Confirmacao" --msgbox "O usuario $validusr devera trocar a senha em $daystoexpire dias!" 8 40
+}
+
+}
 
 function expiracy_now {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
