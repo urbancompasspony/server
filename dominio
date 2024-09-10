@@ -940,13 +940,12 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 }
 
 function expiracy_global {
-daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina quando TODAS AS senhas vao expirar, em dias" 0 0 2>&1 > /dev/tty)
+daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina quando TODAS AS senhas vao expirar, em dias:" 9 35 2>&1 > /dev/tty)
 [ -z "$daystoexpire" ] && {
   dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
 } || {
   samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire
-  sleep 1
-  dialog --title "Confirmacao" --msgbox "O usuario $validusr devera trocar a senha em $daystoexpire dias!" 8 40
+  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
 }
 
 }
