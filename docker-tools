@@ -5,7 +5,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 A 'Retore a Backup' \
 B 'Set MACVLAN' \
 C 'Remove MACVLAN' \
-D 'PiHole: Maintenance' \
+D 'PiHole Maintenance' \
 E 'PiHole Install Error' \
 F 'Nextcloud: filelocks' \
 G 'Nextcloud: add-missing-indices' \
