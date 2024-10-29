@@ -85,6 +85,7 @@ esac
 }
 
 function dwservice0 {
+  clear
   wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
   chmod +x dwagent_x86.sh
   sudo bash dwagent_x86.sh
