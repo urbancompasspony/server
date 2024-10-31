@@ -102,6 +102,13 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
     clear
     echo "Adding missing indices..."
     docker exec -u 33 "$var1" ./occ db:add-missing-indices
+    echo "ok"; sleep 3
+
+    clear
+    echo "Fixing mimetypes..."
+    docker exec -u 33 "$var1" ./occ maintenance:repair --include-expensive
+    echo "ok"; sleep 3
+
     sleep 5
 }
 
