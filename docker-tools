@@ -11,6 +11,7 @@ F 'Nextcloud: filelocks' \
 G 'Nextcloud: add-missing-indices' \
 H 'Nextcloud: check-core' \
 I 'Nextcloud: Disable LDAP' \
+J 'Nextcloud: Upgrade Manually CLI' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) clear ; restorebkp ;;
@@ -22,8 +23,28 @@ F) clear ; filelocks ;;
 G) clear ; missingindices ;;
 H) clear ; checkcore ;;
 I) clear ; disableldap ;;
+J) clear ; upgradenc ;;
 X) echo "." > /dev/null ;;
 esac
+}
+
+function upgradenc {
+VALUE1="nextcloud"
+VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+
+    clear
+    echo "Upgrading..."
+    docker exec -u 33 "$var1" ./occ upgrade
+    sleep 5
 }
 
 function disableldap {
