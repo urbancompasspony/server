@@ -183,18 +183,16 @@ function shared_folders {
 var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
 A 'Mostrar pastas compartilhadas' \
 B 'Criar nova pasta compartilhada' \
-C 'Criar compartilhamento anonimo' \
-D 'Criar compartilhamento estruturado' \
-E 'Excluir compartilhamento' \
-F 'Revalidar configuracoes' \
+C 'Compartilhamento estruturado' \
+D 'Excluir compartilhamento' \
+E 'Revalidar configuracoes' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) show_shared ; shared_folders ;;
 B) create_shared ; shared_folders ;;
-C) create_anon ; shared_folders ;;
-D) create_sync ; shared_folders ;;
-E) remove_shared ; shared_folders ;;
-F) revalid_shared ; shared_folders ;;
+C) create_sync ; shared_folders ;;
+D) remove_shared ; shared_folders ;;
+E) revalid_shared ; shared_folders ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -1270,6 +1268,8 @@ utilize o menu Excluir Compartilhamento!" 0 0 0 "${files[@]}")
   }
 }
 
+# SYNC #
+
 function create_sync {
 VALUE1="nome_do_compartilhamento"
 VALUE3="@Sync, @Desativar_Sync"
@@ -1297,11 +1297,13 @@ esac
   var4=$(echo "$VALUE0" | sed -n 4p)
 
 [ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
-    dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 5 40
+    dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 7 40
   } || {
-    mkdir -p /mnt$var2
-
-tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
+    if [[ $var1 = *" "* ]] || [[ $var2 = *" "* ]]; then
+      dialog --title "ERRO" --msgbox "NAO crie compartilhamentos ou pastas com espacos nos nomes! Ignorando." 7 40
+    else
+      mkdir -p /mnt$var2
+      tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
 path = /mnt$var2
 valid users = $var3
@@ -1314,12 +1316,15 @@ directory mask = 0700
 force directory mode = 0700
 EOF
 
-# Apply 777 but without -R flag!
-chmod 777 /mnt$var2
+      # Apply 777 but without -R flag!
+      chmod 777 /mnt$var2
 
-revalid_shared
+      revalid_shared
+    fi
   }
 }
+
+# SHARED #
 
 function create_shared {
 VALUE1="nome_do_compartilhamento"
@@ -1350,11 +1355,13 @@ esac
   var5=$(echo "$VALUE0" | sed -n 5p)
 
 [ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
-    dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 5 40
+    dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 7 40
   } || {
-    mkdir -p /mnt$var2
-
-tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
+    if [[ $var1 = *" "* ]] || [[ $var2 = *" "* ]]; then
+      dialog --title "ERRO" --msgbox "NAO crie compartilhamentos ou pastas com espacos nos nomes! Ignorando." 7 40
+    else
+      mkdir -p /mnt$var2
+      tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
 [$var1]
 path = /mnt$var2
 valid users = $var3
@@ -1368,55 +1375,15 @@ directory mask = 0777
 force directory mode = 0777
 EOF
 
-# Apply 777 but without -R flag!
-chmod 777 /mnt$var2
+      # Apply 777 but without -R flag!
+      chmod 777 /mnt$var2
 
-revalid_shared
+      revalid_shared
+    fi
   }
 }
 
-function create_anon {
-VALUE1="nome_do_compartilhamento"
-
-  VALUE0=$(dialog --help-button --help-label 'Dica' --ok-label "Criar" --title "Compartilhamento Anonimo" --form "CUIDADO: Este acesso sera totalmente liberado sem usuarios ou senhas! \n\nSe a pasta nao existe ela sera criada. \n
-Use a Dica para achar a pasta! \n\nKB 4046019: Windows 10 e 11 nao permitem conexoes anonimas por padrao." 0 0 0 \
-"Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
-"     /mnt" 2 1 "$VALUE2" 2 10 34 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-case $? in
-   0) echo "." > /dev/null ;;
-   1) return ;;
-   2) dica0 ; return ;;
-esac
-
-  var1=$(echo "$VALUE0" | sed -n 1p)
-  var2=$(echo "$VALUE0" | sed -n 2p)
-
-[ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
-    dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 5 40
-  } || {
-    mkdir -p /mnt$var2
-
-tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
-[$var1]
-path = /mnt$var2
-writable = yes
-browsable = yes
-guest ok = yes
-force user = nobody
-create mask = 0777
-force create mode = 0777
-directory mask = 0777
-force directory mode = 0777
-EOF
-
-# Apply 777 but without -R flag!
-chmod 777 /mnt$var2
-
-revalid_shared
-  }
-}
+# REMOVE #
 
 function remove_shared {
 VALUE1="nome_do_compartilhamento"
