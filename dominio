@@ -1268,62 +1268,6 @@ utilize o menu Excluir Compartilhamento!" 0 0 0 "${files[@]}")
   }
 }
 
-# SYNC #
-
-function create_sync {
-VALUE1="nome_do_compartilhamento"
-VALUE3="@Sync, @Desativar_Sync"
-VALUE4="no"
-
-  VALUE0=$(dialog --help-button --help-label 'Dica' --ok-label "Criar" --title "Compartilhamento para Sync Center" --form "Separe os grupos e/ou usuarios com virgula. \n
-Se a pasta nao existir ela sera criada e ficara oculta. \n
-A permissao da pasta sera do dono da mesma! \n
-Use a Dica para achar a pasta!" 0 0 0 \
-"Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
-"     /mnt" 2 1 "$VALUE2" 2 10 34 0 \
-"Grp Name:" 3 1 "$VALUE3" 3 10 34 0 \
-"Browser.:" 4 1 "$VALUE4" 4 10 34 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-case $? in
-   0) echo "." > /dev/null ;;
-   1) return ;;
-   2) dica0 ; return ;;
-esac
-
-  var1=$(echo "$VALUE0" | sed -n 1p)
-  var2=$(echo "$VALUE0" | sed -n 2p)
-  var3=$(echo "$VALUE0" | sed -n 3p)
-  var4=$(echo "$VALUE0" | sed -n 4p)
-
-[ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
-    dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 7 40
-  } || {
-    if [[ $var1 = *" "* ]] || [[ $var2 = *" "* ]]; then
-      dialog --title "ERRO" --msgbox "NAO crie compartilhamentos ou pastas com espacos nos nomes! Ignorando." 7 40
-    else
-      mkdir -p /mnt$var2
-      tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
-[$var1]
-path = /mnt$var2
-valid users = $var3
-browsable = $var4
-writable = yes
-guest ok = no
-create mask = 0700
-force create mode = 0700
-directory mask = 0700
-force directory mode = 0700
-EOF
-
-      # Apply 777 but without -R flag!
-      chmod 777 /mnt$var2
-
-      revalid_shared
-    fi
-  }
-}
-
 # SHARED #
 
 function create_shared {
@@ -1355,10 +1299,10 @@ esac
   var5=$(echo "$VALUE0" | sed -n 5p)
 
 [ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
-    dialog --title "ERRO" --msgbox "Um compartilhamento com este nome ja existe! Ignorando." 7 40
+    dialog --title "ERRO" --msgbox "ERRO: Um compartilhamento com este nome ja existe na rede! Ignorando." 7 40
   } || {
-    if [[ $var1 = *" "* ]] || [[ $var2 = *" "* ]]; then
-      dialog --title "ERRO" --msgbox "NAO crie compartilhamentos ou pastas com espacos nos nomes! Ignorando." 7 40
+    if [[ $var1 = *" "* ]] || [[ $var2 = *" "* ]] || [[ $var1 = "" ]]; then
+      dialog --title "ERRO" --msgbox "ERRO: Nao crie compartilhamentos com espacos nos nomes ou nomes vazios! Ignorando." 7 40
     else
       mkdir -p /mnt$var2
       tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
@@ -1373,6 +1317,62 @@ create mask = 0777
 force create mode = 0777
 directory mask = 0777
 force directory mode = 0777
+EOF
+
+      # Apply 777 but without -R flag!
+      chmod 777 /mnt$var2
+
+      revalid_shared
+    fi
+  }
+}
+
+# SYNC #
+
+function create_sync {
+VALUE1="nome_do_compartilhamento"
+VALUE3="@Sync, @Desativar_Sync"
+VALUE4="no"
+
+  VALUE0=$(dialog --help-button --help-label 'Dica' --ok-label "Criar" --title "Compartilhamento para Sync Center" --form "Separe os grupos e/ou usuarios com virgula. \n
+Se a pasta nao existir ela sera criada e ficara oculta. \n
+A permissao da pasta sera do dono da mesma! \n
+Use a Dica para achar a pasta!" 0 0 0 \
+"Shr Name:" 1 1 "$VALUE1" 1 10 34 0 \
+"     /mnt" 2 1 "$VALUE2" 2 10 34 0 \
+"Grp Name:" 3 1 "$VALUE3" 3 10 34 0 \
+"Browser.:" 4 1 "$VALUE4" 4 10 34 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+case $? in
+   0) echo "." > /dev/null ;;
+   1) return ;;
+   2) dica0 ; return ;;
+esac
+
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
+
+[ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
+    dialog --title "ERRO" --msgbox "ERRO: Um compartilhamento com este nome ja existe na rede! Ignorando." 7 40
+  } || {
+    if [[ $var1 = *" "* ]] || [[ $var2 = *" "* ]] || [[ $var1 = "" ]]; then
+      dialog --title "ERRO" --msgbox "ERRO: Nao crie compartilhamentos com espacos nos nomes ou nomes vazios! Ignorando." 7 40
+    else
+      mkdir -p /mnt$var2
+      tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
+[$var1]
+path = /mnt$var2
+valid users = $var3
+browsable = $var4
+writable = yes
+guest ok = no
+create mask = 0700
+force create mode = 0700
+directory mask = 0700
+force directory mode = 0700
 EOF
 
       # Apply 777 but without -R flag!
