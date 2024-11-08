@@ -36,7 +36,7 @@ X) exit ;;
 esac
 }
 
-function contrato0 {
+function contratos0 {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'File Browser (L/W)' \
 4 'Homarr (L/W)' \
