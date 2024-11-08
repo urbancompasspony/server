@@ -17,18 +17,62 @@ github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 function start {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'Modelo & Ferramentas' \
-2 'Serviços Gerais' \
-3 'Experimental' \
-4 'Support ARM64' \
-5 'Pessoal' \
+2 'Somente Contrato' \
+3 'Serviços Gerais' \
+4 'Bancos de Dados' \
+5 'Experimental' \
+6 'Support ARM64' \
+7 'Pessoal' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) modelstools ; start ;;
-2) general ; start ;;
-3) experimental ; start ;;
-4) arm640 ; start ;;
-5) personal ; start ;;
+2) contratos0 ; start ;;
+3) general ; start ;;
+4) database ; start ;;
+5) experimental ; start ;;
+6) arm640 ; start ;;
+7) personal ; start ;;
 X) exit ;;
+esac
+}
+
+function contrato0 {
+var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
+3 'File Browser (L/W)' \
+4 'Homarr (L/W)' \
+8 'PenTest & PentApache (L/W)' \
+10 'Scrutiny SMART (W)' \
+11 'SSH Tunnel (A) (W)' \
+12 'WeTTY      (B) (W)' \
+3 'Gestor UniFi (W)' \
+4 'GLPI (W)' \
+9 'Reverse Proxy (W)' \
+14 'Servidor RustDesk (W)' \
+10 'RustDesk Web Client (W)' \
+16 'Servidor OpenFire (Spark) (W)' \
+18 'OnlyOffice (W)' \
+19 'Tailscale CLIENT (L/W)' \
+20 'Syncthing RELAY (W)' \
+21 'OpenVPN Server (L/W)' \
+X '<' 2>&1 > /dev/tty )
+case "$var0" in
+3) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
+4) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
+8) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+10) wget "$github"14-scrutiny -O /tmp/scrutiny; sudo bash /tmp/scrutiny ;;
+11) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
+12) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
+3) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
+4) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+9) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+14) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
+10) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
+16) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+18) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+19) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+20) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
+21) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+X) echo "." > /dev/null ;;
 esac
 }
 
@@ -36,86 +80,48 @@ function modelstools {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'DashDot (L/W)' \
 2 'Dominio & CUPS (4.19) (W)' \
-3 '(C) File Browser (L/W)' \
-4 'Homarr (L/W)' \
-5 'Kuma (L/W)' \
-6 'MySpeed  Test WAN (L/W)' \
-7 'OpenSpeedTest LAN (L/W)' \
-8 'PenTest & PentApache (L/W)' \
-9 'PiHole (L/W)' \
-10 '(C) Scrutiny SMART (W)' \
-11 '(C) SSH Tunnel (A) (W)' \
-12 '(C) WeTTY      (B) (W)' \
-13 'XPRA (L/W)' \
+3 'Kuma (L/W)' \
+4 'MySpeed  Test WAN (L/W)' \
+5 'OpenSpeedTest LAN (L/W)' \
+6 'PiHole (L/W)' \
+7 'XPRA (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
 2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-3) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
-4) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
-5) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-6) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
-7) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-8) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-9) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-10) wget "$github"14-scrutiny -O /tmp/scrutiny; sudo bash /tmp/scrutiny ;;
-11) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
-12) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
-13) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+3) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
+4) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
+5) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+6) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
+7) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
 X) echo "." > /dev/null ;;
 esac
 }
 
 function general {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Bancos de Dados' \
 2 'Ferdium (RAMBOX) (W)' \
-3 'Gestor UniFi (W)' \
-4 'GLPI (W)' \
-5 'Netboot PXE (W)' \
-6 'NextCloud (W)' \
-7 'ntfy (W)' \
-8 'Remotely (W)' \
-9 'Reverse Proxy (W)' \
-10 'RustDesk Web Client (W)' \
-11 'Servidor Apache (W)' \
-12 'Servidor CUPS (W)' \
-13 'Servidor FTP (W)' \
-14 'Servidor RustDesk (W)' \
-15 'Servidor SAMBA (L/W)' \
-16 'Servidor OpenFire (Spark) (W)' \
-17 'Syncthing Client (L/W)' \
-18 'OnlyOffice (W)' \
-19 '(C) Tailscale CLIENT (L/W)' \
-20 '(C) Headscale SERVER (L/W)' \
-21 '(C) Syncthing Relay (W)' \
-22 '(C) Duplicati (W)' \
-23 '(C) OpenVPN Server (L/W)' \
+3 'Netboot PXE (W)' \
+4 'NextCloud (W)' \
+5 'ntfy (W)' \
+6 'Remotely (W)' \
+7 'Servidor Apache (W)' \
+8 'Servidor CUPS (W)' \
+9 'Servidor FTP (W)' \
+10 'Servidor SAMBA (L/W)' \
+11 'Syncthing CLIENT (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-1) database ; general ;;
 2) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
-3) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
-4) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-5) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
-6) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-7) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-8) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
-9) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-10) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
-11) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-12) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-13) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-14) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-15) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
-16) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-17) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-18) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-19) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-20) wget "$github"57-headscale-server -O /tmp/headscale-server; sudo bash /tmp/headscale-server ;;
-21) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
-22) wget "$github"35-duplicati -O /tmp/duplicati; sudo bash /tmp/duplicati ;;
-23) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+3) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
+4) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+5) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
+6) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
+7) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
+8) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
+9) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+10) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
+11) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -196,10 +202,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 '(C) Tailscale CLIENT (L/W)' \
 7 '(C) Headscale SERVER (L/W)' \
 8 '(C) OpenVPN (L/W)' \
-9 'PenTest & PentApache (L/W)' \
+9 '(C) PenTest & PentApache (L/W)' \
 10 'Dominio & CUPS (W)' \
 11 'SSH DW (Backdoor) (L)' \
-12 'Heimdall (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
@@ -213,7 +218,6 @@ case "$var0" in
 9) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
 10) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
 11) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-12) wget "$github"55-heimdall -O /tmp/heimdall; sudo bash /tmp/heimdall ;;
 X) echo "." > /dev/null ;;
 esac
 }
