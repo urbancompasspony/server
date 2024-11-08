@@ -43,8 +43,9 @@ function init {
   [ -f $destpath/${options[choice - 1]} ] && {
     clear
     echo ""
-    echo "Ja existe uma .iso e/ou uma .img desse sistema! Remova-a primeiro e faca o download novamente."
-    sleep 3
+    echo "Ja existe uma .iso e/ou uma .img desse sistema!"
+    echo "Remova-a primeiro e faca o download novamente."
+    sleep 5
   } || {
     clear
     echo ""
