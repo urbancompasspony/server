@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # NEXTCLOUD VERSION:
-nv="25"
+nv="30"
 
 # For Ubuntu 22.04!
 export NEEDRESTART_MODE=a
