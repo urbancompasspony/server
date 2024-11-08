@@ -39,8 +39,13 @@ function init {
   [ $? -ne 0 ] && return
 
   sudo mkdir -p "$destpath"
-  wget --user $usern4me --password $passw0rd $webadress/${options[choice - 1]} -O $destpath/${options[choice - 1]}
-  sudo chmod 777 -R "$destpath"
+
+  [ -f $destpath/${options[choice - 1]} ] && {
+    echo . >/dev/null
+  } || {
+    wget --user $usern4me --password $passw0rd $webadress/${options[choice - 1]} -O $destpath/${options[choice - 1]}
+    sudo chmod 777 -R "$destpath"
+  }
 }
 
 check
