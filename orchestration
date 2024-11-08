@@ -38,40 +38,40 @@ esac
 
 function contratos0 {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-3 'File Browser (L/W)' \
-4 'Homarr (L/W)' \
-8 'PenTest & PentApache (L/W)' \
-10 'Scrutiny SMART (W)' \
-11 'SSH Tunnel (A) (W)' \
-12 'WeTTY      (B) (W)' \
-3 'Gestor UniFi (W)' \
-4 'GLPI (W)' \
+1 'File Browser (L/W)' \
+2 'Homarr (L/W)' \
+3 'PenTest & PentApache (L/W)' \
+4 'Scrutiny SMART (W)' \
+5 'SSH Tunnel (A) (W)' \
+6 'WeTTY      (B) (W)' \
+7 'Gestor UniFi (W)' \
+8 'GLPI (W)' \
 9 'Reverse Proxy (W)' \
-14 'Servidor RustDesk (W)' \
-10 'RustDesk Web Client (W)' \
-16 'Servidor OpenFire (Spark) (W)' \
-18 'OnlyOffice (W)' \
-19 'Tailscale CLIENT (L/W)' \
-20 'Syncthing RELAY (W)' \
-21 'OpenVPN Server (L/W)' \
+10 'Servidor RustDesk (W)' \
+11 'RustDesk Web Client (W)' \
+12 'Servidor OpenFire (Spark) (W)' \
+13 'OnlyOffice (W)' \
+14 'Tailscale CLIENT (L/W)' \
+15 'Syncthing RELAY (W)' \
+16 'OpenVPN Server (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-3) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
-4) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
-8) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-10) wget "$github"14-scrutiny -O /tmp/scrutiny; sudo bash /tmp/scrutiny ;;
-11) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
-12) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
-3) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
-4) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+1) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
+2) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
+3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+4) wget "$github"14-scrutiny -O /tmp/scrutiny; sudo bash /tmp/scrutiny ;;
+5) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
+6) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
+7) wget "$github"03-unifi -O /tmp/unifi; sudo bash /tmp/unifi ;;
+8) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
 9) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-14) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-10) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
-16) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-18) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-19) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-20) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
-21) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+10) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
+11) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
+12) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+13) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+14) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+15) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
+16) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -100,28 +100,28 @@ esac
 
 function general {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-2 'Ferdium (RAMBOX) (W)' \
-3 'Netboot PXE (W)' \
-4 'NextCloud (W)' \
-5 'ntfy (W)' \
-6 'Remotely (W)' \
-7 'Servidor Apache (W)' \
-8 'Servidor CUPS (W)' \
-9 'Servidor FTP (W)' \
-10 'Servidor SAMBA (L/W)' \
-11 'Syncthing CLIENT (L/W)' \
+1 'Ferdium (RAMBOX) (W)' \
+2 'Netboot PXE (W)' \
+3 'NextCloud (W)' \
+4 'ntfy (W)' \
+5 'Remotely (W)' \
+6 'Servidor Apache (W)' \
+7 'Servidor CUPS (W)' \
+8 'Servidor FTP (W)' \
+9 'Servidor SAMBA (L/W)' \
+10 'Syncthing CLIENT (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-2) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
-3) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
-4) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-5) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-6) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
-7) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-8) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-9) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-10) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
-11) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+1) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
+2) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
+3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+4) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
+5) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
+6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
+7) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
+8) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+9) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
+10) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -164,7 +164,6 @@ esac
 
 function personal {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-0 'Dominio & CUPS BETA (W)' \
 1 'Minetest Server (W)' \
 2 'SSH DW (Backdoor) (L)' \
 3 'Ubuntu 22.04 WebUI (W)' \
@@ -175,9 +174,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 8 'WireShark (W)' \
 9 'Endlessh (W)' \
 10 'Ejabberd-chat-server (W/L)' \
+11 'Dominio & CUPS BETA (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-0) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
 1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 3) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
@@ -188,6 +187,7 @@ case "$var0" in
 8) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
 9) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
 10) wget "$github"55-ejabberd-chatserver -O /tmp/55-ejabberd-chatserver; sudo bash /tmp/55-ejabberd-chatserver ;;
+11) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
 X) echo "." > /dev/null ;;
 esac
 }
