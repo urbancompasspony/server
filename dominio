@@ -666,7 +666,7 @@ validpss1=$(echo "$VALUE0" | sed -n 3p)
   } || {
     dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "$validusr1 deve trocar essa senha ao logar?" 0 0
     [ $? = 0 ] && {
-      samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1" --must-change-at-next-login
+      samba-tool user create --must-change-at-next-login "$validusr1" "$validpss1" --surname="$validsur1"
       check_user_creation
     } || {
       samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1"
@@ -682,7 +682,7 @@ function check_user_creation {
   [ "$checkusr00" = "$validusr1" ] && {
     dialog --title "Informacao" --msgbox "\nUsuario $validusr1 criado e configurado com sucesso!" 8 40
   } || {
-    dialog --title "ERRO" --msgbox "O usuario NAO foi criado.\nOs requisitos de senha sao: \n\n-Minimo 7 caracteres. \n\n-Contenha Letras e Numeros \n\n-Pelo menos 1 (uma) letra MAIUSCULA. \n\nExemplo: 12A45c7" 15 40
+    dialog --title "ERRO" --msgbox "O usuario NAO foi criado porque: \n\nJa existe $validusr1 e/ou $validsur1. \n\n OU \n\nNao atendeu os requisitos minimos de senha: \n\n-Minimo 7 caracteres. \n-Contenha Letras e Numeros \n-Pelo menos 1 (uma) letra MAIUSCULA." 17 60
   }
 }
 
