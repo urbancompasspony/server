@@ -7,11 +7,12 @@ B 'Set MACVLAN' \
 C 'Remove MACVLAN' \
 D 'PiHole Maintenance' \
 E 'PiHole Install Error' \
-F 'Nextcloud: filelocks' \
-G 'Nextcloud: add-missing-indices' \
-H 'Nextcloud: check-core' \
-I 'Nextcloud: Disable LDAP' \
-J 'Nextcloud: Upgrade Manually CLI' \
+F 'NC: filelocks' \
+G 'NC: add-missing-indices' \
+H 'NC: check-core' \
+I 'NC: Disable LDAP' \
+J 'NC: Upgrade Manually CLI' \
+K 'NC: mimetypeslist.js (up-to-date!)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) clear ; restorebkp ;;
@@ -24,6 +25,7 @@ G) clear ; missingindices ;;
 H) clear ; checkcore ;;
 I) clear ; disableldap ;;
 J) clear ; upgradenc ;;
+K) clear ; mimetypes0 ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -83,6 +85,28 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
     clear
     echo "Checking core integrity..."
     docker exec -u 33 "$var1" ./occ integrity:check-core
+    sleep 5
+}
+
+function mimetypes0 {
+VALUE1="nextcloud"
+VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+
+    clear
+    echo "Fixing mimetypeslist.js indice..."
+    docker exec -u 33 "$var1" rm core/js/mimetypelist.js
+    docker exec -u 33 "$var1" wget https://raw.githubusercontent.com/nextcloud/server/master/core/js/mimetypelist.js -P core/js
+    echo "ok"; sleep 3
+
     sleep 5
 }
 
