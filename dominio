@@ -50,16 +50,17 @@ E 'Desbloquear usuario' \
 F 'Adicionar usuario a um grupo' \
 G 'Exibir grupos de usuario' \
 H 'Remover usuario de um grupo' \
-I 'Promote usuario a admin' \
-J 'Demote usuario de admin' \
-K 'Alterar a senha de um usuario' \
-L 'Testar a senha de um usuario' \
-M 'Senha de usuario deve expirar?' \
-N 'Quando senha usuario vai expirar?' \
-O 'Forcar troca de senha imediata!' \
-P 'Definir quando expira senha global.' \
-Q 'Mover usuario para OU' \
-R 'Excluir um usuario' \
+I 'Copiar os grupos de um usuario' \
+J 'Promote usuario a admin' \
+K 'Demote usuario de admin' \
+L 'Alterar a senha de um usuario' \
+M 'Testar a senha de um usuario' \
+N 'Senha de usuario deve expirar?' \
+O 'Quando senha usuario vai expirar?' \
+P 'Forcar troca de senha imediata!' \
+Q 'Definir quando expira senha global.' \
+R 'Mover usuario para OU' \
+S 'Excluir um usuario' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
@@ -71,16 +72,17 @@ E) ublk_user ; user_tools ;;
 F) add_user_group ; user_tools ;;
 G) show_group_user ; user_tools ;;
 H) rm_user_group ; user_tools ;;
-I) promote_user ; user_tools ;;
-J) demote_user ; user_tools ;;
-K) change_pass ; user_tools ;;
-L) test_pass ; user_tools ;;
-M) expiracy_usr_pass ; user_tools ;;
-N) expiracy_days ; user_tools ;;
-O) expiracy_now ; user_tools ;;
-P) expiracy_global ; user_tools ;;
-Q) mv_user_ou ; user_tools ;; 
-R) rm_user ; user_tools ;;
+I) copy_group ; user_tools ;;
+J) promote_user ; user_tools ;;
+K) demote_user ; user_tools ;;
+L) change_pass ; user_tools ;;
+M) test_pass ; user_tools ;;
+N) expiracy_usr_pass ; user_tools ;;
+O) expiracy_days ; user_tools ;;
+P) expiracy_now ; user_tools ;;
+Q) expiracy_global ; user_tools ;;
+R) mv_user_ou ; user_tools ;;
+S) rm_user ; user_tools ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -91,10 +93,11 @@ A 'Procurar/Verificar um Grupo' \
 B 'Criar grupo' \
 C 'Exibir todos os grupos' \
 D 'Exibir membros de um grupo' \
-E 'Adicionar grupo 1 a um grupo 2' \
-F 'Remover grupo 1 de um grupo 2' \
-G 'Mover grupo para OU' \
-H 'Excluir um grupo' \
+E 'Copiar os membros de um grupo' \
+F 'Adicionar grupo 1 a um grupo 2' \
+G 'Remover grupo 1 de um grupo 2' \
+H 'Mover grupo para OU' \
+I 'Excluir um grupo' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
@@ -102,10 +105,11 @@ A) check_group ; group_tools ;;
 B) create_group ; group_tools ;;
 C) show_groups ; group_tools ;;
 D) show_user_group ; group_tools ;;
-E) add_group_group ; group_tools ;;
-F) rm_group_group ; group_tools ;;
-G) mv_group_ou ; group_tools ;;
-H) rm_group ; group_tools ;;
+E) copy_user ; group_tools ;;
+F) add_group_group ; group_tools ;;
+G) rm_group_group ; group_tools ;;
+H) mv_group_ou ; group_tools ;;
+I) rm_group ; group_tools ;;
 X) echo "." > /dev/null ;;
 esac
 }
@@ -254,7 +258,7 @@ validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
   dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
 } || {
   repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
-  [ "$repeated" = "$validsilo" ] && {    
+  [ "$repeated" = "$validsilo" ] && {
     dialog --title "Informacao" --msgbox "O silo "$validsilo" existe!" 8 40
     clear
     dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os dados! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
@@ -272,7 +276,7 @@ function show_silos {
 dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os Silos! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
 [ $? -ne 0 ] && return
 silolist=$(samba-tool domain auth silo list)
-echo "$silolist" | less  
+echo "$silolist" | less
 }
 
 function create_silos {
@@ -315,7 +319,7 @@ function add_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
-} || {  
+} || {
   validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
   [ -z "$validsilo" ] && {
     dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
@@ -341,7 +345,7 @@ function rm_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
-} || {  
+} || {
   validsilo=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
   [ -z "$validsilo" ] && {
     dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
@@ -540,7 +544,7 @@ function mv_user_ou {
 validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
-} || {  
+} || {
   validou=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
   [ -z "$validou" ] && {
     dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
@@ -565,7 +569,7 @@ function mv_group_ou {
 validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
-} || {  
+} || {
   validou=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
   [ -z "$validou" ] && {
     dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
@@ -781,7 +785,7 @@ function add_user_group {
 validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
-} || {  
+} || {
   validgrp=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
   [ -z "$validgrp" ] && {
     dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
@@ -806,7 +810,7 @@ function add_group_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp1" ] && {
   dialog --title "ERRO" --msgbox "Grupo 1 nao pode ficar em branco!" 8 40
-} || {  
+} || {
   validgrp2=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
   [ -z "$validgrp2" ] && {
     dialog --title "ERRO" --msgbox "Grupo 2 nao pode ficar em branco!" 8 40
@@ -831,7 +835,7 @@ function rm_group_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp1" ] && {
   dialog --title "ERRO" --msgbox "Grupo 1 nao pode ficar em branco!" 8 40
-} || {  
+} || {
   validgrp2=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
   [ -z "$validgrp2" ] && {
     dialog --title "ERRO" --msgbox "Grupo 2 nao pode ficar em branco!" 8 40
@@ -869,6 +873,60 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
+# Copiar os grupos de um usuario
+function copy_group {
+validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario IN" 0 0 2>&1 > /dev/tty)
+validusr2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario OUT" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr1" ] || [ -z "$validusr2" ] && {
+  dialog --title "ERRO" --msgbox "Usuario IN (ou OUT) em branco! Corrija por favor." 8 40
+  } || {
+    repeated1=$(samba-tool user list | grep -x "$validusr1")
+    repeated2=$(samba-tool user list | grep -x "$validusr2")
+    [ "$repeated1" = "$validusr1" ] && [ "$repeated2" = "$validusr2" ] && {
+      grpsusr=$(samba-tool user getgroups "$validusr1")
+      IFS=$'\n' read -d '' -r -a groups <<< "$(echo "$grpsusr" | awk -v RS='\"' 'NR % 2 == 0 {print "\"" $0 "\""} NR % 2 == 1 {print $0}')"
+      for groupa in "${groups[@]}"; do
+        clear
+        echo ""
+        echo "Adicionando ao grupo $groupa o usuario $validusr2"
+        echo ""
+        samba-tool group addmembers "$groupa" "$validusr2"
+        sleep 1
+        clear
+      done
+    } || {
+      dialog --title "ERROR" --msgbox "Usuario(s) invalido(s)!" 7 25
+    }
+  }
+}
+
+# Copiar os membros de um grupo
+function copy_user {
+validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo IN" 0 0 2>&1 > /dev/tty)
+validgrp2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo OUT" 0 0 2>&1 > /dev/tty)
+[ -z "$validgrp1" ] || [ -z "$validgrp2" ] && {
+  dialog --title "ERRO" --msgbox "Grupo (ou OUT) em branco! Corrija por favor." 8 40
+  } || {
+    repeated1=$(samba-tool group list | grep -x "$validgrp1")
+    repeated2=$(samba-tool group list | grep -x "$validgrp2")
+    [ "$repeated1" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ] && {
+      usrgrps=$(samba-tool group listmembers "$validgrp1")
+      IFS=$'\n' read -d '' -r -a userss <<< "$(echo "$usrgrps" | awk -v RS='\"' 'NR % 2 == 0 {print "\"" $0 "\""} NR % 2 == 1 {print $0}')"
+      for userss1 in "${userss[@]}"; do
+        clear
+        echo ""
+        echo "Adicionando o membro $userss1 ao grupo $validgrp2"
+        echo ""
+        samba-tool group addmembers "$validgrp2" "$userss1"
+        sleep 1
+        clear
+      done
+    } || {
+      dialog --title "ERROR" --msgbox "Grupo(s) invalido(s)!" 7 25
+    }
+  }
+}
+
 function rm_user_group {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
@@ -901,7 +959,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
 } || {
   repeated=$(samba-tool group list | grep -x "$validgrp")
-  [ "$repeated" = "$validgrp" ] && {  
+  [ "$repeated" = "$validgrp" ] && {
     dialog --title 'Confirmacao' --backtitle 'Exclusao de Grupo' --yesno "Deseja excluir o grupo $validgrp?" 0 0
     [ $? = 0 ] && {
       samba-tool group delete "$validgrp"
@@ -1112,7 +1170,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
       sleep 1
       samba-tool group removemembers "Administrators" "$validusr"
       sleep 1
-      dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
+      dialog --title "Informacao" --msgbox "Usuario $validusr deixou de ser administrador!" 8 40
   } || {
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
     }
@@ -1142,7 +1200,7 @@ function mv_pc_ou {
 validpc=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome do Computador" 0 0 2>&1 > /dev/tty)
 [ -z "$validpc" ] && {
   dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
-} || {  
+} || {
   validou=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
   [ -z "$validou" ] && {
     dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
@@ -1215,7 +1273,7 @@ validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o n
   dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
 } || {
   repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
-  [ "$repeated" = "$validpc"\$ ] && {    
+  [ "$repeated" = "$validpc"\$ ] && {
     dialog --title "Informacao" --msgbox "O computador "$validpc"\$ esta cadastrado!" 8 40
     clear
     dialog --title "$ttitle" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os dados! Navegue com as setas para cima e para baixo. Para sair pressione 'q' !" 8 40
