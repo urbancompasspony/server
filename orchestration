@@ -133,6 +133,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 3 'SnipeIT (W)' \
 4 'PwnDrop (W)' \
 5 'Chromium to Web (L/W)' \
+6 'Nexterm (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
@@ -140,6 +141,7 @@ case "$var0" in
 3) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
 4) wget "$github"47-pwndrop -O /tmp/pwndrop; sudo bash /tmp/pwndrop ;;
 5) wget "$github"65-chromium -O /tmp/chromium; sudo bash /tmp/chromium ;;
+6) wget "$github"71-nexterm -O /tmp/nexterm; sudo bash /tmp/nexterm ;;
 X) echo "." > /dev/null ;;
 esac
 }
