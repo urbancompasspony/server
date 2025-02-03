@@ -166,6 +166,7 @@ function s_settings {
   H 'Install ADMX Templates for Windows 10' \
   I 'Install ADMX Templates for Windows 11' \
   J 'Remove ADMX Templates' \
+  K 'Atualizar este Menu' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
@@ -179,6 +180,7 @@ function s_settings {
   H) clear ; force_msi_w10 ; s_settings ;;
   I) clear ; force_msi_w11 ; s_settings ;;
   J) clear ; rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions ; read -p "ADMX Templates removidas. Pressione Enter para continuar!" ; s_settings ;;
+  K) clear ; wget -q https://raw.githubusercontent.com/urbancompasspony/server/main/dominio -O /root/.dominio ; chmod +x /root/.dominio ; exit ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
 }
