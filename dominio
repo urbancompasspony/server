@@ -1071,7 +1071,7 @@ Exemplo: joao_naves" 9 40 2>&1 > /dev/tty)
 [ -z "$validusr1" ] && {
   dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
 } || {
-  repeated2=$(samba-tool user list | grep -x "$validusr1")
+  repeated2=$(samba-tool user list | grep "$validusr1")
   [ "$repeated2" = "$validusr1" ] && {
     dialog --title "Informacao" --msgbox "O usuario $validusr1 esta cadastrado!" 8 40
     clear
@@ -1093,7 +1093,7 @@ validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
 [ -z "$validgrp1" ] && {
   dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
 } || {
-  repeated3=$(samba-tool group list | grep -x "$validgrp1")
+  repeated3=$(samba-tool group list | grep "$validgrp1")
   [ "$repeated3" = "$validgrp1" ] && {
     dialog --title "Informacao" --msgbox "O grupo $validgrp1 esta cadastrado!" 8 40
     clear
