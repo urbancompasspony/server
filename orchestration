@@ -177,6 +177,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 9 'Endlessh (W)' \
 10 'Ejabberd-chat-server (W/L)' \
 11 'Dominio & CUPS BETA (W)' \
+12 'Rancher - k3s k8s (W/L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
@@ -190,6 +191,7 @@ case "$var0" in
 9) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
 10) wget "$github"55-ejabberd-chatserver -O /tmp/55-ejabberd-chatserver; sudo bash /tmp/55-ejabberd-chatserver ;;
 11) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
+12) wget "$github"72-rancher-k8s -O /tmp/rancher; sudo bash /tmp/rancher ;;
 X) echo "." > /dev/null ;;
 esac
 }
