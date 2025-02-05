@@ -2,29 +2,31 @@
 
 function relat0 {
 var0=$(dialog --title 'Relatórios' --cancel-label "Voltar" --backtitle "Gerador de Relatórios v1.0" --menu " " 0 0 0 \
-0 'PROCESSAR TODOS!' \
-1 'Atualizacao de Sistema' \
-2 'Gerar SMART DUMP' \
-3 'Manutencao .db Dominio' \
-4 'Manutencao .db PiHole' \
-5 'Status Pentests' \
-6 'Status SYSLOGs' \
-7 'Status dos Backups' \
-8 'Relatorio Customizado' \
-9 'Refazer Cabecalho (CUIDADO)' \
+0 'PROCESSAR TUDO!' \
+1 'RELATORIOS RECENTES' \
+2 'Atualizacao de Sistema' \
+3 'Gerar SMART DUMP' \
+4 'Manutencao .db Dominio' \
+5 'Manutencao .db PiHole' \
+6 'Status Pentests' \
+7 'Status SYSLOGs' \
+8 'Status dos Backups' \
+9 'Relatorio Customizado' \
+10 'Refazer Cabecalho (CUIDADO)' \
 X 'Voltar' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && start
 case "$var0" in
 0) relatfull ; relat0 ;;
-1) upgrade0 ; relat0 ;;
-2) smartdump0 ; relat0 ;;
-3) domain0 ; relat0 ;;
-4) pihole0 ; relat0 ;;
-5) pentest0 ; relat0 ;;
-6) syslog0 ; relat0 ;;
-7) backup0 ; relat0 ;;
-8) custom0 ; relat0 ;;
-9) cabecalho ; relat0 ;;
+1) cole_relat ; relat0 ;;
+2) upgrade0 ; relat0 ;;
+3) smartdump0 ; relat0 ;;
+4) domain0 ; relat0 ;;
+5) pihole0 ; relat0 ;;
+6) pentest0 ; relat0 ;;
+7) syslog0 ; relat0 ;;
+8) backup0 ; relat0 ;;
+9) custom0 ; relat0 ;;
+10) cabecalho ; relat0 ;;
 X) echo a > /dev/null ;;
 esac
 }
@@ -44,6 +46,14 @@ function relatfull {
   clear; cat "$setfolder"/SMART_DUMP
   read -N 2
 }
+
+function cole_relat {
+  clear; cat "$setfolder"/relatorio-"$monthonly".txt
+  read -N 2
+  clear; cat "$setfolder"/SMART_DUMP
+  read -N 2
+}
+
 # myspeed0
 
 function upgrade0 {
@@ -439,8 +449,8 @@ function enter0 {
 
 setfolder="/srv/relatorios"
 smartdumplocal="$setfolder/SMART_DUMP"
-
 sudo mkdir -p $setfolder
+
 monthonly=$(date +"%m-%Y")
 file="$setfolder/relatorio-$monthonly.txt"
 
