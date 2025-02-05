@@ -54,6 +54,9 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 14 'Tailscale CLIENT (L/W)' \
 15 'Syncthing RELAY (W)' \
 16 'OpenVPN Server (L/W)' \
+17 'qdirstat (L/W)' \
+18 'Smoke Ping (L/W)' \
+19 'Double Commander (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
@@ -72,6 +75,9 @@ case "$var0" in
 14) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
 15) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
 16) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+17) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
+18) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
+19) wget "$github"77-doublecommander -O /tmp/doublecommander; sudo bash /tmp/doublecommander ;;
 X) echo "." > /dev/null ;;
 esac
 }
