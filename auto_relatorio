@@ -39,6 +39,10 @@ function relatfull {
   syslog0
   backup0
   contclean0
+  clear; cat "$setfolder"/relatorio-"$monthonly".txt
+  read -N 2
+  clear; cat "$setfolder"/SMART_DUMP
+  read -N 2
 }
 # myspeed0
 
