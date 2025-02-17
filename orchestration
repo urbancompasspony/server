@@ -189,7 +189,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 9 'Endlessh (W)' \
 10 'Ejabberd-chat-server (W/L)' \
 11 'Dominio & CUPS BETA (W)' \
-12 'Rancher - k3s k8s (W/L)' \
+12 'Rancher - k3s k8s (W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
