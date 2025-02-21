@@ -338,11 +338,6 @@ function enter0 {
 # Start here! #
 ###############
 
-[ "$EUID" -ne 0 ] && {
-  echo "Execute esse script com sudo! Saindo..."
-  exit
-  }
-
 setfolder="/srv/relatorios"
 smartdumplocal="$setfolder/SMART_DUMP"
 sudo mkdir -p $setfolder
