@@ -42,7 +42,7 @@ function smartdump1 {
   datetime0
   rm $smartdumplocal
   touch $smartdumplocal
-  
+
   for i in {a..z}
   do
     # Check if block device exist
@@ -58,7 +58,7 @@ function smartdump1 {
       echo "." >/dev/null
     }
   done
- 
+
   for i in {0..10}
   do
     # Check if block device exist
@@ -71,7 +71,7 @@ function smartdump1 {
         echo ""
     } || {
       echo "." >/dev/null
-    }    
+    }
   done
 
   for i in {0..5}
@@ -141,6 +141,7 @@ function pihole0 {
       var3=$(sed -n '3p' /srv/containers/"$i2"/Information)
       var4=$(sed -n '4p' /srv/containers/"$i2"/Information)
       var5=$(sed -n '5p' /srv/containers/"$i2"/Information)
+      var6=$(sed -n '5p' /srv/containers/"$i2"/Information)
 
       pihole1
 
@@ -183,8 +184,8 @@ function pihole1 {
 --no-healthcheck \
 --restart=unless-stopped \
 --shm-size=512m \
--e SERVERIP=$var3 \
--e WEBPASSWORD=$var2 \
+-e FTLCONF_webserver_api_password=$var2 \
+-e FTLCONF_dns_listeningMode=all \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$i2"/etc/:/etc/pihole \
 -v /srv/containers/"$i2"/dnsmasq.d/:/etc/dnsmasq.d \
@@ -206,8 +207,8 @@ pihole/pihole:latest
 --no-healthcheck \
 --restart=unless-stopped \
 --shm-size=512m \
--e SERVERIP=$var1 \
--e WEBPASSWORD=$var2 \
+-e FTLCONF_webserver_api_password=$var2 \
+-e FTLCONF_dns_listeningMode=all \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$i2"/etc/:/etc/pihole \
 -v /srv/containers/"$i2"/dnsmasq.d/:/etc/dnsmasq.d \
@@ -260,7 +261,7 @@ function syslog0 {
     echo ""; echo "$i"; echo ""
     cat $i | grep -a 'renameat' | tail -n 5
     enter0
-  done 
+  done
 
   echo "$datetime Foi realizada a verificação da integridade dos Logs de Eventos
 das pastas da rede e se os registros de uso, dos compartilhamentos, estão em dia.
