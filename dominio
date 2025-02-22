@@ -202,7 +202,7 @@ function set_common_perm {
 
 function change_password0 {
   var4=$(dialog --title "$ttitle" --backtitle "Regras de senhas para todo o Dominio" --menu " " 0 0 0 \
-  A 'Mostrar Status das Regras' \
+  A 'Mostrar Status das Regras de Senhas' \
   B 'Ativar complexidade das senhas' \
   C 'Desativar complexidade das senhas' \
   D 'Tamanho do historico das senhas' \
@@ -223,8 +223,8 @@ function change_password0 {
   F) pass_min_age ; change_password0 ;;
   G) pass_max_age ; change_password0 ;;
   H) try_login ; change_password0 ;;
-  I)  ; change_password0 ;;
-  J)  ; change_password0 ;;
+  I) failblock_login ; change_password0 ;;
+  J) releaseblock_login ; change_password0 ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -234,118 +234,141 @@ function show_pass_policy {
 }
 
 function set_complex {
-daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Ativar a complexidade de senhas. \n\n
-Valor padrao: ATIVO" 11 35 2>&1 > /dev/tty)
-[ -z "$daystoexpire" ] && {
-  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
-} || {
+  daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --yesno "Ativar a complexidade de senhas? \n\n
+Valor padrao: ATIVO" 9 35 2>&1 > /dev/tty)
+  [ $? = 0 ] && {
   clear
   samba-tool domain passwordsettings set --complexity=on
   samba-tool domain passwordsettings set --history-length=24
   samba-tool domain passwordsettings set --min-pwd-age=1
   samba-tool domain passwordsettings set --max-pwd-age=90
-  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+  samba-tool domain passwordsettings set --min-pwd-length=7
+  dialog --cr-wrap --title "A complexidade de senhas foi reativada!" --backtitle "Complexidade restaurada aos valores padrao." --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
 }
 
 }
 
 function unset_complex {
-daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Ativar a complexidade de senhas. \n\n
-Valor padrao: ATIVO" 11 35 2>&1 > /dev/tty)
-[ -z "$daystoexpire" ] && {
-  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
-} || {
+  daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --yesno "Desativar a complexidade de senhas? \n\n
+Valor padrao: ATIVO" 9 35 2>&1 > /dev/tty)
+  [ $? = 0 ] && {
   clear
   samba-tool domain passwordsettings set --complexity=off
   samba-tool domain passwordsettings set --history-length=0
   samba-tool domain passwordsettings set --min-pwd-age=0
   samba-tool domain passwordsettings set --max-pwd-age=0
-  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+  samba-tool domain passwordsettings set --min-pwd-length=0
+  dialog --cr-wrap --title "A complexidade de senhas foi removida do servidor!" --backtitle "Complexidade totalmente removida." --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
 }
 
 }
 
 function pass_history {
-daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Trocar senha quantas vezes ate permitir repetir. \n\n
+pass_history0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Trocar senha quantas vezes ate permitir repetir? \n\n
 Valor padrao: 24" 11 35 2>&1 > /dev/tty)
-[ -z "$daystoexpire" ] && {
-  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+[ -z "$pass_history0" ] && {
+  dialog002
 } || {
-  samba-tool domain passwordsettings set --history-length=$daystoexpire
-  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+  clear
+  samba-tool domain passwordsettings set --history-length=$pass_history0
+  dialog --title "Confirmacao" --msgbox "A senha devera ser trocada $pass_history0 vezes antes de poder repeti-la!" 8 40
 }
 
 }
 
 function pass_min_length {
-daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Tamanho minimo de caracteres das senhas. \n\n
+pass_min0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Tamanho minimo de caracteres das senhas. \n\n
 Valor padrao: 7" 11 35 2>&1 > /dev/tty)
-[ -z "$daystoexpire" ] && {
-  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+[ -z "$pass_min0" ] && {
+  dialog002
 } || {
-  samba-tool domain passwordsettings set --min-pwd-length=$daystoexpire
-  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+  clear
+  samba-tool domain passwordsettings set --min-pwd-length=$pass_min0
+  dialog --title "Confirmacao" --msgbox "Agora as senhas deverao conter no minimo $pass_min0 caracter(es)!" 8 40
 }
 
 }
 
 function pass_min_age {
-daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Evitar a troca de senha seguidas vezes, em dias: \n\n
-Valor padrao: 1 dia" 11 35 2>&1 > /dev/tty)
-[ -z "$daystoexpire" ] && {
-  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+daystoexpire1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Evitar a troca de senha seguidas vezes. \n\n
+Valor padrao: 1 dia \n\n
+Valor 0: Troque quando quiser" 14 35 2>&1 > /dev/tty)
+[ -z "$daystoexpire1" ] && {
+  dialog002
 } || {
-  samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire
-  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+  clear
+  samba-tool domain passwordsettings set --min-pwd-age=$daystoexpire1
+  dialog --title "Confirmacao" --msgbox "Todos os usuarios so podem trocar a senha novamente apos $daystoexpire1 dias!" 8 40
 }
 
 }
 
 function pass_max_age {
-daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina a validade das senhas em dias. \n\n
-Valor padrao: 90 dias" 11 35 2>&1 > /dev/tty)
-[ -z "$daystoexpire" ] && {
-  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+daystoexpire2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina a validade das senhas em dias. \n\n
+Valor padrao: 90 dias \n\n
+Valor 0: Sem validade." 14 35 2>&1 > /dev/tty)
+[ -z "$daystoexpire2" ] && {
+  dialog002
 } || {
-  samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire
-  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+  clear
+  samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire2
+  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire2 dias!" 8 40
 }
 
 }
 
 function try_login {
-daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina a validade das senhas em dias. \n\n
-Valor padrao: 90 dias" 11 35 2>&1 > /dev/tty)
-[ -z "$daystoexpire" ] && {
-  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+blocklogin0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Quantas tentativas de login antes de bloquear o usuario? \n\n
+Valor padrao: 0" 11 35 2>&1 > /dev/tty)
+[ -z "$blocklogin0" ] && {
+  dialog002
 } || {
-  samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire
-  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+  clear
+  samba-tool domain passwordsettings set --account-lockout-threshold=$blocklogin0
+  dialog --title "Confirmacao" --msgbox "O usuario sera bloqueado se errar a senha $blocklogin0 vezes!" 8 40
 }
 
 }
 
+function failblock_login {
+failblock0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Por quanto tempo manter o usuario bloqueado apos errar a senha? \n\n
+Valor padrao: 30 minutos \n\n
+Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty)
+[ -z "$failblock0" ] && {
+  dialog002
+} || {
+  clear
+  samba-tool domain passwordsettings set --account-lockout-duration=$failblock0
+  dialog --title "Confirmacao" --msgbox "O usuario bloqueado por errar a senha ficara bloqueado por $failblock0 minutos!" 8 40
+}
 
+}
 
+function releaseblock_login {
+releaseblk0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Apos quanto tempo liberar usuarios bloqueados apos errarem a senha? \n\n
+Valor padrao: 30 minutos \n\n
+Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty)
+[ -z "$releaseblk0" ] && {
+  dialog002
+} || {
+  clear
+  samba-tool domain passwordsettings set --reset-account-lockout-after=$releaseblk0
+  dialog --title "Confirmacao" --msgbox "O usuario bloqueado por errar a senha podera logar novamente apos $failblock0 minutos!" 8 40
+}
 
-
-
-
-
-
-
+}
 
 function change_acls0 {
   var4=$(dialog --title "$ttitle" --backtitle "Coletar ou modificar ACLs" --menu " " 0 0 0 \
-  1 'ACL check of GPOs (as Administrator!)' \
-  2 'Get ACLs from a File or Folder' \
-  3 'PERIGO! Set ACL to a File or Folder' \
+  A 'ACL check of GPOs (as Administrator!)' \
+  B 'Get ACLs from a File or Folder' \
+  C 'PERIGO! Set ACL to a File or Folder' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
-  1) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; change_acls0 ;;
-  2) getacls0 ; change_acls0 ;;
-  3) setacls0 ; change_acls0 ;;
+  A) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; change_acls0 ;;
+  B) getacls0 ; change_acls0 ;;
+  C) setacls0 ; change_acls0 ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -362,6 +385,7 @@ C 'Compartilhamento estruturado' \
 D 'Excluir compartilhamento' \
 E 'Revalidar configuracoes' \
 X '<' 2>&1 > /dev/tty )
+[ $? -ne 0 ] && return
 case "$var0" in
 A) show_shared ; shared_folders ;;
 B) create_shared ; shared_folders ;;
@@ -426,7 +450,7 @@ function check_silo {
 validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validsilo" ] && {
-  dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
   [ "$repeated" = "$validsilo" ] && {
@@ -454,7 +478,7 @@ function create_silos {
 validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validsilo" ] && {
-  dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
   [ "$repeated" = "$validsilo" ] && {
@@ -471,7 +495,7 @@ function list_usr_silo {
 validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validsilo" ] && {
-  dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
   [ "$repeated" = "$validsilo" ] && {
@@ -489,11 +513,11 @@ validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
 function add_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
   [ -z "$validsilo" ] && {
-    dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+    dialog002
   } || {
     repeated=$(samba-tool user list | grep -x "$validusr")
     [ "$repeated" = "$validusr" ] && {
@@ -515,11 +539,11 @@ validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --i
 function rm_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   validsilo=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
   [ -z "$validsilo" ] && {
-    dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+    dialog002
   } || {
     repeated=$(samba-tool user list | grep -x "$validusr")
     [ "$repeated" = "$validusr" ] && {
@@ -542,7 +566,7 @@ function rm_silo {
 validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validsilo" ] && {
-  dialog --title "ERRO" --msgbox "Silo nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
   [ "$repeated" = "$validsilo" ] && {
@@ -699,7 +723,7 @@ echo "$oulst" | less
 function create_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Criando uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
 [ -z "$validou" ] && {
-  dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
+  dialog002
 } || {
    repeated=$(samba-tool ou list | grep -x OU="$validou")
   [ "$repeated" = "OU=$validou" ] && {
@@ -714,11 +738,11 @@ validou=$(dialog --title "$ttitle" --backtitle "Criando uma OU" --inputbox "Insi
 function mv_user_ou {
 validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   validou=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
   [ -z "$validou" ] && {
-    dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
+    dialog002
   } || {
     repeated=$(samba-tool user list | grep -x "$validusr")
     [ "$repeated" = "$validusr" ] && {
@@ -739,11 +763,11 @@ validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputb
 function mv_group_ou {
 validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
-  dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   validou=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
   [ -z "$validou" ] && {
-    dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
+    dialog002
   } || {
     repeated=$(samba-tool group list | grep -x "$validgrp")
     [ "$repeated" = "$validgrp" ] && {
@@ -764,7 +788,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox
 function rm_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "Insira o nome da OU:" 0 0 2>&1 > /dev/tty)
 [ -z "$validou" ] && {
-  dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool ou list | grep -x OU="$validou")
   [ "$repeated" = "OU=$validou" ] && {
@@ -789,7 +813,7 @@ validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "In
 function list_obj_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Objetos de uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
 [ -z "$validou" ] && {
-  dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
+  dialog002
 } || {
    repeated=$(samba-tool ou list | grep -x OU="$validou")
   [ "$repeated" = "OU=$validou" ] && {
@@ -864,13 +888,13 @@ function check_user_creation {
 function change_pass {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
     validpss=$(dialog --title "$ttitle" --backtitle "Trocar a senha de usuario do Dominio" --insecure --passwordbox 'Crie uma nova senha para o usuario' 0 0 2>&1 > /dev/tty )
     [ -z "$validpss" ] && {
-      dialog --title "ERROR" --msgbox "Senha nao pode ficar em branco!" 7 25
+      dialog002
     } || {
       samba-tool user setpassword "$validusr" --newpassword="$validpss"
       dialog --title "Informacao" --msgbox "Senha de $validusr trocada com sucesso!" 8 40
@@ -885,7 +909,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function blk_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
@@ -901,7 +925,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function ublk_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
@@ -917,7 +941,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function rm_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
@@ -938,7 +962,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function create_group {
 validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
-  dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validgrp")
   repeated2=$(samba-tool group list | grep -x "$validgrp")
@@ -955,11 +979,11 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function add_user_group {
 validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   validgrp=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
   [ -z "$validgrp" ] && {
-    dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
+    dialog002
   } || {
     repeated=$(samba-tool user list | grep -x "$validusr")
     [ "$repeated" = "$validusr" ] && {
@@ -980,11 +1004,11 @@ validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" -
 function add_group_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp1" ] && {
-  dialog --title "ERRO" --msgbox "Grupo 1 nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   validgrp2=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
   [ -z "$validgrp2" ] && {
-    dialog --title "ERRO" --msgbox "Grupo 2 nao pode ficar em branco!" 8 40
+    dialog002
   } || {
     repeated=$(samba-tool group list | grep -x "$validgrp1")
     [ "$repeated" = "$validgrp1" ] && {
@@ -1005,11 +1029,11 @@ validgrp1=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2
 function rm_group_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp1" ] && {
-  dialog --title "ERRO" --msgbox "Grupo 1 nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   validgrp2=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
   [ -z "$validgrp2" ] && {
-    dialog --title "ERRO" --msgbox "Grupo 2 nao pode ficar em branco!" 8 40
+    dialog002
   } || {
     repeated=$(samba-tool group list | grep -x "$validgrp1")
     [ "$repeated" = "$validgrp1" ] && {
@@ -1030,7 +1054,7 @@ validgrp1=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2"
 function show_user_group {
 validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
-  dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool group list | grep -x "$validgrp")
   [ "$repeated" = "$validgrp" ] && {
@@ -1049,7 +1073,7 @@ function copy_group {
 validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario IN" 0 0 2>&1 > /dev/tty)
 validusr2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario OUT" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr1" ] || [ -z "$validusr2" ] && {
-  dialog --title "ERRO" --msgbox "Usuario IN (ou OUT) em branco! Corrija por favor." 8 40
+  dialog002
   } || {
     repeated1=$(samba-tool user list | grep -x "$validusr1")
     repeated2=$(samba-tool user list | grep -x "$validusr2")
@@ -1076,7 +1100,7 @@ function copy_user {
 validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo IN" 0 0 2>&1 > /dev/tty)
 validgrp2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo OUT" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp1" ] || [ -z "$validgrp2" ] && {
-  dialog --title "ERRO" --msgbox "Grupo (ou OUT) em branco! Corrija por favor." 8 40
+  dialog002
   } || {
     repeated1=$(samba-tool group list | grep -x "$validgrp1")
     repeated2=$(samba-tool group list | grep -x "$validgrp2")
@@ -1101,11 +1125,11 @@ validgrp2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
 function rm_user_group {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   validgrp=$(dialog --title "$ttitle" --backtitle "Remover Usuario de um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
   [ -z "$validgrp" ] && {
-    dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
+    dialog002
   } || {
     repeated=$(samba-tool user list | grep -x "$validusr")
     [ "$repeated" = "$validusr" ] && {
@@ -1127,7 +1151,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function rm_group {
 validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
 [ -z "$validgrp" ] && {
-  dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool group list | grep -x "$validgrp")
   [ "$repeated" = "$validgrp" ] && {
@@ -1148,7 +1172,7 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function expiracy_usr_pass {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
@@ -1166,21 +1190,10 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 }
 
-function expiracy_global {
-daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina quando TODAS AS senhas vao expirar, em dias:" 9 35 2>&1 > /dev/tty)
-[ -z "$daystoexpire" ] && {
-  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
-} || {
-  samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire
-  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
-}
-
-}
-
 function expiracy_now {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
@@ -1201,13 +1214,13 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function expiracy_days {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
     daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina quando a senha vai expirar, em dias" 0 0 2>&1 > /dev/tty)
     [ -z "$daystoexpire" ] && {
-      dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+      dialog002
     } || {
       samba-tool user setexpiry $validusr --days=$daystoexpire
       dialog --title "Confirmacao" --msgbox "O usuario $validusr devera trocar a senha em $daystoexpire dias!" 8 40
@@ -1222,7 +1235,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function show_group_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
@@ -1241,7 +1254,7 @@ validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
 Exemplos: joao, ou Admin" 9 40 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validusr1" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   usrdata=$(samba-tool user list | grep "$validusr1")
   clear
@@ -1256,7 +1269,7 @@ function search_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validgrp1" ] && {
-  dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   grpdata=$(samba-tool group list | grep "$validgrp1")
   clear
@@ -1272,7 +1285,7 @@ validpc1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 Exemplo: PC001 sem o $" 9 40 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validpc1" ] && {
-  dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   pcdata=$(samba-tool computer list | grep "$validpc"\\$)
   clear
@@ -1287,7 +1300,7 @@ function check_user {
 validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario. \n
 Exemplo: joao_naves" 9 40 2>&1 > /dev/tty)
 [ -z "$validusr1" ] && {
-  dialog --title "ERRO" --msgbox "Usuario nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated2=$(samba-tool user list | grep "$validusr1")
   [ "$repeated2" = "$validusr1" ] && {
@@ -1308,7 +1321,7 @@ function check_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de grupo" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validgrp1" ] && {
-  dialog --title "ERRO" --msgbox "Grupo nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated3=$(samba-tool group list | grep "$validgrp1")
   [ "$repeated3" = "$validgrp1" ] && {
@@ -1342,7 +1355,7 @@ function smb_process {
 function promote_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
@@ -1368,7 +1381,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function demote_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
@@ -1394,7 +1407,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function test_pass {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
 [ -z "$validusr" ] && {
-  dialog --title "ERROR" --msgbox "Usuario nao pode ficar em branco!" 7 25
+  dialog002
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
@@ -1412,11 +1425,11 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 function mv_pc_ou {
 validpc=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome do Computador" 0 0 2>&1 > /dev/tty)
 [ -z "$validpc" ] && {
-  dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   validou=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
   [ -z "$validou" ] && {
-    dialog --title "ERRO" --msgbox "OU nao pode ficar em branco!" 8 40
+    dialog002
   } || {
     repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
     [ "$repeated" = "$validpc"\$ ] && {
@@ -1445,7 +1458,7 @@ function create_pc {
 validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validpc" ] && {
-  dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
   [ "$repeated" = "$validpc"\$ ] && {
@@ -1462,7 +1475,7 @@ function rm_pc {
 validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty)
 [ $? -ne 0 ] && return
 [ -z "$validpc" ] && {
-  dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
   [ "$repeated" = "$validpc"\$ ] && {
@@ -1483,7 +1496,7 @@ validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o n
 function check_pc {
 validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty)
 [ -z "$validpc" ] && {
-  dialog --title "ERRO" --msgbox "Computador nao pode ficar em branco!" 8 40
+  dialog002
 } || {
   repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
   [ "$repeated" = "$validpc"\$ ] && {
@@ -1701,6 +1714,10 @@ function dialog001 {
   dialog --title "VISUALIZANDO DADOS" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os resultados! \n\nNavegue com as setas para cima e para baixo. \n\nPara sair pressione 'q' !" 12 40
 }
 
+function dialog002 {
+  dialog --title "ERRO" --msgbox "O(s) campo(s) exigidos nao pode(m) ficar em branco. \nPreencha-o(s) adequadamente!" 7 40
+}
+
 function faq_help {
 clear
 
@@ -1716,6 +1733,10 @@ echo "SOLUCAO: Crie uma nova pasta compartilhada estruturada temporaria com outr
 echo "Via SSH nao se esqueca de que a pasta /mnt/pasta_compartilhada sempre 777 e subpastas 0700."
 echo ""
 }
+
+###############
+# START HERE! #
+###############
 
 # Start all!
 main_menu
