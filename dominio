@@ -35,7 +35,7 @@ function main_menu {
   E) ou_tools ; main_menu ;;
   F) checksilos0 ; main_menu ;;
   G) info_domain ; main_menu ;;
-  H) s_settings ; main_menu ;;
+  H) s_settings_menu ; main_menu ;;
   X) exit ;;
   esac
 }
@@ -156,6 +156,69 @@ function info_domain {
   D) active_sessions ; info_domain ;;
   E) active_shares ; info_domain ;;
   F) faq_help ; read -p "Pressione Enter para continuar!" ; info_domain ;;
+  X) echo "." >/dev/null ;;
+  esac
+}
+
+#####################################
+# O menu de manutenção começa aqui! #
+#####################################
+
+function s_settings_menu {
+var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu " " 0 0 0 \
+  1 'Revalidar Permissoes Comuns' \
+  2 'Modificar Regras de Senhas' \
+  3 'Cuidado: Modificar ACLs' \
+  4 'Instalar ADMX Templates extras W 10' \
+  5 'Instalar ADMX Templates extras W 11' \
+  6 'Remover ADMX Templates extras' \
+  7 'Atualizar este Menu!' \
+  X '<' 2>&1 > /dev/tty )
+  [ $? -ne 0 ] && return
+  case "$var4" in
+  1) set_common_perm ; s_settings_menu ;;
+  2) change_password0 ; s_settings_menu ;;
+  3) ; s_settings_menu ;;
+  4) ; s_settings_menu ;;
+  5) clear ; force_msi_w10 ; s_settings_menu ;;
+  6) clear ; force_msi_w11 ; s_settings_menu ;;
+  7) clear ; rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions ; read -p "ADMX Templates removidas. Pressione Enter para continuar!" ; s_settings_menu ;;
+  K) clear ; wget -q https://raw.githubusercontent.com/urbancompasspony/server/main/dominio -O /root/.dominio ; chmod +x /root/.dominio ; exit ; s_settings_menu ;;
+  X) echo "." >/dev/null ;;
+  esac
+}
+
+function set_common_perm {
+  var4=$(dialog --title "$ttitle" --backtitle "Modificando permissoes" --menu " " 0 0 0 \
+  A 'SysVol check status' \
+  B 'SysVol reset permissions' \
+  C 'samba-ad-dc db check: general' \
+  D 'samba-ad-dc db check: well-known-acls' \
+  X '<' 2>&1 > /dev/tty )
+  [ $? -ne 0 ] && return
+  case "$var4" in
+  A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; set_common_perm ;;
+  B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; set_common_perm ;;
+  C) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; set_common_perm ;;
+  D) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; set_common_perm ;;
+  X) echo "." >/dev/null ;;
+  esac
+}
+
+WIP
+function change_password0 {
+  var4=$(dialog --title "$ttitle" --backtitle "Modificando regras de senhas" --menu " " 0 0 0 \
+  A 'SysVol check' \
+  B 'SysVol reset' \
+  C 'samba-ad-dc db check: well-known-acls' \
+  D 'samba-ad-dc db check: general' \
+  X '<' 2>&1 > /dev/tty )
+  [ $? -ne 0 ] && return
+  case "$var4" in
+  A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
   X) echo "." >/dev/null ;;
   esac
 }
