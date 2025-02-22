@@ -59,9 +59,8 @@ N 'Verificar a senha de um usuario' \
 O 'A senha do usuario deve expirar?' \
 P 'Quando a senha usuario vai expirar?' \
 Q 'Forcar a troca de senha imediata!' \
-R 'Definir quando expira senha (global).' \
-S 'Mover usuario para OU' \
-T 'Excluir um usuario' \
+R 'Mover usuario para OU' \
+S 'Cuidado: Excluir um usuario' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
@@ -82,9 +81,8 @@ N) test_pass ; user_tools ;;
 O) expiracy_usr_pass ; user_tools ;;
 P) expiracy_days ; user_tools ;;
 Q) expiracy_now ; user_tools ;;
-R) expiracy_global ; user_tools ;;
-S) mv_user_ou ; user_tools ;;
-T) rm_user ; user_tools ;;
+R) mv_user_ou ; user_tools ;;
+S) rm_user ; user_tools ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -100,7 +98,7 @@ F 'Copiar os membros de um grupo' \
 G 'Adicionar grupo 1 a um grupo 2' \
 H 'Remover grupo 1 de um grupo 2' \
 I 'Mover grupo para OU' \
-J 'Excluir um grupo' \
+J 'Cuidado: Excluir um grupo' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
@@ -125,7 +123,7 @@ B 'Verificar um computador' \
 C 'Exibir todos os computadores' \
 D 'Criar/Adicionar um computador' \
 E 'Mover computador para OU' \
-F 'Excluir um computador' \
+F 'Cuidado: Excluir um computador' \
 X '<' 2>&1 > /dev/tty )
 [ $? -ne 0 ] && return
 case "$var41" in
@@ -141,21 +139,19 @@ esac
 
 function info_domain {
   var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
-  A 'Detalhes do Dominio' \
-  B 'Complexidade das senhas' \
-  C 'Processos do SAMBA' \
-  D 'Status de todas sessoes ativas' \
-  E 'Status dos compartilhamentos' \
-  F 'F.A.Q. & Ajuda!' \
+  A 'Detalhes deste Dominio' \
+  B 'Processos do SAMBA-AD-DC' \
+  C 'Status de todas sessoes ativas' \
+  D 'Status dos compartilhamentos' \
+  E 'F.A.Q. & Ajuda!' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
   A) domain_details ; info_domain ;;
-  B) show_pass_policy ; info_domain ;;
-  C) smb_process ; info_domain ;;
-  D) active_sessions ; info_domain ;;
-  E) active_shares ; info_domain ;;
-  F) faq_help ; read -p "Pressione Enter para continuar!" ; info_domain ;;
+  B) smb_process ; info_domain ;;
+  C) active_sessions ; info_domain ;;
+  D) active_shares ; info_domain ;;
+  E) faq_help ; read -p "Pressione Enter para continuar!" ; info_domain ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -166,24 +162,23 @@ function info_domain {
 
 function s_settings_menu {
 var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu " " 0 0 0 \
-  1 'Revalidar Permissoes Comuns' \
-  2 'Modificar Regras de Senhas' \
-  3 'Cuidado: Modificar ACLs' \
-  4 'Instalar ADMX Templates extras W 10' \
-  5 'Instalar ADMX Templates extras W 11' \
-  6 'Remover ADMX Templates extras' \
-  7 'Atualizar este Menu!' \
+  A 'Permissoes Comuns' \
+  B 'Regras de Senhas' \
+  C 'Cuidado: ACLs' \
+  D 'Instalar ADMX Templates extras W 10' \
+  E 'Instalar ADMX Templates extras W 11' \
+  F 'Remover ADMX Templates extras' \
+  G 'Atualizar este Menu!' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
-  1) set_common_perm ; s_settings_menu ;;
-  2) change_password0 ; s_settings_menu ;;
-  3) ; s_settings_menu ;;
-  4) ; s_settings_menu ;;
-  5) clear ; force_msi_w10 ; s_settings_menu ;;
-  6) clear ; force_msi_w11 ; s_settings_menu ;;
-  7) clear ; rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions ; read -p "ADMX Templates removidas. Pressione Enter para continuar!" ; s_settings_menu ;;
-  K) clear ; wget -q https://raw.githubusercontent.com/urbancompasspony/server/main/dominio -O /root/.dominio ; chmod +x /root/.dominio ; exit ; s_settings_menu ;;
+  A) set_common_perm ; s_settings_menu ;;
+  B) change_password0 ; s_settings_menu ;;
+  C) change_acls0 ; s_settings_menu ;;
+  D) clear ; force_msi_w10 ; s_settings_menu ;;
+  E) clear ; force_msi_w11 ; s_settings_menu ;;
+  F) clear ; rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions ; read -p "ADMX Templates removidas. Pressione Enter para continuar!" ; s_settings_menu ;;
+  G) clear ; wget -q https://raw.githubusercontent.com/urbancompasspony/server/main/dominio -O /root/.dominio ; chmod +x /root/.dominio ; exit ; s_settings_menu ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -205,56 +200,159 @@ function set_common_perm {
   esac
 }
 
-WIP
 function change_password0 {
-  var4=$(dialog --title "$ttitle" --backtitle "Modificando regras de senhas" --menu " " 0 0 0 \
-  A 'SysVol check' \
-  B 'SysVol reset' \
-  C 'samba-ad-dc db check: well-known-acls' \
-  D 'samba-ad-dc db check: general' \
+  var4=$(dialog --title "$ttitle" --backtitle "Regras de senhas para todo o Dominio" --menu " " 0 0 0 \
+  A 'Mostrar Status das Regras' \
+  B 'Ativar complexidade das senhas' \
+  C 'Desativar complexidade das senhas' \
+  D 'Tamanho do historico das senhas' \
+  E 'Tamanho minimo das senhas' \
+  F 'Validade minima das senhas' \
+  G 'Validade maxima das senhas' \
+  H 'Tentativas de login antes de bloquear' \
+  I 'Duracao do bloqueio de contas se errar' \
+  J 'Duracao da liberacao da conta apos bloqueio' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
-  A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
+  A) show_pass_policy ; change_password0 ;;
+  B) set_complex ; change_password0 ;;
+  C) unset_complex ; change_password0 ;;
+  D) pass_history ; change_password0 ;;
+  E) pass_min_length ; change_password0 ;;
+  F) pass_min_age ; change_password0 ;;
+  G) pass_max_age ; change_password0 ;;
+  H) try_login ; change_password0 ;;
+  I)  ; change_password0 ;;
+  J)  ; change_password0 ;;
   X) echo "." >/dev/null ;;
   esac
 }
 
-function s_settings {
-  var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
-  A 'SysVol check' \
-  B 'SysVol reset' \
-  C 'samba-ad-dc db check: well-known-acls' \
-  D 'samba-ad-dc db check: general' \
-  E 'ACL check of GPOs (as Administrator!)' \
-  F 'Get ACLs from a File or Folder' \
-  G 'PERIGO! Set ACL to a File or Folder' \
-  H 'Install ADMX Templates for Windows 10' \
-  I 'Install ADMX Templates for Windows 11' \
-  J 'Remove ADMX Templates' \
-  K 'Atualizar este Menu para versao recente' \
+function show_pass_policy {
+  dialog --cr-wrap --title "Informaces da Politica de Senhas" --backtitle "$bktitle" --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
+}
+
+function set_complex {
+daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Ativar a complexidade de senhas. \n\n
+Valor padrao: ATIVO" 11 35 2>&1 > /dev/tty)
+[ -z "$daystoexpire" ] && {
+  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+} || {
+  clear
+  samba-tool domain passwordsettings set --complexity=on
+  samba-tool domain passwordsettings set --history-length=24
+  samba-tool domain passwordsettings set --min-pwd-age=1
+  samba-tool domain passwordsettings set --max-pwd-age=90
+  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+}
+
+}
+
+function unset_complex {
+daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Ativar a complexidade de senhas. \n\n
+Valor padrao: ATIVO" 11 35 2>&1 > /dev/tty)
+[ -z "$daystoexpire" ] && {
+  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+} || {
+  clear
+  samba-tool domain passwordsettings set --complexity=off
+  samba-tool domain passwordsettings set --history-length=0
+  samba-tool domain passwordsettings set --min-pwd-age=0
+  samba-tool domain passwordsettings set --max-pwd-age=0
+  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+}
+
+}
+
+function pass_history {
+daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Trocar senha quantas vezes ate permitir repetir. \n\n
+Valor padrao: 24" 11 35 2>&1 > /dev/tty)
+[ -z "$daystoexpire" ] && {
+  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+} || {
+  samba-tool domain passwordsettings set --history-length=$daystoexpire
+  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+}
+
+}
+
+function pass_min_length {
+daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Tamanho minimo de caracteres das senhas. \n\n
+Valor padrao: 7" 11 35 2>&1 > /dev/tty)
+[ -z "$daystoexpire" ] && {
+  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+} || {
+  samba-tool domain passwordsettings set --min-pwd-length=$daystoexpire
+  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+}
+
+}
+
+function pass_min_age {
+daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Evitar a troca de senha seguidas vezes, em dias: \n\n
+Valor padrao: 1 dia" 11 35 2>&1 > /dev/tty)
+[ -z "$daystoexpire" ] && {
+  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+} || {
+  samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire
+  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+}
+
+}
+
+function pass_max_age {
+daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina a validade das senhas em dias. \n\n
+Valor padrao: 90 dias" 11 35 2>&1 > /dev/tty)
+[ -z "$daystoexpire" ] && {
+  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+} || {
+  samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire
+  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+}
+
+}
+
+function try_login {
+daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina a validade das senhas em dias. \n\n
+Valor padrao: 90 dias" 11 35 2>&1 > /dev/tty)
+[ -z "$daystoexpire" ] && {
+  dialog --title "ERRO" --msgbox "Os dias nao podem ficar em branco!" 8 40
+} || {
+  samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire
+  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire dias!" 8 40
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+function change_acls0 {
+  var4=$(dialog --title "$ttitle" --backtitle "Coletar ou modificar ACLs" --menu " " 0 0 0 \
+  1 'ACL check of GPOs (as Administrator!)' \
+  2 'Get ACLs from a File or Folder' \
+  3 'PERIGO! Set ACL to a File or Folder' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
-  A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  C) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  D) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  E) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; s_settings ;;
-  F) getacls0 ; s_settings ;;
-  G) setacls0 ; s_settings ;;
-  H) clear ; force_msi_w10 ; s_settings ;;
-  I) clear ; force_msi_w11 ; s_settings ;;
-  J) clear ; rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions ; read -p "ADMX Templates removidas. Pressione Enter para continuar!" ; s_settings ;;
-  K) clear ; wget -q https://raw.githubusercontent.com/urbancompasspony/server/main/dominio -O /root/.dominio ; chmod +x /root/.dominio ; exit ; s_settings ;;
+  1) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; change_acls0 ;;
+  2) getacls0 ; change_acls0 ;;
+  3) setacls0 ; change_acls0 ;;
   X) echo "." >/dev/null ;;
   esac
 }
 
-
+#############################
+# Menu de Compartilhamentos #
+#############################
 
 function shared_folders {
 var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
@@ -1235,10 +1333,6 @@ Nome da Maquina: $HOSTNAME \n \n
 Versao do SAMBA: $smbv \n \n
 $domainv \n \n
 " 0 0
-}
-
-function show_pass_policy {
-  dialog --cr-wrap --title "Informaces encontradas" --backtitle "$bktitle" --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
 }
 
 function smb_process {
