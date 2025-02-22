@@ -359,10 +359,10 @@ Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty)
 }
 
 function change_acls0 {
-  var4=$(dialog --title "$ttitle" --backtitle "Coletar ou modificar ACLs" --menu " " 0 0 0 \
-  A 'ACL check of GPOs (as Administrator!)' \
-  B 'Get ACLs from a File or Folder' \
-  C 'PERIGO! Set ACL to a File or Folder' \
+  var4=$(dialog --title "CUIDADO!" --backtitle "ATENÇÃO" --menu "Prefira rodar este comando nas maquinas locais: \nicacls C:\\caminho\\do\\usuario /reset /t /c" 0 0 0 \
+  A 'Verificar ACL padrao (Administrator!)' \
+  B 'Coletar ACLs de arquivo ou pasta' \
+  C 'PERIGO! Definir uma ACL a um arquivo ou pasta' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
