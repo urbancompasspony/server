@@ -2,28 +2,30 @@
 
 function tools {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-A 'Retore a Backup' \
-B 'Set MACVLAN' \
-C 'Remove MACVLAN' \
-D 'PiHole Maintenance' \
-E 'PiHole Install Error' \
-F 'NC: filelocks' \
-G 'NC: add-missing-indices' \
-H 'NC: check-core & mimetype' \
-I 'NC: Disable LDAP' \
-J 'NC: Upgrade Manually CLI' \
+A 'Remove not used images' \
+B 'Retore a Backup' \
+C 'Set MACVLAN' \
+D 'Remove MACVLAN' \
+E 'PiHole Maintenance' \
+F 'PiHole Install Error' \
+G 'NC: filelocks' \
+H 'NC: add-missing-indices' \
+I 'NC: check-core & mimetype' \
+J 'NC: Disable LDAP' \
+K 'NC: Upgrade Manually CLI' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-A) clear ; restorebkp ;;
-B) clear ; macvland ;;
-C) clear ; docker network rm macvlan ; sleep 2 ;;
-D) clear ; piholemnt ;;
-E) clear ; piholeinst ;;
-F) clear ; filelocks ;;
-G) clear ; missingindices ;;
-H) clear ; checkcore ;;
-I) clear ; disableldap ;;
-J) clear ; upgradenc ;;
+A) docker image prune -af ; restorebkp ;;
+B) clear ; restorebkp ;;
+C) clear ; macvland ;;
+D) clear ; docker network rm macvlan ; sleep 2 ;;
+E) clear ; piholemnt ;;
+F) clear ; piholeinst ;;
+G) clear ; filelocks ;;
+H) clear ; missingindices ;;
+I) clear ; checkcore ;;
+J) clear ; disableldap ;;
+K) clear ; upgradenc ;;
 X) echo "." > /dev/null ;;
 esac
 }
