@@ -140,17 +140,17 @@ esac
 function info_domain {
   var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
   A 'Detalhes deste Dominio' \
-  B 'Processos do SAMBA-AD-DC' \
-  C 'Status de todas sessoes ativas' \
-  D 'Status dos compartilhamentos' \
-  E 'F.A.Q. & Ajuda!' \
+  B 'Status das Sessoes ativas' \
+  C 'Status dos Compartilhamentos' \
+  D 'Processos do SAMBA-AD-DC' \
+  E 'Ajuda!' \
   X '<' 2>&1 > /dev/tty )
   [ $? -ne 0 ] && return
   case "$var4" in
   A) domain_details ; info_domain ;;
-  B) smb_process ; info_domain ;;
-  C) active_sessions ; info_domain ;;
-  D) active_shares ; info_domain ;;
+  B) active_sessions ; info_domain ;;
+  C) active_shares ; info_domain ;;
+  D) smb_process ; info_domain ;;
   E) faq_help ; read -p "Pressione Enter para continuar!" ; info_domain ;;
   X) echo "." >/dev/null ;;
   esac
