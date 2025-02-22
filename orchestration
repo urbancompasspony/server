@@ -87,7 +87,7 @@ esac
 function modelstools {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'DashDot (L/W)' \
-2 'Dominio & CUPS (4.19) (W)' \
+2 'SAMBA/AD & CUPS (W)' \
 3 'Kuma (L/W)' \
 4 'MySpeed  Test WAN (L/W)' \
 5 'OpenSpeedTest LAN (L/W)' \
