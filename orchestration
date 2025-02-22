@@ -116,8 +116,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 6 'Servidor Apache (W)' \
 7 'Servidor CUPS (W)' \
 8 'Servidor FTP (W)' \
-9 'Servidor SAMBA (L/W)' \
-10 'Syncthing CLIENT (L/W)' \
+9 'Syncthing CLIENT (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
@@ -128,8 +127,7 @@ case "$var0" in
 6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
 7) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
 8) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-9) wget "$github"06-samba -O /tmp/samba; sudo bash /tmp/samba ;;
-10) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+9) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
 X) echo "." > /dev/null ;;
 esac
 }
