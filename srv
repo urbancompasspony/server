@@ -60,7 +60,7 @@ case "$var0" in
 1) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
 3) managers ; start ;;
-4) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_relatorio | tee /home/administrador/.autorelat ; chmod +x /home/administrador/.autorelat ; sudo bash /home/administrador/.autorelat ; start ;;
+4) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/relat_full_tailscale | tee /home/administrador/.autorelat ; chmod +x /home/administrador/.autorelat ; sudo bash /home/administrador/.autorelat ; start ;;
 5) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
 6) firstconfig ; start ;;
 X) exit ;;
