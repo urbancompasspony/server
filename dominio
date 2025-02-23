@@ -512,11 +512,8 @@ validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
 
 function add_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog002
-} || {
-  validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
-  [ -z "$validsilo" ] && {
+validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] || [ -z "$validsilo" ] && {
     dialog002
   } || {
     repeated=$(samba-tool user list | grep -x "$validusr")
@@ -534,15 +531,10 @@ validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --i
   }
 }
 
-}
-
 function rm_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog002
-} || {
-  validsilo=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
-  [ -z "$validsilo" ] && {
+validsilo=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] || [ -z "$validsilo" ] && {
     dialog002
   } || {
     repeated=$(samba-tool user list | grep -x "$validusr")
@@ -558,8 +550,6 @@ validusr=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --in
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
     }
   }
-}
-
 }
 
 function rm_silo {
@@ -737,11 +727,8 @@ validou=$(dialog --title "$ttitle" --backtitle "Criando uma OU" --inputbox "Insi
 
 function mv_user_ou {
 validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog002
-} || {
-  validou=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
-  [ -z "$validou" ] && {
+validou=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] || [ -z "$validou" ] && {
     dialog002
   } || {
     repeated=$(samba-tool user list | grep -x "$validusr")
@@ -758,15 +745,11 @@ validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputb
       }
     }
   }
-}
 
 function mv_group_ou {
 validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp" ] && {
-  dialog002
-} || {
-  validou=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
-  [ -z "$validou" ] && {
+validou=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
+[ -z "$validgrp" ] || [ -z "$validou" ] && {
     dialog002
   } || {
     repeated=$(samba-tool group list | grep -x "$validgrp")
@@ -783,7 +766,6 @@ validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox
       }
     }
   }
-}
 
 function rm_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "Insira o nome da OU:" 0 0 2>&1 > /dev/tty)
@@ -978,11 +960,8 @@ validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 function add_user_group {
 validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog002
-} || {
-  validgrp=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ -z "$validgrp" ] && {
+validgrp=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] || [ -z "$validgrp" ] && {
     dialog002
   } || {
     repeated=$(samba-tool user list | grep -x "$validusr")
@@ -999,15 +978,11 @@ validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" -
       }
     }
   }
-}
 
 function add_group_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp1" ] && {
-  dialog002
-} || {
-  validgrp2=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
-  [ -z "$validgrp2" ] && {
+validgrp2=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
+[ -z "$validgrp1" ] || [ -z "$validgrp2" ] && {
     dialog002
   } || {
     repeated=$(samba-tool group list | grep -x "$validgrp1")
@@ -1024,15 +999,11 @@ validgrp1=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2
       }
     }
   }
-}
 
 function rm_group_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp1" ] && {
-  dialog002
-} || {
-  validgrp2=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
-  [ -z "$validgrp2" ] && {
+validgrp2=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
+[ -z "$validgrp1" ] || [ -z "$validgrp2" ] && {
     dialog002
   } || {
     repeated=$(samba-tool group list | grep -x "$validgrp1")
@@ -1049,7 +1020,6 @@ validgrp1=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2"
       }
     }
   }
-}
 
 function show_user_group {
 validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
@@ -1124,11 +1094,8 @@ validgrp2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
 
 function rm_user_group {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
-  dialog002
-} || {
-  validgrp=$(dialog --title "$ttitle" --backtitle "Remover Usuario de um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-  [ -z "$validgrp" ] && {
+validgrp=$(dialog --title "$ttitle" --backtitle "Remover Usuario de um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
+[ -z "$validusr" ] || [ -z "$validgrp" ] && {
     dialog002
   } || {
     repeated=$(samba-tool user list | grep -x "$validusr")
@@ -1144,8 +1111,6 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
       dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
       }
   }
-}
-
 }
 
 function rm_group {
@@ -1359,18 +1324,18 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
-      clear
-      samba-tool group addmembers "Domain Admins" "$validusr"
-      sleep 1
-      samba-tool group addmembers "Schema Admins" "$validusr"
-      sleep 1
-      samba-tool group addmembers "Enterprise Admins" "$validusr"
-      sleep 1
-      samba-tool group addmembers "Group Policy Creator Owners" "$validusr"
-      sleep 1
-      samba-tool group addmembers "Administrators" "$validusr"
-      sleep 1
-      dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
+    clear
+    samba-tool group addmembers "Domain Admins" "$validusr"
+    sleep 1
+    samba-tool group addmembers "Schema Admins" "$validusr"
+    sleep 1
+    samba-tool group addmembers "Enterprise Admins" "$validusr"
+    sleep 1
+    samba-tool group addmembers "Group Policy Creator Owners" "$validusr"
+    sleep 1
+    samba-tool group addmembers "Administrators" "$validusr"
+    sleep 1
+    dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
   } || {
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
     }
@@ -1385,18 +1350,18 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
-      clear
-      samba-tool group removemembers "Domain Admins" "$validusr"
-      sleep 1
-      samba-tool group removemembers "Schema Admins" "$validusr"
-      sleep 1
-      samba-tool group removemembers "Enterprise Admins" "$validusr"
-      sleep 1
-      samba-tool group removemembers "Group Policy Creator Owners" "$validusr"
-      sleep 1
-      samba-tool group removemembers "Administrators" "$validusr"
-      sleep 1
-      dialog --title "Informacao" --msgbox "Usuario $validusr deixou de ser administrador!" 8 40
+    clear
+    samba-tool group removemembers "Domain Admins" "$validusr"
+    sleep 1
+    samba-tool group removemembers "Schema Admins" "$validusr"
+    sleep 1
+    samba-tool group removemembers "Enterprise Admins" "$validusr"
+    sleep 1
+    samba-tool group removemembers "Group Policy Creator Owners" "$validusr"
+    sleep 1
+    samba-tool group removemembers "Administrators" "$validusr"
+    sleep 1
+    dialog --title "Informacao" --msgbox "Usuario $validusr deixou de ser administrador!" 8 40
   } || {
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
     }
@@ -1411,10 +1376,10 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 } || {
   repeated=$(samba-tool user list | grep -x "$validusr")
   [ "$repeated" = "$validusr" ] && {
-      clear
-      kinit "$validusr"
-      echo ""
-      read -p "Pressione Enter para continuar!"
+    clear
+    kinit "$validusr"
+    echo ""
+    read -p "Pressione Enter para continuar!"
   } || {
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
     }
@@ -1424,11 +1389,8 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
 
 function mv_pc_ou {
 validpc=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome do Computador" 0 0 2>&1 > /dev/tty)
-[ -z "$validpc" ] && {
-  dialog002
-} || {
-  validou=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
-  [ -z "$validou" ] && {
+validou=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
+[ -z "$validpc" ] || [ -z "$validou" ] && {
     dialog002
   } || {
     repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
@@ -1445,7 +1407,6 @@ validpc=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inpu
       }
     }
   }
-}
 
 function show_pcs {
 dialog001
