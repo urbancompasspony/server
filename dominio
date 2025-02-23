@@ -509,7 +509,6 @@ validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
 
 }
 
-
 function add_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
@@ -628,7 +627,6 @@ function changemoreacls {
 
 function checkpathfolder {
   PathFolder0="$(cat /tmp/path01)"
-
   [ "$PathFolder0" = "" ] && {
     PathFolder0="/mnt"
   } || {
@@ -659,6 +657,7 @@ clear
 echo "Pacote MSITOOLS nao encontrado!"
 sleep 3
 }
+
 }
 
 function force_msi_w11 {
@@ -687,27 +686,28 @@ clear
 echo "Pacote MSITOOLS nao encontrado!"
 sleep 3
 }
+
 }
 
 function active_shares {
-dialog001
-[ $? -ne 0 ] && return
-active_sh=$(net status shares)
-echo "$active_sh" | less
+  dialog001
+  [ $? -ne 0 ] && return
+  active_sh=$(net status shares)
+  echo "$active_sh" | less
 }
 
 function active_sessions {
-dialog001
-[ $? -ne 0 ] && return
-active_se=$(net status sessions)
-echo "$active_se" | less
+  dialog001
+  [ $? -ne 0 ] && return
+  active_se=$(net status sessions)
+  echo "$active_se" | less
 }
 
 function show_ous {
-dialog001
-[ $? -ne 0 ] && return
-oulst=$(samba-tool ou list)
-echo "$oulst" | less
+  dialog001
+  [ $? -ne 0 ] && return
+  oulst=$(samba-tool ou list)
+  echo "$oulst" | less
 }
 
 function create_ou {
@@ -810,17 +810,17 @@ validou=$(dialog --title "$ttitle" --backtitle "Objetos de uma OU" --inputbox "I
 }
 
 function show_users {
-dialog001
-[ $? -ne 0 ] && return
-usrlst=$(samba-tool user list)
-echo "$usrlst" | less
+  dialog001
+  [ $? -ne 0 ] && return
+  usrlst=$(samba-tool user list)
+  echo "$usrlst" | less
 }
 
 function show_groups {
-dialog001
-[ $? -ne 0 ] && return
-grplist=$(samba-tool group list)
-echo "$grplist" | less
+  dialog001
+  [ $? -ne 0 ] && return
+  grplist=$(samba-tool group list)
+  echo "$grplist" | less
 }
 
 function create_user {
@@ -1681,7 +1681,6 @@ function dialog002 {
 
 function faq_help {
 clear
-
 echo " "
 echo "CUIDADO:"
 echo "Se usar uma versao modificada do Windows, tipo o ReviCC ou W10Lite, tem uma grande chance de causar problemas/imprevistos!"
