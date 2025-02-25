@@ -77,20 +77,22 @@ var0=$(dialog --title 'Suporte & Help Desk' --backtitle "Suporte & Help Desk" --
 2 'Gerir Containers' \
 3 'Gerir Active Directory' \
 4 'Ferramentas & Utilidades' \
-5 'Iniciar Area de Trabalho' \
-6 'Urgencias & Emergencias' \
-7 'Reiniciar Servidor' \
-8 'Desligar Servidor' \
+5 'Ajustar Modo Kioske' \
+6 'Iniciar Area de Trabalho' \
+7 'Urgencias & Emergencias' \
+8 'Reiniciar Servidor' \
+9 'Desligar Servidor' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
 2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
 3) domain00 ; managers ;;
 4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | tee /home/administrador/.t00lz ; chmod +x /home/administrador/.t00lz ; clear ; sudo bash /home/administrador/.t00lz ; managers ;;
-5) desktop00 ; managers ;;
-6) urgencies0 ; managers ;;
-7) reb00t ; managers ;;
-8) shutd0 ; managers ;;
+5) [ -d /home/administrador/kiosk ] && { curl -sSL https://raw.githubusercontent.com/urbancompasspony/kiosk-mode/refs/heads/main/MENU | tee /home/administrador/.kiosk ; chmod +x /home/administrador/.kiosk ; clear ; bash /home/administrador/.kiosk; } || { clear; echo "Modo Kioske nao configurado."; } ; managers ;;
+6) desktop00 ; managers ;;
+7) urgencies0 ; managers ;;
+8) reb00t ; managers ;;
+9) shutd0 ; managers ;;
 X) exit ;;
 esac
 }
