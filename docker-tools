@@ -8,11 +8,12 @@ C 'Set MACVLAN' \
 D 'Remove MACVLAN' \
 E 'PiHole Maintenance' \
 F 'PiHole Install Error' \
-G 'NC: filelocks' \
-H 'NC: add-missing-indices' \
-I 'NC: check-core & mimetype' \
-J 'NC: Disable LDAP' \
-K 'NC: Upgrade Manually CLI' \
+G 'Reset Syncthing Password' \
+H 'NC: filelocks' \
+I 'NC: add-missing-indices' \
+J 'NC: check-core & mimetype' \
+K 'NC: Disable LDAP' \
+L 'NC: Upgrade Manually CLI' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) clear ; docker image prune -af ; sleep 2 ;;
@@ -21,13 +22,31 @@ C) clear ; macvland ;;
 D) clear ; rmmacvland ;;
 E) clear ; piholemnt ;;
 F) clear ; piholeinst ;;
-G) clear ; filelocks ;;
-H) clear ; missingindices ;;
-I) clear ; checkcore ;;
-J) clear ; disableldap ;;
-K) clear ; upgradenc ;;
+G) clear ; syncpass0 ;;
+H) clear ; filelocks ;;
+I) clear ; missingindices ;;
+J) clear ; checkcore ;;
+K) clear ; disableldap ;;
+L) clear ; upgradenc ;;
 X) echo "." > /dev/null ;;
 esac
+}
+
+function syncpass0 {
+VALUE1="syncthing"
+VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Syncthing" 8 35 0 \
+"NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    clear
+    docker exec -it "$var1" syncthing generate --gui-password=admin --gui-user=admin
+    echo ""; echo "Usuario e senha da WebGUI foram modificados para admin/admin!"
 }
 
 function upgradenc {
@@ -116,6 +135,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
 }
 
 function piholemnt {
+VALUE1="pihole"
 VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
 "NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -133,6 +153,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
 }
 
 function piholeinst {
+VALUE1="pihole"
 VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
 "NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -151,7 +172,6 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
 
 function filelocks {
 VALUE1="nextcloud-mysql"
-
 VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "MySQL - NextCloud" 9 35 0 \
 "mSQLcont:" 1 1 "$VALUE1" 1 11 30 0 \
 "Password:" 2 1 "$VALUE2" 2 11 30 0 \
