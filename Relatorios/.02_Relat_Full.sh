@@ -25,7 +25,7 @@ function upgrade0 {
   sudo apt update -y &&
   sudo apt upgrade -y &&
   sudo apt autoremove -y &&
-  echo ""; echo "$datetime nesta data o sistema do servidor foi atualizado e está em dia com a segurança digital.
+  echo ""; echo "Em $datetime o sistema do servidor foi atualizado e está em dia com a segurança digital.
 " | sudo tee -a "$file"
 }
 
@@ -161,7 +161,7 @@ function pihole0 {
 
       docker restart "$i2"
 
-      echo ""; echo "Em $datetime nesta data os serviços de DNS e bloqueios de sites do $i2 foram atualizados e suas listas foram revalidadas!
+      echo ""; echo "Em $datetime os serviços de DNS e bloqueios de sites do $i2 foram atualizados e suas listas foram revalidadas!
 " | sudo tee -a "$file"
     done
   } && {
