@@ -2,9 +2,9 @@
 
 SCRIPT0=".02_Relat_Full.sh"
 
-SERVER_LIST=".03_Serversb.txt"
+SERVER_LIST=".03_Servers.txt"
 
-PASSWORD_LIST=".04_Passwordsb.txt"
+PASSWORD_LIST=".04_Passwords.txt"
 
 REMOTE_PORT=22
 
