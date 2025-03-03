@@ -2,9 +2,9 @@
 
 SCRIPT0=".02_Relat_Full.sh"
 
-SERVER_LIST=".03_Servers.txt"
+SERVER_LIST=".03_Serversb.txt"
 
-PASSWORD_LIST=".04_Passwords.txt"
+PASSWORD_LIST=".04_Passwordsb.txt"
 
 REMOTE_PORT=22
 
@@ -20,11 +20,11 @@ while IFS= read -r server && IFS= read -r password <&3; do
 
         scp -P $REMOTE_PORT $SCRIPT0 $REMOTE_USER@$REMOTE_HOST:/tmp/$SCRIPT0
 
-        ssh $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "sshpass -p '$password' bash /tmp/$SCRIPT0" | tee "${REMOTE_HOST}_Registro_Completo_de_Eventos.txt"
+        ssh $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "sshpass -p '$password' bash /tmp/$SCRIPT0" | tee "Registro completo de eventos do servidor ${REMOTE_HOST}.txt"
 
-        ssh $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "cat /srv/relatorios/relatorio-$(date +'%m-%Y').txt" | tee "${REMOTE_HOST}_Relatorio_de_Manutenção.txt"
+        ssh $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "cat /srv/relatorios/relatorio-$(date +'%m-%Y').txt" | tee "Relatorio de Manutenção do servidor ${REMOTE_HOST}.txt"
 
-        ssh $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "cat /srv/relatorios/SMART_DUMP" | tee "${REMOTE_HOST}_SMART_DUMP.txt"
+        ssh $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "cat /srv/relatorios/SMART_DUMP" | tee "Saúde dos discos do servidor ${REMOTE_HOST}.txt"
 
         if [ $? -eq 0 ]; then
             echo "Comando executado com sucesso em $REMOTE_USER@$REMOTE_HOST."
