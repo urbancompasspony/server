@@ -6,11 +6,12 @@ function cabecalho {
   [ -f "$file" ] || {
     sudo touch $setfolder/relatorio-$monthonly.txt
 
-    echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA"; echo ""
+    echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA
+" | sudo tee "$file"
     echo "Conforme estipulado em contrato mensal de prestação de serviços na área de
 informática, segue abaixo o relatório de manutenções preventivas e
 corretivas executados no servidor no período de $monthonly:
-" | sudo tee "$file"
+" | sudo tee -a "$file"
     sleep 1
   } && {
     echo "." > /dev/null
