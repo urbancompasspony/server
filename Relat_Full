@@ -1,47 +1,45 @@
 #!/bin/bash
 
-function relat0 {
-  cabecalho
-  upgrade0
-  smartdump0
-  domain0
-  pihole0
-  pentest0
-  syslog0
-  backup0
-  contclean0
-  clear; cat "$setfolder"/relatorio-"$monthonly".txt
-  read -N 2
-  clear; cat "$setfolder"/SMART_DUMP
-  read -N 2
+TERM=xterm-256color
+
+function cabecalho {
+  [ -f "$file" ] || {
+    sudo touch $setfolder/relatorio-$monthonly.txt
+
+    echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA"; echo ""
+    echo "Conforme estipulado em contrato mensal de prestação de serviços na área de
+informática, segue abaixo o relatório de manutenções preventivas e
+corretivas executados no servidor no período de $monthonly:
+" | sudo tee "$file"
+    sleep 1
+  } && {
+    echo "." > /dev/null
+  }
 }
 
 function upgrade0 {
   datetime0
   export DEBIAN_FRONTEND=noninteractive
-  clear
   echo ""; echo "Atualizando o sistema!"; echo ""
   sudo apt update -y &&
   sudo apt upgrade -y &&
   sudo apt autoremove -y &&
-  echo "$datetime Nesta data o sistema do servidor foi atualizado e está em dia com a segurança digital.
+  echo ""; echo "$datetime nesta data o sistema do servidor foi atualizado e está em dia com a segurança digital.
 " | sudo tee -a "$file"
 }
 
 function smartdump0 {
   datetime0
-  clear
   smartdump1
-  enter0
-  echo "$datetime Foi realizada a verificação da saúde dos discos rígidos.
+  echo ""; echo "Em $datetime foi realizada a verificação da saúde dos discos rígidos.
 Mais informações no anexo SMART_DUMP no e-mail!
 " | sudo tee -a "$file"
 }
 
 function smartdump1 {
   datetime0
-  rm $smartdumplocal
-  touch $smartdumplocal
+  sudo rm $smartdumplocal
+  sudo touch $smartdumplocal
 
   for i in {a..z}
   do
@@ -100,21 +98,16 @@ function smartdump1 {
 done
 
 echo "" | sudo tee -a $smartdumplocal
-echo "Verificacao concluida em $datetime!" | sudo tee -a $smartdumplocal
+echo ""; echo "Verificacao concluida em $datetime!" | sudo tee -a $smartdumplocal
 }
 
 function domain0 {
   [ -d "/srv/containers/dominio" ] && {
   datetime0
-
-  clear
   docker exec dominio samba-tool ntacl sysvolreset -U Administrator
-  clear
   docker exec dominio samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes
 
-  enter0
-
-  echo "$datetime Foi realizada a verificação da integridade do Controlador de Domínio.
+  echo ""; echo "Em $datetime foi realizada a verificação da integridade do Controlador de Domínio.
 " | sudo tee -a "$file"
 
   } || {
@@ -127,9 +120,8 @@ function pihole0 {
 
   [ "$testpihole" = "" ] || {
     datetime0
-    clear; echo ""; echo "Checando por updates do PiHole"
+    echo ""; echo "Checando por updates do PiHole"
     docker pull pihole/pihole:latest
-    clear
 
     for i in $(find /srv/containers -maxdepth 1 -name '*pihole*'); do
       i2=$(basename "$i")
@@ -141,12 +133,15 @@ function pihole0 {
       var3=$(sed -n '3p' /srv/containers/"$i2"/Information)
       var4=$(sed -n '4p' /srv/containers/"$i2"/Information)
       var5=$(sed -n '5p' /srv/containers/"$i2"/Information)
-      var6=$(sed -n '5p' /srv/containers/"$i2"/Information)
+      var6=$(sed -n '6p' /srv/containers/"$i2"/Information)
 
       pihole1
 
+      echo ""; echo "Esperar 5s antes de aplicar as configs"; sleep 5
+      docker exec "$i2" pihole-FTL --config misc.etc_dnsmasq_d true
+
       docker exec "$i2" rm /etc/pihole/pihole-FTL.conf
-      docker exec "$i2" touch /etc/pihole/pihole-FTL.conf
+      docker exec "$i2" sudo touch /etc/pihole/pihole-FTL.conf
       docker exec "$i2" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
       docker exec "$i2" bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
 
@@ -163,10 +158,11 @@ function pihole0 {
         echo "." >/dev/null
       }
 
-    echo "$datetime Nesta data os serviços de DNS e bloqueios de sites do $i2 foram atualizados e suas listas foram revalidadas!
+      docker restart "$i2"
+
+      echo ""; echo "Em $datetime nesta data os serviços de DNS e bloqueios de sites do $i2 foram atualizados e suas listas foram revalidadas!
 " | sudo tee -a "$file"
     done
-    enter0
   } && {
     echo "." > /dev/null
   }
@@ -186,6 +182,7 @@ function pihole1 {
 --shm-size=512m \
 -e FTLCONF_webserver_api_password=$var2 \
 -e FTLCONF_dns_listeningMode=all \
+-e TZ=$var6 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$i2"/etc/:/etc/pihole \
 -v /srv/containers/"$i2"/dnsmasq.d/:/etc/dnsmasq.d \
@@ -209,6 +206,7 @@ pihole/pihole:latest
 --shm-size=512m \
 -e FTLCONF_webserver_api_password=$var2 \
 -e FTLCONF_dns_listeningMode=all \
+-e TZ=$var6 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$i2"/etc/:/etc/pihole \
 -v /srv/containers/"$i2"/dnsmasq.d/:/etc/dnsmasq.d \
@@ -227,76 +225,65 @@ function pentest0 {
   [ -d "/srv/containers/pentest" ] && {
     datetime0
     [ -f /srv/containers/pentest/Pentests/Ransomware_Detectado ] && {
-      clear; echo ""
+      echo ""
       cat /srv/containers/pentest/Pentests/Ransomware_Detectado
-      enter0
     } || {
       echo "." > /dev/null
     }
 
-    var6=$(sed -n '6p' /srv/containers/pentest/Information); clear
+    var6=$(sed -n '6p' /srv/containers/pentest/Information)
 
     for i in $(find /srv/containers/pentest/Pentests/Ataques_Bem-sucedidos -name '*1*'); do
-      clear
       cat "$i"
-      enter0
     done
 
-    echo "$datetime Nenhum novo equipamento vulnerável detectado na rede.
+    echo ""; echo "Em $datetime nenhum novo equipamento vulnerável detectado na rede.
 Por enquanto nenhum equipamento cujos testes sejam pertinentes de serem notificados.
 " | sudo tee -a "$file"
 
   } || {
-    clear; echo ""; echo "Pentest não configurado. Ignorando."
+    echo ""; echo "Pentest não configurado. Ignorando."
     sleep 3
   }
 }
 
 function syslog0 {
   datetime0
-  clear
 
   for i in $(ls /srv/containers/*/log/syslog); do
-    clear
     echo ""; echo "$i"; echo ""
-    cat $i | grep -a 'renameat' | tail -n 5
-    enter0
+    cat $i | grep -a 'renameat' | tail -n 7
   done
 
-  echo "$datetime Foi realizada a verificação da integridade dos Logs de Eventos
+  echo ""; echo "Em $datetime foi realizada a verificação da integridade dos Logs de Eventos
 das pastas da rede e se os registros de uso, dos compartilhamentos, estão em dia.
 " | sudo tee -a "$file"
 }
 
 function backup0 {
   datetime0
-  clear; echo ""; echo "Checando armazenamento geral!"; echo ""
+  echo ""; echo "Checando armazenamento geral!"; echo ""
   df -h
-  enter0
 
-  clear; echo ""; echo "DUMP de RSnapshots!"; echo ""
-  journalctl -b 0 | grep -a "rsnap" | tail -n 5
-  enter0
+  echo ""; echo "DUMP de RSnapshots!"; echo ""
+  journalctl -b 0 | grep -a "rsnap" | tail -n 7
 
-  clear; echo ""; echo "DUMP de RSYNC!"; echo ""
-  journalctl -b 0 | grep -a "rsync" | tail -n 5
-  enter0
+  echo ""; echo "DUMP de RSYNC!"; echo ""
+  journalctl -b 0 | grep -a "rsync" | tail -n 7
 
-  clear; echo ""; echo "DUMP do RClone (se existente)!"; echo ""
-  journalctl -b 0 | grep -a "rclone" | tail -n 5
-  enter0
+  echo ""; echo "DUMP do RClone (se existente)!"; echo ""
+  journalctl -b 0 | grep -a "rclone" | tail -n 7
 
-  clear; echo ""; echo "Checando backups dos containers!"; echo ""
+  echo ""; echo "Checando backups dos containers!"; echo ""
+
   destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
   [ -d "$destiny" ] && {
-    ls -la $destiny
-    enter0
+    ls -lah $destiny
   } || {
-    clear; echo ""; echo "Não existem backups de containers neste servidor! Verifique se esta situação está correta!"; echo ""
-    enter0
+    echo ""; echo "Não existem backups de containers neste servidor! Verifique se esta situação está correta!"; echo ""
   }
 
-  echo "$datetime Foi realizada a verificação das rotinas de backup do servidor.
+  echo "Em $datetime foi realizada a verificação das rotinas de backup do servidor.
 O backup para a nuvem, se existente, também foi verificado.
 " | sudo tee -a "$file"
 }
@@ -304,40 +291,31 @@ O backup para a nuvem, se existente, também foi verificado.
 function contclean0 {
   docker image prune -a -f
 
-  echo "$datetime Foi realizada a limpeza do sistema com remoção de somente pacotes e
+  echo ""; echo "Em $datetime foi realizada a limpeza do sistema com remoção de somente pacotes e
 imagens obsoletas dos serviços, objetivando reduzir o consumo de armazenamento.
 " | sudo tee -a "$file"
 }
 
-function cabecalho {
-  [ -f "$file" ] || {
-    sudo touch $setfolder/relatorio-$monthonly.txt
-
-    clear
-    echo "RELATÓRIO MENSAL DE PRESTAÇÃO DE SERVIÇOS DE INFORMÁTICA
-Conforme estipulado em contrato mensal de prestação de serviços na área de
-informática, segue abaixo o relatório de suporte, manutenções preventivas e
-corretivas executados no período de $monthonly:
-" | sudo tee "$file"
-    sleep 1
-  } && {
-    echo "." > /dev/null
-  }
-}
-
-function datetime0 {
-  datetime=$(date +"%d/%m")
-  #datetime=$(date +"%d/%m - %H:%m:%S")
-}
-
-function enter0 {
-  echo ""; echo "Pressione Enter 2x para continuar!"; echo ""
-  read -N 2
+function relatend0 {
+  echo ""; echo "=============================================================================================="
+  echo ""; echo "RELATORIO RESUMIDO"
+  echo ""; echo "=============================================================================================="
+  echo ""; echo "SMART_DUMP:"
+  echo ""; cat $smartdumplocal
+  echo ""; echo "=============================================================================================="
+  echo ""; cat $setfolder/relatorio-$monthonly.txt
+  echo "=============================================================================================="
+  echo ""
 }
 
 ###############
 # Start here! #
 ###############
+
+function datetime0 {
+  datetime=$(date +"%d/%m")
+  #datetime=$(date +"%d/%m - %H:%m:%S")
+}
 
 setfolder="/srv/relatorios"
 smartdumplocal="$setfolder/SMART_DUMP"
@@ -346,6 +324,15 @@ sudo mkdir -p $setfolder
 monthonly=$(date +"%m-%Y")
 file="$setfolder/relatorio-$monthonly.txt"
 
-relat0
+cabecalho
+upgrade0
+smartdump0
+domain0
+pihole0
+pentest0
+syslog0
+backup0
+contclean0
+relatend0
 
 exit 1
