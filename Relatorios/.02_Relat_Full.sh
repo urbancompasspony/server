@@ -296,6 +296,7 @@ imagens obsoletas dos serviços, objetivando reduzir o consumo de armazenamento.
 " | sudo tee -a "$file"
 }
 
+# NOT USED. But keep here bcuz I like it.
 function relatend0 {
   echo ""; echo "=============================================================================================="
   echo ""; echo "RELATORIO RESUMIDO"
@@ -333,6 +334,5 @@ pentest0
 syslog0
 backup0
 contclean0
-relatend0
 
 exit 1
