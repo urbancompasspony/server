@@ -297,6 +297,15 @@ imagens obsoletas dos serviços, objetivando reduzir o consumo de armazenamento.
 " | sudo tee -a "$file"
 }
 
+function swap0 {
+  sudo swapoff -a &&
+  sudo swapon -a &&
+}
+
+function datetime0 {
+  datetime=$(date +"%d/%m")
+}
+
 # NOT USED. But keep here bcuz I like it.
 function relatend0 {
   echo ""; echo "=============================================================================================="
@@ -314,11 +323,6 @@ function relatend0 {
 # Start here! #
 ###############
 
-function datetime0 {
-  datetime=$(date +"%d/%m")
-  #datetime=$(date +"%d/%m - %H:%m:%S")
-}
-
 setfolder="/srv/relatorios"
 smartdumplocal="$setfolder/SMART_DUMP"
 sudo mkdir -p $setfolder
@@ -326,6 +330,10 @@ sudo mkdir -p $setfolder
 monthonly=$(date +"%m-%Y")
 file="$setfolder/relatorio-$monthonly.txt"
 
+# Swap Off and On
+sudo swapoff -a && sudo swapon -a &&
+
+swap0
 cabecalho
 upgrade0
 smartdump0
@@ -335,5 +343,6 @@ pentest0
 syslog0
 backup0
 contclean0
+swap0
 
 exit 1
