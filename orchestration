@@ -58,6 +58,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 18 'Smoke Ping (L/W)' \
 19 'Sist2 Indexer (W)' \
 20 'Network UPS Tools Gui (L)' \
+21 'SMS PowerViewer (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
@@ -80,6 +81,7 @@ case "$var0" in
 18) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
 19) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
 20) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
+21) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
 X) echo "." > /dev/null ;;
 esac
 }
