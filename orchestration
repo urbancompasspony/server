@@ -190,6 +190,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 10 'Ejabberd-chat-server (W/L)' \
 11 'Dominio & CUPS BETA (W)' \
 12 'Rancher - k3s k8s (W)' \
+13 'Chromium Browser (W/L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
@@ -204,6 +205,7 @@ case "$var0" in
 10) wget "$github"55-ejabberd-chatserver -O /tmp/55-ejabberd-chatserver; sudo bash /tmp/55-ejabberd-chatserver ;;
 11) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
 12) wget "$github"72-rancher-k8s -O /tmp/rancher; sudo bash /tmp/rancher ;;
+13) wget "$github"17-Chromium -O /tmp/Chromium; sudo bash /tmp/Chromium ;;
 X) echo "." > /dev/null ;;
 esac
 }
