@@ -1,0 +1,3 @@
+nano /var/lib/samba/sysvol/[dominio]/Policies/[GUID]/User/Preferences/Wallpaper.xml
+
+samba-tool gpo create "NomeDaNovaGPO" --dns-name=dominio.local --path=/var/lib/samba/sysvol/[dominio]/Policies
