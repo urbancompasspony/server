@@ -1,0 +1,17 @@
+Create GPO if possible.<br>
+
+Navigate to the
+Computer Configuration > Policies > Administrative Templates > System > Windows Time Service > Time Providers entry,
+and double-click Configure Windows NTP Client to configure the policy.
+
+Not forget 0x9 flag!
+
+Get back to Time Providers entry, and double-click:
+Enable Windows NTP Client to configure the policy.
+
+2 5 7 1024 0
+
+>>> Use Type NTP.
+
+GPO not working?
+w32tm /config /update /manualpeerlist:0.ubuntu.pool.ntp.org /syncfromflags:manual /reliable:yes
