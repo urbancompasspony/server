@@ -14,6 +14,8 @@ I 'NC: add-missing-indices' \
 J 'NC: check-core & mimetype' \
 K 'NC: Disable LDAP' \
 L 'NC: Upgrade Manually CLI' \
+M 'NC: Scan App Data' \
+N 'NC: Scan User Data' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) clear ; docker image prune -af ; sleep 2 ;;
@@ -28,8 +30,46 @@ I) clear ; missingindices ;;
 J) clear ; checkcore ;;
 K) clear ; disableldap ;;
 L) clear ; upgradenc ;;
+M) clear ; scanapp0 ;;
+N) clear ; scanuser0 ;;
 X) echo "." > /dev/null ;;
 esac
+}
+
+function scanapp0 {
+VALUE1="nextcloud"
+VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    clear
+    echo "Checking core integrity..."
+    docker exec -u 33 "$var1" ./occ files:scan-app-data
+    sleep 5
+}
+
+function scanuser0 {
+VALUE1="nextcloud"
+VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+    esac
+
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    clear
+    echo "Checking core integrity..."
+    docker exec -u 33 "$var1" ./occ files:scan --all
+    sleep 5
 }
 
 function syncpass0 {
