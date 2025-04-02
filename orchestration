@@ -178,7 +178,7 @@ esac
 
 function personal {
 var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Minetest Server (W)' \
+1 'Luanti Server (W)' \
 2 'SSH DW (Backdoor) (L)' \
 3 'Ubuntu 22.04 WebUI (W)' \
 4 'Jellyfin (L/W)' \
@@ -193,7 +193,7 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 13 'Chromium Browser (W/L)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-1) wget "$github"12-minetest-server -O /tmp/minetest; sudo bash /tmp/minetest ;;
+1) wget "$github"12-luanti-server -O /tmp/luanti; sudo bash /tmp/luanti ;;
 2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
 3) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
 4) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
