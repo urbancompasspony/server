@@ -1,3 +1,6 @@
+
+sudo chmod +x /etc/profile.d/create_shortcut.sh
+
 #!/bin/bash
 
 # Define the mount folder path
