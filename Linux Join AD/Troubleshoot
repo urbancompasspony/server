@@ -37,3 +37,16 @@ Password:
 <email address hidden>@sambaclientdc1:~$
 
 I think it is also important to mention that this problem would be introduced anyway if/when you updated to a newer version of Ubuntu, because the recent SSSD versions all have this GPO code in place. As far as I have investigated, it doesn't seem to me that Samba is at fault here.
+
+3) Problems Login SDDM
+Edit /usr/lib/systemd/system/sddm.service
+and add smb.service to the end of the After line.
+
+I tried adding sssd but it didn't show my freeipa login.
+if you want add extra services you should be adding them in an override file in /etc/systemd/system/sddm.service.d/override.conf
+
+[Unit]
+After=systemd-user-sessions.service getty@tty1.service plymouth-quit.service systemd-logind.service smb.service
+
+MOAR:
+https://documentation.ubuntu.com/server/how-to/sssd/with-active-directory/
