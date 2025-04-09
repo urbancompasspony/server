@@ -1,0 +1,19 @@
+
+/etc/profile.d/ creating an ad.sh file, for example
+
+OBS:
+They run when a user logs in (via console, SSH, etc.)
+They are sourced by /etc/profile which is executed for login shells
+All scripts with .sh extension in this directory are executed automatically
+They run in alphabetical order
+They run with the permissions of the logged-in user
+They are intended for system-wide environment settings that should be applied to all users
+
+Everything inside /etc/skel/ is copied to /home/ when a new user is created.
+
+OBS:
+These files only get copied once - during user account creation
+They don't automatically update existing users if you change /etc/skel/
+They're used to establish default environment settings for new users
+Hidden files (those starting with a dot) are included in the copy
+The files are owned by the new user after copying
