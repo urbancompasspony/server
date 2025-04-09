@@ -1,4 +1,5 @@
 Create /etc/profile.d/lock_wallpaper.sh
+sudo chmod +x /etc/profile.d/lock_wallpaper.sh
 
 #!/bin/bash
 cp /etc/skel/.config/plasma-org.kde.plasma.desktop-appletsrc ~/.config/
