@@ -1,0 +1,17 @@
+sudo nano /etc/profile.d/restrict_usb.sh
+
+#!/bin/bash
+
+# Check if the user is allowed to use USB storage
+if groups | grep -q "usb_allowed"; then
+    echo "USB access granted."
+else
+    sudo modprobe -r usb-storage
+    echo "USB storage blocked."
+fi
+
+sudo chmod +x /etc/profile.d/restrict_usb.sh
+
+Replace username with the user who should have access.
+sudo groupadd usb_allowed
+sudo usermod -aG usb_allowed username
