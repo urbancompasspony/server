@@ -2,6 +2,8 @@ I can easily reproduce the problem when I enable GPO on the Samba AD DC and then
 
 1) The easiest one, as said above, is to use the following setting in your /etc/sssd/sssd.conf:
 ad_gpo_access_control = permissive
+maybe:
+access_provider = ad
 
 2) The other possible solution, as explained by Sumit Bose on that Fedora bug, is to create the GptTpml.inf file by hand with the following contents:
 
