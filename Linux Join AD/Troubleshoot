@@ -1,0 +1,37 @@
+I can easily reproduce the problem when I enable GPO on the Samba AD DC and then try to do a regular user login on the client. I can also confirm that Valtteri's analysis seems good indeed: the Samba AD DC doesn't create the GptTmpl.inf file automatically, and SSSD doesn't handle this very well
+
+1) The easiest one, as said above, is to use the following setting in your /etc/sssd/sssd.conf:
+ad_gpo_access_control = permissive
+
+2) The other possible solution, as explained by Sumit Bose on that Fedora bug, is to create the GptTpml.inf file by hand with the following contents:
+
+-------- snip --------
+[Unicode]
+Unicode=yes
+[Version]
+signature="$CHICAGO$"
+Revision=1
+-------- snip --------
+
+which, according to Sumit, represents just an empty policy file with a valid header. I tested this workaround here and it seems to work:
+
+# cd /var/lib/samba/sysvol/test.lan/Policies/\{31B2F340-016D-11D2-945F-00C04FB984F9\}/MACHINE/
+# mkdir -p Microsoft/Windows\ NT/SecEdit/
+# cd Microsoft/Windows\ NT/SecEdit/
+# cat > GptTmpl.inf << EOF
+[Unicode]
+Unicode=yes
+[Version]
+signature="$CHICAGO$"
+Revision=1
+EOF
+
+Then, in the client machine:
+
+# login
+sambaclientdc1 login: <email address hidden>
+Password:
+...
+<email address hidden>@sambaclientdc1:~$
+
+I think it is also important to mention that this problem would be introduced anyway if/when you updated to a newer version of Ubuntu, because the recent SSSD versions all have this GPO code in place. As far as I have investigated, it doesn't seem to me that Samba is at fault here.
