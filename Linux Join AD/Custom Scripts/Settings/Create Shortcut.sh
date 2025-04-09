@@ -1,5 +1,5 @@
-
-sudo chmod +x /etc/profile.d/create_shortcut.sh
+# AT THE END, RUN:
+# sudo chmod +x /etc/profile.d/create_shortcut.sh
 
 #!/bin/bash
 
