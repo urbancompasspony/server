@@ -1,0 +1,13 @@
+sudo apt install sssd pam-mount cifs-utils
+
+sudo nano /etc/security/pam_mount.conf.xml and add:
+<volume user="*" fstype="cifs" server="AD_SERVER" path="SHARE" mountpoint="/mnt/users/%(USER)" options="uid=%(USER),gid=users" />
+
+Edit /etc/pam.d/common-session
+session optional pam_mount.so
+
+sudo nano /etc/security/pam_mount.conf.xml
+<volume user="userA" fstype="cifs" server="AD_SERVER" path="DAT" mountpoint="/mnt/DAT" options="uid=%(USER),gid=users" />
+<volume user="userA" fstype="cifs" server="AD_SERVER" path="TAD" mountpoint="/mnt/TAD" options="uid=%(USER),gid=users" />
+<volume user="userB" fstype="cifs" server="AD_SERVER" path="ZAT" mountpoint="/mnt/ZAT" options="uid=%(USER),gid=users" />
+<volume user="*" fstype="cifs" server="AD_SERVER" path="DAT" mountpoint="/mnt/DAT" options="uid=%(USER),gid=users" />
