@@ -1,0 +1,12 @@
+sudo nano /etc/skel/.config/plasma-org.kde.plasma.desktop-appletsrc
+
+[Containments][2][Wallpaper][org.kde.image]
+Image=/usr/share/backgrounds/company.jpg
+
+sudo chown root:root /etc/skel/.config/plasma-org.kde.plasma.desktop-appletsrc
+sudo chmod 444 /etc/skel/.config/plasma-org.kde.plasma.desktop-appletsrc
+
+cp /etc/skel/.config/plasma-org.kde.plasma.desktop-appletsrc /home/*/.config/
+chown root:root /home/*/.config/plasma-org.kde.plasma.desktop-appletsrc
+chmod 444 /home/*/.config/plasma-org.kde.plasma.desktop-appletsrc
+
