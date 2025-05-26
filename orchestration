@@ -41,45 +41,43 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 1 'File Browser (L/W)' \
 2 'Homarr (L/W)' \
 3 'PenTest & PentApache (L/W)' \
-4 'Scrutiny SMART (W)' \
-5 'SSH Tunnel (A) (W)' \
-6 'WeTTY      (B) (W)' \
-7 'Gestor UniFi (W)' \
-8 'GLPI (W)' \
-9 'Reverse Proxy (W)' \
-10 'Servidor RustDesk (W)' \
-11 'RustDesk Web Client (W)' \
-12 'Servidor OpenFire (Spark) (W)' \
-13 'OnlyOffice (W)' \
-14 'Tailscale CLIENT (L/W)' \
-15 'OpenVPN Server (L/W)' \
-16 'Q Dir stat (L/W)' \
-17 'Smoke Ping (L/W)' \
-18 'Sist2 Indexer (W)' \
-19 'Network UPS Tools Gui (L)' \
-20 'SMS PowerViewer (L/W)' \
+4 'SSH Tunnel (A) (W)' \
+5 'WeTTY      (B) (W)' \
+6 'Gestor UniFi (W)' \
+7 'GLPI (W)' \
+8 'Reverse Proxy (W)' \
+9 'Servidor RustDesk (W)' \
+10 'RustDesk Web Client (W)' \
+11 'Servidor OpenFire (Spark) (W)' \
+12 'OnlyOffice (W)' \
+13 'Tailscale CLIENT (L/W)' \
+14 'OpenVPN Server (L/W)' \
+15 'Q Dir stat (L/W)' \
+16 'Smoke Ping (L/W)' \
+17 'Sist2 Indexer (W)' \
+18 'Network UPS Tools Gui (L)' \
+19 'SMS PowerViewer (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
 2) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
 3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-4) wget "$github"14-scrutiny -O /tmp/scrutiny; sudo bash /tmp/scrutiny ;;
-5) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
-6) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
-7) wget "$github"03-unifi-net -O /tmp/unifi; sudo bash /tmp/unifi ;;
-8) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-9) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-10) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-11) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
-12) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-13) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-14) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-15) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-16) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
-17) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
-18) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
-19) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
-20) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
+4) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
+5) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
+6) wget "$github"03-unifi-net -O /tmp/unifi; sudo bash /tmp/unifi ;;
+7) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+8) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+9) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
+10) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
+11) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+12) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+13) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+14) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+15) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
+16) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
+17) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
+18) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
+19) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
 X) echo "." > /dev/null ;;
 esac
 }
