@@ -52,13 +52,12 @@ var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
 12 'Servidor OpenFire (Spark) (W)' \
 13 'OnlyOffice (W)' \
 14 'Tailscale CLIENT (L/W)' \
-15 'Syncthing RELAY (W)' \
-16 'OpenVPN Server (L/W)' \
-17 'Q Dir stat (L/W)' \
-18 'Smoke Ping (L/W)' \
-19 'Sist2 Indexer (W)' \
-20 'Network UPS Tools Gui (L)' \
-21 'SMS PowerViewer (L/W)' \
+15 'OpenVPN Server (L/W)' \
+16 'Q Dir stat (L/W)' \
+17 'Smoke Ping (L/W)' \
+18 'Sist2 Indexer (W)' \
+19 'Network UPS Tools Gui (L)' \
+20 'SMS PowerViewer (L/W)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
@@ -75,13 +74,12 @@ case "$var0" in
 12) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
 13) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
 14) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-15) wget "$github"25-syncthingrelay -O /tmp/syncthingrelay; sudo bash /tmp/syncthingrelay ;;
-16) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-17) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
-18) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
-19) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
-20) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
-21) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
+15) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+16) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
+17) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
+18) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
+19) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
+20) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
 X) echo "." > /dev/null ;;
 esac
 }
