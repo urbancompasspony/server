@@ -163,7 +163,16 @@ log_message "Verificando resolução DNS..."
 if ! nslookup google.com >/dev/null 2>&1; then
     echo -e "${YELLOW}⚠️  AVISO: Problemas na resolução DNS${NC}"
     add_warning
+else
+  echo -e "${GREEN}✅ Resolução DNS OK, os seguintes dados foram coletados: ${NC}"
+  meuipwan=$(dig @resolver4.opendns.com myip.opendns.com +short)
+  meugateway=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+')
+  meudevice=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
+  meuiplan=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
+  minhasubnet="${meugateway%.*}.0"
+  echo -e "IP WAN   : $meuipwan \nIP LAN   : $meuiplan \nGateway  : $meugateway \nSubnet   : $minhasubnet \nInterface: $meudevice"
 fi
+
 echo ""
 sleep 3
 
