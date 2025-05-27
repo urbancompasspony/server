@@ -35,6 +35,7 @@ else
     exit 1
 fi
 echo ""
+sleep 3
 
 # Teste 01 - Verificando armazenamento (melhorado)
 echo -e "${BLUE}🔍 Teste 01: Verificando armazenamento...${NC}"
@@ -53,6 +54,7 @@ else
 fi
 
 echo ""
+sleep 3
 
 # Verifica sistemas de arquivos com erros
 log_message "Verificando integridade dos sistemas de arquivos..."
@@ -66,6 +68,7 @@ else
 fi
 
 echo ""
+sleep 3
 
 # Verifica dispositivos com bad blocks
 log_message "Verificando dispositivos com possíveis problemas..."
@@ -80,6 +83,7 @@ for device in $smart_devices; do
     fi
 done
 echo ""
+sleep 3
 
 # Teste 02 - Verificando espaço em disco (melhorado)
 echo -e "${BLUE}🔍 Teste 02: Verificando utilização de armazenamento...${NC}"
@@ -95,6 +99,7 @@ else
 fi
 
 echo ""
+sleep 3
 
 # Verifica uso acima de 90%
 log_message "Verificando uso acima de 90%..."
@@ -106,6 +111,7 @@ if [ -n "$disk_high" ]; then
 fi
 
 echo ""
+sleep 3
 
 # Verifica inodes
 log_message "Verificando utilização de inodes..."
@@ -116,6 +122,7 @@ if [ -n "$inode_full" ]; then
     add_error
 fi
 echo ""
+sleep 3
 
 # Teste 03 - Verificando conectividade de rede (melhorado)
 echo -e "${BLUE}🔍 Teste 03: Verificando conectividade de rede...${NC}"
@@ -138,17 +145,19 @@ else
 fi
 
 echo ""
+sleep 3
 
 # Verifica interfaces de rede
 log_message "Verificando interfaces de rede..."
-network_down=$(ip link show | grep -B1 "state DOWN" | grep -v "lo:" | grep ":")
+network_down=$(ip -o link show | awk '/state DOWN/ {print $2,$17}')
 if [ -n "$network_down" ]; then
-    echo -e "${YELLOW}⚠️  AVISO: Interface(s) de rede inativa(s):${NC}"
+    echo -e "${YELLOW}⚠️  AVISO: Interface(s) de rede inativa(s) detectadas (ignore caso sejam VIRBR0 ou DOCKER0):${NC}"
     echo "$network_down"
     add_warning
 fi
 
 echo ""
+sleep 3
 
 # Verifica resolução DNS
 log_message "Verificando resolução DNS..."
@@ -157,6 +166,7 @@ if ! nslookup google.com >/dev/null 2>&1; then
     add_warning
 fi
 echo ""
+sleep 3
 
 # Teste 04 - Verificando serviços essenciais (muito melhorado)
 echo -e "${BLUE}🔍 Teste 04: Verificando serviços essenciais...${NC}"
@@ -239,6 +249,7 @@ else
     echo -e "${GREEN}✅ OK: LibVirt não está instalado (isso pode ser normal)${NC}"
 fi
 echo ""
+sleep 3
 
 # Teste 05 - Verificações adicionais de sistema
 echo -e "${BLUE}🔍 Teste 05: Verificações adicionais do sistema...${NC}"
@@ -291,11 +302,17 @@ echo ""
 
 if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then
     echo -e "${GREEN}🎉 SISTEMA SAUDÁVEL: Nenhum problema detectado!${NC}"
+    echo ""
+    sleep 5
     exit 0
 elif [ $ERRORS -eq 0 ]; then
     echo -e "${YELLOW}⚠️  SISTEMA COM AVISOS: Verificar itens mencionados${NC}"
+    echo ""
+    sleep 5
     exit 1
 else
     echo -e "${RED}🚨 SISTEMA COM PROBLEMAS CRÍTICOS: Ação imediata necessária!${NC}"
+    echo ""
+    sleep 5
     exit 2
 fi
