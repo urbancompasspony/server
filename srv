@@ -51,7 +51,7 @@ function start {
 var0=$(dialog --title "SUPERVISOR" --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
 1 'Orchestration' \
 2 'Docker Maintenance' \
-3 'Support & Help Desk' \
+3 'Suporte ao Servidor' \
 4 'Auto Relatorio' \
 5 'Atualizar o .bashrc' \
 6 'First Run' \
@@ -72,15 +72,15 @@ function startocult {
 }
 
 function managers {
-var0=$(dialog --title 'Suporte & Help Desk' --backtitle "Suporte & Help Desk" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
+var0=$(dialog --title 'Suporte ao Servidor' --backtitle "Suporte ao Servidor" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
 1 'Gerir Maquinas Virtuais' \
 2 'Gerir Containers' \
 3 'Gerir Active Directory' \
 4 'Ferramentas & Utilidades' \
-5 'Ajustar Modo Kiosk' \
-6 'Iniciar Area de Trabalho' \
-7 'Restaurar Containers' \
-8 'Solucao de Problemas' \
+5 'Ajustar Modo Kiosk (se existente)' \
+6 'Iniciar Area de Trabalho (local)' \
+7 'Solucao de Problemas Comuns' \
+8 'Restaurar Containers' \
 9 'Reiniciar Servidor' \
 10 'Desligar Servidor' \
 X 'Sair' 2>&1 > /dev/tty )
@@ -91,8 +91,8 @@ case "$var0" in
 4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | tee /home/administrador/.t00lz ; chmod +x /home/administrador/.t00lz ; clear ; sudo bash /home/administrador/.t00lz ; managers ;;
 5) [ -d /home/administrador/kiosk ] && { curl -sSL https://raw.githubusercontent.com/urbancompasspony/kiosk-mode/refs/heads/main/MENU | tee /home/administrador/.kiosk ; chmod +x /home/administrador/.kiosk ; clear ; bash /home/administrador/.kiosk; } || { clear; echo "Modo Kioske nao configurado."; } ; managers ;;
 6) desktop00 ; managers ;;
-7) urgencies0 ; managers ;;
-8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; bash /home/administrador/.sp ; managers ;;
+7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; bash /home/administrador/.sp ; managers ;;
+8) urgencies0 ; managers ;;
 10) reb00t ; managers ;;
 11) shutd0 ; managers ;;
 X) exit ;;
