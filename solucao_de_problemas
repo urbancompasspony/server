@@ -79,6 +79,8 @@ for device in $smart_devices; do
         if echo "$smart_status" | grep -q "FAILED"; then
             echo -e "${RED}❌ CRÍTICO: Dispositivo /dev/$device com falha SMART!${NC}"
             add_error
+        else
+            echo -e "${GREEN}✅ OK: Dispositivo /dev/$device sem problemas SMART para relatar.${NC}"
         fi
     fi
 done
@@ -108,6 +110,8 @@ if [ -n "$disk_high" ]; then
     echo -e "${YELLOW}⚠️  AVISO: Armazenamento(s) com mais de 90% de uso:${NC}"
     echo "$disk_high"
     add_warning
+else
+    echo -e "${GREEN}✅ OK: Nenhum disco com +90% de uso${NC}"
 fi
 
 echo ""
@@ -120,6 +124,8 @@ if [ -n "$inode_full" ]; then
     echo -e "${RED}❌ ERRO: Sistema(s) de arquivo(s) com inodes esgotados!${NC}"
     echo "$inode_full"
     add_error
+else
+    echo -e "${GREEN}✅ OK: Nenhum disco com inodes esgotados${NC}"
 fi
 echo ""
 sleep 3
@@ -150,9 +156,11 @@ sleep 3
 log_message "Verificando interfaces de rede..."
 network_down=$(ip -o link show | awk '/state DOWN/ {print $2,$17}')
 if [ -n "$network_down" ]; then
-    echo -e "${YELLOW}⚠️  AVISO: Interface(s) de rede inativa(s) detectadas (ignore caso sejam VIRBR0 ou DOCKER0):${NC}"
+    echo -e "${YELLOW}⚠️  AVISO: Interface(s) de rede inativa(s) detectadas (ignore as interfaces BR-xxxxx, VIRBR0 e/ou DOCKER0):${NC}"
     echo "$network_down"
     add_warning
+else
+    echo -e "${GREEN}✅ Todas as interfaces de rede existentes estão ativas!${NC}"
 fi
 
 echo ""
@@ -188,7 +196,7 @@ for service in "${critical_services[@]}"; do
         echo -e "${GREEN}✅ OK: Serviço $service está ativo${NC}"
     else
         if systemctl list-unit-files --type=service | grep -q "^$service"; then
-            echo -e "${YELLOW}⚠️  AVISO: Serviço $service está inativo${NC}"
+            echo -e "${YELLOW}⚠️  AVISO: Serviço $service está inativo, isso está correto?${NC}"
             add_warning
         fi
     fi
@@ -201,17 +209,21 @@ if systemctl is-active --quiet docker 2>/dev/null; then
     
     # Verifica saúde do Docker
     if ! docker system df >/dev/null 2>&1; then
-        echo -e "${YELLOW}⚠️  AVISO: Docker não está respondendo adequadamente${NC}"
+        echo -e "${YELLOW}⚠️  AVISO: Docker não está respondendo adequadamente.${NC}"
         add_warning
+    else
+        echo -e "${GREEN}✅ OK: Docker está respondendo aos comandos normalmente.${NC}"
     fi
     
     # Verifica containers problemáticos
     exited_containers=$(docker ps -f status=exited -q 2>/dev/null)
     if [ -n "$exited_containers" ]; then
         exited_count=$(echo "$exited_containers" | wc -l)
-        echo -e "${YELLOW}⚠️  AVISO: $exited_count container(s) em estado EXITED${NC}"
+        echo -e "${YELLOW}⚠️  AVISO: $exited_count container(s) em estado de EXITED, isto está correto?${NC}"
         docker ps -f status=exited --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
         add_warning
+    else
+        echo -e "${GREEN}✅ OK: Containers ativos e operando normalmente de acordo com o sistema.${NC}"
     fi
     
     restarting_containers=$(docker ps -f status=restarting -q 2>/dev/null)
@@ -219,6 +231,8 @@ if systemctl is-active --quiet docker 2>/dev/null; then
         echo -e "${RED}❌ ERRO: Container(s) em estado de restart infinito!${NC}"
         docker ps -f status=restarting --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
         add_error
+    else
+        echo -e "${GREEN}✅ OK: Não há containers reiniciando em estado de erro.${NC}"
     fi
     
     # Verifica containers com uso alto de recursos
@@ -227,34 +241,38 @@ if systemctl is-active --quiet docker 2>/dev/null; then
         echo -e "${YELLOW}⚠️  AVISO: Container(s) com alto uso de CPU:${NC}"
         echo "$high_cpu_containers"
         add_warning
+    else
+        echo -e "${GREEN}✅ OK: Não há containers com alto consumo de CPU.${NC}"
     fi
     
 elif command -v docker >/dev/null 2>&1; then
-    echo -e "${RED}❌ ERRO: Docker está instalado mas não está executando!${NC}"
+    echo -e "${RED}❌ ERRO: Docker está instalado mas não está executando! Isso está correto?${NC}"
     add_error
 else
-    echo -e "${GREEN}✅ OK: Docker não está instalado (isso pode ser normal)${NC}"
+    echo -e "${GREEN}✅ OK: Docker não está instalado, mas isto está correto?${NC}"
 fi
 
 # Testando LibVirt (melhorado)
 log_message "Verificando LibVirt..."
 if systemctl is-active --quiet libvirtd 2>/dev/null; then
-    echo -e "${GREEN}✅ OK: LibVirt está ativo${NC}"
+    echo -e "${GREEN}✅ OK: LibVirt está ativo e operando.${NC}"
     
     # Verifica VMs com problemas
     if command -v virsh >/dev/null 2>&1; then
         vm_problems=$(sudo virsh list --all | grep -E "shut off|crashed|paused")
         if [ -n "$vm_problems" ]; then
-            echo -e "${YELLOW}⚠️  AVISO: VMs em estado não ativo:${NC}"
+            echo -e "${YELLOW}⚠️  AVISO: VMs em algum estado de pausa, travado ou desligado:${NC}"
             echo "$vm_problems"
             add_warning
+        else
+            echo -e "${GREEN}✅ OK: As VMs existentes estão executando.${NC}"
         fi
     fi
 elif command -v libvirtd >/dev/null 2>&1; then
-    echo -e "${YELLOW}⚠️  AVISO: LibVirt está instalado mas não está executando${NC}"
+    echo -e "${YELLOW}⚠️  AVISO: LibVirt está instalado mas não está executando!${NC}"
     add_warning
 else
-    echo -e "${GREEN}✅ OK: LibVirt não está instalado (isso pode ser normal)${NC}"
+    echo -e "${GREEN}✅ OK: LibVirt não está instalado neste servidor. Sem capacidades de virtualização.${NC}"
 fi
 echo ""
 sleep 3
@@ -275,7 +293,7 @@ fi
 # Verifica memória
 mem_usage=$(free | awk 'NR==2{printf "%.0f", $3*100/$2}')
 if [ "$mem_usage" -gt 90 ]; then
-    echo -e "${RED}❌ ERRO: Uso de memória crítico (${mem_usage}%)${NC}"
+    echo -e "${RED}❌ ERRO: Uso de memória alto crítico (${mem_usage}%)${NC}"
     add_error
 elif [ "$mem_usage" -gt 80 ]; then
     echo -e "${YELLOW}⚠️  AVISO: Uso de memória alto (${mem_usage}%)${NC}"
@@ -289,6 +307,8 @@ zombies=$(ps aux | awk '$8 ~ /^Z/ { count++ } END { print count+0 }')
 if [ "$zombies" -gt 0 ]; then
     echo -e "${YELLOW}⚠️  AVISO: $zombies processo(s) zumbi detectado(s)${NC}"
     add_warning
+else
+    echo -e "${GREEN}✅ OK: Nenhum processo zumbi detectado.${NC}"
 fi
 
 # Verifica logs de erro recentes
