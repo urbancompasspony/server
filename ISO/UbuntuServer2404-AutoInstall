@@ -59,6 +59,7 @@ autoinstall:
     primary:
       - arches: [default]
         uri: http://archive.ubuntu.com/ubuntu/
+    geoip: false
   package_update: true
   packages:
     - build-essential
