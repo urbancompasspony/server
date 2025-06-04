@@ -77,7 +77,7 @@ xorriso -indev ubuntu-24.04.2-live-server-amd64.iso -report_el_torito as_mkisofs
 8)
 cd source-files; xorriso -as mkisofs -r \
   -V 'Ubuntu 24.04 LTS AUTO' \
-  -o ../ubuntu-24.04-autoinstall.iso \
+  -o ../ubuntuserver-24.04-autoinstall.iso \
   --grub2-mbr ../BOOT/1-Boot-NoEmul.img \
   -partition_offset 16 \
   --mbr-force-bootable \
