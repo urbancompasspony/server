@@ -189,7 +189,7 @@ sleep 3
 echo -e "${BLUE}🔍 Teste 04: Verificando serviços essenciais...${NC}"
 
 # Lista de serviços críticos para verificar
-critical_services=("ssh" "systemd-resolved" "NetworkManager" "cron")
+critical_services=("ssh.socket" "systemd-resolved" "NetworkManager" "cron")
 
 # Verifica serviços do sistema
 for service in "${critical_services[@]}"; do
