@@ -1,7 +1,7 @@
 #!/bin/bash
 
 YAML="settings.yaml"
-CHECKSUM_FILE="/checksum"
+CHECKSUM_FILE="/var/lib/recover"
 
 # Verifica se ambos arquivos existem
 if [ ! -f "$YAML" ] || [ ! -f "$CHECKSUM_FILE" ]; then
