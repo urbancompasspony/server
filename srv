@@ -81,8 +81,9 @@ var0=$(dialog --title 'Suporte ao Servidor' --backtitle "Suporte ao Servidor" --
 6 'Iniciar Area de Trabalho (local)' \
 7 'Solucao de Problemas Comuns' \
 8 'Restaurar Containers' \
-9 'Reiniciar Servidor' \
-10 'Desligar Servidor' \
+9 'Todas as Informacoes do Servidor' \
+10 'Reiniciar Servidor' \
+11 'Desligar Servidor' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
@@ -93,10 +94,22 @@ case "$var0" in
 6) desktop00 ; managers ;;
 7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; sudo bash /home/administrador/.sp ; managers ;;
 8) urgencies0 ; managers ;;
+9) allinfoz0 ; managers ;;
 10) reb00t ; managers ;;
 11) shutd0 ; managers ;;
 X) exit ;;
 esac
+}
+
+function allinfoz0 {
+  [ -f /srv/settings.yaml ] && {
+    allinfoz="cat /srv/settings.yaml"
+    clear
+    dialog --title 'Todas as infomacoes do servidor:' --msgbox "$allinfoz" 0 0
+    clear
+  } || {
+    dialog --title 'ATENCAO:' --msgbox "Servidor fora de estrutura, por favor, estruture este servidor para o novo Modelo CDN." 0 0
+  }
 }
 
 function urgencies0 {
