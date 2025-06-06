@@ -242,7 +242,7 @@ esac
 # START HERE! #
 ###############
 
-[ -f /srv/containers/scripts/myip ] && {
+[ -f /srv/settings.yaml ] && {
   start
 } || {
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
