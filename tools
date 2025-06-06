@@ -249,7 +249,9 @@ GigaDNS .... 189.38.95.96 ....: $GIGA_S
 Claro ...... 181.213.132.2 ...: $CLARO_P
 Claro ...... 181.213.132.3 ...: $CLARO_S"
 
-dialog --title 'Resultados do Teste Ping:' --msgbox "$TEXTAO01" 0 0
+dialog --title "VISUALIZANDO DADOS" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os resultados! \n\nNavegue com as setas para cima e para baixo. \n\nPara sair pressione 'q' !" 12 40
+echo "$TEXTAO01" | less
+#dialog --title 'Resultados do Teste Ping:' --msgbox "$TEXTAO01" 0 0
 }
 
 function gauge1 {
