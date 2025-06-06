@@ -103,9 +103,9 @@ esac
 
 function allinfoz0 {
   [ -f /srv/settings.yaml ] && {
-    allinfoz="cat /srv/settings.yaml"
+    allinfoz=$(cat /srv/settings.yaml)
     clear
-    dialog --title 'Todas as Infomacoes do servidor' --msgbox "$allinfoz" 0 0
+    dialog --title 'Todas as Infomacoes do servidor' --msgbox "$allinfoz" 10 70
     clear
   } || {
     dialog --title 'ATENCAO' --msgbox "Servidor fora de estrutura.\nModelo M identificado.\n\nEstruture este servidor para o Modelo CDN para ler todas as informacoes!" 9 50
