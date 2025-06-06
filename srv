@@ -52,17 +52,13 @@ var0=$(dialog --title "SUPERVISOR" --backtitle "Bem-Vindo ao Server Manager $ver
 1 'Orchestration' \
 2 'Docker Maintenance' \
 3 'Suporte ao Servidor' \
-4 'Auto Relatorio' \
-5 'Atualizar o .bashrc' \
-6 'First Run' \
+4 'First Run!' \
 X 'Exit' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
 3) managers ; start ;;
-4) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/relat_full_tailscale | tee /home/administrador/.autorelat ; chmod +x /home/administrador/.autorelat ; sudo bash /home/administrador/.autorelat ; start ;;
-5) curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash ; start ;;
-6) firstconfig ; start ;;
+4) firstconfig ; start ;;
 X) exit ;;
 esac
 }
@@ -240,6 +236,11 @@ function motd0 {
   echo "Não execute esse script com sudo! Saindo..."
   exit
   }
+
+if [ -z "$BASHRC_UPDATE_CHECKED" ]; then
+  export BASHRC_UPDATE_CHECKED=1
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+fi
 
 init
 
