@@ -238,37 +238,4 @@ X) echo "." > /dev/null ;;
 esac
 }
 
-###############
-# START HERE! #
-###############
-
-[ -f /srv/settings.yaml ] && {
-  start
-} || {
-  IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
-  MyIPNF=$(dialog --title 'MyIP!' --backtitle "Sugestão: $IPMachine" --inputbox "Este IP não foi definido. \nQual o IP deste Servidor?" 10 40 2>&1 > /dev/tty)
-
-  sudo mkdir -p /srv/containers/scripts/config
-
-  sudo touch /srv/containers/scripts/config/backupcont
-  echo "source" > /srv/containers/scripts/config/backupcont
-  echo "destiny" >> /srv/containers/scripts/config/backupcont
-  echo "mountpoint" >> /srv/containers/scripts/config/backupcont
-  echo "UUID" >> /srv/containers/scripts/config/backupcont
-
-  wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
-  cat 01-Backup | sudo tee /srv/containers/scripts/backupcont
-  sudo rm -r 01-Backup
-
-  wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf"
-  cat rsnapshot.conf | sudo tee /srv/containers/scripts/rsnapshot
-  sudo rm -r rsnapshot.conf
-
-  sudo touch /srv/containers/scripts/myip
-  echo "$MyIPNF" | sudo tee /srv/containers/scripts/myip
-
-  clear
-  echo "VAI LA CONFIGURAR O MACVLAN!"
-  sleep 10
-  start
-}
+start
