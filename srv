@@ -22,27 +22,27 @@ function init {
 password=$(dialog --backtitle "Server Manager $version - By José Humberto" --title "Digite a senha!" --insecure --passwordbox "" 7 30 2>&1 > /dev/tty)
 hash0=$(echo "$password" | md5sum | awk '{print $1}')
   [ $? -ne 0 ] && exit
-  [ -z "$password" ] && {
+  if [ -z "$password" ]; then
       dialog --title "ERROR" --msgbox "É necessário digitar uma senha para continuar." 6 40
       clear
-  } || {
-    [ "$hash0" = "$hash1" ] && {
+  else
+    if [ "$hash0" = "$hash1" ]; then
       start
-    } || {
-      [ "$hash0" = "$hash2" ] && {
+    else
+      if [ "$hash0" = "$hash2" ]; then
         startocult
-      } || {
-        [ "$hash0" = "$hash3" ] && {
+      else
+        if [ "$hash0" = "$hash3" ]; then
           start
-        } || {
+        else
           clear
           dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
           timeout=$((timeout+1)); sleep $timeout
           init
-        }
-      }
-    }
-  }
+        fi
+      fi
+    fi
+  fi
 }
 
 hash1="fe5dfdd991450623c39efc7705e47ad5"
@@ -98,7 +98,7 @@ esac
 }
 
 function allinfoz0 {
-  [ -f /srv/settings.yaml ] && {
+  if [ -f /srv/settings.yaml ]; then
     YAML_FILE="/srv/settings.yaml"
 
     meuipwan=$(dig @resolver4.opendns.com myip.opendns.com +short)
@@ -125,55 +125,53 @@ Placa: $info2
 Tipo: $info3"
     # --------------------------------------
 
-    dialog --title "VISUALIZANDO DADOS" --backtitle "$bktitle" --msgbox "Pressione OK abaixo para visualizar os resultados! \n\nNavegue com as setas para cima e para baixo. \n\nPara sair pressione 'q' !" 12 40
+    dialog --title "VISUALIZANDO DADOS" --backtitle "" --msgbox "Pressione OK abaixo para visualizar os resultados! \n\nNavegue com as setas para cima e para baixo. \n\nPara sair pressione 'q' !" 12 40
     clear; echo "$dialog_text" | less
     clear
-  } || {
+  else
     dialog --title 'ATENCAO' --msgbox "Servidor fora de estrutura.\nModelo M identificado.\n\nEstruture este servidor para o Modelo CDN para ler todas as informacoes!" 9 50
-  }
+  fi
 }
 
 function desktop00 {
-  pstree -s $$ | grep sshd 1>&2 >/dev/null && {
+  if pstree -s $$ | grep sshd 1>&2 >/dev/null; then
     clear; echo ""; echo "Voce esta tentando acessar o desktop remotamente. Use esse menu la na tela local do servidor!"
-  } ||{ 
+  else
     desktop01
-  }
+  fi
   sleep 3
 }
 
 function desktop01 {
-  [ -f /usr/bin/labwc ] && {
+  if [ -f /usr/bin/labwc ]; then
     labwc
     return
-  } || {
+  else
     startx
     return
-  }
-  clear; echo ""; echo "Nenhum servidor grafico foi localizado! Verifique seu sistema."
-  sleep 2
+  fi
 }
 
 hash1="e4439267203fb5277d347e6cd6e440b5"
 
 function reb00t {
   dialog --title 'Reiniciar' --backtitle "Reinicio" --yesno 'Deseja reiniciar este sistema?' 0 0
-  [ $? = 0 ] && {
+  if [ $? = 0 ]; then
     sudo reboot
-  } || {
+  else
     echo "." >/dev/null
-  }
+  fi
 }
 
 hash1="7c6126d9cc35fccb0c8a3a42147ea85f"
 
 function shutd0 {
   dialog --title 'Desligar' --backtitle "Desligamento" --yesno 'Deseja desligar este sistema?' 0 0
-  [ $? = 0 ] && {
+  if [ $? = 0 ]; then
     sudo shutdown -h now
-  } || {
+  else
     echo "." >/dev/null
-  }
+  fi
 }
 
 function wayland00 {
@@ -186,12 +184,12 @@ function wayland00 {
 }
 
 function domain00 {
-  docker ps -a | grep dominio 1>&2 >/dev/null && {
+  if docker ps -a | grep dominio 1>&2 >/dev/null; then
     docker exec -it dominio /root/.init
     return
-  } || {
+  else
     clear; echo ""; echo "Nenhum Controlador de Dominio encontrado neste sistema!"; echo ""; sleep 3
-  }
+  fi
 }
 
 function dwgeneric0 {
