@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function tools {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
+var0=$(dialog --title "" --backtitle "" --menu " " 0 0 0 \
 A 'Remove not used images' \
 B 'Retore a Backup' \
 C 'Set MACVLAN' \
@@ -244,7 +244,7 @@ VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "MySQL - NextCloud" 
 function macvland {
   var1="0"; var2="0"; var3="0"; var4="0"
 
-  VALUE1="${meugateway%.*}.0"
+  #VALUE1="${meugateway%.*}.0"
   VALUE2=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+')
   VALUE3=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
   VALUE4="macvlan"
@@ -269,28 +269,27 @@ echo "$VALUE0"
   var3=$(echo "$VALUE0" | sed -n 3p)
   var4=$(echo "$VALUE0" | sed -n 4p)
 
-  [ "$var1" = "0" ] || [ "$var2" = "0" ] || [ "$var3" = "0" ] || [ "$var4" = "0" ] && {
+  if [ "$var1" = "0" ] || [ "$var2" = "0" ] || [ "$var3" = "0" ] || [ "$var4" = "0" ]; then
     dialog --title "ERRO" --msgbox "O(s) campo(s) exigidos nao pode(m) ficar em branco. \nPreencha-o(s) adequadamente!" 7 40
     macvland
-  } || {
+  else
     macvlanr=$(docker inspect "$var4" 1>/dev/null 2>/dev/null && echo yes || echo no)
-    [ "$macvlanr" = "no" ] && {
+    if [ "$macvlanr" = "no" ];then
       docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" "$var4"
-    } || {
+    else
       echo "A macvlan $var4 existe! Saindo..."
-      }
-}
-
+    fi
+  fi
 }
 
 function rmmacvland {
-rmmacvland0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Deseja remover qual macvlan?" 8 35 "macvlan" 2>&1 > /dev/tty)
-[ -z "$rmmacvland0" ] && {
+rmmacvland0=$(dialog --title "" --backtitle "" --inputbox "Deseja remover qual macvlan?" 8 35 "macvlan" 2>&1 > /dev/tty)
+if [ -z "$rmmacvland0" ]; then
   dialog --title "ERRO" --msgbox "O(s) campo(s) exigidos nao pode(m) ficar em branco. \nPreencha-o(s) adequadamente!" 7 40
-} || {
+else
   clear
   docker network rm "$rmmacvland0"
-}
+fi
 
 }
 
