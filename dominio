@@ -1672,7 +1672,7 @@ function dica0 {
 }
 
 function dialog001 {
-  dialog --title "VISUALIZANDO DADOS" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os resultados! \n\nNavegue com as setas para cima e para baixo. \n\nPara sair pressione 'q' !" 12 40
+  dialog --title "VISUALIZANDO DADOS" --backtitle "$bktitle" --msgbox "Pressione OK abaixo para visualizar os resultados! \n\nNavegue com as setas para cima e para baixo. \n\nPara sair pressione 'q' !" 12 40
 }
 
 function dialog002 {
