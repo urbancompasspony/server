@@ -111,7 +111,7 @@ function allinfoz0 {
     info3=$(yq -r '.Hardware.Placa' "$YAML_FILE")
 
     # --------------------------------------
-    dialog_text="Informacoes:
+    dialog_text="Informacoes do Servidor:
 
 $info1
 
