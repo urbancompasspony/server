@@ -99,9 +99,17 @@ esac
 
 function allinfoz0 {
   [ -f /srv/settings.yaml ] && {
-    allinfoz=$(cat /srv/settings.yaml)
-    clear
-    dialog --title 'Todas as Infomacoes do servidor' --msgbox "$allinfoz" 10 70
+    YAML_FILE="settings2.yaml"
+
+    info1=$(yq -r '.Dados_da_Placa_Mae.Tipo' "$YAML_FILE")
+    info2=$(yq -r '.Dados_da_Placa_Mae.Placa' "$YAML_FILE")
+    info3=$(yq -r '.Informacoes.Serial_Windows' "$YAML_FILE")
+
+    dialog_text="Tipo: $info1
+Placa: $info2
+Serial_Windows: $info3"
+
+    clear; dialog --title 'Infomacoes do Servidor' --msgbox "$dialog_text" 10 100
     clear
   } || {
     dialog --title 'ATENCAO' --msgbox "Servidor fora de estrutura.\nModelo M identificado.\n\nEstruture este servidor para o Modelo CDN para ler todas as informacoes!" 9 50
