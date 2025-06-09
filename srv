@@ -99,17 +99,34 @@ esac
 
 function allinfoz0 {
   [ -f /srv/settings.yaml ] && {
-    YAML_FILE="settings2.yaml"
+    YAML_FILE="/srv/settings.yaml"
 
-    info1=$(yq -r '.Dados_da_Placa_Mae.Tipo' "$YAML_FILE")
-    info2=$(yq -r '.Dados_da_Placa_Mae.Placa' "$YAML_FILE")
-    info3=$(yq -r '.Informacoes.Serial_Windows' "$YAML_FILE")
+    meuipwan=$(dig @resolver4.opendns.com myip.opendns.com +short)
+    meugateway=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+')
+    meuiplan=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
+    minhasubnet="${meugateway%.*}.0"
 
-    dialog_text="Tipo: $info1
+    info1=$(yq -r '.Informacoes' "$YAML_FILE")
+    info2=$(yq -r '.Hardware.Tipo' "$YAML_FILE")
+    info3=$(yq -r '.Hardware.Placa' "$YAML_FILE")
+
+    # --------------------------------------
+    dialog_text="Informacoes:
+
+$info1
+
+IP WAN: $meuipwan
+IP LAN Atual: $meuiplan
+Gateway Identificado: $meugateway
+Subnet Identificada: $minhasubnet
+
+Hardware:
 Placa: $info2
-Serial_Windows: $info3"
+Tipo: $info3"
+    # --------------------------------------
 
-    clear; dialog --title 'Infomacoes do Servidor' --msgbox "$dialog_text" 10 100
+    dialog --title "VISUALIZANDO DADOS" --backtitle "$bktitle" --msgbox "Pressione OK abaixo para visualizar os resultados! \n\nNavegue com as setas para cima e para baixo. \n\nPara sair pressione 'q' !" 12 40
+    clear; echo "$dialog_text" | less
     clear
   } || {
     dialog --title 'ATENCAO' --msgbox "Servidor fora de estrutura.\nModelo M identificado.\n\nEstruture este servidor para o Modelo CDN para ler todas as informacoes!" 9 50
