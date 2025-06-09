@@ -76,8 +76,8 @@ var0=$(dialog --title 'Suporte ao Servidor' --backtitle "Suporte ao Servidor" --
 5 'Ajustar Modo Kiosk (se existente)' \
 6 'Iniciar Area de Trabalho (local)' \
 7 'Solucao de Problemas Comuns' \
-8 'Restaurar Containers' \
-9 'Todas as Informacoes do Servidor' \
+8 'Informacoes do Servidor' \
+9 'Continuidade do Negocio' \
 10 'Reiniciar Servidor' \
 11 'Desligar Servidor' \
 X 'Sair' 2>&1 > /dev/tty )
@@ -89,8 +89,8 @@ case "$var0" in
 5) [ -d /home/administrador/kiosk ] && { curl -sSL https://raw.githubusercontent.com/urbancompasspony/kiosk-mode/refs/heads/main/MENU | tee /home/administrador/.kiosk ; chmod +x /home/administrador/.kiosk ; clear ; bash /home/administrador/.kiosk; } || { clear; echo "Modo Kioske nao configurado."; } ; managers ;;
 6) desktop00 ; managers ;;
 7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; sudo bash /home/administrador/.sp ; managers ;;
-8) urgencies0 ; managers ;;
-9) allinfoz0 ; managers ;;
+8) allinfoz0 ; managers ;;
+9) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/00-Base | tee /home/administrador/.base ; chmod +x /home/administrador/.base ; clear ; sudo bash /home/administrador/.base ; managers ;;
 10) reb00t ; managers ;;
 11) shutd0 ; managers ;;
 X) exit ;;
