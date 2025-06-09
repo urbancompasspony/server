@@ -49,16 +49,22 @@ hash1="fe5dfdd991450623c39efc7705e47ad5"
 
 function start {
 var0=$(dialog --title "SUPERVISOR" --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
-1 'Orchestration' \
+1 'Docker Orchestration' \
 2 'Docker Maintenance' \
-3 'Suporte ao Servidor' \
-4 'First Run!' \
+3 'Linite Model-1' \
+4 'AutoConfig pfSense (VM)' \
+5 'DWAgent (ARM)' \
+6 'Set Wayland (labwc 24.04+)' \
+7 'Set OpenBox ObaMenu' \
 X 'Exit' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
-3) managers ; start ;;
-4) firstconfig ; start ;;
+3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/model-1 | bash ; start ;;
+4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; start ;;
+5) dwgeneric0 ; start ;;
+6) wayland00 ; start ;;
+7) clear ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
 X) exit ;;
 esac
 }
@@ -69,30 +75,24 @@ function startocult {
 
 function managers {
 var0=$(dialog --title 'Suporte ao Servidor' --backtitle "Suporte ao Servidor" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-1 'Gerir Maquinas Virtuais' \
-2 'Gerir Containers' \
-3 'Gerir Active Directory' \
-4 'Ferramentas & Utilidades' \
-5 'Ajustar Modo Kiosk (se existente)' \
-6 'Iniciar Area de Trabalho (local)' \
-7 'Solucao de Problemas Comuns' \
-8 'Informacoes do Servidor' \
-9 'Continuidade do Negocio' \
-10 'Reiniciar Servidor' \
-11 'Desligar Servidor' \
+1 'Informacoes do Servidor' \
+2 'Iniciar Area de Trabalho (localhost)' \
+3 'Gerir o Active Directory (se existente)' \
+4 'Ferramentas & Ajustes Diversos' \
+5 'Solucao de Problemas' \
+6 'Continuidade do Negocio (CdN)' \
+7 'Reiniciar Servidor' \
+8 'Desligar Servidor' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
-1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/vm_machine | bash ; managers ;;
-2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ; managers ;;
+1) allinfoz0 ; managers ;;
+2) desktop00 ; managers ;;
 3) domain00 ; managers ;;
 4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | tee /home/administrador/.t00lz ; chmod +x /home/administrador/.t00lz ; clear ; sudo bash /home/administrador/.t00lz ; managers ;;
-5) [ -d /home/administrador/kiosk ] && { curl -sSL https://raw.githubusercontent.com/urbancompasspony/kiosk-mode/refs/heads/main/MENU | tee /home/administrador/.kiosk ; chmod +x /home/administrador/.kiosk ; clear ; bash /home/administrador/.kiosk; } || { clear; echo "Modo Kioske nao configurado."; } ; managers ;;
-6) desktop00 ; managers ;;
-7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; sudo bash /home/administrador/.sp ; managers ;;
-8) allinfoz0 ; managers ;;
-9) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/00-Base | tee /home/administrador/.base ; chmod +x /home/administrador/.base ; clear ; sudo bash /home/administrador/.base ; managers ;;
-10) reb00t ; managers ;;
-11) shutd0 ; managers ;;
+5) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; sudo bash /home/administrador/.sp ; managers ;;
+6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/00-Base | tee /home/administrador/.base ; chmod +x /home/administrador/.base ; clear ; sudo bash /home/administrador/.base ; managers ;;
+7) reb00t ; managers ;;
+8) shutd0 ; managers ;;
 X) exit ;;
 esac
 }
@@ -114,18 +114,6 @@ Serial_Windows: $info3"
   } || {
     dialog --title 'ATENCAO' --msgbox "Servidor fora de estrutura.\nModelo M identificado.\n\nEstruture este servidor para o Modelo CDN para ler todas as informacoes!" 9 50
   }
-}
-
-function urgencies0 {
-var0=$(dialog --title ' ' --backtitle "Restauracao de Containers" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-1 'Restaurar Containers Localmente' \
-2 'Baixar Backups de Containers' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/03-AutoRestoreBKP | bash ; urgencies0 ;;
-2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/04-AutoRestoreCloud | tee /home/administrador/.rc ; chmod +x /home/administrador/.rc ; clear ; bash /home/administrador/.rc ; urgencies0 ;;4) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/05-AutoRestoreBKPCloud | bash ; urgencies0 ;;
-X) echo "." >/dev/null ;;
-esac
 }
 
 function desktop00 {
@@ -171,43 +159,6 @@ function shutd0 {
   }
 }
 
-function firstconfig {
-var0=$(dialog --title ' ' --backtitle "Fiest Configuration!" --menu " " 0 0 0 \
-1 'Linite Model-1' \
-2 'AutoConfig pfSense (VM)' \
-3 'DWAgent (ARM)' \
-4 'Set MOTD' \
-5 'Set Wayland (labwc 24.04+)' \
-6 'Set OpenBox ObaMenu' \
-7 'Waydroid (EndeavourOS)' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/model-1 | bash ; firstconfig ;;
-2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; firstconfig ;;
-3) dwgeneric0 ; firstconfig ;;
-4) motd0 ; firstconfig ;;
-5) wayland00 ; firstconfig ;;
-6) clear ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; firstconfig ;;
-7) waydroid0 ; firstconfig ;;
-X) echo "." >/dev/null ;;
-esac
-}
-
-function waydroid0 {
-  yay -Syyu; clear
-  sudo pacman -S lzip radeontop nvtop; clear
-  yay -S binder_linux-dkms; clear
-  sudo systemctl stop waydroid-container.service; clear
-  sudo rm -rf /var/lib/waydroid
-  sudo modprobe -r binder-linux
-  sudo modprobe binder-linux devices=binder,hwbinder,vndbinder
-  yay -S waydroid; clear
-  sudo firewall-cmd --zone=trusted --add-port=67/udp; sudo firewall-cmd --zone=trusted --add-port=53/udp; sudo firewall-cmd --zone=trusted --add-forward; sudo firewall-cmd --zone=trusted --add-interface=waydroid0; sudo firewall-cmd --runtime-to-permanent
-  sudo waydroid init -s GAPPS; clear
-
-  echo "Tudo pronto!"; sleep 3
-}
-
 function wayland00 {
   clear
   sudo apt update
@@ -230,14 +181,6 @@ function dwgeneric0 {
   wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh
   chmod +x dwagent_generic.sh
   sudo bash dwagent_generic.sh
-}
-
-function motd0 {
-  sudo apt update; sudo apt install figlet -y; sudo rm -R /etc/update-motd.d/*
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header -O /etc/update-motd.d/00-header
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo -O /etc/update-motd.d/20-sysinfo
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd -O /etc/update-motd.d/90-dynamic-motd
-  sudo chmod +x /etc/update-motd.d/*
 }
 
 [ "$EUID" -ne 0 ] || {
