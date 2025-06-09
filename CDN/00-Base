@@ -1,0 +1,19 @@
+#!/bin/bash
+
+function urgencies0 {
+var0=$(dialog --title ' ' --backtitle "Restauracao de Containers" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
+1 'Restaurar Containers Localmente' \
+2 'Download Backups de Containers' \
+3 'Refazer o Servidor' \
+X '<' 2>&1 > /dev/tty )
+case "$var0" in
+1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/01-Restore_BKP | bash ; urgencies0 ;;
+2) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/02-Restore_Cloud | tee /home/administrador/.rc ; chmod +x /home/administrador/.rc ; clear ; bash /home/administrador/.rc ; urgencies0 ;;4) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/05-AutoRestoreBKPCloud | bash ; urgencies0 ;;
+3) clear; echo "EM BREVE!"; sleep 3
+X) echo "." >/dev/null ;;
+esac
+}
+
+urgencies0
+
+exit 1
