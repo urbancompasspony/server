@@ -16,6 +16,7 @@ var0=$(dialog --title 'Ferramentas' --backtitle "Ferramentas e Utilidades" --men
 10 'SpeedTest by Ookla' \
 11 'Explorar o conteudo de /mnt' \
 12 'Teste de Placa de Rede' \
+13 'Ajustar Modo Kiosk' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) dwservice0 ; start ;;
@@ -30,6 +31,7 @@ case "$var0" in
 10) clear; echo ""; echo "Aguarde a conclusao do teste!"; echo ""; curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 ; echo ""; sleep 3; read -p "Teste concluido! Pressione Enter para fechar" ; start ;;
 11) dialog --stdout --title "Veja as pastas da raiz dos discos!" --dselect "/mnt" 15 40; start ;;
 12) iperftest ; start ;;
+13) [ -d /home/administrador/kiosk ] && { curl -sSL https://raw.githubusercontent.com/urbancompasspony/kiosk-mode/refs/heads/main/MENU | tee /home/administrador/.kiosk ; chmod +x /home/administrador/.kiosk ; clear ; bash /home/administrador/.kiosk; } || { clear; echo "Modo Kioske nao configurado."; } ; start ;;
 X) echo "." >/dev/null ;;
 esac
 }
