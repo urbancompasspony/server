@@ -40,20 +40,20 @@ function init {
 
   sudo mkdir -p "$destpath"
 
-  [ -f $destpath/${options[choice - 1]} ] && {
+  if [ -f $destpath/${options[choice - 1]} ]; then
     clear
     echo ""
     echo "Ja existe uma .iso e/ou uma .img desse sistema!"
     echo "Remova-a primeiro e faca o download novamente."
     sleep 5
-  } || {
+  else
     clear
     echo ""
     echo "Nenhuma .iso e/ou .img localizada. Fazendo download..."
     echo ""
     wget --user $usern4me --password $passw0rd $webadress/${options[choice - 1]} -O $destpath/${options[choice - 1]}
     sudo chmod 777 -R "$destpath"
-  }
+  fi
 }
 
 check
