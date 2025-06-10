@@ -25,11 +25,27 @@ case "$var0" in
 6) sambaclient ; start ;;
 7) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
 8) clear ; satas ; start ;;
-9) clear; echo ""; echo "Aguarde a conclusao do teste!"; echo ""; curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 ; echo ""; sleep 3; read -p "Teste concluido! Pressione Enter para fechar" ; start ;;
+9) speedtest0 ; start ;;
+11) kiosk0 ; start ;;
 10) iperftest ; start ;;
-11) [ -d /home/administrador/kiosk ] && { curl -sSL https://raw.githubusercontent.com/urbancompasspony/kiosk-mode/refs/heads/main/MENU | tee /home/administrador/.kiosk ; chmod +x /home/administrador/.kiosk ; clear ; bash /home/administrador/.kiosk; } || { clear; echo "Modo Kioske nao configurado."; } ; start ;;
 X) echo "." >/dev/null ;;
 esac
+}
+
+function kiosk0 {
+  if [ -d /home/administrador/kiosk ]; then
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/kiosk-mode/refs/heads/main/MENU | tee /home/administrador/.kiosk ; chmod +x /home/administrador/.kiosk ; clear ; bash /home/administrador/.kiosk
+  else
+    clear; echo "Modo Kioske nao configurado."
+  fi
+}
+
+function speedtest0 {
+ clear
+ echo ""; echo "Aguarde a conclusao do teste!"; echo ""
+ curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3
+ echo ""; sleep 3
+ read -r -p "Teste concluido! Pressione Enter para fechar"
 }
 
 function tailscale0 {
@@ -66,7 +82,7 @@ esac
 
 function iperfclnt {
   clear; echo ""
-  read -a ipcc -p "Digite o IP do Servidor: "
+  read -r -a ipcc -p "Digite o IP do Servidor: "
   clear; echo "Entrando no modo Cliente. Para sair antes do teste concluir, tecle 'CTRL Esquerdo' + C duas vezes seguidas!"; echo ""
   iperf -c "$ipcc" &&
   read -r -p "Teste finalizado, tecle Enter para sair!"
@@ -79,20 +95,6 @@ function iperfsrv {
   read -r -p "Teste finalizado, tecle Enter para sair!"
 }
 
-function udpcast0 {
-# WIP: Add set interface menu option...
-var2=$(dialog --title 'UDPCast' --backtitle "$bktitle" --menu "Escolha o modo!" 0 0 0 \
-A 'Client' \
-B 'Server' \
-X '<' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && {start}
-case "$var2" in
-A) clear; echo ""; echo "Modo Cliente. Para sair, precione CTRL + C!" ; echo ""; udp-receiver --file=/dev/null ;;
-B) clear; echo ""; echo "Modo Servidor. Para sair, precione CTRL + C!" ; echo ""; udp-sender --file=/dev/zero ;;
-X) echo "." >/dev/null ;;
-esac
-}
-
 function dwservice0 {
   clear
   wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
@@ -100,28 +102,21 @@ function dwservice0 {
   sudo bash dwagent_x86.sh
 }
 
-function beep {
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
-  sudo bash /home/administrador/.beep.sh
-  echo "@reboot sleep 60; bash /home/administrador/.beep.sh" >> /tmp/crontab_new
-  sudo crontab -l | cat - /tmp/crontab_new > crontab.txt && sudo crontab crontab.txt
-}
-
 function sambaclient {
-[ -f  "$pathmount" ] && {
+if [ -f  "$pathmount" ]; then
   VALUE1=$(sed -n '1p' "$pathmount")
   VALUE2=$(sed -n '2p' "$pathmount")
-  VALUE3=$(sed -n '3p' "$pathmount") 
-  VALUE4=$(sed -n '4p' "$pathmount")  
+  VALUE3=$(sed -n '3p' "$pathmount")
+  VALUE4=$(sed -n '4p' "$pathmount")
   VALUE5=$(sed -n '5p' "$pathmount")
-} || {
+else
   touch "$pathmount"
   VALUE1="//192.168.X.Y/backup"
   VALUE2="/mnt/backup"
   VALUE3="admin"
   VALUE4="p4ssw0rd"
-  VALUE5=",domain=WORKGROUP" 
-}
+  VALUE5=",domain=WORKGROUP"
+fi
 
 VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --title "Mounting" --form "Pastas de Redes" 15 50 0 \
 "PATH: " 1 1 "$VALUE1" 1 10 34 0 \
@@ -148,26 +143,25 @@ dmn1=$(echo "$VALUE0" | sed -n 5p)
   }
 
 echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
-[ "$echa1" = "sim" ] && {
-  dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 7 30
-  sambaclient
-} || {
-  echo "$path1" > "$pathmount"
-  echo "$mntpt1" >> "$pathmount"
-  echo "$user1" >> "$pathmount"
-  echo "$pass1" >> "$pathmount"
-  echo "$dmn1" >> "$pathmount"
+  if [ "$echa1" = "sim" ]; then
+    dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 7 30
+    sambaclient
+  else
+    echo "$path1" > "$pathmount"
+    echo "$mntpt1" >> "$pathmount"
+    echo "$user1" >> "$pathmount"
+    echo "$pass1" >> "$pathmount"
+    echo "$dmn1" >> "$pathmount"
 
-  sudo mkdir -p "$mntpt1"
-  sudo mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
-  mntshow2=$(df -hT)
-  }
+    sudo mkdir -p "$mntpt1"
+    sudo mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
+  fi
 }
 
 function satas {
   gouge=10
   for number in $(find /sys/class/scsi_host/host* -maxdepth 0); do
-    echo "0 0 0" | sudo tee $number/scan; clear
+    echo "0 0 0" | sudo tee "$number"/scan; clear
     gauge1 $(($gouge+20)) "Scaneando e validando portas SATA"
     sleep 1
   done
@@ -237,7 +231,7 @@ GigaDNS .... 189.38.95.96 ....: $GIGA_S
 Claro ...... 181.213.132.2 ...: $CLARO_P
 Claro ...... 181.213.132.3 ...: $CLARO_S"
 
-dialog --title "VISUALIZANDO DADOS" --backtitle "$bktitle" --msgbox "Pressione Enter para visualizar os resultados! \n\nNavegue com as setas para cima e para baixo. \n\nPara sair pressione 'q' !" 12 40
+dialog --title "VISUALIZANDO DADOS" --backtitle "" --msgbox "Pressione Enter para visualizar os resultados! \n\nNavegue com as setas para cima e para baixo. \n\nPara sair pressione 'q' !" 12 40
 echo "$TEXTAO01" | less
 #dialog --title 'Resultados do Teste Ping:' --msgbox "$TEXTAO01" 0 0
 }
@@ -252,58 +246,25 @@ function ping1 {
   ping -c 1 "$1" | awk 'NR==2{print $7,$8}' |  cut -c7-
 }
 
-function smartdump {
-  # Clear SMART_DUMP File
-  rm SMART_DUMP
-  touch SMART_DUMP
-  
-  # Check SMART of block devices /dev/sdX
-  for i in a b c d e f g h i j k l m n o p
-    do
-      sudo skdump /dev/sd$i >> SMART_DUMP
-    done
-
-  # Check if there is NVME
-  [ -b /dev/nvme0n1 ] && {
-    for i in 1 2 3 4 5 6 7 8
-      do
-        sudo smartctl -a /dev/nvme0n1p$i >> SMART_DUMP
-      done
-  } || {
-    echo "NVME not present."
-  }
-
-  # Check if there is MegaRAID
-  [ $4 = 1 ] && {
-    for i in 0 1 2 3 4 5 6 7 8
-      do
-        sudo smartctl -d megaraid,$i -a /dev/sg$5 >> SMART_DUMP
-      done
-    } || {
-      echo "MegaRAID not present."
-    }
-}
-
 function synctunnel {
 tunnelmount="/tmp/tunnelmount"
 tunneloptions="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=60 -o ServerAliveCountMax=5"
 known_hosts_file="/home/$USER/.ssh/known_hosts"
 
-[ -f  "$tunnelmount" ] && {
+if [ -f  "$tunnelmount" ]; then
   VALUE1=$(sed -n '1p' "$tunnelmount")
   VALUE2=$(sed -n '2p' "$tunnelmount")
-  VALUE3=$(sed -n '3p' "$tunnelmount") 
+  VALUE3=$(sed -n '3p' "$tunnelmount")
   VALUE4=$(sed -n '4p' "$tunnelmount")
-  VALUE5=$(sed -n '5p' "$tunnelmount")  
-} || {
+  VALUE5=$(sed -n '5p' "$tunnelmount")
+else
   touch "$tunnelmount"
-
   VALUE1="192.168.0.1"
   VALUE2="root"
   VALUE3="admin"
   VALUE4="22"
   VALUE5="192.168.0.10"
-}
+fi
 
 VALUE0=$(dialog --ok-label "Conectar" --title "Tunnel SSH" --form "Connecting..." 13 50 0 \
 "Firewall: " 1 1 "$VALUE1" 1 10 34 0 \
