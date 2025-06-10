@@ -75,7 +75,7 @@ log_message "Verificando armazenamento com possíveis BAD BLOCKS..."
 smart_devices=$(lsblk -d -o NAME,TYPE | grep disk | awk '{print $1}')
 for device in $smart_devices; do
     if command -v smartctl >/dev/null 2>&1; then
-        smart_status=$(sudo smartctl -H /dev/$device 2>/dev/null | grep "SMART overall-health")
+        smart_status=$(sudo smartctl -H /dev/"$device" 2>/dev/null | grep "SMART overall-health")
         if echo "$smart_status" | grep -q "FAILED"; then
             echo -e "${RED}❌ CRÍTICO: Dispositivo /dev/$device com falha SMART!${NC}"
             add_error
