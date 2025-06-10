@@ -43,20 +43,20 @@ function ransom {
   cat "$1" | grep -E -i "$extensoes2" | sudo tee -a "$2"
 
   for i in "${notefiles[@]}"; do
-    find "$main_paths01" "$main_paths02" "$main_paths03" "$main_paths04" "$main_paths05" -type f -name $i | sudo tee -a "$2"
+    find "$main_paths01" "$main_paths02" "$main_paths03" "$main_paths04" "$main_paths05" -type f -name "$i" | sudo tee -a "$2"
   done
 }
 
 function start {
   sudo find /srv/containers/*/log -name "syslog" | tee /tmp/listfiles
-  cat /tmp/listfiles | while read LINE; do
-    [ -d /srv/containers/pentest ] && {
-      ransom $LINE "$path_to_pentest"
+  cat /tmp/listfiles | while read -r LINE; do
+    if [ -d /srv/containers/pentest ]; then
+      ransom "$LINE" "$path_to_pentest"
       [ -s "$path_to_pentest" ] || { sudo mv "$path_to_pentest" "$path_pentests/$message00" ; }
-    } || {
-      ransom $LINE "$alternative_path"
+    else
+      ransom "$LINE" "$alternative_path"
       [ -s "$alternative_path" ] || { sudo mv "$alternative_path" "$path_alternative/$message00" ; }
-    }
+    fi
   done
 }
 
