@@ -16,7 +16,7 @@ export ttitle=" Server Menu v7.0 "
 export PathFolder0
 
 function main_menu {
-  var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
+  if var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
   A 'Ferramentas de Usuarios' \
   B 'Ferramentas de Grupos' \
   C 'Ferramentas de Computadores' \
@@ -25,8 +25,10 @@ function main_menu {
   F 'Silos de Autenticacao' \
   G 'Informacoes do Dominio' \
   H 'Configuracoes do Dominio' \
-  X 'Sair' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && exit
+  X 'Sair' 2>&1 > /dev/tty ); then
+    exit
+  fi
+  
   case "$var4" in
   A) user_tools ; main_menu ;;
   B) group_tools ; main_menu ;;
@@ -41,7 +43,7 @@ function main_menu {
 }
 
 function user_tools {
-var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Usuarios" --menu " " 0 0 0 \
+if var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Usuarios" --menu " " 0 0 0 \
 A 'Procurar usuario' \
 B 'Verificar um usuario' \
 C 'Criar usuario' \
@@ -61,8 +63,10 @@ P 'Quando a senha usuario vai expirar?' \
 Q 'Forcar a troca de senha imediata!' \
 R 'Mover usuario para OU' \
 S 'Cuidado: Excluir um usuario' \
-X '<' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && return
+X '<' 2>&1 > /dev/tty ); then
+  return
+fi
+
 case "$var41" in
 A) search_user ; user_tools ;;
 B) check_user ; user_tools ;;
@@ -88,7 +92,7 @@ esac
 }
 
 function group_tools {
-var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Grupos" --menu " " 0 0 0 \
+if var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Grupos" --menu " " 0 0 0 \
 A 'Procurar grupo' \
 B 'Verificar um Grupo' \
 C 'Criar grupo' \
@@ -99,8 +103,10 @@ G 'Adicionar grupo 1 a um grupo 2' \
 H 'Remover grupo 1 de um grupo 2' \
 I 'Mover grupo para OU' \
 J 'Cuidado: Excluir um grupo' \
-X '<' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && return
+X '<' 2>&1 > /dev/tty ); then
+return
+fi
+
 case "$var41" in
 A) search_group ; group_tools ;;
 B) check_group ; group_tools ;;
@@ -117,15 +123,17 @@ esac
 }
 
 function pc_tools {
-var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Computadores" --menu " " 0 0 0 \
+if var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Computadores" --menu " " 0 0 0 \
 A 'Procurar computador' \
 B 'Verificar um computador' \
 C 'Exibir todos os computadores' \
 D 'Criar/Adicionar um computador' \
 E 'Mover computador para OU' \
 F 'Cuidado: Excluir um computador' \
-X '<' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && return
+X '<' 2>&1 > /dev/tty );then
+  return
+fi
+
 case "$var41" in
 A) search_pc ; pc_tools ;;
 B) check_pc ; pc_tools ;;
@@ -138,20 +146,22 @@ esac
 }
 
 function info_domain {
-  var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
+  if var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
   A 'Detalhes deste Dominio' \
   B 'Status das Sessoes ativas' \
   C 'Status dos Compartilhamentos' \
   D 'Processos do SAMBA-AD-DC' \
   E 'Ajuda!' \
-  X '<' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && return
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+  
   case "$var4" in
   A) domain_details ; info_domain ;;
   B) active_sessions ; info_domain ;;
   C) active_shares ; info_domain ;;
   D) smb_process ; info_domain ;;
-  E) faq_help ; read -p "Pressione Enter para continuar!" ; info_domain ;;
+  E) faq_help ; read -r -p "Pressione Enter para continuar!" ; info_domain ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -161,7 +171,7 @@ function info_domain {
 #####################################
 
 function s_settings_menu {
-var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu " " 0 0 0 \
+if var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu " " 0 0 0 \
   A 'Permissoes Comuns' \
   B 'Regras de Senhas' \
   C 'Cuidado: ACLs' \
@@ -169,39 +179,43 @@ var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu " " 0
   E 'Instalar ADMX Templates extras W 11' \
   F 'Remover ADMX Templates extras' \
   G 'Atualizar este Menu!' \
-  X '<' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && return
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+  
   case "$var4" in
   A) set_common_perm ; s_settings_menu ;;
   B) change_password0 ; s_settings_menu ;;
   C) change_acls0 ; s_settings_menu ;;
   D) clear ; force_msi_w10 ; s_settings_menu ;;
   E) clear ; force_msi_w11 ; s_settings_menu ;;
-  F) clear ; rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions ; read -p "ADMX Templates removidas. Pressione Enter para continuar!" ; s_settings_menu ;;
-  G) clear ; wget -q https://raw.githubusercontent.com/urbancompasspony/server/main/dominio -O /root/.dominio ; chmod +x /root/.dominio ; exit ; s_settings_menu ;;
+  F) clear ; rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions ; read -r -p "ADMX Templates removidas. Pressione Enter para continuar!" ; s_settings_menu ;;
+  G) clear ; wget -q https://raw.githubusercontent.com/urbancompasspony/server/main/dominio -O /root/.dominio ; chmod +x /root/.dominio ; s_settings_menu ;;
   X) echo "." >/dev/null ;;
   esac
 }
 
 function set_common_perm {
-  var4=$(dialog --title "$ttitle" --backtitle "Modificando permissoes" --menu " " 0 0 0 \
+  if var4=$(dialog --title "$ttitle" --backtitle "Modificando permissoes" --menu " " 0 0 0 \
   A 'SysVol check status' \
   B 'SysVol reset permissions' \
   C 'samba-ad-dc db check: general' \
   D 'samba-ad-dc db check: well-known-acls' \
-  X '<' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && return
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+  
   case "$var4" in
-  A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -p "Pressione Enter para continuar!" ; set_common_perm ;;
-  B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -p "Pressione Enter para continuar!" ; set_common_perm ;;
-  C) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -p "Pressione Enter para continuar!" ; set_common_perm ;;
-  D) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -p "Pressione Enter para continuar!" ; set_common_perm ;;
+  A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -r -p "Pressione Enter para continuar!" ; set_common_perm ;;
+  B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -r -p "Pressione Enter para continuar!" ; set_common_perm ;;
+  C) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -r -p "Pressione Enter para continuar!" ; set_common_perm ;;
+  D) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -r -p "Pressione Enter para continuar!" ; set_common_perm ;;
   X) echo "." >/dev/null ;;
   esac
 }
 
 function change_password0 {
-  var4=$(dialog --title "$ttitle" --backtitle "Regras de senhas para todo o Dominio" --menu " " 0 0 0 \
+  if var4=$(dialog --title "$ttitle" --backtitle "Regras de senhas para todo o Dominio" --menu " " 0 0 0 \
   A 'Mostrar Status das Regras de Senhas' \
   B 'Ativar complexidade das senhas' \
   C 'Desativar complexidade das senhas' \
@@ -212,8 +226,10 @@ function change_password0 {
   H 'Tentativas de login antes de bloquear' \
   I 'Duracao do bloqueio de contas se errar' \
   J 'Duracao da liberacao da conta apos bloqueio' \
-  X '<' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && return
+  X '<' 2>&1 > /dev/tty ); then
+   return
+ fi
+ 
   case "$var4" in
   A) show_pass_policy ; change_password0 ;;
   B) set_complex ; change_password0 ;;
@@ -234,9 +250,8 @@ function show_pass_policy {
 }
 
 function set_complex {
-  daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --yesno "Ativar a complexidade de senhas? \n\n
-Valor padrao: ATIVO" 9 35 2>&1 > /dev/tty)
-  [ $? = 0 ] && {
+  if daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --yesno "Ativar a complexidade de senhas? \n\n
+Valor padrao: ATIVO" 9 35 2>&1 > /dev/tty); then
   clear
   samba-tool domain passwordsettings set --complexity=on
   samba-tool domain passwordsettings set --history-length=24
@@ -244,14 +259,12 @@ Valor padrao: ATIVO" 9 35 2>&1 > /dev/tty)
   samba-tool domain passwordsettings set --max-pwd-age=90
   samba-tool domain passwordsettings set --min-pwd-length=7
   dialog --cr-wrap --title "A complexidade de senhas foi reativada!" --backtitle "Complexidade restaurada aos valores padrao." --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
-}
-
+  fi
 }
 
 function unset_complex {
-  daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --yesno "Desativar a complexidade de senhas? \n\n
-Valor padrao: ATIVO" 9 35 2>&1 > /dev/tty)
-  [ $? = 0 ] && {
+  if daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --yesno "Desativar a complexidade de senhas? \n\n
+Valor padrao: ATIVO" 9 35 2>&1 > /dev/tty); then
   clear
   samba-tool domain passwordsettings set --complexity=off
   samba-tool domain passwordsettings set --history-length=0
@@ -259,33 +272,32 @@ Valor padrao: ATIVO" 9 35 2>&1 > /dev/tty)
   samba-tool domain passwordsettings set --max-pwd-age=0
   samba-tool domain passwordsettings set --min-pwd-length=0
   dialog --cr-wrap --title "A complexidade de senhas foi removida do servidor!" --backtitle "Complexidade totalmente removida." --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
-}
+fi
 
 }
 
 function pass_history {
 pass_history0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Trocar senha quantas vezes ate permitir repetir? \n\n
 Valor padrao: 24" 11 35 2>&1 > /dev/tty)
-[ -z "$pass_history0" ] && {
-  dialog002
-} || {
-  clear
-  samba-tool domain passwordsettings set --history-length=$pass_history0
-  dialog --title "Confirmacao" --msgbox "A senha devera ser trocada $pass_history0 vezes antes de poder repeti-la!" 8 40
-}
-
+  if [ -z "$pass_history0" ]; then
+    dialog002
+  else
+    clear
+    samba-tool domain passwordsettings set --history-length="$pass_history0"
+    dialog --title "Confirmacao" --msgbox "A senha devera ser trocada $pass_history0 vezes antes de poder repeti-la!" 8 40
+  fi
 }
 
 function pass_min_length {
 pass_min0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Tamanho minimo de caracteres das senhas. \n\n
 Valor padrao: 7" 11 35 2>&1 > /dev/tty)
-[ -z "$pass_min0" ] && {
-  dialog002
-} || {
-  clear
-  samba-tool domain passwordsettings set --min-pwd-length=$pass_min0
-  dialog --title "Confirmacao" --msgbox "Agora as senhas deverao conter no minimo $pass_min0 caracter(es)!" 8 40
-}
+  if [ -z "$pass_min0" ]; then
+    dialog002
+  else
+    clear
+    samba-tool domain passwordsettings set --min-pwd-length="$pass_min0"
+    dialog --title "Confirmacao" --msgbox "Agora as senhas deverao conter no minimo $pass_min0 caracter(es)!" 8 40
+  fi
 
 }
 
@@ -293,80 +305,77 @@ function pass_min_age {
 daystoexpire1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Evitar a troca de senha seguidas vezes. \n\n
 Valor padrao: 1 dia \n\n
 Valor 0: Troque quando quiser" 14 35 2>&1 > /dev/tty)
-[ -z "$daystoexpire1" ] && {
-  dialog002
-} || {
-  clear
-  samba-tool domain passwordsettings set --min-pwd-age=$daystoexpire1
-  dialog --title "Confirmacao" --msgbox "Todos os usuarios so podem trocar a senha novamente apos $daystoexpire1 dias!" 8 40
-}
-
+  if [ -z "$daystoexpire1" ]; then
+    dialog002
+  else
+    clear
+    samba-tool domain passwordsettings set --min-pwd-age="$daystoexpire1"
+    dialog --title "Confirmacao" --msgbox "Todos os usuarios so podem trocar a senha novamente apos $daystoexpire1 dias!" 8 40
+  fi
 }
 
 function pass_max_age {
 daystoexpire2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina a validade das senhas em dias. \n\n
 Valor padrao: 90 dias \n\n
 Valor 0: Sem validade." 14 35 2>&1 > /dev/tty)
-[ -z "$daystoexpire2" ] && {
-  dialog002
-} || {
-  clear
-  samba-tool domain passwordsettings set --max-pwd-age=$daystoexpire2
-  dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire2 dias!" 8 40
-}
-
+  if [ -z "$daystoexpire2" ]; then
+    dialog002
+  else
+    clear
+    samba-tool domain passwordsettings set --max-pwd-age="$daystoexpire2"
+    dialog --title "Confirmacao" --msgbox "Todos os usuarios devem trocar a senha em $daystoexpire2 dias!" 8 40
+  fi
 }
 
 function try_login {
 blocklogin0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Quantas tentativas de login antes de bloquear o usuario? \n\n
 Valor padrao: 0" 11 35 2>&1 > /dev/tty)
-[ -z "$blocklogin0" ] && {
-  dialog002
-} || {
-  clear
-  samba-tool domain passwordsettings set --account-lockout-threshold=$blocklogin0
-  dialog --title "Confirmacao" --msgbox "O usuario sera bloqueado se errar a senha $blocklogin0 vezes!" 8 40
-}
-
+  if [ -z "$blocklogin0" ]; then
+    dialog002
+  else
+    clear
+    samba-tool domain passwordsettings set --account-lockout-threshold="$blocklogin0"
+    dialog --title "Confirmacao" --msgbox "O usuario sera bloqueado se errar a senha $blocklogin0 vezes!" 8 40
+  fi
 }
 
 function failblock_login {
 failblock0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Por quanto tempo manter o usuario bloqueado apos errar a senha? \n\n
 Valor padrao: 30 minutos \n\n
 Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty)
-[ -z "$failblock0" ] && {
-  dialog002
-} || {
-  clear
-  samba-tool domain passwordsettings set --account-lockout-duration=$failblock0
-  dialog --title "Confirmacao" --msgbox "O usuario bloqueado por errar a senha ficara bloqueado por $failblock0 minutos!" 8 40
-}
-
+  if [ -z "$failblock0" ]; then
+    dialog002
+  else
+    clear
+    samba-tool domain passwordsettings set --account-lockout-duration="$failblock0"
+    dialog --title "Confirmacao" --msgbox "O usuario bloqueado por errar a senha ficara bloqueado por $failblock0 minutos!" 8 40
+  fi
 }
 
 function releaseblock_login {
 releaseblk0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Apos quanto tempo liberar usuarios bloqueados apos errarem a senha? \n\n
 Valor padrao: 30 minutos \n\n
 Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty)
-[ -z "$releaseblk0" ] && {
-  dialog002
-} || {
-  clear
-  samba-tool domain passwordsettings set --reset-account-lockout-after=$releaseblk0
-  dialog --title "Confirmacao" --msgbox "O usuario bloqueado por errar a senha podera logar novamente apos $failblock0 minutos!" 8 40
-}
-
+  if [ -z "$releaseblk0" ]; then
+    dialog002
+  else
+    clear
+    samba-tool domain passwordsettings set --reset-account-lockout-after="$releaseblk0"
+    dialog --title "Confirmacao" --msgbox "O usuario bloqueado por errar a senha podera logar novamente apos $failblock0 minutos!" 8 40
+  fi
 }
 
 function change_acls0 {
-  var4=$(dialog --title "CUIDADO!" --backtitle "ATENÇÃO" --menu "Prefira rodar este comando nas maquinas locais: \nicacls C:\\caminho\\do\\usuario /reset /t /c" 0 0 0 \
+  if var4=$(dialog --title "CUIDADO!" --backtitle "ATENÇÃO" --menu "Prefira rodar este comando nas maquinas locais: \nicacls C:\\caminho\\do\\usuario /reset /t /c" 0 0 0 \
   A 'Verificar ACL padrao (Administrator!)' \
   B 'Coletar ACLs de arquivo ou pasta' \
   C 'PERIGO! Definir uma ACL a um arquivo ou pasta' \
-  X '<' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && return
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+  
   case "$var4" in
-  A) clear ; samba-tool gpo aclcheck -U Administrator ; read -p "Pressione Enter para continuar!" ; change_acls0 ;;
+  A) clear ; samba-tool gpo aclcheck -U Administrator ; read -r -p "Pressione Enter para continuar!" ; change_acls0 ;;
   B) getacls0 ; change_acls0 ;;
   C) setacls0 ; change_acls0 ;;
   X) echo "." >/dev/null ;;
@@ -378,14 +387,16 @@ function change_acls0 {
 #############################
 
 function shared_folders {
-var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
+if var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
 A 'Mostrar pastas compartilhadas' \
 B 'Criar nova pasta compartilhada' \
 C 'Compartilhamento estruturado' \
 D 'Excluir compartilhamento' \
 E 'Revalidar configuracoes' \
-X '<' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && return
+X '<' 2>&1 > /dev/tty ); then
+  return
+fi
+
 case "$var0" in
 A) show_shared ; shared_folders ;;
 B) create_shared ; shared_folders ;;
@@ -397,13 +408,15 @@ esac
 }
 
 function ou_tools {
-  var12=$(dialog --title "$ttitle" --backtitle "Unidades Organizacionais" --menu " " 0 0 0 \
+if var12=$(dialog --title "$ttitle" --backtitle "Unidades Organizacionais" --menu " " 0 0 0 \
   A 'Listar todas as OUs' \
   B 'Criar uma OU' \
   C 'Listar objetos de OU' \
   D 'Excluir uma OU' \
-  X '<' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && return
+  X '<' 2>&1 > /dev/tty ); then
+    return
+fi
+
   case "$var12" in
   A) show_ous ; ou_tools ;;
   B) create_ou ; ou_tools ;;
@@ -416,15 +429,15 @@ function ou_tools {
 function checksilos0 {
   test01=$(samba-tool domain level show | grep -q 2012 && echo yes || echo no)
   test02=$(samba-tool domain level show | grep -q 2016 && echo yes || echo no)
-  [ "$test01" = "yes" ] || [ "$test02" = "yes" ] && {
+  if [ "$test01" = "yes" ] || [ "$test02" = "yes" ]; then
     menusilo
-  } || {
+  else
     dialog --title "Tentando acessar Silos" --backtitle "Informacao" --msgbox "Nivel funcional muito baixo! \nSAMBA Incompativel." 7 40
-  }
+  fi
 }
 
 function menusilo {
-  var12=$(dialog --title "$ttitle" --backtitle "Silos de Autenticacao" --menu " " 0 0 0 \
+  if var12=$(dialog --title "$ttitle" --backtitle "Silos de Autenticacao" --menu " " 0 0 0 \
   A 'Procurar/verificar um silo' \
   B 'Listar todos os silos' \
   C 'Criar um silo' \
@@ -432,8 +445,9 @@ function menusilo {
   E 'Adicionar um usuario a um silo' \
   F 'Remover um usuario de um silo' \
   G 'Excluir um silo' \
-  X '<' 2>&1 > /dev/tty )
-  [ $? -ne 0 ] && return
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
   case "$var12" in
   A) check_silo ; menusilo ;;
   B) show_silos ; menusilo ;;
@@ -447,135 +461,136 @@ function menusilo {
 }
 
 function check_silo {
-validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && return
-[ -z "$validsilo" ] && {
+if validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty); then
+return
+fi
+
+if [ -z "$validsilo" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
-  [ "$repeated" = "$validsilo" ] && {
-    dialog --title "Informacao" --msgbox "O silo "$validsilo" existe!" 8 40
+  if [ "$repeated" = "$validsilo" ]; then
+    dialog --title "Informacao" --msgbox "O silo $validsilo existe!" 8 40
     clear
     dialog001
-    [ $? -ne 0 ] && return
     silodata=$(samba-tool domain auth silo view --name "$validsilo")
     echo "$silodata" | less
-  } || {
+  else
     dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
-  }
-}
-
+  fi
+fi
 }
 
 function show_silos {
 dialog001
-[ $? -ne 0 ] && return
 silolist=$(samba-tool domain auth silo list)
 echo "$silolist" | less
 }
 
 function create_silos {
-validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && return
-[ -z "$validsilo" ] && {
+if validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty); then
+  return
+fi
+
+if [ -z "$validsilo" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
-  [ "$repeated" = "$validsilo" ] && {
+  if [ "$repeated" = "$validsilo" ]; then
     dialog --title "ERROR" --msgbox "Silo $validsilo ja existe!" 7 25
-  } || {
+  else
     samba-tool domain auth silo create --name "$validsilo"
     dialog --title "Informacao" --msgbox "Silo $validsilo criado com sucesso!" 7 25
-  }
-}
-
+  fi
+fi
 }
 
 function list_usr_silo {
-validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && return
-[ -z "$validsilo" ] && {
+if validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty); then
+  return
+fi
+
+if [ -z "$validsilo" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
-  [ "$repeated" = "$validsilo" ] && {
+  if [ "$repeated" = "$validsilo" ]; then
     dialog001
     silomembers=$(samba-tool domain auth silo member list --name "$validsilo")
     echo "$silomembers" | less
-  } || {
+  else
     dialog --title "ERRO" --msgbox "Silo invalido!" 8 40
-    }
-}
-
+  fi
+fi
 }
 
 function add_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] || [ -z "$validsilo" ] && {
+if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
     dialog002
-  } || {
+  else
     repeated=$(samba-tool user list | grep -x "$validusr")
-    [ "$repeated" = "$validusr" ] && {
-    repeated2=$(samba-tool domain auth silo list | grep -x "$validsilo")
-    [ "$repeated2" = "$validsilo" ] && {
-      samba-tool domain auth silo member add --name "$validsilo" --member "$validusr"
-      dialog --title "Informacao" --msgbox "O usuario $validusr foi promovido ao silo $validsilo!" 8 40
-    } || {
-      dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
-    }
-  } || {
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-    }
-  }
+    if [ "$repeated" = "$validusr" ]; then
+      repeated2=$(samba-tool domain auth silo list | grep -x "$validsilo")
+      if [ "$repeated2" = "$validsilo" ]; then
+        samba-tool domain auth silo member add --name "$validsilo" --member "$validusr"
+        dialog --title "Informacao" --msgbox "O usuario $validusr foi promovido ao silo $validsilo!" 8 40
+      else
+        dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function rm_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 validsilo=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] || [ -z "$validsilo" ] && {
+if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
     dialog002
-  } || {
+  else  
     repeated=$(samba-tool user list | grep -x "$validusr")
-    [ "$repeated" = "$validusr" ] && {
-    repeated2=$(samba-tool domain auth silo list | grep -x "$validsilo")
-    [ "$repeated2" = "$validsilo" ] && {
-      samba-tool domain auth silo member remove --name "$validsilo" --member "$validusr"
-      dialog --title "Informacao" --msgbox "O usuario $validusr foi removido do silo $validsilo!" 8 40
-    } || {
-      dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
-    }
-  } || {
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-    }
-  }
+    if [ "$repeated" = "$validusr" ]; then
+      repeated2=$(samba-tool domain auth silo list | grep -x "$validsilo")
+      if [ "$repeated2" = "$validsilo" ]; then
+        samba-tool domain auth silo member remove --name "$validsilo" --member "$validusr"
+        dialog --title "Informacao" --msgbox "O usuario $validusr foi removido do silo $validsilo!" 8 40
+      else
+        dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function rm_silo {
-validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty)
-[ $? -ne 0 ] && return
-[ -z "$validsilo" ] && {
+if validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty); then
+  return
+fi
+
+if [ -z "$validsilo" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
-  [ "$repeated" = "$validsilo" ] && {
-    dialog --title 'Confirmacao' --backtitle 'Exclusao de Silo' --yesno 'Deseja excluir este silo?' 0 0
-    [ $? = 0 ] && {
+  if [ "$repeated" = "$validsilo" ]; then
+    if dialog --title 'Confirmacao' --backtitle 'Exclusao de Silo' --yesno 'Deseja excluir este silo?' 0 0; then
       samba-tool domain auth silo delete --name "$validsilo"
       dialog --title "Informacao" --msgbox "Silo $validsilo excluido com sucesso!" 7 25
-    } || {
-      echo "a" > /dev/null
-      }
-  } || {
+    fi
+  else
     dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
-  }
-}
-
+  fi
+fi
 }
 
 function getacls0 {
-VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Get ACL" --dselect "/mnt" 15 40)
-[ $? -ne 0 ] && return
+if VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Get ACL" --dselect "/mnt" 15 40); then
+  return
+fi
+
 Pathtemp0=$(echo "$VALUE0" | sed -n 1p)
 
 acl00=$(samba-tool ntacl get --as-sddl "$Pathtemp0")
@@ -593,8 +608,10 @@ dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes ACL
 
 checkpathfolder
 
-VALUE00=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Set Folder" --dselect "$PathFolder0" 15 40)
-[ $? -ne 0 ] && return
+if VALUE00=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Set Folder" --dselect "$PathFolder0" 15 40); then
+  return
+fi
+
 PathFolder0new=$(echo "$VALUE00" | sed -n 1p)
 
 samba-tool ntacl set "$acl00" "$PathFolder0new"
@@ -606,123 +623,90 @@ changemoreacls
 }
 
 function changemoreacls {
-  dialog --title 'Confirmacao' --backtitle 'Informacao' --yesno 'Deseja trocar a ACL de outra pasta?' 0 0
-  [ $? = 0 ] && {
+  if dialog --title 'Confirmacao' --backtitle 'Informacao' --yesno 'Deseja trocar a ACL de outra pasta?' 0 0; then
   acl00="$(cat /tmp/acl01)"
   PathFolder0="$(cat /tmp/path01)"
   pathtempacl0="$(cat /tmp/pathtemp00)"
-
-  VALUE00=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Set Folder" --dselect "$PathFolder0" 15 40)
-  [ $? -ne 0 ] && return
+  fi
+  
+  if VALUE00=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Set Folder" --dselect "$PathFolder0" 15 40); then
   PathFolder0new=$(echo "$VALUE00" | sed -n 1p)
-
   echo "$PathFolder0new"| tee /tmp/path01 >/dev/null
   samba-tool ntacl set "$acl00" "$PathFolder0new"
-
   dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta \n$PathFolder0new\nrecebeu as seguintes ACLs: \n\n$acl00\n\nficando com as mesmas permissoes da pasta \n$pathtempacl0!" 16 70
-
   changemoreacls
-  }
+  fi
 }
 
 function checkpathfolder {
   PathFolder0="$(cat /tmp/path01)"
-  [ "$PathFolder0" = "" ] && {
+  if [ "$PathFolder0" = "" ]; then
     PathFolder0="/mnt"
-  } || {
-    echo "." >/dev/null
-  }
+  fi
 }
 
 function force_msi_w10 {
-dpkg --list | grep msitools && {
-
-dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0
-  [ $? = 0 ] && {
-
-wget -O w10admx.msi "$admxw10" \
-    && msiextract -C /msifiles/ w10admx.msi
-
-rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions
-
-samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
-
-echo ""
-read -p "As regras do Windows 10 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
-  } || {
-    echo "." > /dev/null
-  }
-} || {
-clear
-echo "Pacote MSITOOLS nao encontrado!"
-sleep 3
-}
-
+if dpkg --list | grep msitools; then
+  if dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0; then
+    wget -O w10admx.msi "$admxw10" && mkdir /msifiles && msiextract -C /msifiles/ w10admx.msi
+    rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions
+    samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
+    echo ""; read -r -p "As regras do Windows 10 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
+  fi
+else
+  clear
+  echo "Pacote MSITOOLS nao encontrado!"
+  sleep 3
+fi
 }
 
 function force_msi_w11 {
-dpkg --list | grep msitools && {
-
-dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0
-  [ $? = 0 ] && {
-
-wget -O w11admx.msi "$admxw11" \
-    && mkdir /msifiles \
-    && msiextract -C /msifiles/ w11admx.msi
-
-rm -R /var/lib/samba/sysvol/$DOMAIN/Policies/PolicyDefinitions
-
-mv /msifiles/Program\ Files/Microsoft\ Group\ Policy/Windows\ 11\ September\ 2022\ Update\ \(22H2\)/PolicyDefinitions/ /msifiles/PolicyDefinitions/
-
-samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
-
-echo ""
-read -p "As regras do Windows 11 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
-  } || {
-    echo "." > /dev/null
-  }
-} || {
-clear
-echo "Pacote MSITOOLS nao encontrado!"
-sleep 3
-}
-
+if dpkg --list | grep msitools; then
+  if dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0; then
+    wget -O w11admx.msi "$admxw11" && mkdir /msifiles && msiextract -C /msifiles/ w11admx.msi
+    rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions
+    mv /msifiles/Program\ Files/Microsoft\ Group\ Policy/Windows\ 11\ September\ 2022\ Update\ \(22H2\)/PolicyDefinitions/ /msifiles/PolicyDefinitions/
+    samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
+    echo ""; read -r -p "As regras do Windows 11 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
+  fi
+else
+  clear
+  echo "Pacote MSITOOLS nao encontrado!"
+  sleep 3
+fi
 }
 
 function active_shares {
   dialog001
-  [ $? -ne 0 ] && return
   active_sh=$(net status shares)
   echo "$active_sh" | less
 }
 
 function active_sessions {
   dialog001
-  [ $? -ne 0 ] && return
   active_se=$(net status sessions)
   echo "$active_se" | less
 }
 
 function show_ous {
   dialog001
-  [ $? -ne 0 ] && return
   oulst=$(samba-tool ou list)
   echo "$oulst" | less
 }
 
 function create_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Criando uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
-[ -z "$validou" ] && {
+if [ -z "$validou" ]; then
   dialog002
-} || {
+else
    repeated=$(samba-tool ou list | grep -x OU="$validou")
-  [ "$repeated" = "OU=$validou" ] && {
+  if [ "$repeated" = "OU=$validou" ]; then
     dialog --title "Informacao" --msgbox "A OU=$validou ja existe!" 8 40
-  } || {
+  else
     samba-tool ou create OU="$validou"
     dialog --title "Informacao" --msgbox "OU=$validou criada com sucesso!" 7 25
-    }
-  }
+  fi
+fi
 }
 
 function mv_user_ou {
