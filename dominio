@@ -429,6 +429,7 @@ fi
 function checksilos0 {
   test01=$(samba-tool domain level show | grep -q 2012 && echo yes || echo no)
   test02=$(samba-tool domain level show | grep -q 2016 && echo yes || echo no)
+
   if [ "$test01" = "yes" ] || [ "$test02" = "yes" ]; then
     menusilo
   else
@@ -462,7 +463,7 @@ function menusilo {
 
 function check_silo {
 if validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty); then
-return
+  return
 fi
 
 if [ -z "$validsilo" ]; then
@@ -482,9 +483,9 @@ fi
 }
 
 function show_silos {
-dialog001
-silolist=$(samba-tool domain auth silo list)
-echo "$silolist" | less
+  dialog001
+  silolist=$(samba-tool domain auth silo list)
+  echo "$silolist" | less
 }
 
 function create_silos {
@@ -527,6 +528,7 @@ fi
 function add_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
+
 if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
     dialog002
   else
@@ -548,6 +550,7 @@ if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
 function rm_usr_silo {
 validusr=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 validsilo=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
+
 if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
     dialog002
   else  
@@ -695,7 +698,10 @@ function show_ous {
 }
 
 function create_ou {
-validou=$(dialog --title "$ttitle" --backtitle "Criando uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
+if ! validou=$(dialog --title "$ttitle" --backtitle "Criando uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
+  return
+fi
+
 if [ -z "$validou" ]; then
   dialog002
 else
@@ -710,8 +716,14 @@ fi
 }
 
 function mv_user_ou {
-validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
-validou=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
+if ! validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty); then
+  return
+fi
+
+if ! validou=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
+  return
+fi
+
 if [ -z "$validusr" ] || [ -z "$validou" ]; then
     dialog002
 else
@@ -731,8 +743,14 @@ fi
 }
 
 function mv_group_ou {
-validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-validou=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
+if ! validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty); then
+  return
+fi
+
+if ! validou=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
+  return
+fi
+
 if [ -z "$validgrp" ] || [ -z "$validou" ]; then
   dialog002
 else
@@ -752,7 +770,10 @@ fi
 }
 
 function rm_ou {
-validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "Insira o nome da OU:" 0 0 2>&1 > /dev/tty)
+if ! validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "Insira o nome da OU:" 0 0 2>&1 > /dev/tty); then
+  return
+fi
+
 if [ -z "$validou" ]; then
   dialog002
 else
@@ -774,7 +795,10 @@ fi
 }
 
 function list_obj_ou {
-validou=$(dialog --title "$ttitle" --backtitle "Objetos de uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
+if ! validou=$(dialog --title "$ttitle" --backtitle "Objetos de uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
+  return
+fi
+
 if [ -z "$validou" ]; then
   dialog002
 else
@@ -837,7 +861,10 @@ fi
 }
 
 function check_user_creation {
-  checkusr00=$(samba-tool user list | grep -x "$validusr1")
+  if checkusr00=$(samba-tool user list | grep -x "$validusr1"); then
+    return
+  fi
+
   if [ "$checkusr00" = "$validusr1" ]; then
     dialog --title "Informacao" --msgbox "\nUsuario $validusr1 criado e configurado com sucesso!" 8 40
   else
