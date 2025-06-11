@@ -19,52 +19,54 @@ version="v5.1"
 
 # PASSWORD
 function init {
-if ! password=$(dialog --backtitle "Server Manager $version - By José Humberto" --title "Digite a senha!" --insecure --passwordbox "" 7 30 2>&1 > /dev/tty)
-then
-  exit
-fi
+  if ! password=$(dialog --backtitle "Server Manager $version - By José Humberto" --title "Digite a senha!" --insecure --passwordbox "" 7 30 2>&1 > /dev/tty); then
+    exit
+  fi
 
-hash0=$(echo "$password" | md5sum | awk '{print $1}')
+  hash0=$(echo "$password" | md5sum | awk '{print $1}')
 
-if [ -z "$password" ]; then
-  dialog --title "ERROR" --msgbox "É necessário digitar uma senha para continuar." 6 40
-  clear
-elif [ "$hash0" = "$hash1" ]; then
-  start
-elif [ "$hash0" = "$hash2" ]; then
-  startocult
-elif [ "$hash0" = "$hash3" ]; then
-  start
-else
-  clear
-  dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
-  timeout=$((timeout+1)); sleep $timeout
-  init
-fi
+  if [ -z "$password" ]; then
+    dialog --title "ERROR" --msgbox "É necessário digitar uma senha para continuar." 6 40
+    clear
+  elif [ "$hash0" = "$hash1" ]; then
+    start
+  elif [ "$hash0" = "$hash2" ]; then
+    startocult
+  elif [ "$hash0" = "$hash3" ]; then
+    start
+  else
+    clear
+    dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
+    timeout=$((timeout+1)); sleep $timeout
+    init
+  fi
 }
 
 hash1="fe5dfdd991450623c39efc7705e47ad5"
 
 function start {
-var0=$(dialog --title "SUPERVISOR" --backtitle "Bem-Vindo ao Server Manager $version!" --menu " " 0 0 0 \
-1 'Docker Orchestration' \
-2 'Docker Maintenance' \
-3 'Linite Model-1' \
-4 'AutoConfig pfSense (VM)' \
-5 'DWAgent (ARM)' \
-6 'Set Wayland (labwc 24.04+)' \
-7 'Set OpenBox ObaMenu' \
-X 'Exit' 2>&1 > /dev/tty )
-case "$var0" in
-1) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
-2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
-3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/model-1 | bash ; start ;;
-4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; start ;;
-5) dwgeneric0 ; start ;;
-6) wayland00 ; start ;;
-7) clear ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
-X) exit ;;
-esac
+  if ! var0=$(dialog --title "SUPERVISOR" --backtitle "Bem-Vindo ao Server Manager $version!" --ok-label "Acessar" --cancel-label "Sair" --menu " " 0 0 0 \
+  1 'Docker Orchestration' \
+  2 'Docker Maintenance' \
+  3 'Linite Model-1' \
+  4 'AutoConfig pfSense (VM)' \
+  5 'DWAgent (ARM)' \
+  6 'Set Wayland (labwc 24.04+)' \
+  7 'Set OpenBox ObaMenu' \
+  X 'Sair' 2>&1 > /dev/tty ); then
+    exit
+  fi
+  
+  case "$var0" in
+  1) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
+  2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
+  3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/model-1 | bash ; start ;;
+  4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; start ;;
+  5) dwgeneric0 ; start ;;
+  6) wayland00 ; start ;;
+  7) clear ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
+  X) exit ;;
+  esac
 }
 
 function startocult {
@@ -72,27 +74,30 @@ function startocult {
 }
 
 function managers {
-var0=$(dialog --title 'Suporte ao Servidor' --backtitle "Suporte ao Servidor" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-1 'Informacoes do Servidor' \
-2 'Iniciar Area de Trabalho (localhost)' \
-3 'Gerir o Active Directory (se existente)' \
-4 'Ferramentas & Ajustes Diversos' \
-5 'Solucao de Problemas' \
-6 'Continuidade do Negocio (CdN)' \
-7 'Reiniciar Servidor' \
-8 'Desligar Servidor' \
-X 'Sair' 2>&1 > /dev/tty )
-case "$var0" in
-1) allinfoz0 ; managers ;;
-2) desktop00 ; managers ;;
-3) domain00 ; managers ;;
-4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | tee /home/administrador/.t00lz ; chmod +x /home/administrador/.t00lz ; clear ; sudo bash /home/administrador/.t00lz ; managers ;;
-5) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; sudo bash /home/administrador/.sp ; managers ;;
-6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/00-Base | tee /home/administrador/.base ; chmod +x /home/administrador/.base ; clear ; sudo bash /home/administrador/.base ; managers ;;
-7) reb00t ; managers ;;
-8) shutd0 ; managers ;;
-X) exit ;;
-esac
+  if ! var0=$(dialog --title 'Suporte ao Servidor' --backtitle "Suporte ao Servidor" --ok-label "Acessar" --cancel-label "Sair" --menu " " 0 0 0 \
+  1 'Informacoes do Servidor' \
+  2 'Iniciar Area de Trabalho (localhost)' \
+  3 'Gerir o Active Directory (se existente)' \
+  4 'Ferramentas & Ajustes Diversos' \
+  5 'Solucao de Problemas' \
+  6 'Continuidade do Negocio (CdN)' \
+  7 'Reiniciar Servidor' \
+  8 'Desligar Servidor' \
+  X 'Sair' 2>&1 > /dev/tty ); then
+    exit
+  fi
+
+  case "$var0" in
+  1) allinfoz0 ; managers ;;
+  2) desktop00 ; managers ;;
+  3) domain00 ; managers ;;
+  4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | tee /home/administrador/.t00lz ; chmod +x /home/administrador/.t00lz ; clear ; sudo bash /home/administrador/.t00lz ; managers ;;
+  5) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; sudo bash /home/administrador/.sp ; managers ;;
+  6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/00-Base | tee /home/administrador/.base ; chmod +x /home/administrador/.base ; clear ; sudo bash /home/administrador/.base ; managers ;;
+  7) reb00t ; managers ;;
+  8) shutd0 ; managers ;;
+  X) exit ;;
+  esac
 }
 
 function allinfoz0 {
@@ -190,10 +195,10 @@ function dwgeneric0 {
   sudo bash dwagent_generic.sh
 }
 
-[ "$EUID" -ne 0 ] || {
+if ! [ "$EUID" -ne 0 ]; then
   echo "Não execute esse script com sudo! Saindo..."
   exit
-  }
+fi
 
 if [ -z "$BASHRC_UPDATE_CHECKED" ]; then
   export BASHRC_UPDATE_CHECKED=1
