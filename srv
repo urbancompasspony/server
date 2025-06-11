@@ -19,31 +19,28 @@ version="v5.1"
 
 # PASSWORD
 function init {
-if password=$(dialog --backtitle "Server Manager $version - By José Humberto" --title "Digite a senha!" --insecure --passwordbox "" 7 30 2>&1 > /dev/tty)
-hash0=$(echo "$password" | md5sum | awk '{print $1}'); then
-    exit
-  fi
-  if [ -z "$password" ]; then
-      dialog --title "ERROR" --msgbox "É necessário digitar uma senha para continuar." 6 40
-      clear
-  else
-    if [ "$hash0" = "$hash1" ]; then
-      start
-    else
-      if [ "$hash0" = "$hash2" ]; then
-        startocult
-      else
-        if [ "$hash0" = "$hash3" ]; then
-          start
-        else
-          clear
-          dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
-          timeout=$((timeout+1)); sleep $timeout
-          init
-        fi
-      fi
-    fi
-  fi
+if ! password=$(dialog --backtitle "Server Manager $version - By José Humberto" --title "Digite a senha!" --insecure --passwordbox "" 7 30 2>&1 > /dev/tty)
+then
+  exit
+fi
+
+hash0=$(echo "$password" | md5sum | awk '{print $1}')
+
+if [ -z "$password" ]; then
+  dialog --title "ERROR" --msgbox "É necessário digitar uma senha para continuar." 6 40
+  clear
+elif [ "$hash0" = "$hash1" ]; then
+  start
+elif [ "$hash0" = "$hash2" ]; then
+  startocult
+elif [ "$hash0" = "$hash3" ]; then
+  start
+else
+  clear
+  dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
+  timeout=$((timeout+1)); sleep $timeout
+  init
+fi
 }
 
 hash1="fe5dfdd991450623c39efc7705e47ad5"
