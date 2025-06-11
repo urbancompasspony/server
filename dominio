@@ -712,44 +712,44 @@ fi
 function mv_user_ou {
 validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 validou=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] || [ -z "$validou" ] && {
+if [ -z "$validusr" ] || [ -z "$validou" ]; then
     dialog002
-  } || {
-    repeated=$(samba-tool user list | grep -x "$validusr")
-    [ "$repeated" = "$validusr" ] && {
+else
+  repeated=$(samba-tool user list | grep -x "$validusr")
+  if [ "$repeated" = "$validusr" ]; then
     repeated2=$(samba-tool ou list | grep -x OU="$validou")
-      [ "$repeated2" = "OU=$validou" ] && {
-        samba-tool user move "$validusr" OU="$validou"
-        dialog --title "Informacao" --msgbox "O usuario $validusr foi movido para a OU=$validou!" 8 40
-      } || {
-        dialog --title "ERROR" --msgbox "OU invalida!" 7 25
-        }
-    } || {
-      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-      }
-    }
-  }
+    if [ "$repeated2" = "OU=$validou" ]; then
+      samba-tool user move "$validusr" OU="$validou"
+      dialog --title "Informacao" --msgbox "O usuario $validusr foi movido para a OU=$validou!" 8 40
+    else
+      dialog --title "ERROR" --msgbox "OU invalida!" 7 25
+    fi
+  else
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  fi
+fi
+}
 
 function mv_group_ou {
 validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
 validou=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp" ] || [ -z "$validou" ] && {
-    dialog002
-  } || {
-    repeated=$(samba-tool group list | grep -x "$validgrp")
-    [ "$repeated" = "$validgrp" ] && {
+if [ -z "$validgrp" ] || [ -z "$validou" ]; then
+  dialog002
+else
+  repeated=$(samba-tool group list | grep -x "$validgrp")
+  if [ "$repeated" = "$validgrp" ]; then
     repeated2=$(samba-tool ou list | grep -x OU="$validou")
-      [ "$repeated2" = "OU=$validou" ] && {
-        samba-tool group move "$validgrp" OU="$validou"
-        dialog --title "Informacao" --msgbox "O grupo $validgrp foi movido para a OU=$validou!" 8 40
-      } || {
-        dialog --title "ERROR" --msgbox "OU invalida!" 7 25
-        }
-    } || {
-      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
-      }
-    }
-  }
+    if [ "$repeated2" = "OU=$validou" ]; then
+      samba-tool group move "$validgrp" OU="$validou"
+      dialog --title "Informacao" --msgbox "O grupo $validgrp foi movido para a OU=$validou!" 8 40
+    else
+      dialog --title "ERROR" --msgbox "OU invalida!" 7 25
+    fi
+  else
+    dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+  fi
+fi
+}
 
 function rm_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "Insira o nome da OU:" 0 0 2>&1 > /dev/tty)
@@ -795,14 +795,12 @@ validou=$(dialog --title "$ttitle" --backtitle "Objetos de uma OU" --inputbox "I
 
 function show_users {
   dialog001
-  [ $? -ne 0 ] && return
   usrlst=$(samba-tool user list)
   echo "$usrlst" | less
 }
 
 function show_groups {
   dialog001
-  [ $? -ne 0 ] && return
   grplist=$(samba-tool group list)
   echo "$grplist" | less
 }
@@ -1148,7 +1146,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
   [ "$repeated" = "$validusr" ] && {
     dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "O usuario $validusr deve trocar a senha imediatamente?" 0 0
     [ $? = 0 ] && {
-      net sam set pwdmustchangenow $validusr yes
+      net sam set pwdmustchangenow "$validusr" yes
       dialog --title "Informacao" --msgbox "O usuario deve trocar a senha imediatamente!" 8 40
     } || {
       echo "a" > /dev/null
@@ -1171,7 +1169,7 @@ validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o 
     [ -z "$daystoexpire" ] && {
       dialog002
     } || {
-      samba-tool user setexpiry $validusr --days=$daystoexpire
+      samba-tool user setexpiry "$validusr" --days="$daystoexpire"
       dialog --title "Confirmacao" --msgbox "O usuario $validusr devera trocar a senha em $daystoexpire dias!" 8 40
     }
   } || {
@@ -1257,7 +1255,7 @@ Exemplo: joao_naves" 9 40 2>&1 > /dev/tty)
     clear
     dialog001
     [ $? -ne 0 ] && return
-    usrdata=$(samba-tool user show $validusr1)
+    usrdata=$(samba-tool user show "$validusr1")
     echo "$usrdata" | less
   } || {
     dialog --title "Informacao" --msgbox "O usuario $validusr1 nao foi encontrado neste servidor." 8 40
@@ -1278,7 +1276,7 @@ validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o
     clear
     dialog001
     [ $? -ne 0 ] && return
-    grpdata=$(samba-tool group show $validgrp1)
+    grpdata=$(samba-tool group show "$validgrp1")
     echo "$grpdata" | less
   } || {
     dialog --title "Informacao" --msgbox "O grupo $validgrp1 nao foi encontrado neste servidor." 8 40
@@ -1445,7 +1443,7 @@ validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o n
 } || {
   repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
   [ "$repeated" = "$validpc"\$ ] && {
-    dialog --title "Informacao" --msgbox "O computador "$validpc"\$ esta cadastrado!" 8 40
+    dialog --title "Informacao" --msgbox "O computador $validpc\$ esta cadastrado!" 8 40
     clear
     dialog001
     [ $? -ne 0 ] && return
@@ -1460,7 +1458,7 @@ validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o n
 
 function share_tools {
   result=$(grep -rnw /etc/samba/external/smb.conf -e 'include' 2>/dev/null 1>/dev/null && echo sim || echo nao)
-  [ $result = sim ] && {
+  [ "$result" = sim ] && {
     menu
   } || {
     dialog --title "ERRO" --msgbox "Sub-sistema INCLUDE nao encontrado para este Dominio! \n
@@ -1486,7 +1484,7 @@ function show_shared {
 utilize o menu Excluir Compartilhamento!" 0 0 0 "${files[@]}")
       [ $? -ne 0 ] && return
       clear
-      cat $file
+      cat "$file"
       echo ""
       read -p "Pressione ENTER quando terminar de visualizar a configuracao!"
       show_shared
@@ -1527,14 +1525,14 @@ esac
   var4=$(echo "$VALUE0" | sed -n 4p)
   var5=$(echo "$VALUE0" | sed -n 5p)
 
-[ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
+[ -f /etc/samba/external/smb.conf.d/"$var1".conf ] && {
     dialog --title "ERRO" --msgbox "ERRO: Um compartilhamento com este nome ja existe na rede! Ignorando." 7 40
   } || {
     if [[ $var1 = *" "* ]] || [[ $var2 = *" "* ]] || [[ $var1 = "" ]]; then
       dialog --title "ERRO" --msgbox "ERRO: Nao crie compartilhamentos com espacos nos nomes ou nomes vazios! Ignorando." 7 40
     else
-      mkdir -p /mnt$var2
-      tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
+      mkdir -p /mnt"$var2"
+      tee /etc/samba/external/smb.conf.d/"$var1".conf << EOF
 [$var1]
 path = /mnt$var2
 valid users = $var3
@@ -1549,7 +1547,7 @@ force directory mode = 0777
 EOF
 
       # Apply 777 but without -R flag!
-      chmod 777 /mnt$var2
+      chmod 777 /mnt"$var2"
 
       revalid_shared
     fi
@@ -1584,14 +1582,14 @@ esac
   var3=$(echo "$VALUE0" | sed -n 3p)
   var4=$(echo "$VALUE0" | sed -n 4p)
 
-[ -f /etc/samba/external/smb.conf.d/$var1.conf ] && {
+[ -f /etc/samba/external/smb.conf.d/"$var1".conf ] && {
     dialog --title "ERRO" --msgbox "ERRO: Um compartilhamento com este nome ja existe na rede! Ignorando." 7 40
   } || {
     if [[ $var1 = *" "* ]] || [[ $var2 = *" "* ]] || [[ $var1 = "" ]]; then
       dialog --title "ERRO" --msgbox "ERRO: Nao crie compartilhamentos com espacos nos nomes ou nomes vazios! Ignorando." 7 40
     else
-      mkdir -p /mnt$var2
-      tee /etc/samba/external/smb.conf.d/$var1.conf << EOF
+      mkdir -p /mnt"$var2"
+      tee /etc/samba/external/smb.conf.d/"$var1".conf << EOF
 [$var1]
 path = /mnt$var2
 valid users = $var3
@@ -1605,7 +1603,7 @@ force directory mode = 0700
 EOF
 
       # Apply 777 but without -R flag!
-      chmod 777 /mnt$var2
+      chmod 777 /mnt"$var2"
 
       revalid_shared
     fi
@@ -1633,7 +1631,7 @@ Seus dados nao sao apagados, apenas o compartilhamento sera removido!" 0 0 0 \
   } && {
     dialog --title 'Confirmacao' --backtitle 'Remover Compartilhamento' --yesno 'Deseja excluir este compartilhamento?' 0 0
     [ $? = 0 ] && {
-      rm /etc/samba/external/smb.conf.d/$varaqui.conf
+      rm /etc/samba/external/smb.conf.d/"$varaqui".conf
       revalid_shared
       dialog --title "Confirmacao" --msgbox "Compartilhamento removido!" 5 40
     } || {
