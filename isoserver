@@ -35,12 +35,13 @@ function init {
     menu_options+=("$((i + 1))" "${options[i]}")
   done
 
-  choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
-  [ $? -ne 0 ] && return
+  if choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty); then
+    exit
+  fi
 
   sudo mkdir -p "$destpath"
 
-  if [ -f $destpath/${options[choice - 1]} ]; then
+  if [ -f $destpath/"${options[choice - 1]}" ]; then
     clear
     echo ""
     echo "Ja existe uma .iso e/ou uma .img desse sistema!"
@@ -51,7 +52,7 @@ function init {
     echo ""
     echo "Nenhuma .iso e/ou .img localizada. Fazendo download..."
     echo ""
-    wget --user $usern4me --password $passw0rd $webadress/${options[choice - 1]} -O $destpath/${options[choice - 1]}
+    wget --user "$usern4me" --password "$passw0rd" "$webadress"/"${options[choice - 1]}" -O "$destpath"/"${options[choice - 1]}"
     sudo chmod 777 -R "$destpath"
   fi
 }
