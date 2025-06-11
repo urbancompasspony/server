@@ -16,7 +16,7 @@ export ttitle=" Server Menu v7.0 "
 export PathFolder0
 
 function main_menu {
-  if var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
+  if ! var4=$(dialog --title "$ttitle" --backtitle "$bktitle" --menu " " 0 0 0 \
   A 'Ferramentas de Usuarios' \
   B 'Ferramentas de Grupos' \
   C 'Ferramentas de Computadores' \
