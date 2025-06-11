@@ -8,8 +8,8 @@
 
 destpath="/var/lib/libvirt/images"
 
-sudo mkdir -p "$destpath"
-sudo chmod 777 -R "$destpath"
+mkdir -p "$destpath"
+chmod 777 -R "$destpath"
 
 serverip="172.20.0.22"
 lanhost="http://$serverip"
@@ -19,7 +19,7 @@ usern4me="admin"
 passw0rd="isorulez"
 
 # Check where get the .img file
-if ping -c 1 $serverip >/dev/null; then
+if ping -c 1 "$serverip" >/dev/null; then
     webadress="$lanhost"
 else
     webadress="$wanhost"
@@ -32,45 +32,61 @@ fi
 function check {
   [ "$EUID" -ne 0 ] && {
     echo "Execute esse script como Root!"
-    exit
+    exit 1
     }
 }
 
 function start {
-  [ -f /var/lib/libvirt/images/pfsense.img ] && {
+  if [ -f "$destpath/pfsense.img" ]; then
     setinter
     echo "." >/dev/null
-  } || {
+  else
     calling pfsense.img
     setperma
     setinter
-  }
+  fi
 }
 
 function calling {
   clear
-  sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
+  wget --user "$usern4me" --password "$passw0rd" "$webadress/$1" -O "$destpath/$1"
 }
 
 function setperma {
-  sudo chmod 777 -R "$destpath"
+  chmod 777 -R "$destpath"
 }
 
 function setinter {
-  # Get my main LAN (usually motherboard)
+  # Get main LAN (usually motherboard)
   mylan=$(ip route get 1.1.1.1 2>/dev/null | grep -oP 'dev \K\S+')
 
   # Create an Array but eliminating docker, veth, lo, tun, virbr, macv and myself (mylan) from that!
-  myarray=($(ls /sys/class/net/ | grep -v "docker" | grep -v "veth" | grep -v "lo" | grep -v "virbr" | grep -v "macv" | grep -v "tun" | grep -v "$mylan"))
-  
-  # With the remaining connection interfaces, create the aspects of menu. (Do not try to set order based on appliance pfsense!
-  VALUE1="${myarray[0]}"; VALUE2="${myarray[1]}"; VALUE3="${myarray[2]}"; VALUE4="${myarray[3]}"
+  myarray=()
+  for iface in /sys/class/net/*; do
+    iface=$(basename "$iface")
+    case "$iface" in
+      docker*|veth*|lo|virbr*|macv*|tun*|"$mylan")
+        continue
+        ;;
+      *)
+        myarray+=("$iface")
+        ;;
+    esac
+  done
 
-  # If array is empty, fill with zero!
-  [ "${myarray[0]}" = "" ] && { VALUE1="0"; } || { echo "." >/dev/null ; }
-  [ "${myarray[1]}" = "" ] && { VALUE2="0"; } || { echo "." >/dev/null ; }
-  [ "${myarray[2]}" = "" ] && { VALUE3="0"; } || { echo "." >/dev/null ; }
-  [ "${myarray[3]}" = "" ] && { VALUE4="0"; } || { echo "." >/dev/null ; }
+  # Set up initial values for dialog
+  VALUE1="${myarray[0]}"
+  VALUE2="${myarray[1]}"
+  VALUE3="${myarray[2]}"
+  VALUE4="${myarray[3]}"
+
+  for i in {0..3}; do
+    idx=$((i+1))
+    var="VALUE$idx"
+    if [[ -z "${myarray[$i]}" ]]; then
+      printf -v "$var" "0"
+    fi
+  done
 
   VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Definir Interfaces" --form "O que estiver zero nao sera utilizado!" 13 40 0 \
 "IP LAN 0:" 1 1 "$VALUE1" 1 11 30 0 \
@@ -90,82 +106,48 @@ function setinter {
   var3=$(echo "$VALUE0" | sed -n 3p)
   var4=$(echo "$VALUE0" | sed -n 4p)
 
-  [ $var3 = "0" ] && [ $var4 = "0" ] && { createvm2 "$var1" "$var2"; }
+  interfaces=()
+  for v in "$var1" "$var2" "$var3" "$var4"; do
+    [[ "$v" != "0" ]] && interfaces+=("$v")
+  done
 
-  [ $var4 = "0" ] && { createvm3 "$var1" "$var2" "$var3"; }
+  createvm_dynamic "${interfaces[@]}"
+}
 
-  createvm4 "$var1" "$var2" "$var3" "$var4"
+function createvm_dynamic {
+  local name="pfSense"
+  local networks=("$@")
+  local net_args=()
+  local mac_prefix="52:54:00:55:ea"
+  
+  for i in "${!networks[@]}"; do
+    local idx
+    idx=$(printf "%02x" $((i+1)))
+    net_args+=("--network" "type=direct,source=${networks[$i]},source_mode=bridge,mac=${mac_prefix}:${idx}")
+  done
+
+  virt-install --import \
+    --name "$name" \
+    --boot hd,cdrom,menu=on \
+    --memory 2048 \
+    --vcpus 2 \
+    --cpu host \
+    "${net_args[@]}" \
+    --disk "$destpath/pfsense.img" \
+    --os-variant=freebsd13.1 \
+    --graphics vnc \
+    --import \
+    --autostart 1>/dev/null 2>/dev/null &
+
+  dialog --title "Informação" --msgbox "Se a maquina virtual nao existia, ela sera criada e inicializada!" 6 40
+  dialog --title "Informação" --msgbox "Verifique o status da maquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
+
+  exit
 }
 
 function dialognet {
   dialog --title "Informação" --msgbox "Checar a existencia de altnames nas informacoes a seguir!" 7 40
   dialog --title "Informação" --msgbox "$(ip a)" 25 70
-}
-
-function createvm2 {
-  virt-install --import \
---name pfSense \
---boot hd,cdrom,menu=on \
---memory 2048 \
---vcpus 2 \
---cpu host \
---network type=direct,source=$1,source_mode=bridge,mac=52:54:00:55:ea:01 \
---network type=direct,source=$2,source_mode=bridge,mac=52:54:00:55:ea:02 \
---disk /var/lib/libvirt/images/pfsense.img \
---os-variant=freebsd13.1 \
---graphics vnc \
---import \
---autostart 1>/dev/null 2>/dev/null &
-
-dialog --title "Informação" --msgbox "Se a maquina virtual nao existia, ela sera criada e inicializada!" 6 40
-dialog --title "Informação" --msgbox "Verifique o status da maquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
-
-exit
-}
-
-function createvm3 {
-  virt-install --import \
---name pfSense \
---boot hd,cdrom,menu=on \
---memory 2048 \
---vcpus 2 \
---cpu host \
---network type=direct,source=$1,source_mode=bridge,mac=52:54:00:55:ea:01 \
---network type=direct,source=$2,source_mode=bridge,mac=52:54:00:55:ea:02 \
---network type=direct,source=$3,source_mode=bridge,mac=52:54:00:55:ea:03 \
---disk /var/lib/libvirt/images/pfsense.img \
---os-variant=freebsd13.1 \
---graphics vnc \
---import \
---autostart 1>/dev/null 2>/dev/null &
-
-dialog --title "Informação" --msgbox "Se a maquina virtual nao existia, ela sera criada e inicializada!" 6 40
-dialog --title "Informação" --msgbox "Verifique o status da maquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
-
-exit
-}
-
-function createvm4 {
-  virt-install --import \
---name pfSense \
---boot hd,cdrom,menu=on \
---memory 2048 \
---vcpus 2 \
---cpu host \
---network type=direct,source=$1,source_mode=bridge,mac=52:54:00:55:ea:01 \
---network type=direct,source=$2,source_mode=bridge,mac=52:54:00:55:ea:02 \
---network type=direct,source=$3,source_mode=bridge,mac=52:54:00:55:ea:03 \
---network type=direct,source=$4,source_mode=bridge,mac=52:54:00:55:ea:04 \
---disk /var/lib/libvirt/images/pfsense.img \
---os-variant=freebsd13.1 \
---graphics vnc \
---import \
---autostart 1>/dev/null 2>/dev/null &
-
-dialog --title "Informação" --msgbox "Se a maquina virtual nao existia, ela sera criada e inicializada!" 6 40
-dialog --title "Informação" --msgbox "Verifique o status da maquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
-
-exit
 }
 
 #########
@@ -175,4 +157,4 @@ exit
 check
 start
 
-exit 1
+exit 0
