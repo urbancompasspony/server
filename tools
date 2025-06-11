@@ -68,11 +68,12 @@ function tailscale0 {
 }
 
 function iperftest {
-var0=$(dialog --title 'iperf' --backtitle "" --menu "Escolha o modo!" 0 0 0 \
+if var0=$(dialog --title 'iperf' --backtitle "" --menu "Escolha o modo!" 0 0 0 \
 1 'Cliente' \
 2 'Servidor' \
-X '<' 2>&1 > /dev/tty )
-[ $? -ne 0 ] && return
+X '<' 2>&1 > /dev/tty ); then
+  return
+fi
 case "$var0" in
 1) iperfclnt ; start ;;
 2) iperfsrv ; start ;;
@@ -84,7 +85,9 @@ function iperfclnt {
   clear; echo ""
   read -r -a ipcc -p "Digite o IP do Servidor: "
   clear; echo "Entrando no modo Cliente. Para sair antes do teste concluir, tecle 'CTRL Esquerdo' + C duas vezes seguidas!"; echo ""
-  iperf -c "$ipcc" &&
+  for ip in "${ipcc[@]}"; do
+    iperf -c "$ip"
+  done
   read -r -p "Teste finalizado, tecle Enter para sair!"
 }
 
@@ -147,11 +150,13 @@ echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
     dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 7 30
     sambaclient
   else
-    echo "$path1" > "$pathmount"
-    echo "$mntpt1" >> "$pathmount"
-    echo "$user1" >> "$pathmount"
-    echo "$pass1" >> "$pathmount"
-    echo "$dmn1" >> "$pathmount"
+  {
+    echo "$path1"
+    echo "$mntpt1"
+    echo "$user1"
+    echo "$pass1"
+    echo "$dmn1"
+  } > "$pathmount"
 
     sudo mkdir -p "$mntpt1"
     sudo mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
@@ -160,9 +165,9 @@ echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
 
 function satas {
   gouge=10
-  for number in $(find /sys/class/scsi_host/host* -maxdepth 0); do
+  find /sys/class/scsi_host/host* -maxdepth 0 -print0 | while IFS= read -r -d '' number; do
     echo "0 0 0" | sudo tee "$number"/scan; clear
-    gauge1 $(($gouge+20)) "Scaneando e validando portas SATA"
+    gauge1 $((gouge+20)) "Scaneando e validando portas SATA"
     sleep 1
   done
   dialog --title 'Informacao:' --msgbox "Concluido!" 0 0
@@ -244,66 +249,6 @@ function gauge1 {
 
 function ping1 {
   ping -c 1 "$1" | awk 'NR==2{print $7,$8}' |  cut -c7-
-}
-
-function synctunnel {
-tunnelmount="/tmp/tunnelmount"
-tunneloptions="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=60 -o ServerAliveCountMax=5"
-known_hosts_file="/home/$USER/.ssh/known_hosts"
-
-if [ -f  "$tunnelmount" ]; then
-  VALUE1=$(sed -n '1p' "$tunnelmount")
-  VALUE2=$(sed -n '2p' "$tunnelmount")
-  VALUE3=$(sed -n '3p' "$tunnelmount")
-  VALUE4=$(sed -n '4p' "$tunnelmount")
-  VALUE5=$(sed -n '5p' "$tunnelmount")
-else
-  touch "$tunnelmount"
-  VALUE1="192.168.0.1"
-  VALUE2="root"
-  VALUE3="admin"
-  VALUE4="22"
-  VALUE5="192.168.0.10"
-fi
-
-VALUE0=$(dialog --ok-label "Conectar" --title "Tunnel SSH" --form "Connecting..." 13 50 0 \
-"Firewall: " 1 1 "$VALUE1" 1 10 34 0 \
-"UserFW:" 2 1 "$VALUE2" 2 10 34 0 \
-"PassFW:" 3 1 "$VALUE3" 3 10 34 0 \
-"SrcPrt:" 4 1 "$VALUE4" 4 10 34 0 \
-"IP Dst:" 5 1 "$VALUE5" 5 10 34 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-case $? in
-   0) echo "." > /dev/null ;;
-   1) exit ;;
-esac
-
-path1=$(echo "$VALUE0" | sed -n 1p)
-user1=$(echo "$VALUE0" | sed -n 2p)
-pass1=$(echo "$VALUE0" | sed -n 3p)
-prt1=$(echo "$VALUE0" | sed -n 4p)
-ipdst1=$(echo "$VALUE0" | sed -n 5p)
-
-[ -z "$path1" ] || [ -z "$user1" ] || [ -z "$pass1" ] || [ -z "$prt1" ] || [ -z "$ipdst1" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 7 30
-  synctunnel
-  }
-
-  echo "$path1" > "$tunnelmount"
-  echo "$user1" >> "$tunnelmount"
-  echo "$pass1" >> "$tunnelmount"
-  echo "$prt1" >> "$tunnelmount"
-  echo "$ipdst1" >> "$tunnelmount"
-
-  clear
-  ssh-keygen -f $known_hosts_file -R "$2"
-
-  echo ""
-  echo "Access the service as 'localhost' through port '4321'!"
-  echo ""
-
-  sshpass -p "$pass1" ssh $tunneloptions "$user1"@"$path1" -N -L 4321:"$ipdst1":"$prt1"
 }
 
 start
