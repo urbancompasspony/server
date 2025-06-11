@@ -43,7 +43,7 @@ function main_menu {
 }
 
 function user_tools {
-if var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Usuarios" --menu " " 0 0 0 \
+if ! var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Usuarios" --menu " " 0 0 0 \
 A 'Procurar usuario' \
 B 'Verificar um usuario' \
 C 'Criar usuario' \
@@ -92,7 +92,7 @@ esac
 }
 
 function group_tools {
-if var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Grupos" --menu " " 0 0 0 \
+if ! var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Grupos" --menu " " 0 0 0 \
 A 'Procurar grupo' \
 B 'Verificar um Grupo' \
 C 'Criar grupo' \
@@ -104,7 +104,7 @@ H 'Remover grupo 1 de um grupo 2' \
 I 'Mover grupo para OU' \
 J 'Cuidado: Excluir um grupo' \
 X '<' 2>&1 > /dev/tty ); then
-return
+  return
 fi
 
 case "$var41" in
@@ -123,7 +123,7 @@ esac
 }
 
 function pc_tools {
-if var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Computadores" --menu " " 0 0 0 \
+if ! var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Computadores" --menu " " 0 0 0 \
 A 'Procurar computador' \
 B 'Verificar um computador' \
 C 'Exibir todos os computadores' \
@@ -146,7 +146,7 @@ esac
 }
 
 function info_domain {
-  if var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
+  if ! var4=$(dialog --title "$ttitle" --backtitle "Manutencao Geral do Dominio" --menu " " 0 0 0 \
   A 'Detalhes deste Dominio' \
   B 'Status das Sessoes ativas' \
   C 'Status dos Compartilhamentos' \
@@ -171,7 +171,7 @@ function info_domain {
 #####################################
 
 function s_settings_menu {
-if var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu " " 0 0 0 \
+if ! var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu " " 0 0 0 \
   A 'Permissoes Comuns' \
   B 'Regras de Senhas' \
   C 'Cuidado: ACLs' \
@@ -196,7 +196,7 @@ if var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu " 
 }
 
 function set_common_perm {
-  if var4=$(dialog --title "$ttitle" --backtitle "Modificando permissoes" --menu " " 0 0 0 \
+  if ! var4=$(dialog --title "$ttitle" --backtitle "Modificando permissoes" --menu " " 0 0 0 \
   A 'SysVol check status' \
   B 'SysVol reset permissions' \
   C 'samba-ad-dc db check: general' \
@@ -215,7 +215,7 @@ function set_common_perm {
 }
 
 function change_password0 {
-  if var4=$(dialog --title "$ttitle" --backtitle "Regras de senhas para todo o Dominio" --menu " " 0 0 0 \
+  if ! var4=$(dialog --title "$ttitle" --backtitle "Regras de senhas para todo o Dominio" --menu " " 0 0 0 \
   A 'Mostrar Status das Regras de Senhas' \
   B 'Ativar complexidade das senhas' \
   C 'Desativar complexidade das senhas' \
@@ -366,7 +366,7 @@ Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty)
 }
 
 function change_acls0 {
-  if var4=$(dialog --title "CUIDADO!" --backtitle "ATENÇÃO" --menu "Prefira rodar este comando nas maquinas locais: \nicacls C:\\caminho\\do\\usuario /reset /t /c" 0 0 0 \
+  if ! var4=$(dialog --title "CUIDADO!" --backtitle "ATENÇÃO" --menu "Prefira rodar este comando nas maquinas locais: \nicacls C:\\caminho\\do\\usuario /reset /t /c" 0 0 0 \
   A 'Verificar ACL padrao (Administrator!)' \
   B 'Coletar ACLs de arquivo ou pasta' \
   C 'PERIGO! Definir uma ACL a um arquivo ou pasta' \
@@ -387,7 +387,7 @@ function change_acls0 {
 #############################
 
 function shared_folders {
-if var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
+if ! var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
 A 'Mostrar pastas compartilhadas' \
 B 'Criar nova pasta compartilhada' \
 C 'Compartilhamento estruturado' \
@@ -408,7 +408,7 @@ esac
 }
 
 function ou_tools {
-if var12=$(dialog --title "$ttitle" --backtitle "Unidades Organizacionais" --menu " " 0 0 0 \
+if ! var12=$(dialog --title "$ttitle" --backtitle "Unidades Organizacionais" --menu " " 0 0 0 \
   A 'Listar todas as OUs' \
   B 'Criar uma OU' \
   C 'Listar objetos de OU' \
@@ -437,7 +437,7 @@ function checksilos0 {
 }
 
 function menusilo {
-  if var12=$(dialog --title "$ttitle" --backtitle "Silos de Autenticacao" --menu " " 0 0 0 \
+  if ! var12=$(dialog --title "$ttitle" --backtitle "Silos de Autenticacao" --menu " " 0 0 0 \
   A 'Procurar/verificar um silo' \
   B 'Listar todos os silos' \
   C 'Criar um silo' \
