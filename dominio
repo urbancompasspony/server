@@ -753,44 +753,40 @@ fi
 
 function rm_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "Insira o nome da OU:" 0 0 2>&1 > /dev/tty)
-[ -z "$validou" ] && {
+if [ -z "$validou" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool ou list | grep -x OU="$validou")
-  [ "$repeated" = "OU=$validou" ] && {
-    dialog --title 'Confirmacao' --backtitle 'Exclusao de OU' --yesno 'Deseja excluir esta OU?' 0 0
-    [ $? = 0 ] && {
+  if [ "$repeated" = "OU=$validou" ]; then
+    if dialog --title 'Confirmacao' --backtitle 'Exclusao de OU' --yesno 'Deseja excluir esta OU?' 0 0; then
       samba-tool ou delete OU="$validou"
       repeated2=$(samba-tool ou list | grep -x OU="$validou")
-      [ "$repeated2" = "OU=$validou" ] && {
+      if [ "$repeated2" = "OU=$validou" ]; then
         dialog --title "Informacao" --msgbox "A OU=$validou possui Objetos e nao foi removida!" 8 40
-      } || {
+      else
         dialog --title "Informacao" --msgbox "A OU=$validou foi removida com sucesso!" 7 25
-      }
-    } || {
-      echo "a" > /dev/null
-      }
-  } || {
+      fi
+    fi
+  else
     dialog --title "Informacao" --msgbox "A OU=$validou nao foi encontrada!" 8 40
-    }
-  }
+  fi
+fi
 }
 
 function list_obj_ou {
 validou=$(dialog --title "$ttitle" --backtitle "Objetos de uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
-[ -z "$validou" ] && {
+if [ -z "$validou" ]; then
   dialog002
-} || {
+else
    repeated=$(samba-tool ou list | grep -x OU="$validou")
-  [ "$repeated" = "OU=$validou" ] && {
+  if [ "$repeated" = "OU=$validou" ]; then
     dialog001
-    [ $? -ne 0 ] && return
     oubjects=$(samba-tool ou listobjects OU="$validou")
     echo "$oubjects" | less
-  } || {
+  else
     dialog --title "Informacao" --msgbox "OU=$validou invalida!" 7 25
-    }
-  }
+  fi
+fi
 }
 
 function show_users {
@@ -810,268 +806,253 @@ VALUE1="joao_naves"
 VALUE2="Joao Naves"
 VALUE3="A12345d"
 
-VALUE0=$(dialog --ok-label "Criar"  --backtitle "$bktitle" --title "Adicionar Usuario" --form "Preencha todos os campos! \nAtento na complexidade da senha!" 0 0 0 \
+if VALUE0=$(dialog --ok-label "Criar"  --backtitle "$bktitle" --title "Adicionar Usuario" --form "Preencha todos os campos! \nAtento na complexidade da senha!" 0 0 0 \
 "Usuario: " 1 1 "$VALUE1" 1 10 34 0 \
 "Exibicao:" 2 1 "$VALUE2" 2 10 34 0 \
 "Senha:" 3 1 "$VALUE3" 3 10 34 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && return
+3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+  return
+fi
+
 validusr1=$(echo "$VALUE0" | sed -n 1p)
 validsur1=$(echo "$VALUE0" | sed -n 2p)
 validpss1=$(echo "$VALUE0" | sed -n 3p)
-[ -z "$validpss1" ] || [ -z "$validusr1" ] || [ -z "$validsur1" ] && {
+if [ -z "$validpss1" ] || [ -z "$validusr1" ] || [ -z "$validsur1" ]; then
   dialog --title "ERRO" --msgbox "Nao deixe nenhum campo vazio!" 8 40
-} || {
+else
   repeated=$(samba-tool user list | grep -x "$validusr1")
   repeated2=$(samba-tool group list | grep -x "$validusr1")
-  [ "$repeated" = "$validusr1" ] || [ "$repeated2" = "$validusr1" ] && {
+  if [ "$repeated" = "$validusr1" ] || [ "$repeated2" = "$validusr1" ]; then
     dialog --title "Informacao" --msgbox "Conflito detectado! \n\nO usuario $validusr1 ja existe!" 8 40
-  } || {
-    dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "$validusr1 deve trocar essa senha ao logar?" 0 0
-    [ $? = 0 ] && {
+  else
+    if dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "$validusr1 deve trocar essa senha ao logar?" 0 0; then
       samba-tool user create --must-change-at-next-login "$validusr1" "$validpss1" --surname="$validsur1"
       check_user_creation
-    } || {
+    else
       samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1"
       check_user_creation
-    }
-  }
-}
-
+    fi
+  fi
+fi
 }
 
 function check_user_creation {
   checkusr00=$(samba-tool user list | grep -x "$validusr1")
-  [ "$checkusr00" = "$validusr1" ] && {
+  if [ "$checkusr00" = "$validusr1" ]; then
     dialog --title "Informacao" --msgbox "\nUsuario $validusr1 criado e configurado com sucesso!" 8 40
-  } || {
+  else
     dialog --title "ERRO" --msgbox "O usuario NAO foi criado porque: \n\nJa existe $validusr1 e/ou $validsur1. \n\n OU \n\nNao atendeu os requisitos minimos de senha: \n\n-Minimo 7 caracteres. \n-Contenha Letras e Numeros \n-Pelo menos 1 (uma) letra MAIUSCULA." 17 60
-  }
+  fi
 }
 
 function change_pass {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
+if [ -z "$validusr" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool user list | grep -x "$validusr")
-  [ "$repeated" = "$validusr" ] && {
+  if [ "$repeated" = "$validusr" ]; then
     validpss=$(dialog --title "$ttitle" --backtitle "Trocar a senha de usuario do Dominio" --insecure --passwordbox 'Crie uma nova senha para o usuario' 0 0 2>&1 > /dev/tty )
-    [ -z "$validpss" ] && {
+    if [ -z "$validpss" ]; then
       dialog002
-    } || {
+    else
       samba-tool user setpassword "$validusr" --newpassword="$validpss"
       dialog --title "Informacao" --msgbox "Senha de $validusr trocada com sucesso!" 8 40
-      }
-  } || {
+    fi
+  else
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-    }
-}
-
+  fi
+fi
 }
 
 function blk_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
+if [ -z "$validusr" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool user list | grep -x "$validusr")
-  [ "$repeated" = "$validusr" ] && {
+  if [ "$repeated" = "$validusr" ]; then
     samba-tool user disable "$validusr"
     dialog --title "Informacao" --msgbox "Usuario $validusr bloqueado com sucesso!" 7 25
-  } || {
+  else
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-    }
-}
-
+  fi
+fi
 }
 
 function ublk_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
+if [ -z "$validusr" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool user list | grep -x "$validusr")
-  [ "$repeated" = "$validusr" ] && {
+  if [ "$repeated" = "$validusr" ]; then
     samba-tool user enable "$validusr"
     dialog --title "Informacao" --msgbox "Usuario $validusr desbloqueado com sucesso!" 7 25
-  } || {
+  else
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-    }
-}
-
+  fi
+fi
 }
 
 function rm_user {
 validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] && {
+if [ -z "$validusr" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool user list | grep -x "$validusr")
-  [ "$repeated" = "$validusr" ] && {
-    dialog --title 'Confirmacao' --backtitle 'Exclusao de Usuario' --yesno 'Deseja excluir este usuario?' 0 0
-    [ $? = 0 ] && {
+  if [ "$repeated" = "$validusr" ]; then
+    if dialog --title 'Confirmacao' --backtitle 'Exclusao de Usuario' --yesno 'Deseja excluir este usuario?' 0 0; then
       samba-tool user delete "$validusr"
       dialog --title "Informacao" --msgbox "Usuario $validusr excluido com sucesso!" 7 25
-    } || {
+    else
       echo "a" > /dev/null
-      }
-  } || {
+    fi
+  else
     dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-  }
-}
-
+  fi
+fi
 }
 
 function create_group {
 validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp" ] && {
+if [ -z "$validgrp" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool user list | grep -x "$validgrp")
   repeated2=$(samba-tool group list | grep -x "$validgrp")
-  [ "$repeated" = "$validgrp" ] || [ "$repeated2" = "$validgrp" ] && {
+  if [ "$repeated" = "$validgrp" ] || [ "$repeated2" = "$validgrp" ]; then
     dialog --title "Informacao" --msgbox "Conflito detectado! O grupo $validgrp nao sera criado!" 8 40
-  } || {
+  else
     samba-tool group create "$validgrp"
     dialog --title "Informacao" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
-    }
-}
-
+  fi
+fi
 }
 
 function add_user_group {
 validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
 validgrp=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr" ] || [ -z "$validgrp" ] && {
-    dialog002
-  } || {
-    repeated=$(samba-tool user list | grep -x "$validusr")
-    [ "$repeated" = "$validusr" ] && {
+if [ -z "$validusr" ] || [ -z "$validgrp" ]; then
+  dialog002
+else
+  repeated=$(samba-tool user list | grep -x "$validusr")
+  if [ "$repeated" = "$validusr" ]; then
     repeated2=$(samba-tool group list | grep -x "$validgrp")
-      [ "$repeated2" = "$validgrp" ] && {
-        samba-tool group addmembers "$validgrp" "$validusr"
-        dialog --title "Informacao" --msgbox "O usuario $validusr foi adicionado ao grupo $validgrp!" 8 40
-      } || {
-        dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
-        }
-    } || {
-      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
-      }
-    }
-  }
+    if [ "$repeated2" = "$validgrp" ]; then
+      samba-tool group addmembers "$validgrp" "$validusr"
+      dialog --title "Informacao" --msgbox "O usuario $validusr foi adicionado ao grupo $validgrp!" 8 40
+    else
+      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+    fi
+  else
+    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  fi
+fi
+}
 
 function add_group_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
 validgrp2=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp1" ] || [ -z "$validgrp2" ] && {
+if [ -z "$validgrp1" ] || [ -z "$validgrp2" ]; then
     dialog002
-  } || {
-    repeated=$(samba-tool group list | grep -x "$validgrp1")
-    [ "$repeated" = "$validgrp1" ] && {
-    repeated2=$(samba-tool group list | grep -x "$validgrp2")
-      [ "$repeated2" = "$validgrp2" ] && {
-        samba-tool group addmembers "$validgrp2" "$validgrp1"
-        dialog --title "Informacao" --msgbox "O grupo $validgrp1 foi adicionado ao grupo $validgrp2!" 8 40
-      } || {
-        dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
-        }
-    } || {
-      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
-      }
-    }
-  }
+else
+  repeated=$(samba-tool group list | grep -x "$validgrp1")
+  repeated2=$(samba-tool group list | grep -x "$validgrp2")
+  if [ "$repeated" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ]; then
+    samba-tool group addmembers "$validgrp2" "$validgrp1"
+    dialog --title "Informacao" --msgbox "O grupo $validgrp1 foi adicionado ao grupo $validgrp2!" 8 40
+  else
+    dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+  fi
+fi
+}
 
 function rm_group_group {
 validgrp1=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
 validgrp2=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp1" ] || [ -z "$validgrp2" ] && {
-    dialog002
-  } || {
-    repeated=$(samba-tool group list | grep -x "$validgrp1")
-    [ "$repeated" = "$validgrp1" ] && {
-    repeated2=$(samba-tool group list | grep -x "$validgrp2")
-      [ "$repeated2" = "$validgrp2" ] && {
-        samba-tool group removemembers "$validgrp2" "$validgrp1"
-        dialog --title "Informacao" --msgbox "O grupo $validgrp1 foi removido do grupo $validgrp2!" 8 40
-      } || {
-        dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
-        }
-    } || {
-      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
-      }
-    }
-  }
+if [ -z "$validgrp1" ] || [ -z "$validgrp2" ]; then
+  dialog002
+else
+  repeated=$(samba-tool group list | grep -x "$validgrp1")
+  repeated2=$(samba-tool group list | grep -x "$validgrp2")
+  if [ "$repeated" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ]; then
+    samba-tool group removemembers "$validgrp2" "$validgrp1"
+    dialog --title "Informacao" --msgbox "O grupo $validgrp1 foi removido do grupo $validgrp2!" 8 40
+  else
+    dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+  fi
+fi
+}
 
 function show_user_group {
 validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp" ] && {
+if [ -z "$validgrp" ]; then
   dialog002
-} || {
+else
   repeated=$(samba-tool group list | grep -x "$validgrp")
-  [ "$repeated" = "$validgrp" ] && {
+  if [ "$repeated" = "$validgrp" ]; then
     dialog001
     usrgrps=$(samba-tool group listmembers "$validgrp")
     echo "$usrgrps" | less
-  } || {
+  else
     dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
-  }
-}
-
+  fi
+fi
 }
 
 # Copiar os grupos de um usuario
 function copy_group {
 validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario IN" 0 0 2>&1 > /dev/tty)
 validusr2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario OUT" 0 0 2>&1 > /dev/tty)
-[ -z "$validusr1" ] || [ -z "$validusr2" ] && {
+if [ -z "$validusr1" ] || [ -z "$validusr2" ]; then
   dialog002
-  } || {
-    repeated1=$(samba-tool user list | grep -x "$validusr1")
-    repeated2=$(samba-tool user list | grep -x "$validusr2")
-    [ "$repeated1" = "$validusr1" ] && [ "$repeated2" = "$validusr2" ] && {
-      grpsusr=$(samba-tool user getgroups "$validusr1")
-      IFS=$'\n' read -d '' -r -a groups <<< "$(echo "$grpsusr" | awk -v RS='\"' 'NR % 2 == 0 {print "\"" $0 "\""} NR % 2 == 1 {print $0}')"
-      for groupa in "${groups[@]}"; do
-        clear
-        echo ""
-        echo "Adicionando ao grupo $groupa o usuario $validusr2"
-        echo ""
-        samba-tool group addmembers "$groupa" "$validusr2"
-        sleep 1
-        clear
-      done
-    } || {
-      dialog --title "ERROR" --msgbox "Usuario(s) invalido(s)!" 7 25
-    }
-  }
+else
+  repeated1=$(samba-tool user list | grep -x "$validusr1")
+  repeated2=$(samba-tool user list | grep -x "$validusr2")
+  if [ "$repeated1" = "$validusr1" ] && [ "$repeated2" = "$validusr2" ]; then
+    grpsusr=$(samba-tool user getgroups "$validusr1")
+    IFS=$'\n' read -d '' -r -a groups <<< "$(echo "$grpsusr" | awk -v RS='\"' 'NR % 2 == 0 {print "\"" $0 "\""} NR % 2 == 1 {print $0}')"
+    for groupa in "${groups[@]}"; do
+      clear
+      echo ""
+      echo "Adicionando ao grupo $groupa o usuario $validusr2"
+      echo ""
+      samba-tool group addmembers "$groupa" "$validusr2"
+      sleep 1
+      clear
+    done
+  else
+    dialog --title "ERROR" --msgbox "Usuario(s) invalido(s)!" 7 25
+  fi
+fi
 }
 
 # Copiar os membros de um grupo
 function copy_user {
 validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo IN" 0 0 2>&1 > /dev/tty)
 validgrp2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo OUT" 0 0 2>&1 > /dev/tty)
-[ -z "$validgrp1" ] || [ -z "$validgrp2" ] && {
+if [ -z "$validgrp1" ] || [ -z "$validgrp2" ]; then
   dialog002
-  } || {
-    repeated1=$(samba-tool group list | grep -x "$validgrp1")
-    repeated2=$(samba-tool group list | grep -x "$validgrp2")
-    [ "$repeated1" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ] && {
-      usrgrps=$(samba-tool group listmembers "$validgrp1")
-      IFS=$'\n' read -d '' -r -a userss <<< "$(echo "$usrgrps" | awk -v RS='\"' 'NR % 2 == 0 {print "\"" $0 "\""} NR % 2 == 1 {print $0}')"
-      for userss1 in "${userss[@]}"; do
-        clear
-        echo ""
-        echo "Adicionando o membro $userss1 ao grupo $validgrp2"
-        echo ""
-        samba-tool group addmembers "$validgrp2" "$userss1"
-        sleep 1
-        clear
-      done
-    } || {
-      dialog --title "ERROR" --msgbox "Grupo(s) invalido(s)!" 7 25
-    }
-  }
+else
+  repeated1=$(samba-tool group list | grep -x "$validgrp1")
+  repeated2=$(samba-tool group list | grep -x "$validgrp2")
+  if [ "$repeated1" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ]; then
+    usrgrps=$(samba-tool group listmembers "$validgrp1")
+    IFS=$'\n' read -d '' -r -a userss <<< "$(echo "$usrgrps" | awk -v RS='\"' 'NR % 2 == 0 {print "\"" $0 "\""} NR % 2 == 1 {print $0}')"
+    for userss1 in "${userss[@]}"; do
+      clear
+      echo ""
+      echo "Adicionando o membro $userss1 ao grupo $validgrp2"
+      echo ""
+      samba-tool group addmembers "$validgrp2" "$userss1"
+      sleep 1
+      clear
+    done
+  else
+    dialog --title "ERROR" --msgbox "Grupo(s) invalido(s)!" 7 25
+  fi
+fi
 }
 
 function rm_user_group {
