@@ -28,7 +28,7 @@ function main_menu {
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
-  
+
   case "$var4" in
   A) user_tools ; main_menu ;;
   B) group_tools ; main_menu ;;
@@ -43,106 +43,106 @@ function main_menu {
 }
 
 function user_tools {
-if ! var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Usuarios" --menu " " 0 0 0 \
-A 'Procurar usuario' \
-B 'Verificar um usuario' \
-C 'Criar usuario' \
-D 'Exibir todos os usuarios' \
-E 'Bloquear usuario' \
-F 'Desbloquear usuario' \
-G 'Adicionar usuario a um grupo' \
-H 'Exibir grupos de usuario' \
-I 'Remover usuario de um grupo' \
-J 'Copiar os grupos de um usuario' \
-K 'Promote usuario a admin' \
-L 'Demote usuario de admin' \
-M 'Alterar a senha de um usuario' \
-N 'Verificar a senha de um usuario' \
-O 'A senha do usuario deve expirar?' \
-P 'Quando a senha usuario vai expirar?' \
-Q 'Forcar a troca de senha imediata!' \
-R 'Mover usuario para OU' \
-S 'Cuidado: Excluir um usuario' \
-X '<' 2>&1 > /dev/tty ); then
-  return
-fi
+  if ! var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Usuarios" --menu " " 0 0 0 \
+  A 'Procurar usuario' \
+  B 'Verificar um usuario' \
+  C 'Criar usuario' \
+  D 'Exibir todos os usuarios' \
+  E 'Bloquear usuario' \
+  F 'Desbloquear usuario' \
+  G 'Adicionar usuario a um grupo' \
+  H 'Exibir grupos de usuario' \
+  I 'Remover usuario de um grupo' \
+  J 'Copiar os grupos de um usuario' \
+  K 'Promote usuario a admin' \
+  L 'Demote usuario de admin' \
+  M 'Alterar a senha de um usuario' \
+  N 'Verificar a senha de um usuario' \
+  O 'A senha do usuario deve expirar?' \
+  P 'Quando a senha usuario vai expirar?' \
+  Q 'Forcar a troca de senha imediata!' \
+  R 'Mover usuario para OU' \
+  S 'Cuidado: Excluir um usuario' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
 
-case "$var41" in
-A) search_user ; user_tools ;;
-B) check_user ; user_tools ;;
-C) create_user ; user_tools ;;
-D) show_users ; user_tools ;;
-E) blk_user ; user_tools ;;
-F) ublk_user ; user_tools ;;
-G) add_user_group ; user_tools ;;
-H) show_group_user ; user_tools ;;
-I) rm_user_group ; user_tools ;;
-J) copy_group ; user_tools ;;
-K) promote_user ; user_tools ;;
-L) demote_user ; user_tools ;;
-M) change_pass ; user_tools ;;
-N) test_pass ; user_tools ;;
-O) expiracy_usr_pass ; user_tools ;;
-P) expiracy_days ; user_tools ;;
-Q) expiracy_now ; user_tools ;;
-R) mv_user_ou ; user_tools ;;
-S) rm_user ; user_tools ;;
-X) echo "." >/dev/null ;;
-esac
+  case "$var41" in
+  A) search_user ; user_tools ;;
+  B) check_user ; user_tools ;;
+  C) create_user ; user_tools ;;
+  D) show_users ; user_tools ;;
+  E) blk_user ; user_tools ;;
+  F) ublk_user ; user_tools ;;
+  G) add_user_group ; user_tools ;;
+  H) show_group_user ; user_tools ;;
+  I) rm_user_group ; user_tools ;;
+  J) copy_group ; user_tools ;;
+  K) promote_user ; user_tools ;;
+  L) demote_user ; user_tools ;;
+  M) change_pass ; user_tools ;;
+  N) test_pass ; user_tools ;;
+  O) expiracy_usr_pass ; user_tools ;;
+  P) expiracy_days ; user_tools ;;
+  Q) expiracy_now ; user_tools ;;
+  R) mv_user_ou ; user_tools ;;
+  S) rm_user ; user_tools ;;
+  X) echo "." >/dev/null ;;
+  esac
 }
 
 function group_tools {
-if ! var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Grupos" --menu " " 0 0 0 \
-A 'Procurar grupo' \
-B 'Verificar um Grupo' \
-C 'Criar grupo' \
-D 'Exibir todos os grupos' \
-E 'Exibir membros de um grupo' \
-F 'Copiar os membros de um grupo' \
-G 'Adicionar grupo 1 a um grupo 2' \
-H 'Remover grupo 1 de um grupo 2' \
-I 'Mover grupo para OU' \
-J 'Cuidado: Excluir um grupo' \
-X '<' 2>&1 > /dev/tty ); then
-  return
-fi
+  if ! var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Grupos" --menu " " 0 0 0 \
+  A 'Procurar grupo' \
+  B 'Verificar um Grupo' \
+  C 'Criar grupo' \
+  D 'Exibir todos os grupos' \
+  E 'Exibir membros de um grupo' \
+  F 'Copiar os membros de um grupo' \
+  G 'Adicionar grupo 1 a um grupo 2' \
+  H 'Remover grupo 1 de um grupo 2' \
+  I 'Mover grupo para OU' \
+  J 'Cuidado: Excluir um grupo' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
 
-case "$var41" in
-A) search_group ; group_tools ;;
-B) check_group ; group_tools ;;
-C) create_group ; group_tools ;;
-D) show_groups ; group_tools ;;
-E) show_user_group ; group_tools ;;
-F) copy_user ; group_tools ;;
-G) add_group_group ; group_tools ;;
-H) rm_group_group ; group_tools ;;
-I) mv_group_ou ; group_tools ;;
-J) rm_group ; group_tools ;;
-X) echo "." > /dev/null ;;
-esac
+  case "$var41" in
+  A) search_group ; group_tools ;;
+  B) check_group ; group_tools ;;
+  C) create_group ; group_tools ;;
+  D) show_groups ; group_tools ;;
+  E) show_user_group ; group_tools ;;
+  F) copy_user ; group_tools ;;
+  G) add_group_group ; group_tools ;;
+  H) rm_group_group ; group_tools ;;
+  I) mv_group_ou ; group_tools ;;
+  J) rm_group ; group_tools ;;
+  X) echo "." > /dev/null ;;
+  esac
 }
 
 function pc_tools {
-if ! var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Computadores" --menu " " 0 0 0 \
-A 'Procurar computador' \
-B 'Verificar um computador' \
-C 'Exibir todos os computadores' \
-D 'Criar/Adicionar um computador' \
-E 'Mover computador para OU' \
-F 'Cuidado: Excluir um computador' \
-X '<' 2>&1 > /dev/tty );then
-  return
-fi
+  if ! var41=$(dialog --title "$ttitle" --backtitle "Ferramentas de Computadores" --menu " " 0 0 0 \
+  A 'Procurar computador' \
+  B 'Verificar um computador' \
+  C 'Exibir todos os computadores' \
+  D 'Criar/Adicionar um computador' \
+  E 'Mover computador para OU' \
+  F 'Cuidado: Excluir um computador' \
+  X '<' 2>&1 > /dev/tty );then
+    return
+  fi
 
-case "$var41" in
-A) search_pc ; pc_tools ;;
-B) check_pc ; pc_tools ;;
-C) show_pcs ; pc_tools ;;
-D) create_pc ; pc_tools ;;
-E) mv_pc_ou ; pc_tools ;;
-F) rm_pc ; pc_tools ;;
-X) echo "." > /dev/null ;;
-esac
+  case "$var41" in
+  A) search_pc ; pc_tools ;;
+  B) check_pc ; pc_tools ;;
+  C) show_pcs ; pc_tools ;;
+  D) create_pc ; pc_tools ;;
+  E) mv_pc_ou ; pc_tools ;;
+  F) rm_pc ; pc_tools ;;
+  X) echo "." > /dev/null ;;
+  esac
 }
 
 function info_domain {
@@ -155,7 +155,7 @@ function info_domain {
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
-  
+
   case "$var4" in
   A) domain_details ; info_domain ;;
   B) active_sessions ; info_domain ;;
@@ -182,7 +182,7 @@ if ! var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu 
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
-  
+
   case "$var4" in
   A) set_common_perm ; s_settings_menu ;;
   B) change_password0 ; s_settings_menu ;;
@@ -204,7 +204,7 @@ function set_common_perm {
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
-  
+
   case "$var4" in
   A) clear ; samba-tool ntacl sysvolcheck -U administrator ; read -r -p "Pressione Enter para continuar!" ; set_common_perm ;;
   B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -r -p "Pressione Enter para continuar!" ; set_common_perm ;;
@@ -229,7 +229,7 @@ function change_password0 {
   X '<' 2>&1 > /dev/tty ); then
    return
  fi
- 
+
   case "$var4" in
   A) show_pass_policy ; change_password0 ;;
   B) set_complex ; change_password0 ;;
@@ -253,11 +253,11 @@ function set_complex {
   if daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --yesno "Ativar a complexidade de senhas? \n\n
 Valor padrao: ATIVO" 9 35 2>&1 > /dev/tty); then
   clear
-  samba-tool domain passwordsettings set --complexity=on
-  samba-tool domain passwordsettings set --history-length=24
-  samba-tool domain passwordsettings set --min-pwd-age=1
-  samba-tool domain passwordsettings set --max-pwd-age=90
-  samba-tool domain passwordsettings set --min-pwd-length=7
+  samba-tool domain passwordsettings set --complexity=on; sleep 0.5
+  samba-tool domain passwordsettings set --history-length=24; sleep 0.5
+  samba-tool domain passwordsettings set --min-pwd-age=1; sleep 0.5
+  samba-tool domain passwordsettings set --max-pwd-age=90; sleep 0.5
+  samba-tool domain passwordsettings set --min-pwd-length=7; sleep 0.5
   dialog --cr-wrap --title "A complexidade de senhas foi reativada!" --backtitle "Complexidade restaurada aos valores padrao." --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
   fi
 }
@@ -266,19 +266,22 @@ function unset_complex {
   if daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --yesno "Desativar a complexidade de senhas? \n\n
 Valor padrao: ATIVO" 9 35 2>&1 > /dev/tty); then
   clear
-  samba-tool domain passwordsettings set --complexity=off
-  samba-tool domain passwordsettings set --history-length=0
-  samba-tool domain passwordsettings set --min-pwd-age=0
-  samba-tool domain passwordsettings set --max-pwd-age=0
-  samba-tool domain passwordsettings set --min-pwd-length=0
+  samba-tool domain passwordsettings set --complexity=off; sleep 0.5
+  samba-tool domain passwordsettings set --history-length=0; sleep 0.5
+  samba-tool domain passwordsettings set --min-pwd-age=0; sleep 0.5
+  samba-tool domain passwordsettings set --max-pwd-age=0; sleep 0.5
+  samba-tool domain passwordsettings set --min-pwd-length=0; sleep 0.5
   dialog --cr-wrap --title "A complexidade de senhas foi removida do servidor!" --backtitle "Complexidade totalmente removida." --msgbox  "$(samba-tool domain passwordsettings show)" 0 0
 fi
 
 }
 
 function pass_history {
-pass_history0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Trocar senha quantas vezes ate permitir repetir? \n\n
-Valor padrao: 24" 11 35 2>&1 > /dev/tty)
+  if ! pass_history0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Trocar senha quantas vezes ate permitir repetir? \n\n
+Valor padrao: 24" 11 35 2>&1 > /dev/tty); then
+    return
+  fi
+
   if [ -z "$pass_history0" ]; then
     dialog002
   else
@@ -289,8 +292,11 @@ Valor padrao: 24" 11 35 2>&1 > /dev/tty)
 }
 
 function pass_min_length {
-pass_min0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Tamanho minimo de caracteres das senhas. \n\n
-Valor padrao: 7" 11 35 2>&1 > /dev/tty)
+  if ! pass_min0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Tamanho minimo de caracteres das senhas. \n\n
+Valor padrao: 7" 11 35 2>&1 > /dev/tty); then
+    return
+  fi
+
   if [ -z "$pass_min0" ]; then
     dialog002
   else
@@ -302,9 +308,12 @@ Valor padrao: 7" 11 35 2>&1 > /dev/tty)
 }
 
 function pass_min_age {
-daystoexpire1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Evitar a troca de senha seguidas vezes. \n\n
+  if ! daystoexpire1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Evitar a troca de senha seguidas vezes. \n\n
 Valor padrao: 1 dia \n\n
-Valor 0: Troque quando quiser" 14 35 2>&1 > /dev/tty)
+Valor 0: Troque quando quiser" 14 35 2>&1 > /dev/tty); then
+    return
+  fi
+
   if [ -z "$daystoexpire1" ]; then
     dialog002
   else
@@ -315,9 +324,12 @@ Valor 0: Troque quando quiser" 14 35 2>&1 > /dev/tty)
 }
 
 function pass_max_age {
-daystoexpire2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina a validade das senhas em dias. \n\n
+  if ! daystoexpire2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina a validade das senhas em dias. \n\n
 Valor padrao: 90 dias \n\n
-Valor 0: Sem validade." 14 35 2>&1 > /dev/tty)
+Valor 0: Sem validade." 14 35 2>&1 > /dev/tty); then
+    return
+  fi
+
   if [ -z "$daystoexpire2" ]; then
     dialog002
   else
@@ -328,8 +340,11 @@ Valor 0: Sem validade." 14 35 2>&1 > /dev/tty)
 }
 
 function try_login {
-blocklogin0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Quantas tentativas de login antes de bloquear o usuario? \n\n
-Valor padrao: 0" 11 35 2>&1 > /dev/tty)
+  if ! blocklogin0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Quantas tentativas de login antes de bloquear o usuario? \n\n
+Valor padrao: 0" 11 35 2>&1 > /dev/tty); then
+    return
+  fi
+
   if [ -z "$blocklogin0" ]; then
     dialog002
   else
@@ -340,9 +355,12 @@ Valor padrao: 0" 11 35 2>&1 > /dev/tty)
 }
 
 function failblock_login {
-failblock0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Por quanto tempo manter o usuario bloqueado apos errar a senha? \n\n
+  if ! failblock0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Por quanto tempo manter o usuario bloqueado apos errar a senha? \n\n
 Valor padrao: 30 minutos \n\n
-Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty)
+Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty); then
+    return
+  fi
+
   if [ -z "$failblock0" ]; then
     dialog002
   else
@@ -353,9 +371,12 @@ Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty)
 }
 
 function releaseblock_login {
-releaseblk0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Apos quanto tempo liberar usuarios bloqueados apos errarem a senha? \n\n
+  if ! releaseblk0=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Apos quanto tempo liberar usuarios bloqueados apos errarem a senha? \n\n
 Valor padrao: 30 minutos \n\n
-Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty)
+Valor 0: Sem tempo limite." 14 35 2>&1 > /dev/tty); then
+    return
+  fi
+
   if [ -z "$releaseblk0" ]; then
     dialog002
   else
@@ -373,7 +394,7 @@ function change_acls0 {
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
-  
+
   case "$var4" in
   A) clear ; samba-tool gpo aclcheck -U Administrator ; read -r -p "Pressione Enter para continuar!" ; change_acls0 ;;
   B) getacls0 ; change_acls0 ;;
@@ -387,35 +408,35 @@ function change_acls0 {
 #############################
 
 function shared_folders {
-if ! var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
-A 'Mostrar pastas compartilhadas' \
-B 'Criar nova pasta compartilhada' \
-C 'Compartilhamento estruturado' \
-D 'Excluir compartilhamento' \
-E 'Revalidar configuracoes' \
-X '<' 2>&1 > /dev/tty ); then
-  return
-fi
+  if ! var0=$(dialog --title "$ttitle" --backtitle "Gestao de Pastas Compartilhadas" --menu " " 0 0 0 \
+  A 'Mostrar pastas compartilhadas' \
+  B 'Criar nova pasta compartilhada' \
+  C 'Compartilhamento estruturado' \
+  D 'Excluir compartilhamento' \
+  E 'Revalidar configuracoes' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
 
-case "$var0" in
-A) show_shared ; shared_folders ;;
-B) create_shared ; shared_folders ;;
-C) create_sync ; shared_folders ;;
-D) remove_shared ; shared_folders ;;
-E) revalid_shared ; shared_folders ;;
-X) echo "." >/dev/null ;;
-esac
+  case "$var0" in
+  A) show_shared ; shared_folders ;;
+  B) create_shared ; shared_folders ;;
+  C) create_sync ; shared_folders ;;
+  D) remove_shared ; shared_folders ;;
+  E) revalid_shared ; shared_folders ;;
+  X) echo "." >/dev/null ;;
+  esac
 }
 
 function ou_tools {
-if ! var12=$(dialog --title "$ttitle" --backtitle "Unidades Organizacionais" --menu " " 0 0 0 \
+  if ! var12=$(dialog --title "$ttitle" --backtitle "Unidades Organizacionais" --menu " " 0 0 0 \
   A 'Listar todas as OUs' \
   B 'Criar uma OU' \
   C 'Listar objetos de OU' \
   D 'Excluir uma OU' \
   X '<' 2>&1 > /dev/tty ); then
     return
-fi
+  fi
 
   case "$var12" in
   A) show_ous ; ou_tools ;;
@@ -449,6 +470,7 @@ function menusilo {
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
+
   case "$var12" in
   A) check_silo ; menusilo ;;
   B) show_silos ; menusilo ;;
@@ -462,24 +484,24 @@ function menusilo {
 }
 
 function check_silo {
-if validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validsilo" ]; then
-  dialog002
-else
-  repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
-  if [ "$repeated" = "$validsilo" ]; then
-    dialog --title "Informacao" --msgbox "O silo $validsilo existe!" 8 40
-    clear
-    dialog001
-    silodata=$(samba-tool domain auth silo view --name "$validsilo")
-    echo "$silodata" | less
-  else
-    dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
+  if ! validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validsilo" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
+    if [ "$repeated" = "$validsilo" ]; then
+      dialog --title "Informacao" --msgbox "O silo $validsilo existe!" 8 40
+      clear
+      dialog001
+      silodata=$(samba-tool domain auth silo view --name "$validsilo")
+      echo "$silodata" | less
+    else
+      dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
+    fi
+  fi
 }
 
 function show_silos {
@@ -489,47 +511,47 @@ function show_silos {
 }
 
 function create_silos {
-if validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validsilo" ]; then
-  dialog002
-else
-  repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
-  if [ "$repeated" = "$validsilo" ]; then
-    dialog --title "ERROR" --msgbox "Silo $validsilo ja existe!" 7 25
-  else
-    samba-tool domain auth silo create --name "$validsilo"
-    dialog --title "Informacao" --msgbox "Silo $validsilo criado com sucesso!" 7 25
+  if ! validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validsilo" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
+    if [ "$repeated" = "$validsilo" ]; then
+      dialog --title "ERROR" --msgbox "Silo $validsilo ja existe!" 7 25
+    else
+      samba-tool domain auth silo create --name "$validsilo"
+      dialog --title "Informacao" --msgbox "Silo $validsilo criado com sucesso!" 7 25
+    fi
+  fi
 }
 
 function list_usr_silo {
-if validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validsilo" ]; then
-  dialog002
-else
-  repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
-  if [ "$repeated" = "$validsilo" ]; then
-    dialog001
-    silomembers=$(samba-tool domain auth silo member list --name "$validsilo")
-    echo "$silomembers" | less
-  else
-    dialog --title "ERRO" --msgbox "Silo invalido!" 8 40
+  if ! validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validsilo" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
+    if [ "$repeated" = "$validsilo" ]; then
+      dialog001
+      silomembers=$(samba-tool domain auth silo member list --name "$validsilo")
+      echo "$silomembers" | less
+    else
+      dialog --title "ERRO" --msgbox "Silo invalido!" 8 40
+    fi
+  fi
 }
 
 function add_usr_silo {
-validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
-validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
+  validusr=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
+  validsilo=$(dialog --title "$ttitle" --backtitle "Promover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
 
-if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
+  if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
     dialog002
   else
     repeated=$(samba-tool user list | grep -x "$validusr")
@@ -548,12 +570,12 @@ if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
 }
 
 function rm_usr_silo {
-validusr=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
-validsilo=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
+  validusr=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
+  validsilo=$(dialog --title "$ttitle" --backtitle "Remover Usuario a um Silo" --inputbox "Insira o nome do Silo" 0 0 2>&1 > /dev/tty)
 
-if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
+  if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
     dialog002
-  else  
+  else
     repeated=$(samba-tool user list | grep -x "$validusr")
     if [ "$repeated" = "$validusr" ]; then
       repeated2=$(samba-tool domain auth silo list | grep -x "$validsilo")
@@ -570,74 +592,74 @@ if [ -z "$validusr" ] || [ -z "$validsilo" ]; then
 }
 
 function rm_silo {
-if validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validsilo" ]; then
-  dialog002
-else
-  repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
-  if [ "$repeated" = "$validsilo" ]; then
-    if dialog --title 'Confirmacao' --backtitle 'Exclusao de Silo' --yesno 'Deseja excluir este silo?' 0 0; then
-      samba-tool domain auth silo delete --name "$validsilo"
-      dialog --title "Informacao" --msgbox "Silo $validsilo excluido com sucesso!" 7 25
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
+  if ! validsilo=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do silo" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validsilo" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool domain auth silo list | grep -x "$validsilo")
+    if [ "$repeated" = "$validsilo" ]; then
+      if dialog --title 'Confirmacao' --backtitle 'Exclusao de Silo' --yesno 'Deseja excluir este silo?' 0 0; then
+        samba-tool domain auth silo delete --name "$validsilo"
+        dialog --title "Informacao" --msgbox "Silo $validsilo excluido com sucesso!" 7 25
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Silo invalido!" 7 25
+    fi
+  fi
 }
 
 function getacls0 {
-if VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Get ACL" --dselect "/mnt" 15 40); then
-  return
-fi
+  if ! VALUE0=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Get ACL" --dselect "/mnt" 15 40); then
+    return
+  fi
 
-Pathtemp0=$(echo "$VALUE0" | sed -n 1p)
+  Pathtemp0=$(echo "$VALUE0" | sed -n 1p)
 
-acl00=$(samba-tool ntacl get --as-sddl "$Pathtemp0")
-echo "$acl00" | tee /tmp/acl01 >/dev/null
-echo "$Pathtemp0" | tee /tmp/pathtemp00 >/dev/null
+  acl00=$(samba-tool ntacl get --as-sddl "$Pathtemp0")
+  echo "$acl00" | tee /tmp/acl01 >/dev/null
+  echo "$Pathtemp0" | tee /tmp/pathtemp00 >/dev/null
 
-dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes ACLs da pasta \n$Pathtemp0\nforam coletadas: \n\n$acl00" 14 70
+  dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes ACLs da pasta \n$Pathtemp0\nforam coletadas: \n\n$acl00" 14 70
 }
 
 function setacls0 {
-acl00="$(cat /tmp/acl01)"
-pathtempacl0="$(cat /tmp/pathtemp00)"
+  acl00="$(cat /tmp/acl01)"
+  pathtempacl0="$(cat /tmp/pathtemp00)"
 
-dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes ACLs coletadas da pasta previamente definida\n$pathtempacl0\nserao utilizadas: \n\n$acl00" 12 70
+  dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "As seguintes ACLs coletadas da pasta previamente definida\n$pathtempacl0\nserao utilizadas: \n\n$acl00" 12 70
 
-checkpathfolder
+  checkpathfolder
 
-if VALUE00=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Set Folder" --dselect "$PathFolder0" 15 40); then
-  return
-fi
+  if ! VALUE00=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Set Folder" --dselect "$PathFolder0" 15 40); then
+    return
+  fi
 
-PathFolder0new=$(echo "$VALUE00" | sed -n 1p)
+  PathFolder0new=$(echo "$VALUE00" | sed -n 1p)
 
-samba-tool ntacl set "$acl00" "$PathFolder0new"
-echo "$PathFolder0new"| tee /tmp/path01 >/dev/null
+  samba-tool ntacl set "$acl00" "$PathFolder0new"
+  echo "$PathFolder0new"| tee /tmp/path01 >/dev/null
 
-dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta \n$PathFolder0new\nrecebeu as seguintes ACLs: \n\n$acl00\n\nficando com as mesmas permissoes da pasta \n$pathtempacl0!" 16 70
+  dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta \n$PathFolder0new\nrecebeu as seguintes ACLs: \n\n$acl00\n\nficando com as mesmas permissoes da pasta \n$pathtempacl0!" 16 70
 
-changemoreacls
+  changemoreacls
 }
 
 function changemoreacls {
   if dialog --title 'Confirmacao' --backtitle 'Informacao' --yesno 'Deseja trocar a ACL de outra pasta?' 0 0; then
-  acl00="$(cat /tmp/acl01)"
-  PathFolder0="$(cat /tmp/path01)"
-  pathtempacl0="$(cat /tmp/pathtemp00)"
+    acl00="$(cat /tmp/acl01)"
+    PathFolder0="$(cat /tmp/path01)"
+    pathtempacl0="$(cat /tmp/pathtemp00)"
   fi
-  
+
   if VALUE00=$(dialog --stdout --backtitle "Use as setas para navegar nos diretorios abaixo, use ESPACO 2x para confirmar uma pasta!" --title "Set Folder" --dselect "$PathFolder0" 15 40); then
-  PathFolder0new=$(echo "$VALUE00" | sed -n 1p)
-  echo "$PathFolder0new"| tee /tmp/path01 >/dev/null
-  samba-tool ntacl set "$acl00" "$PathFolder0new"
-  dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta \n$PathFolder0new\nrecebeu as seguintes ACLs: \n\n$acl00\n\nficando com as mesmas permissoes da pasta \n$pathtempacl0!" 16 70
-  changemoreacls
+    PathFolder0new=$(echo "$VALUE00" | sed -n 1p)
+    echo "$PathFolder0new"| tee /tmp/path01 >/dev/null
+    samba-tool ntacl set "$acl00" "$PathFolder0new"
+    dialog --title "Confirmacao" --backtitle "Informacao" --msgbox "A pasta \n$PathFolder0new\nrecebeu as seguintes ACLs: \n\n$acl00\n\nficando com as mesmas permissoes da pasta \n$pathtempacl0!" 16 70
+    changemoreacls
   fi
 }
 
@@ -649,34 +671,32 @@ function checkpathfolder {
 }
 
 function force_msi_w10 {
-if dpkg --list | grep msitools; then
-  if dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0; then
-    wget -O w10admx.msi "$admxw10" && mkdir /msifiles && msiextract -C /msifiles/ w10admx.msi
-    rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions
-    samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
-    echo ""; read -r -p "As regras do Windows 10 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
+  if dpkg --list | grep msitools; then
+    if dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0; then
+      wget -O w10admx.msi "$admxw10" && mkdir /msifiles && msiextract -C /msifiles/ w10admx.msi
+      rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions
+      samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
+      echo ""; read -r -p "As regras do Windows 10 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
+    fi
+  else
+    clear; echo "Pacote MSITOOLS nao encontrado!"; sleep 3
   fi
-else
-  clear
-  echo "Pacote MSITOOLS nao encontrado!"
-  sleep 3
-fi
 }
 
 function force_msi_w11 {
-if dpkg --list | grep msitools; then
-  if dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0; then
-    wget -O w11admx.msi "$admxw11" && mkdir /msifiles && msiextract -C /msifiles/ w11admx.msi
-    rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions
-    mv /msifiles/Program\ Files/Microsoft\ Group\ Policy/Windows\ 11\ September\ 2022\ Update\ \(22H2\)/PolicyDefinitions/ /msifiles/PolicyDefinitions/
-    samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
-    echo ""; read -r -p "As regras do Windows 11 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
+  if dpkg --list | grep msitools; then
+    if dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0; then
+      wget -O w11admx.msi "$admxw11" && mkdir /msifiles && msiextract -C /msifiles/ w11admx.msi
+      rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions
+      mv /msifiles/Program\ Files/Microsoft\ Group\ Policy/Windows\ 11\ September\ 2022\ Update\ \(22H2\)/PolicyDefinitions/ /msifiles/PolicyDefinitions/
+      samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
+      echo ""; read -r -p "As regras do Windows 11 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
+    fi
+  else
+    clear
+    echo "Pacote MSITOOLS nao encontrado!"
+    sleep 3
   fi
-else
-  clear
-  echo "Pacote MSITOOLS nao encontrado!"
-  sleep 3
-fi
 }
 
 function active_shares {
@@ -698,119 +718,119 @@ function show_ous {
 }
 
 function create_ou {
-if ! validou=$(dialog --title "$ttitle" --backtitle "Criando uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validou" ]; then
-  dialog002
-else
-   repeated=$(samba-tool ou list | grep -x OU="$validou")
-  if [ "$repeated" = "OU=$validou" ]; then
-    dialog --title "Informacao" --msgbox "A OU=$validou ja existe!" 8 40
-  else
-    samba-tool ou create OU="$validou"
-    dialog --title "Informacao" --msgbox "OU=$validou criada com sucesso!" 7 25
+  if ! validou=$(dialog --title "$ttitle" --backtitle "Criando uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validou" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool ou list | grep -x OU="$validou")
+    if [ "$repeated" = "OU=$validou" ]; then
+      dialog --title "Informacao" --msgbox "A OU=$validou ja existe!" 8 40
+    else
+      samba-tool ou create OU="$validou"
+      dialog --title "Informacao" --msgbox "OU=$validou criada com sucesso!" 7 25
+    fi
+  fi
 }
 
 function mv_user_ou {
-if ! validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if ! validou=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validusr" ] || [ -z "$validou" ]; then
-    dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    repeated2=$(samba-tool ou list | grep -x OU="$validou")
-    if [ "$repeated2" = "OU=$validou" ]; then
-      samba-tool user move "$validusr" OU="$validou"
-      dialog --title "Informacao" --msgbox "O usuario $validusr foi movido para a OU=$validou!" 8 40
-    else
-      dialog --title "ERROR" --msgbox "OU invalida!" 7 25
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if ! validou=$(dialog --title "$ttitle" --backtitle "Mover Usuario para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
+
+  if [ -z "$validusr" ] || [ -z "$validou" ]; then
+      dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      repeated2=$(samba-tool ou list | grep -x OU="$validou")
+      if [ "$repeated2" = "OU=$validou" ]; then
+        samba-tool user move "$validusr" OU="$validou"
+        dialog --title "Informacao" --msgbox "O usuario $validusr foi movido para a OU=$validou!" 8 40
+      else
+        dialog --title "ERROR" --msgbox "OU invalida!" 7 25
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function mv_group_ou {
-if ! validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if ! validou=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validgrp" ] || [ -z "$validou" ]; then
-  dialog002
-else
-  repeated=$(samba-tool group list | grep -x "$validgrp")
-  if [ "$repeated" = "$validgrp" ]; then
-    repeated2=$(samba-tool ou list | grep -x OU="$validou")
-    if [ "$repeated2" = "OU=$validou" ]; then
-      samba-tool group move "$validgrp" OU="$validou"
-      dialog --title "Informacao" --msgbox "O grupo $validgrp foi movido para a OU=$validou!" 8 40
-    else
-      dialog --title "ERROR" --msgbox "OU invalida!" 7 25
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+  if ! validgrp=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if ! validou=$(dialog --title "$ttitle" --backtitle "Mover Grupo para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
+
+  if [ -z "$validgrp" ] || [ -z "$validou" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool group list | grep -x "$validgrp")
+    if [ "$repeated" = "$validgrp" ]; then
+      repeated2=$(samba-tool ou list | grep -x OU="$validou")
+      if [ "$repeated2" = "OU=$validou" ]; then
+        samba-tool group move "$validgrp" OU="$validou"
+        dialog --title "Informacao" --msgbox "O grupo $validgrp foi movido para a OU=$validou!" 8 40
+      else
+        dialog --title "ERROR" --msgbox "OU invalida!" 7 25
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+    fi
+  fi
 }
 
 function rm_ou {
-if ! validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "Insira o nome da OU:" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validou" ]; then
-  dialog002
-else
-  repeated=$(samba-tool ou list | grep -x OU="$validou")
-  if [ "$repeated" = "OU=$validou" ]; then
-    if dialog --title 'Confirmacao' --backtitle 'Exclusao de OU' --yesno 'Deseja excluir esta OU?' 0 0; then
-      samba-tool ou delete OU="$validou"
-      repeated2=$(samba-tool ou list | grep -x OU="$validou")
-      if [ "$repeated2" = "OU=$validou" ]; then
-        dialog --title "Informacao" --msgbox "A OU=$validou possui Objetos e nao foi removida!" 8 40
-      else
-        dialog --title "Informacao" --msgbox "A OU=$validou foi removida com sucesso!" 7 25
-      fi
-    fi
-  else
-    dialog --title "Informacao" --msgbox "A OU=$validou nao foi encontrada!" 8 40
+  if ! validou=$(dialog --title "$ttitle" --backtitle "Excluindo uma OU" --inputbox "Insira o nome da OU:" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validou" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool ou list | grep -x OU="$validou")
+    if [ "$repeated" = "OU=$validou" ]; then
+      if dialog --title 'Confirmacao' --backtitle 'Exclusao de OU' --yesno 'Deseja excluir esta OU?' 0 0; then
+        samba-tool ou delete OU="$validou"
+        repeated2=$(samba-tool ou list | grep -x OU="$validou")
+        if [ "$repeated2" = "OU=$validou" ]; then
+          dialog --title "Informacao" --msgbox "A OU=$validou possui Objetos e nao foi removida!" 8 40
+        else
+          dialog --title "Informacao" --msgbox "A OU=$validou foi removida com sucesso!" 7 25
+        fi
+      fi
+    else
+      dialog --title "Informacao" --msgbox "A OU=$validou nao foi encontrada!" 8 40
+    fi
+  fi
 }
 
 function list_obj_ou {
-if ! validou=$(dialog --title "$ttitle" --backtitle "Objetos de uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validou" ]; then
-  dialog002
-else
-   repeated=$(samba-tool ou list | grep -x OU="$validou")
-  if [ "$repeated" = "OU=$validou" ]; then
-    dialog001
-    oubjects=$(samba-tool ou listobjects OU="$validou")
-    echo "$oubjects" | less
-  else
-    dialog --title "Informacao" --msgbox "OU=$validou invalida!" 7 25
+  if ! validou=$(dialog --title "$ttitle" --backtitle "Objetos de uma OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validou" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool ou list | grep -x OU="$validou")
+    if [ "$repeated" = "OU=$validou" ]; then
+      dialog001
+      oubjects=$(samba-tool ou listobjects OU="$validou")
+      echo "$oubjects" | less
+    else
+      dialog --title "Informacao" --msgbox "OU=$validou invalida!" 7 25
+    fi
+  fi
 }
 
 function show_users {
@@ -826,42 +846,43 @@ function show_groups {
 }
 
 function create_user {
-VALUE1="joao_naves"
-VALUE2="Joao Naves"
-VALUE3="A12345d"
+  VALUE1="joao_naves"
+  VALUE2="Joao Naves"
+  VALUE3="A12345d"
 
-if VALUE0=$(dialog --ok-label "Criar"  --backtitle "$bktitle" --title "Adicionar Usuario" --form "Preencha todos os campos! \nAtento na complexidade da senha!" 0 0 0 \
+  if ! VALUE0=$(dialog --ok-label "Criar"  --backtitle "$bktitle" --title "Adicionar Usuario" --form "Preencha todos os campos! \nAtento na complexidade da senha!" 0 0 0 \
 "Usuario: " 1 1 "$VALUE1" 1 10 34 0 \
 "Exibicao:" 2 1 "$VALUE2" 2 10 34 0 \
 "Senha:" 3 1 "$VALUE3" 3 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
-  return
-fi
+    return
+  fi
 
-validusr1=$(echo "$VALUE0" | sed -n 1p)
-validsur1=$(echo "$VALUE0" | sed -n 2p)
-validpss1=$(echo "$VALUE0" | sed -n 3p)
-if [ -z "$validpss1" ] || [ -z "$validusr1" ] || [ -z "$validsur1" ]; then
-  dialog --title "ERRO" --msgbox "Nao deixe nenhum campo vazio!" 8 40
-else
-  repeated=$(samba-tool user list | grep -x "$validusr1")
-  repeated2=$(samba-tool group list | grep -x "$validusr1")
-  if [ "$repeated" = "$validusr1" ] || [ "$repeated2" = "$validusr1" ]; then
-    dialog --title "Informacao" --msgbox "Conflito detectado! \n\nO usuario $validusr1 ja existe!" 8 40
+  validusr1=$(echo "$VALUE0" | sed -n 1p)
+  validsur1=$(echo "$VALUE0" | sed -n 2p)
+  validpss1=$(echo "$VALUE0" | sed -n 3p)
+
+  if [ -z "$validpss1" ] || [ -z "$validusr1" ] || [ -z "$validsur1" ]; then
+    dialog --title "ERRO" --msgbox "Nao deixe nenhum campo vazio!" 8 40
   else
-    if dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "$validusr1 deve trocar essa senha ao logar?" 0 0; then
-      samba-tool user create --must-change-at-next-login "$validusr1" "$validpss1" --surname="$validsur1"
-      check_user_creation
+    repeated=$(samba-tool user list | grep -x "$validusr1")
+    repeated2=$(samba-tool group list | grep -x "$validusr1")
+    if [ "$repeated" = "$validusr1" ] || [ "$repeated2" = "$validusr1" ]; then
+      dialog --title "Informacao" --msgbox "Conflito detectado! \n\nO usuario $validusr1 ja existe!" 8 40
     else
-      samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1"
-      check_user_creation
+      if dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "$validusr1 deve trocar essa senha ao logar?" 0 0; then
+        samba-tool user create --must-change-at-next-login "$validusr1" "$validpss1" --surname="$validsur1"
+        check_user_creation
+      else
+        samba-tool user create "$validusr1" "$validpss1" --surname="$validsur1"
+        check_user_creation
+      fi
     fi
   fi
-fi
 }
 
 function check_user_creation {
-  if checkusr00=$(samba-tool user list | grep -x "$validusr1"); then
+  if ! checkusr00=$(samba-tool user list | grep -x "$validusr1"); then
     return
   fi
 
@@ -873,409 +894,480 @@ function check_user_creation {
 }
 
 function change_pass {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    validpss=$(dialog --title "$ttitle" --backtitle "Trocar a senha de usuario do Dominio" --insecure --passwordbox 'Crie uma nova senha para o usuario' 0 0 2>&1 > /dev/tty )
-    if [ -z "$validpss" ]; then
-      dialog002
-    else
-      samba-tool user setpassword "$validusr" --newpassword="$validpss"
-      dialog --title "Informacao" --msgbox "Senha de $validusr trocada com sucesso!" 8 40
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      validpss=$(dialog --title "$ttitle" --backtitle "Trocar a senha de usuario do Dominio" --insecure --passwordbox 'Crie uma nova senha para o usuario' 0 0 2>&1 > /dev/tty )
+      if [ -z "$validpss" ]; then
+        dialog002
+      else
+        samba-tool user setpassword "$validusr" --newpassword="$validpss"
+        dialog --title "Informacao" --msgbox "Senha de $validusr trocada com sucesso!" 8 40
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function blk_user {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    samba-tool user disable "$validusr"
-    dialog --title "Informacao" --msgbox "Usuario $validusr bloqueado com sucesso!" 7 25
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      samba-tool user disable "$validusr"
+      dialog --title "Informacao" --msgbox "Usuario $validusr bloqueado com sucesso!" 7 25
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function ublk_user {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    samba-tool user enable "$validusr"
-    dialog --title "Informacao" --msgbox "Usuario $validusr desbloqueado com sucesso!" 7 25
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      samba-tool user enable "$validusr"
+      dialog --title "Informacao" --msgbox "Usuario $validusr desbloqueado com sucesso!" 7 25
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function rm_user {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    if dialog --title 'Confirmacao' --backtitle 'Exclusao de Usuario' --yesno 'Deseja excluir este usuario?' 0 0; then
-      samba-tool user delete "$validusr"
-      dialog --title "Informacao" --msgbox "Usuario $validusr excluido com sucesso!" 7 25
-    else
-      echo "a" > /dev/null
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      if dialog --title 'Confirmacao' --backtitle 'Exclusao de Usuario' --yesno 'Deseja excluir este usuario?' 0 0; then
+        samba-tool user delete "$validusr"
+        dialog --title "Informacao" --msgbox "Usuario $validusr excluido com sucesso!" 7 25
+      else
+        echo "a" > /dev/null
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function create_group {
-validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-if [ -z "$validgrp" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validgrp")
-  repeated2=$(samba-tool group list | grep -x "$validgrp")
-  if [ "$repeated" = "$validgrp" ] || [ "$repeated2" = "$validgrp" ]; then
-    dialog --title "Informacao" --msgbox "Conflito detectado! O grupo $validgrp nao sera criado!" 8 40
-  else
-    samba-tool group create "$validgrp"
-    dialog --title "Informacao" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
+  if ! validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validgrp" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validgrp")
+    repeated2=$(samba-tool group list | grep -x "$validgrp")
+    if [ "$repeated" = "$validgrp" ] || [ "$repeated2" = "$validgrp" ]; then
+      dialog --title "Informacao" --msgbox "Conflito detectado! O grupo $validgrp nao sera criado!" 8 40
+    else
+      samba-tool group create "$validgrp"
+      dialog --title "Informacao" --msgbox "Grupo $validgrp criado com sucesso!" 7 25
+    fi
+  fi
 }
 
 function add_user_group {
-validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty)
-validgrp=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ] || [ -z "$validgrp" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    repeated2=$(samba-tool group list | grep -x "$validgrp")
-    if [ "$repeated2" = "$validgrp" ]; then
-      samba-tool group addmembers "$validgrp" "$validusr"
-      dialog --title "Informacao" --msgbox "O usuario $validusr foi adicionado ao grupo $validgrp!" 8 40
-    else
-      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome de Usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if ! validgrp=$(dialog --title "$ttitle" --backtitle "Adicionar Usuario a um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
+
+  if [ -z "$validusr" ] || [ -z "$validgrp" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      repeated2=$(samba-tool group list | grep -x "$validgrp")
+      if [ "$repeated2" = "$validgrp" ]; then
+        samba-tool group addmembers "$validgrp" "$validusr"
+        dialog --title "Informacao" --msgbox "O usuario $validusr foi adicionado ao grupo $validgrp!" 8 40
+      else
+        dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function add_group_group {
-validgrp1=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
-validgrp2=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
-if [ -z "$validgrp1" ] || [ -z "$validgrp2" ]; then
-    dialog002
-else
-  repeated=$(samba-tool group list | grep -x "$validgrp1")
-  repeated2=$(samba-tool group list | grep -x "$validgrp2")
-  if [ "$repeated" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ]; then
-    samba-tool group addmembers "$validgrp2" "$validgrp1"
-    dialog --title "Informacao" --msgbox "O grupo $validgrp1 foi adicionado ao grupo $validgrp2!" 8 40
-  else
-    dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+  if ! validgrp1=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if ! validgrp2=$(dialog --title "$ttitle" --backtitle "Adicionar Grupo 1 a um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
+
+  if [ -z "$validgrp1" ] || [ -z "$validgrp2" ]; then
+      dialog002
+  else
+    repeated=$(samba-tool group list | grep -x "$validgrp1")
+    repeated2=$(samba-tool group list | grep -x "$validgrp2")
+    if [ "$repeated" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ]; then
+      samba-tool group addmembers "$validgrp2" "$validgrp1"
+      dialog --title "Informacao" --msgbox "O grupo $validgrp1 foi adicionado ao grupo $validgrp2!" 8 40
+    else
+      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+    fi
+  fi
 }
 
 function rm_group_group {
-validgrp1=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty)
-validgrp2=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty)
-if [ -z "$validgrp1" ] || [ -z "$validgrp2" ]; then
-  dialog002
-else
-  repeated=$(samba-tool group list | grep -x "$validgrp1")
-  repeated2=$(samba-tool group list | grep -x "$validgrp2")
-  if [ "$repeated" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ]; then
-    samba-tool group removemembers "$validgrp2" "$validgrp1"
-    dialog --title "Informacao" --msgbox "O grupo $validgrp1 foi removido do grupo $validgrp2!" 8 40
-  else
-    dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+  if ! validgrp1=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 1" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if ! validgrp2=$(dialog --title "$ttitle" --backtitle "Remover Grupo 1 de um Grupo 2" --inputbox "Insira o nome do Grupo 2" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
+
+  if [ -z "$validgrp1" ] || [ -z "$validgrp2" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool group list | grep -x "$validgrp1")
+    repeated2=$(samba-tool group list | grep -x "$validgrp2")
+    if [ "$repeated" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ]; then
+      samba-tool group removemembers "$validgrp2" "$validgrp1"
+      dialog --title "Informacao" --msgbox "O grupo $validgrp1 foi removido do grupo $validgrp2!" 8 40
+    else
+      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+    fi
+  fi
 }
 
 function show_user_group {
-validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-if [ -z "$validgrp" ]; then
-  dialog002
-else
-  repeated=$(samba-tool group list | grep -x "$validgrp")
-  if [ "$repeated" = "$validgrp" ]; then
-    dialog001
-    usrgrps=$(samba-tool group listmembers "$validgrp")
-    echo "$usrgrps" | less
-  else
-    dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+  if ! validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validgrp" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool group list | grep -x "$validgrp")
+    if [ "$repeated" = "$validgrp" ]; then
+      dialog001
+      usrgrps=$(samba-tool group listmembers "$validgrp")
+      echo "$usrgrps" | less
+    else
+      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+    fi
+  fi
 }
 
 # Copiar os grupos de um usuario
 function copy_group {
-validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario IN" 0 0 2>&1 > /dev/tty)
-validusr2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario OUT" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr1" ] || [ -z "$validusr2" ]; then
-  dialog002
-else
-  repeated1=$(samba-tool user list | grep -x "$validusr1")
-  repeated2=$(samba-tool user list | grep -x "$validusr2")
-  if [ "$repeated1" = "$validusr1" ] && [ "$repeated2" = "$validusr2" ]; then
-    grpsusr=$(samba-tool user getgroups "$validusr1")
-    IFS=$'\n' read -d '' -r -a groups <<< "$(echo "$grpsusr" | awk -v RS='\"' 'NR % 2 == 0 {print "\"" $0 "\""} NR % 2 == 1 {print $0}')"
-    for groupa in "${groups[@]}"; do
-      clear
-      echo ""
-      echo "Adicionando ao grupo $groupa o usuario $validusr2"
-      echo ""
-      samba-tool group addmembers "$groupa" "$validusr2"
-      sleep 1
-      clear
-    done
-  else
-    dialog --title "ERROR" --msgbox "Usuario(s) invalido(s)!" 7 25
+  if ! validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario IN" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if ! validusr2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario OUT" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
+
+  if [ -z "$validusr1" ] || [ -z "$validusr2" ]; then
+    dialog002
+  else
+    repeated1=$(samba-tool user list | grep -x "$validusr1")
+    repeated2=$(samba-tool user list | grep -x "$validusr2")
+    if [ "$repeated1" = "$validusr1" ] && [ "$repeated2" = "$validusr2" ]; then
+      grpsusr=$(samba-tool user getgroups "$validusr1")
+      IFS=$'\n' read -d '' -r -a groups <<< "$(echo "$grpsusr" | awk -v RS='\"' 'NR % 2 == 0 {print "\"" $0 "\""} NR % 2 == 1 {print $0}')"
+      for groupa in "${groups[@]}"; do
+        clear
+        echo ""
+        echo "Adicionando ao grupo $groupa o usuario $validusr2"
+        echo ""
+        samba-tool group addmembers "$groupa" "$validusr2"
+        sleep 1
+        clear
+      done
+    else
+      dialog --title "ERROR" --msgbox "Usuario(s) invalido(s)!" 7 25
+    fi
+  fi
 }
 
 # Copiar os membros de um grupo
 function copy_user {
-validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo IN" 0 0 2>&1 > /dev/tty)
-validgrp2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo OUT" 0 0 2>&1 > /dev/tty)
-if [ -z "$validgrp1" ] || [ -z "$validgrp2" ]; then
-  dialog002
-else
-  repeated1=$(samba-tool group list | grep -x "$validgrp1")
-  repeated2=$(samba-tool group list | grep -x "$validgrp2")
-  if [ "$repeated1" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ]; then
-    usrgrps=$(samba-tool group listmembers "$validgrp1")
-    IFS=$'\n' read -d '' -r -a userss <<< "$(echo "$usrgrps" | awk -v RS='\"' 'NR % 2 == 0 {print "\"" $0 "\""} NR % 2 == 1 {print $0}')"
-    for userss1 in "${userss[@]}"; do
-      clear
-      echo ""
-      echo "Adicionando o membro $userss1 ao grupo $validgrp2"
-      echo ""
-      samba-tool group addmembers "$validgrp2" "$userss1"
-      sleep 1
-      clear
-    done
-  else
-    dialog --title "ERROR" --msgbox "Grupo(s) invalido(s)!" 7 25
+  if ! validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo IN" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if ! validgrp2=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Grupo OUT" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
+
+  if [ -z "$validgrp1" ] || [ -z "$validgrp2" ]; then
+    dialog002
+  else
+    repeated1=$(samba-tool group list | grep -x "$validgrp1")
+    repeated2=$(samba-tool group list | grep -x "$validgrp2")
+    if [ "$repeated1" = "$validgrp1" ] && [ "$repeated2" = "$validgrp2" ]; then
+      usrgrps=$(samba-tool group listmembers "$validgrp1")
+      IFS=$'\n' read -d '' -r -a userss <<< "$(echo "$usrgrps" | awk -v RS='\"' 'NR % 2 == 0 {print "\"" $0 "\""} NR % 2 == 1 {print $0}')"
+      for userss1 in "${userss[@]}"; do
+        clear
+        echo ""
+        echo "Adicionando o membro $userss1 ao grupo $validgrp2"
+        echo ""
+        samba-tool group addmembers "$validgrp2" "$userss1"
+        sleep 1
+        clear
+      done
+    else
+      dialog --title "ERROR" --msgbox "Grupo(s) invalido(s)!" 7 25
+    fi
+  fi
 }
 
 function rm_user_group {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario" 0 0 2>&1 > /dev/tty)
-validgrp=$(dialog --title "$ttitle" --backtitle "Remover Usuario de um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ] || [ -z "$validgrp" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    repeated2=$(samba-tool group list | grep -x "$validgrp")
-    if [ "$repeated2" = "$validgrp" ]; then
-      samba-tool group removemembers "$validgrp" "$validusr"
-      dialog --title "Informacao" --msgbox "O usuario $validusr foi removido do grupo $validgrp!" 8 40
-    else
-      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if ! validgrp=$(dialog --title "$ttitle" --backtitle "Remover Usuario de um Grupo" --inputbox "Insira o nome do Grupo" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
+
+  if [ -z "$validusr" ] || [ -z "$validgrp" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      repeated2=$(samba-tool group list | grep -x "$validgrp")
+      if [ "$repeated2" = "$validgrp" ]; then
+        samba-tool group removemembers "$validgrp" "$validusr"
+        dialog --title "Informacao" --msgbox "O usuario $validusr foi removido do grupo $validgrp!" 8 40
+      else
+        dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function rm_group {
-validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty)
-if [ -z "$validgrp" ]; then
-  dialog002
-else
-  repeated=$(samba-tool group list | grep -x "$validgrp")
-  if [ "$repeated" = "$validgrp" ]; then
-    if dialog --title 'Confirmacao' --backtitle 'Exclusao de Grupo' --yesno "Deseja excluir o grupo $validgrp?" 0 0; then
-      samba-tool group delete "$validgrp"
-      dialog --title "Informacao" --msgbox "Grupo $validgrp excluido com sucesso!" 7 25
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+  if ! validgrp=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validgrp" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool group list | grep -x "$validgrp")
+    if [ "$repeated" = "$validgrp" ]; then
+      if dialog --title 'Confirmacao' --backtitle 'Exclusao de Grupo' --yesno "Deseja excluir o grupo $validgrp?" 0 0; then
+        samba-tool group delete "$validgrp"
+        dialog --title "Informacao" --msgbox "Grupo $validgrp excluido com sucesso!" 7 25
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Grupo invalido!" 7 25
+    fi
+  fi
 }
 
 function expiracy_usr_pass {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    if dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "A senha de $validusr nao deve mais expirar?" 0 0; then
-      samba-tool user setexpiry "$validusr" --noexpiry
-      dialog --title "Informacao" --msgbox "A senha de $validusr nao expira!" 8 40
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      if dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "A senha de $validusr nao deve mais expirar?" 0 0; then
+        samba-tool user setexpiry "$validusr" --noexpiry
+        dialog --title "Informacao" --msgbox "A senha de $validusr nao expira!" 8 40
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function expiracy_now {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    if dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "O usuario $validusr deve trocar a senha imediatamente?" 0 0; then
-      net sam set pwdmustchangenow "$validusr" yes
-      dialog --title "Informacao" --msgbox "O usuario deve trocar a senha imediatamente!" 8 40
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      if dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "O usuario $validusr deve trocar a senha imediatamente?" 0 0; then
+        net sam set pwdmustchangenow "$validusr" yes
+        dialog --title "Informacao" --msgbox "O usuario deve trocar a senha imediatamente!" 8 40
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function expiracy_days {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina quando a senha vai expirar, em dias" 0 0 2>&1 > /dev/tty)
-    if [ -z "$daystoexpire" ]; then
-      dialog002
-    else
-      samba-tool user setexpiry "$validusr" --days="$daystoexpire"
-      dialog --title "Confirmacao" --msgbox "O usuario $validusr devera trocar a senha em $daystoexpire dias!" 8 40
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      daystoexpire=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Defina quando a senha vai expirar, em dias" 0 0 2>&1 > /dev/tty)
+      if [ -z "$daystoexpire" ]; then
+        dialog002
+      else
+        samba-tool user setexpiry "$validusr" --days="$daystoexpire"
+        dialog --title "Confirmacao" --msgbox "O usuario $validusr devera trocar a senha em $daystoexpire dias!" 8 40
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function show_group_user {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    dialog001
-    grpsusr=$(samba-tool user getgroups "$validusr")
-    echo "$grpsusr" | less
-  else
-    dialog --title "ERRO" --msgbox "Usuario invalido!" 8 40
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      dialog001
+      grpsusr=$(samba-tool user getgroups "$validusr")
+      echo "$grpsusr" | less
+    else
+      dialog --title "ERRO" --msgbox "Usuario invalido!" 8 40
+    fi
+  fi
 }
 
 function search_user {
-if validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario. \n
-Exemplos: joao, ou Admin" 9 40 2>&1 > /dev/tty); then
-  return
-fi
+  if ! validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario. \n
+  Exemplos: joao, ou Admin" 9 40 2>&1 > /dev/tty); then
+    return
+  fi
 
-if [ -z "$validusr1" ]; then
-  dialog002
-else
-  usrdata=$(samba-tool user list | grep "$validusr1")
-  clear
-  dialog001
-  echo "$usrdata" | less
-fi
-
+  if [ -z "$validusr1" ]; then
+    dialog002
+  else
+    usrdata=$(samba-tool user list | grep "$validusr1")
+    clear
+    dialog001
+    echo "$usrdata" | less
+  fi
 }
 
 function search_group {
-if validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty); then
-  return
-fi
+  if ! validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do grupo" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
 
-if [ -z "$validgrp1" ]; then
-  dialog002
-else
-  grpdata=$(samba-tool group list | grep "$validgrp1")
-  clear
-  dialog001
-  echo "$grpdata" | less
-fi
+  if [ -z "$validgrp1" ]; then
+    dialog002
+  else
+    grpdata=$(samba-tool group list | grep "$validgrp1")
+    clear
+    dialog001
+    echo "$grpdata" | less
+  fi
 }
 
 function search_pc {
-if validpc1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do computador. \n
-Exemplo: PC001 sem o $" 9 40 2>&1 > /dev/tty); then
-  return
-fi
+  if ! validpc1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do computador. \n
+  Exemplo: PC001 sem o $" 9 40 2>&1 > /dev/tty); then
+    return
+  fi
 
-if [ -z "$validpc1" ]; then
-  dialog002
-else
-  pcdata=$(samba-tool computer list | grep "$validpc"\\$)
-  clear
-  dialog001
-  echo "$pcdata" | less
-fi
+  if [ -z "$validpc1" ]; then
+    dialog002
+  else
+    pcdata=$(samba-tool computer list | grep "$validpc"\\$)
+    clear
+    dialog001
+    echo "$pcdata" | less
+  fi
 }
 
 function check_user {
-validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario. \n
-Exemplo: joao_naves" 9 40 2>&1 > /dev/tty)
-if [ -z "$validusr1" ]; then
-  dialog002
-else
-  repeated2=$(samba-tool user list | grep "$validusr1")
-  if [ "$repeated2" = "$validusr1" ]; then
-    dialog --title "Informacao" --msgbox "O usuario $validusr1 esta cadastrado!" 8 40
-    clear
-    dialog001
-    usrdata=$(samba-tool user show "$validusr1")
-    echo "$usrdata" | less
-  else
-    dialog --title "Informacao" --msgbox "O usuario $validusr1 nao foi encontrado neste servidor." 8 40
+  if ! validusr1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario. \n
+  Exemplo: joao_naves" 9 40 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr1" ]; then
+    dialog002
+  else
+    repeated2=$(samba-tool user list | grep "$validusr1")
+    if [ "$repeated2" = "$validusr1" ]; then
+      dialog --title "Informacao" --msgbox "O usuario $validusr1 esta cadastrado!" 8 40
+      clear
+      dialog001
+      usrdata=$(samba-tool user show "$validusr1")
+      echo "$usrdata" | less
+    else
+      dialog --title "Informacao" --msgbox "O usuario $validusr1 nao foi encontrado neste servidor." 8 40
+    fi
+  fi
 }
 
 function check_group {
-if validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de grupo" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validgrp1" ]; then
-  dialog002
-else
-  repeated3=$(samba-tool group list | grep "$validgrp1")
-  if [ "$repeated3" = "$validgrp1" ]; then
-    dialog --title "Informacao" --msgbox "O grupo $validgrp1 esta cadastrado!" 8 40
-    clear
-    dialog001
-    grpdata=$(samba-tool group show "$validgrp1")
-    echo "$grpdata" | less
-  else
-    dialog --title "Informacao" --msgbox "O grupo $validgrp1 nao foi encontrado neste servidor." 8 40
+  if ! validgrp1=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de grupo" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validgrp1" ]; then
+    dialog002
+  else
+    repeated3=$(samba-tool group list | grep "$validgrp1")
+    if [ "$repeated3" = "$validgrp1" ]; then
+      dialog --title "Informacao" --msgbox "O grupo $validgrp1 esta cadastrado!" 8 40
+      clear
+      dialog001
+      grpdata=$(samba-tool group show "$validgrp1")
+      echo "$grpdata" | less
+    else
+      dialog --title "Informacao" --msgbox "O grupo $validgrp1 nao foi encontrado neste servidor." 8 40
+    fi
+  fi
 }
 
 function domain_details {
@@ -1293,153 +1385,171 @@ function smb_process {
 }
 
 function promote_user {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    clear
-    samba-tool group addmembers "Domain Admins" "$validusr"
-    sleep 1
-    samba-tool group addmembers "Schema Admins" "$validusr"
-    sleep 1
-    samba-tool group addmembers "Enterprise Admins" "$validusr"
-    sleep 1
-    samba-tool group addmembers "Group Policy Creator Owners" "$validusr"
-    sleep 1
-    samba-tool group addmembers "Administrators" "$validusr"
-    sleep 1
-    dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      clear
+      samba-tool group addmembers "Domain Admins" "$validusr"
+      sleep 1
+      samba-tool group addmembers "Schema Admins" "$validusr"
+      sleep 1
+      samba-tool group addmembers "Enterprise Admins" "$validusr"
+      sleep 1
+      samba-tool group addmembers "Group Policy Creator Owners" "$validusr"
+      sleep 1
+      samba-tool group addmembers "Administrators" "$validusr"
+      sleep 1
+      dialog --title "Informacao" --msgbox "Usuario $validusr se tornou administrador!" 8 40
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function demote_user {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    clear
-    samba-tool group removemembers "Domain Admins" "$validusr"
-    sleep 1
-    samba-tool group removemembers "Schema Admins" "$validusr"
-    sleep 1
-    samba-tool group removemembers "Enterprise Admins" "$validusr"
-    sleep 1
-    samba-tool group removemembers "Group Policy Creator Owners" "$validusr"
-    sleep 1
-    samba-tool group removemembers "Administrators" "$validusr"
-    sleep 1
-    dialog --title "Informacao" --msgbox "Usuario $validusr deixou de ser administrador!" 8 40
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      clear
+      samba-tool group removemembers "Domain Admins" "$validusr"
+      sleep 1
+      samba-tool group removemembers "Schema Admins" "$validusr"
+      sleep 1
+      samba-tool group removemembers "Enterprise Admins" "$validusr"
+      sleep 1
+      samba-tool group removemembers "Group Policy Creator Owners" "$validusr"
+      sleep 1
+      samba-tool group removemembers "Administrators" "$validusr"
+      sleep 1
+      dialog --title "Informacao" --msgbox "Usuario $validusr deixou de ser administrador!" 8 40
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function test_pass {
-validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty)
-if [ -z "$validusr" ]; then
-  dialog002
-else
-  repeated=$(samba-tool user list | grep -x "$validusr")
-  if [ "$repeated" = "$validusr" ]; then
-    clear
-    kinit "$validusr"
-    echo ""
-    read -r -p "Pressione Enter para continuar!"
-  else
-    dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+  if ! validusr=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome de usuario" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validusr" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool user list | grep -x "$validusr")
+    if [ "$repeated" = "$validusr" ]; then
+      clear
+      kinit "$validusr"
+      echo ""
+      read -r -p "Pressione Enter para continuar!"
+    else
+      dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
+    fi
+  fi
 }
 
 function mv_pc_ou {
-validpc=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome do Computador" 0 0 2>&1 > /dev/tty)
-validou=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty)
-if [ -z "$validpc" ] || [ -z "$validou" ]; then
-  dialog002
-else
-  repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
-  if [ "$repeated" = "$validpc"\$ ]; then
-  repeated2=$(samba-tool ou list | grep -x OU="$validou")
-    if [ "$repeated2" = "OU=$validou" ]; then
-      samba-tool computer move "$validpc" OU="$validou"
-      dialog --title "Informacao" --msgbox "O Computador $validpc\$ foi movido para a OU=$validou!" 8 40
-    else
-      dialog --title "ERROR" --msgbox "OU invalida!" 7 25
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Computador invalido!" 7 25
+  if ! validpc=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome do Computador" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if ! validou=$(dialog --title "$ttitle" --backtitle "Mover Computador para OU" --inputbox "Insira o nome da OU" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
+
+  if [ -z "$validpc" ] || [ -z "$validou" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
+    if [ "$repeated" = "$validpc"\$ ]; then
+    repeated2=$(samba-tool ou list | grep -x OU="$validou")
+      if [ "$repeated2" = "OU=$validou" ]; then
+        samba-tool computer move "$validpc" OU="$validou"
+        dialog --title "Informacao" --msgbox "O Computador $validpc\$ foi movido para a OU=$validou!" 8 40
+      else
+        dialog --title "ERROR" --msgbox "OU invalida!" 7 25
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Computador invalido!" 7 25
+    fi
+  fi
 }
 
 function show_pcs {
-dialog001
-cmplist=$(samba-tool computer list)
-echo "$cmplist" | less
+  dialog001
+  cmplist=$(samba-tool computer list)
+  echo "$cmplist" | less
 }
 
 function create_pc {
-if validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validpc" ]; then
-  dialog002
-else
-  repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
-  if [ "$repeated" = "$validpc"\$ ]; then
-    dialog --title "ERROR" --msgbox "Computador ja existe!" 7 25
-  else
-    samba-tool computer create "$validpc"
-    dialog --title "Informacao" --msgbox "Computador $validpc\$ criado com sucesso!" 7 25
+  if ! validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validpc" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
+    if [ "$repeated" = "$validpc"\$ ]; then
+      dialog --title "ERROR" --msgbox "Computador ja existe!" 7 25
+    else
+      samba-tool computer create "$validpc"
+      dialog --title "Informacao" --msgbox "Computador $validpc\$ criado com sucesso!" 7 25
+    fi
+  fi
 }
 
 function rm_pc {
-if validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty); then
-  return
-fi
-
-if [ -z "$validpc" ]; then
-  dialog002
-else
-  repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
-  if [ "$repeated" = "$validpc"\$ ]; then
-    if dialog --title 'Confirmacao' --backtitle 'Exclusao de Computador' --yesno 'Deseja excluir este computador?' 0 0; then
-      samba-tool computer delete "$validpc"\$
-      dialog --title "Informacao" --msgbox "Computador $validpc\$ excluido com sucesso!" 7 25
-    fi
-  else
-    dialog --title "ERROR" --msgbox "Computador invalido!" 7 25
+  if ! validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validpc" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
+    if [ "$repeated" = "$validpc"\$ ]; then
+      if dialog --title 'Confirmacao' --backtitle 'Exclusao de Computador' --yesno 'Deseja excluir este computador?' 0 0; then
+        samba-tool computer delete "$validpc"\$
+        dialog --title "Informacao" --msgbox "Computador $validpc\$ excluido com sucesso!" 7 25
+      fi
+    else
+      dialog --title "ERROR" --msgbox "Computador invalido!" 7 25
+    fi
+  fi
 }
 
 function check_pc {
-validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty)
-if [ -z "$validpc" ]; then
-  dialog002
-else
-  repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
-  if [ "$repeated" = "$validpc"\$ ]; then
-    dialog --title "Informacao" --msgbox "O computador $validpc\$ esta cadastrado!" 8 40
-    clear
-    dialog001
-    pccdata=$(samba-tool computer show "$validpc"\$)
-    echo "$pccdata" | less
-  else
-    dialog --title "ERROR" --msgbox "Computador invalido!" 7 25
+  if ! validpc=$(dialog --title "$ttitle" --backtitle "$bktitle" --inputbox "Insira o nome do Computador (sem o $)" 0 0 2>&1 > /dev/tty); then
+    return
   fi
-fi
+
+  if [ -z "$validpc" ]; then
+    dialog002
+  else
+    repeated=$(samba-tool computer list | grep -x "$validpc"\\$)
+    if [ "$repeated" = "$validpc"\$ ]; then
+      dialog --title "Informacao" --msgbox "O computador $validpc\$ esta cadastrado!" 8 40
+      clear
+      dialog001
+      pccdata=$(samba-tool computer show "$validpc"\$)
+      echo "$pccdata" | less
+    else
+      dialog --title "ERROR" --msgbox "Computador invalido!" 7 25
+    fi
+  fi
 }
 
 function show_shared {
@@ -1455,7 +1565,7 @@ function show_shared {
       echo "Nenhuma configuracao encontrada em $setfolder"
       sleep 1
     } || {
-      if file=$(dialog --stdout --title "Escolha um compartilhamento para visualizar" --cancel-label "Voltar" --menu "Somente leitura. \nPara remover,
+      if ! file=$(dialog --stdout --title "Escolha um compartilhamento para visualizar" --cancel-label "Voltar" --menu "Somente leitura. \nPara remover,
 utilize o menu Excluir Compartilhamento!" 0 0 0 "${files[@]}"); then
         return
       fi
@@ -1501,9 +1611,9 @@ esac
   var4=$(echo "$VALUE0" | sed -n 4p)
   var5=$(echo "$VALUE0" | sed -n 5p)
 
-if [ -f /etc/samba/external/smb.conf.d/"$var1".conf ]; then
+  if [ -f /etc/samba/external/smb.conf.d/"$var1".conf ]; then
     dialog --title "ERRO" --msgbox "ERRO: Um compartilhamento com este nome ja existe na rede! Ignorando." 7 40
-else
+  else
     if [[ $var1 = *" "* ]] || [[ $var2 = *" "* ]] || [[ $var1 = "" ]]; then
       dialog --title "ERRO" --msgbox "ERRO: Nao crie compartilhamentos com espacos nos nomes ou nomes vazios! Ignorando." 7 40
     else
@@ -1527,7 +1637,7 @@ EOF
 
       revalid_shared
     fi
-fi
+  fi
 }
 
 # SYNC #
@@ -1558,9 +1668,9 @@ esac
   var3=$(echo "$VALUE0" | sed -n 3p)
   var4=$(echo "$VALUE0" | sed -n 4p)
 
-if [ -f /etc/samba/external/smb.conf.d/"$var1".conf ]; then
+  if [ -f /etc/samba/external/smb.conf.d/"$var1".conf ]; then
     dialog --title "ERRO" --msgbox "ERRO: Um compartilhamento com este nome ja existe na rede! Ignorando." 7 40
-else
+  else
     if [[ $var1 = *" "* ]] || [[ $var2 = *" "* ]] || [[ $var1 = "" ]]; then
       dialog --title "ERRO" --msgbox "ERRO: Nao crie compartilhamentos com espacos nos nomes ou nomes vazios! Ignorando." 7 40
     else
@@ -1583,7 +1693,7 @@ EOF
 
       revalid_shared
     fi
-fi
+  fi
 }
 
 function remove_shared {
