@@ -9,7 +9,7 @@ X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/01-Restore_BKP | bash ; urgencies0 ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/02-Restore_Cloud | bash ; urgencies0 ;;
-3) clear ; echo "EM BREVE!" ; urgencies0 ;;
+3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/03-ReDo-SRV | bash ; urgencies0 ;;
 X) echo "." >/dev/null ;;
 esac
 }
