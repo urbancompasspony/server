@@ -1,243 +1,223 @@
 #!/bin/bash
 
 function tools {
-var0=$(dialog --title "" --backtitle "" --menu " " 0 0 0 \
-A 'Remove not used images' \
-B 'Retore a Backup' \
-C 'Set MACVLAN' \
-D 'Remove MACVLAN' \
-E 'PiHole Maintenance' \
-F 'PiHole Install Error' \
-G 'Reset Syncthing Password' \
-H 'NC: filelocks' \
-I 'NC: add-missing-indices' \
-J 'NC: check-core & mimetype' \
-K 'NC: Disable LDAP' \
-L 'NC: Upgrade Manually CLI' \
-M 'NC: Scan App Data' \
-N 'NC: Scan User Data' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-A) clear ; docker image prune -af ; sleep 2 ;;
-B) clear ; restorebkp ;;
-C) clear ; macvland ;;
-D) clear ; rmmacvland ;;
-E) clear ; piholemnt ;;
-F) clear ; piholeinst ;;
-G) clear ; syncpass0 ;;
-H) clear ; filelocks ;;
-I) clear ; missingindices ;;
-J) clear ; checkcore ;;
-K) clear ; disableldap ;;
-L) clear ; upgradenc ;;
-M) clear ; scanapp0 ;;
-N) clear ; scanuser0 ;;
-X) echo "." > /dev/null ;;
-esac
+  if ! var0=$(dialog --title "" --backtitle "" --menu " " 0 0 0 \
+  A 'Remove not used images' \
+  B 'Retore a Backup' \
+  C 'Set MACVLAN' \
+  D 'Remove MACVLAN' \
+  E 'PiHole Maintenance' \
+  F 'PiHole Install Error' \
+  G 'Reset Syncthing Password' \
+  H 'NC: filelocks' \
+  I 'NC: add-missing-indices' \
+  J 'NC: check-core & mimetype' \
+  K 'NC: Disable LDAP' \
+  L 'NC: Upgrade Manually CLI' \
+  M 'NC: Scan App Data' \
+  N 'NC: Scan User Data' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+  
+  case "$var0" in
+  A) clear ; docker image prune -af ; sleep 2 ;;
+  B) clear ; restorebkp ;;
+  C) clear ; macvland ;;
+  D) clear ; rmmacvland ;;
+  E) clear ; piholemnt ;;
+  F) clear ; piholeinst ;;
+  G) clear ; syncpass0 ;;
+  H) clear ; filelocks ;;
+  I) clear ; missingindices ;;
+  J) clear ; checkcore ;;
+  K) clear ; disableldap ;;
+  L) clear ; upgradenc ;;
+  M) clear ; scanapp0 ;;
+  N) clear ; scanuser0 ;;
+  X) return ;;
+  esac
 }
 
 function scanapp0 {
-VALUE1="nextcloud"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
-"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  VALUE1="nextcloud"
 
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    clear
-    echo "Checking core integrity..."
-    docker exec -u 33 "$var1" ./occ files:scan-app-data
-    sleep 5
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  clear; echo "Checking core integrity..."
+  docker exec -u 33 "$var1" ./occ files:scan-app-data
+  sleep 3
 }
 
 function scanuser0 {
-VALUE1="nextcloud"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
-"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  VALUE1="nextcloud"
 
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    clear
-    echo "Checking core integrity..."
-    docker exec -u 33 "$var1" ./occ files:scan --all
-    sleep 5
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  clear; echo "Checking core integrity..."
+  docker exec -u 33 "$var1" ./occ files:scan --all
+  sleep 3
 }
 
 function syncpass0 {
-VALUE1="syncthing"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Syncthing" 8 35 0 \
-"NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  VALUE1="syncthing"
 
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Syncthing" 8 35 0 \
+  "NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    clear
-    docker exec -it "$var1" syncthing generate --gui-password=admin --gui-user=admin
-    echo ""; echo "Usuario e senha da WebGUI foram modificados para admin/admin!"
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  clear
+  docker exec -it "$var1" syncthing generate --gui-password=admin --gui-user=admin
+  echo ""; echo "Usuario e senha da WebGUI foram modificados para admin/admin!"
 }
 
 function upgradenc {
-VALUE1="nextcloud"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
-"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  VALUE1="nextcloud"
 
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-    var1=$(echo "$VALUE0" | sed -n 1p)
+  var1=$(echo "$VALUE0" | sed -n 1p)
 
-    clear
-    echo "Upgrading..."
-    docker exec -u 33 "$var1" ./occ upgrade
-    sleep 5
+  clear
+  echo "Upgrading..."
+  docker exec -u 33 "$var1" ./occ upgrade
+  sleep 3
 }
 
 function disableldap {
-VALUE1="nextcloud"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Disable LDAP" 9 35 0 \
-"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  VALUE1="nextcloud"
 
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Disable LDAP" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-    var1=$(echo "$VALUE0" | sed -n 1p)
+  var1=$(echo "$VALUE0" | sed -n 1p)
 
-    clear
-    echo "Disabling LDAP Backend!"
-    docker exec -u 33 "$var1" ./occ ldap:set-config "s01" "ldapConfigurationActive" "0"
-    sleep 2
-    docker restart "$var1"
-    sleep 5
+  clear
+  echo "Disabling LDAP Backend!"
+  docker exec -u 33 "$var1" ./occ ldap:set-config "s01" "ldapConfigurationActive" "0"
+  sleep 2
+  docker restart "$var1"
+  sleep 3
 }
 
 function checkcore {
 VALUE1="nextcloud"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
-"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    clear
-    echo "Checking core integrity..."
-    docker exec -u 33 "$var1" ./occ integrity:check-core
-    docker exec -u 33 "$var1" ./occ maintenance:mimetype:update-js
-    docker exec -u 33 "$var1" ./occ integrity:check-core
-    docker exec -u 33 "$var1" ./occ maintenance:mimetype:update-js
-    sleep 5
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  clear; echo "Checking core integrity..."
+  docker exec -u 33 "$var1" ./occ integrity:check-core
+  docker exec -u 33 "$var1" ./occ maintenance:mimetype:update-js
+  docker exec -u 33 "$var1" ./occ integrity:check-core
+  docker exec -u 33 "$var1" ./occ maintenance:mimetype:update-js
+  sleep 3
 }
 
 function missingindices {
-VALUE1="nextcloud"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
-"NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  VALUE1="nextcloud"
 
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-    var1=$(echo "$VALUE0" | sed -n 1p)
+  var1=$(echo "$VALUE0" | sed -n 1p)
 
-    clear
-    echo "Adding missing indices..."
-    docker exec -u 33 "$var1" ./occ db:add-missing-indices
-    echo "ok"; sleep 3
+  clear
+  echo "Adding missing indices..."
+  docker exec -u 33 "$var1" ./occ db:add-missing-indices
+  echo "ok"; sleep 3
 
-    clear
-    echo "Fixing mimetypes..."
-    docker exec -u 33 "$var1" ./occ maintenance:repair --include-expensive
-    echo "ok"; sleep 3
+  clear
+  echo "Fixing mimetypes..."
+  docker exec -u 33 "$var1" ./occ maintenance:repair --include-expensive
+  echo "ok"; sleep 3
 
-    sleep 5
+  sleep 3
 }
 
 function piholemnt {
-VALUE1="pihole"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
-"NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  VALUE1="pihole"
 
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
+  "NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    clear
-    docker exec "$var1" bash -c "pihole -g -r recover"
-    docker exec "$var1" bash -c "rm /etc/pihole/pihole-FTL.db"
-    docker restart "$var1"
+  clear
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  docker exec "$var1" bash -c "pihole -g -r recover"
+  docker exec "$var1" bash -c "rm /etc/pihole/pihole-FTL.db"
+  docker restart "$var1"
 }
 
 function piholeinst {
-VALUE1="pihole"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
-"NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  VALUE1="pihole"
 
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
+  "NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    clear
-    docker exec "$var1" bash -c "rm /etc/pihole/gravity.db"
-    docker exec "$var1" bash -c "pihole -g"
-    docker restart "$var1"
+  clear
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  docker exec "$var1" bash -c "rm /etc/pihole/gravity.db"
+  docker exec "$var1" bash -c "pihole -g"
+  docker restart "$var1"
 }
 
 function filelocks {
-VALUE1="nextcloud-mysql"
-VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "MySQL - NextCloud" 9 35 0 \
-"mSQLcont:" 1 1 "$VALUE1" 1 11 30 0 \
-"Password:" 2 1 "$VALUE2" 2 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  VALUE1="nextcloud-mysql"
 
-    case $? in
-      0) echo "." > /dev/null ;;
-      1) exit ;;
-    esac
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "MySQL - NextCloud" 9 35 0 \
+  "mSQLcont:" 1 1 "$VALUE1" 1 11 30 0 \
+  "Password:" 2 1 "$VALUE2" 2 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    var2=$(echo "$VALUE0" | sed -n 2p)
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
 
-    clear
-    echo "File Locks atualmente no Banco de Dados:"
-    docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
-    sleep 5
-    docker exec "$var1" mysql --user=root --password="$var2" -D nextcloud -e 'delete from oc_file_locks where 1'
-    sleep 1
-    clear
-    echo "Conferencia de limpeza de File Locks:"
-    docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
-    echo "Se nada aparecer aqui, foi limpo com sucesso!"
-    sleep 3
+  clear
+  echo "File Locks atualmente no Banco de Dados:"
+  docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
+  sleep 5
+  docker exec "$var1" mysql --user=root --password="$var2" -D nextcloud -e 'delete from oc_file_locks where 1'
+  sleep 1
+  clear
+  echo "Conferencia de limpeza de File Locks:"
+  docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
+  echo "Se nada aparecer aqui, foi limpo com sucesso!"
+  sleep 3
 }
 
 
@@ -283,14 +263,14 @@ echo "$VALUE0"
 }
 
 function rmmacvland {
-rmmacvland0=$(dialog --title "" --backtitle "" --inputbox "Deseja remover qual macvlan?" 8 35 "macvlan" 2>&1 > /dev/tty)
-if [ -z "$rmmacvland0" ]; then
-  dialog --title "ERRO" --msgbox "O(s) campo(s) exigidos nao pode(m) ficar em branco. \nPreencha-o(s) adequadamente!" 7 40
-else
-  clear
-  docker network rm "$rmmacvland0"
-fi
+  rmmacvland0=$(dialog --title "" --backtitle "" --inputbox "Deseja remover qual macvlan?" 8 35 "macvlan" 2>&1 > /dev/tty)
 
+  if [ -z "$rmmacvland0" ]; then
+    dialog --title "ERRO" --msgbox "O(s) campo(s) exigidos nao pode(m) ficar em branco. \nPreencha-o(s) adequadamente!" 7 40
+  else
+    clear
+    docker network rm "$rmmacvland0"
+  fi
 }
 
 function dialognet {
@@ -298,14 +278,6 @@ function dialognet {
   dialog --title "Informação" --msgbox "$(ip a)" 25 70
 }
 
-function restorebkp {
-echo "em breve!"
-sleep 2
-# /srv/containers/scripts/pathrestore
-#sudo tar -xvf dominio-30_01_24.tar -C /srv/containers/
-}
-
-# Start here!
 tools
 
 exit 1
