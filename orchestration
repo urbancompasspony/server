@@ -12,227 +12,251 @@ bkTTITLE="Sistema Automatizado de Orquestração de Containers"
 github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
 function start {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Modelo & Ferramentas' \
-2 'Somente Contrato' \
-3 'Serviços Gerais' \
-4 'Bancos de Dados' \
-5 'Experimental' \
-6 'Support ARM64' \
-7 'Pessoal' \
-X 'Sair' 2>&1 > /dev/tty )
-case "$var0" in
-1) modelstools ; start ;;
-2) contratos0 ; start ;;
-3) general ; start ;;
-4) database ; start ;;
-5) experimental ; start ;;
-6) arm640 ; start ;;
-7) personal ; start ;;
-X) exit ;;
-esac
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'Modelo & Ferramentas' \
+  2 'Somente Contrato' \
+  3 'Serviços Gerais' \
+  4 'Bancos de Dados' \
+  5 'Experimental' \
+  6 'Support ARM64' \
+  7 'Pessoal' \
+  X 'Sair' 2>&1 > /dev/tty ); then
+    exit
+  fi
+
+  case "$var0" in
+  1) modelstools ; start ;;
+  2) contratos0 ; start ;;
+  3) general ; start ;;
+  4) database ; start ;;
+  5) experimental ; start ;;
+  6) arm640 ; start ;;
+  7) personal ; start ;;
+  X) exit ;;
+  esac
 }
 
 function contratos0 {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'File Browser (L/W)' \
-2 'Homarr (L/W)' \
-3 'PenTest & PentApache (L/W)' \
-4 'SSH Tunnel (A) (W)' \
-5 'WeTTY      (B) (W)' \
-6 'Gestor UniFi (W)' \
-7 'GLPI (W)' \
-8 'Reverse Proxy (W)' \
-9 'Servidor RustDesk (W)' \
-10 'RustDesk Web Client (W)' \
-11 'Servidor OpenFire (Spark) (W)' \
-12 'OnlyOffice (W)' \
-13 'Tailscale CLIENT (L/W)' \
-14 'OpenVPN Server (L/W)' \
-15 'Q Dir stat (L/W)' \
-16 'Smoke Ping (L/W)' \
-17 'Sist2 Indexer (W)' \
-18 'Network UPS Tools Gui (L)' \
-19 'SMS PowerViewer (L/W)' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
-2) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
-3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-4) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
-5) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
-6) wget "$github"03-unifi-net -O /tmp/unifi; sudo bash /tmp/unifi ;;
-7) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-8) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-9) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-10) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
-11) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-12) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-13) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-14) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-15) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
-16) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
-17) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
-18) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
-19) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
-X) echo "." > /dev/null ;;
-esac
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'File Browser (L/W)' \
+  2 'Homarr (L/W)' \
+  3 'PenTest & PentApache (L/W)' \
+  4 'SSH Tunnel (A) (W)' \
+  5 'WeTTY      (B) (W)' \
+  6 'Gestor UniFi (W)' \
+  7 'GLPI (W)' \
+  8 'Reverse Proxy (W)' \
+  9 'Servidor RustDesk (W)' \
+  10 'RustDesk Web Client (W)' \
+  11 'Servidor OpenFire (Spark) (W)' \
+  12 'OnlyOffice (W)' \
+  13 'Tailscale CLIENT (L/W)' \
+  14 'OpenVPN Server (L/W)' \
+  15 'Q Dir stat (L/W)' \
+  16 'Smoke Ping (L/W)' \
+  17 'Sist2 Indexer (W)' \
+  18 'Network UPS Tools Gui (L)' \
+  19 'SMS PowerViewer (L/W)' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
+  2) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
+  3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+  4) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
+  5) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
+  6) wget "$github"03-unifi-net -O /tmp/unifi; sudo bash /tmp/unifi ;;
+  7) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+  8) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+  9) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
+  10) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
+  11) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+  12) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+  13) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+  14) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+  15) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
+  16) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
+  17) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
+  18) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
+  19) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
+  X) return ;;
+  esac
 }
 
 function modelstools {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'DashDot (L/W)' \
-2 'SAMBA/AD & CUPS (W)' \
-3 'Kuma (L/W)' \
-4 'MySpeed  Test WAN (L/W)' \
-5 'OpenSpeedTest LAN (L/W)' \
-6 'PiHole (L/W)' \
-7 'XPRA (L/W)' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
-2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-3) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-4) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
-5) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-6) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-7) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
-X) echo "." > /dev/null ;;
-esac
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'DashDot (L/W)' \
+  2 'SAMBA/AD & CUPS (W)' \
+  3 'Kuma (L/W)' \
+  4 'MySpeed  Test WAN (L/W)' \
+  5 'OpenSpeedTest LAN (L/W)' \
+  6 'PiHole (L/W)' \
+  7 'XPRA (L/W)' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
+  2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
+  3) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
+  4) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
+  5) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+  6) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
+  7) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+  X) return ;;
+  esac
 }
 
 function general {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Ferdium (RAMBOX) (W)' \
-2 'Netboot PXE (W)' \
-3 'NextCloud (W)' \
-4 'ntfy (W)' \
-5 'Remotely (W)' \
-6 'Servidor Apache (W)' \
-7 'Servidor CUPS (W)' \
-8 'Servidor FTP (W)' \
-9 'Syncthing CLIENT (L/W)' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
-2) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
-3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-4) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-5) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
-6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-7) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-8) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-9) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-X) echo "." > /dev/null ;;
-esac
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'Ferdium (RAMBOX) (W)' \
+  2 'Netboot PXE (W)' \
+  3 'NextCloud (W)' \
+  4 'ntfy (W)' \
+  5 'Remotely (W)' \
+  6 'Servidor Apache (W)' \
+  7 'Servidor CUPS (W)' \
+  8 'Servidor FTP (W)' \
+  9 'Syncthing CLIENT (L/W)' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
+  2) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
+  3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+  4) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
+  5) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
+  6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
+  7) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
+  8) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+  9) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+  X) return ;;
+  esac
 }
 
 function experimental {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Android (VM) (L)' \
-2 'macOS (VM) (L)' \
-3 'SnipeIT (W)' \
-4 'PwnDrop (W)' \
-5 'Chromium to Web (L/W)' \
-6 'Nexterm (W)' \
-7 'Diskover (W)' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
-2) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
-3) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
-4) wget "$github"47-pwndrop -O /tmp/pwndrop; sudo bash /tmp/pwndrop ;;
-5) wget "$github"65-chromium -O /tmp/chromium; sudo bash /tmp/chromium ;;
-6) wget "$github"71-nexterm -O /tmp/nexterm; sudo bash /tmp/nexterm ;;
-7) wget "$github"73-diskover -O /tmp/diskover; sudo bash /tmp/diskover ;;
-X) echo "." > /dev/null ;;
-esac
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'Android (VM) (L)' \
+  2 'macOS (VM) (L)' \
+  3 'SnipeIT (W)' \
+  4 'PwnDrop (W)' \
+  5 'Chromium to Web (L/W)' \
+  6 'Nexterm (W)' \
+  7 'Diskover (W)' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
+  2) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
+  3) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
+  4) wget "$github"47-pwndrop -O /tmp/pwndrop; sudo bash /tmp/pwndrop ;;
+  5) wget "$github"65-chromium -O /tmp/chromium; sudo bash /tmp/chromium ;;
+  6) wget "$github"71-nexterm -O /tmp/nexterm; sudo bash /tmp/nexterm ;;
+  7) wget "$github"73-diskover -O /tmp/diskover; sudo bash /tmp/diskover ;;
+  X) echo "." > /dev/null ;;
+  esac
 }
 
 function database {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'MySQL (W)' \
-2 'MariaDB (W)' \
-3 'OracleXE 21C (W)' \
-4 'Firebird (W)' \
-5 'PHPMyAdmin (L)' \
-6 'ElasticSearch 7.17.22 (W)' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
-2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
-3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
-4) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
-5) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
-6) wget "$github"78-elasticsearch -O /tmp/elasticsearch; sudo bash /tmp/elasticsearch ;;
-X) echo "." > /dev/null ;;
-esac
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'MySQL (W)' \
+  2 'MariaDB (W)' \
+  3 'OracleXE 21C (W)' \
+  4 'Firebird (W)' \
+  5 'PHPMyAdmin (L)' \
+  6 'ElasticSearch 7.17.22 (W)' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
+  2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
+  3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
+  4) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
+  5) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
+  6) wget "$github"78-elasticsearch -O /tmp/elasticsearch; sudo bash /tmp/elasticsearch ;;
+  X) return ;;
+  esac
 }
 
 function personal {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'Luanti Server (W)' \
-2 'SSH DW (Backdoor) (L)' \
-3 'Ubuntu 22.04 WebUI (W)' \
-4 'Jellyfin (L/W)' \
-5 'qBitTorrent (W)' \
-6 'Ollama IA  (A) (L)' \
-7 'Ollama Web (B) (L)' \
-8 'WireShark (W)' \
-9 'Endlessh (W)' \
-10 'Ejabberd-chat-server (W/L)' \
-11 'Dominio & CUPS BETA (W)' \
-12 'Rancher - k3s k8s (W)' \
-13 'Chromium Browser (W/L)' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) wget "$github"12-luanti-server -O /tmp/luanti; sudo bash /tmp/luanti ;;
-2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-3) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
-4) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
-5) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
-6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-8) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
-9) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
-10) wget "$github"55-ejabberd-chatserver -O /tmp/55-ejabberd-chatserver; sudo bash /tmp/55-ejabberd-chatserver ;;
-11) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
-12) wget "$github"72-rancher-k8s -O /tmp/rancher; sudo bash /tmp/rancher ;;
-13) wget "$github"17-Chromium -O /tmp/Chromium; sudo bash /tmp/Chromium ;;
-X) echo "." > /dev/null ;;
-esac
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'Luanti Server (W)' \
+  2 'SSH DW (Backdoor) (L)' \
+  3 'Ubuntu 22.04 WebUI (W)' \
+  4 'Jellyfin (L/W)' \
+  5 'qBitTorrent (W)' \
+  6 'Ollama IA  (A) (L)' \
+  7 'Ollama Web (B) (L)' \
+  8 'WireShark (W)' \
+  9 'Endlessh (W)' \
+  10 'Ejabberd-chat-server (W/L)' \
+  11 'Dominio & CUPS BETA (W)' \
+  12 'Rancher - k3s k8s (W)' \
+  13 'Chromium Browser (W/L)' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) wget "$github"12-luanti-server -O /tmp/luanti; sudo bash /tmp/luanti ;;
+  2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
+  3) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
+  4) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
+  5) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
+  6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
+  7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
+  8) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
+  9) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
+  10) wget "$github"55-ejabberd-chatserver -O /tmp/55-ejabberd-chatserver; sudo bash /tmp/55-ejabberd-chatserver ;;
+  11) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
+  12) wget "$github"72-rancher-k8s -O /tmp/rancher; sudo bash /tmp/rancher ;;
+  13) wget "$github"17-Chromium -O /tmp/Chromium; sudo bash /tmp/Chromium ;;
+  X) return ;;
+  esac
 }
 
 function arm640 {
-var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu " " 0 0 0 \
-1 'DashDot (L/W)' \
-2 'Kuma (L/W)' \
-3 'MySpeed  Test WAN (L/W)' \
-4 'OpenSpeedTest LAN (L/W)' \
-5 'PiHole (L/W)' \
-6 '(C) Tailscale CLIENT (L/W)' \
-7 '(C) Headscale SERVER (L/W)' \
-8 '(C) OpenVPN (L/W)' \
-9 '(C) PenTest & PentApache (L/W)' \
-10 'Dominio & CUPS (W)' \
-11 'SSH DW (Backdoor) (L)' \
-12 'SMS PowerViewer (L/W)' \
-X '<' 2>&1 > /dev/tty )
-case "$var0" in
-1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
-2) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-3) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
-4) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-5) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-6) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-7) wget "$github"57-headscale-server -O /tmp/headscale-server; sudo bash /tmp/headscale-server ;;
-8) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-9) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-10) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-11) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-12) wget "$github"11-SMS-PV -O /tmp/sms; sudo bash /tmp/sms ;;
-X) echo "." > /dev/null ;;
-esac
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'DashDot (L/W)' \
+  2 'Kuma (L/W)' \
+  3 'MySpeed  Test WAN (L/W)' \
+  4 'OpenSpeedTest LAN (L/W)' \
+  5 'PiHole (L/W)' \
+  6 '(C) Tailscale CLIENT (L/W)' \
+  7 '(C) Headscale SERVER (L/W)' \
+  8 '(C) OpenVPN (L/W)' \
+  9 '(C) PenTest & PentApache (L/W)' \
+  10 'Dominio & CUPS (W)' \
+  11 'SSH DW (Backdoor) (L)' \
+  12 'SMS PowerViewer (L/W)' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
+  2) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
+  3) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
+  4) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+  5) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
+  6) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+  7) wget "$github"57-headscale-server -O /tmp/headscale-server; sudo bash /tmp/headscale-server ;;
+  8) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+  9) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
+  10) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
+  11) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
+  12) wget "$github"11-SMS-PV -O /tmp/sms; sudo bash /tmp/sms ;;
+  X) return ;;
+  esac
 }
 
 start
