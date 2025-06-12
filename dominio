@@ -11,7 +11,7 @@ export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
 export bktitle="Active Directory & Domain Controller"
-export ttitle=" Server Menu v7.0 "
+export ttitle=" v7.0 - 05.06.2025"
 
 export PathFolder0
 
