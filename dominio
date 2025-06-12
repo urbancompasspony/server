@@ -162,7 +162,7 @@ function info_domain {
   C) active_shares ; info_domain ;;
   D) smb_process ; info_domain ;;
   E) faq_help ; read -r -p "Pressione Enter para continuar!" ; info_domain ;;
-  X) echo "." >/dev/null ;;
+  X) return ;;
   esac
 }
 
@@ -191,7 +191,7 @@ if ! var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu 
   E) clear ; force_msi_w11 ; s_settings_menu ;;
   F) clear ; rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions ; read -r -p "ADMX Templates removidas. Pressione Enter para continuar!" ; s_settings_menu ;;
   G) clear ; wget -q https://raw.githubusercontent.com/urbancompasspony/server/main/dominio -O /root/.dominio ; chmod +x /root/.dominio ; s_settings_menu ;;
-  X) echo "." >/dev/null ;;
+  X) return ;;
   esac
 }
 
@@ -210,7 +210,7 @@ function set_common_perm {
   B) clear ; samba-tool ntacl sysvolreset -U Administrator ; read -r -p "Pressione Enter para continuar!" ; set_common_perm ;;
   C) clear ; samba-tool dbcheck --cross-ncs --fix --yes ; read -r -p "Pressione Enter para continuar!" ; set_common_perm ;;
   D) clear ; samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes ; read -r -p "Pressione Enter para continuar!" ; set_common_perm ;;
-  X) echo "." >/dev/null ;;
+  X) return ;;
   esac
 }
 
@@ -241,7 +241,7 @@ function change_password0 {
   H) try_login ; change_password0 ;;
   I) failblock_login ; change_password0 ;;
   J) releaseblock_login ; change_password0 ;;
-  X) echo "." >/dev/null ;;
+  X) return ;;
   esac
 }
 
@@ -399,7 +399,7 @@ function change_acls0 {
   A) clear ; samba-tool gpo aclcheck -U Administrator ; read -r -p "Pressione Enter para continuar!" ; change_acls0 ;;
   B) getacls0 ; change_acls0 ;;
   C) setacls0 ; change_acls0 ;;
-  X) echo "." >/dev/null ;;
+  X) return ;;
   esac
 }
 
@@ -424,7 +424,7 @@ function shared_folders {
   C) create_sync ; shared_folders ;;
   D) remove_shared ; shared_folders ;;
   E) revalid_shared ; shared_folders ;;
-  X) echo "." >/dev/null ;;
+  X) return ;;
   esac
 }
 
@@ -443,7 +443,7 @@ function ou_tools {
   B) create_ou ; ou_tools ;;
   C) list_obj_ou ; ou_tools ;;
   D) rm_ou ; ou_tools ;;
-  X) echo "." >/dev/null ;;
+  X) return ;;
   esac
 }
 
@@ -479,7 +479,7 @@ function menusilo {
   E) add_usr_silo ; menusilo ;;
   F) rm_usr_silo ; menusilo ;;
   G) rm_silo ; menusilo ;;
-  X) echo "." >/dev/null ;;
+  X) return ;;
   esac
 }
 
