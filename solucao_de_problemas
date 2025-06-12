@@ -1,5 +1,7 @@
 #!/bin/bash
 
+version="v3.7 - 04.06.2025"
+
 # Cores para output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -21,7 +23,7 @@ add_warning() { ((WARNINGS++)); }
 add_error() { ((ERRORS++)); }
 
 echo "============================================"
-echo "Diagnóstico do Sistema - Versão 3.0"
+echo "Diagnóstico do Sistema $version"
 echo "============================================"
 echo ""
 
