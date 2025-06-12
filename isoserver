@@ -35,9 +35,7 @@ function init {
     menu_options+=("$((i + 1))" "${options[i]}")
   done
 
-  if choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty); then
-    exit
-  fi
+  choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
 
   sudo mkdir -p "$destpath"
 
