@@ -9,28 +9,27 @@ function start {
   3 'Baixar Imagens .ISO (XPRA)' \
   4 'Atualizar Driver VirtIO (XPRA)' \
   5 'Teste Ping DNS' \
-  6 'Cliente SAMBA' \
-  7 'Testar o Beep' \
-  8 'Sync SATAs' \
-  9 'SpeedTest by Ookla' \
-  10 'Teste de Placa de Rede' \
-  11 'Ajustar Modo Kiosk' \
+  6 'Testar o Beep' \
+  7 'Sync SATAs' \
+  8 'SpeedTest by Ookla' \
+  9 'Teste de Placa de Rede' \
+  10 'Ajustar Modo Kiosk' \
+  11 'Alterar Hostname do Servidor' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
-  
   case "$var0" in
   1) dwservice0 ; start ;;
   2) tailscale0 ; start ;;
   3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; start ;;
   4) clear; sudo wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso -O /var/lib/libvirt/images/virtio-win.iso ; start ;;
   5) clear ; dnstest ; start ;;
-  6) sambaclient ; start ;;
-  7) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
-  8) clear ; satas ; start ;;
-  9) speedtest0 ; start ;;
-  11) kiosk0 ; start ;;
-  10) iperftest ; start ;;
+  6) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
+  7) clear ; satas ; start ;;
+  8) speedtest0 ; start ;;
+  9) iperftest ; start ;;
+  10) kiosk0 ; start ;;
+  11) hostname_menu ; start ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -105,65 +104,6 @@ function dwservice0 {
   wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
   chmod +x dwagent_x86.sh
   sudo bash dwagent_x86.sh
-}
-
-function sambaclient {
-  if [ -f  "$pathmount" ]; then
-    VALUE1=$(sed -n '1p' "$pathmount")
-    VALUE2=$(sed -n '2p' "$pathmount")
-    VALUE3=$(sed -n '3p' "$pathmount")
-    VALUE4=$(sed -n '4p' "$pathmount")
-    VALUE5=$(sed -n '5p' "$pathmount")
-  else
-    touch "$pathmount"
-    VALUE1="//192.168.X.Y/backup"
-    VALUE2="/mnt/backup"
-    VALUE3="admin"
-    VALUE4="p4ssw0rd"
-    VALUE5=",domain=WORKGROUP"
-  fi
-
-  VALUE0=$(dialog --help-button --help-label 'Show' --ok-label "Montar" --title "Mounting" --form "Pastas de Redes" 15 50 0 \
-  "PATH: " 1 1 "$VALUE1" 1 10 34 0 \
-  "MNT:" 2 1 "$VALUE2" 2 10 34 0 \
-  "USER:" 3 1 "$VALUE3" 3 10 34 0 \
-  "PASS:" 4 1 "$VALUE4" 4 10 34 0 \
-  "DOM:" 5 1 "$VALUE5" 5 10 34 0 \
-  3>&1 1>&2 2>&3 3>&- > /dev/tty)
-  case $? in
-    0) echo "." > /dev/null ;;
-    1) exit ;;
-    2) mntshow1=$(cat /etc/mtab | grep mnt); dialog --title 'MNTs' --msgbox "$mntshow1" 0 0 ; sambaclient ;;
-  esac
-
-  path1=$(echo "$VALUE0" | sed -n 1p)
-  mntpt1=$(echo "$VALUE0" | sed -n 2p)
-  user1=$(echo "$VALUE0" | sed -n 3p)
-  pass1=$(echo "$VALUE0" | sed -n 4p)
-  dmn1=$(echo "$VALUE0" | sed -n 5p)
-
-  if [ -z "$path1" ] || [ -z "$mntpt1" ] || [ -z "$user1" ] || [ -z "$pass1" ]; then
-    dialog --title "ERRO" --msgbox "Não deixe os campos PATH, MNT, USER ou PASS vazios!" 7 30
-    sambaclient
-  fi
-
-  echa1=$(grep "$mntpt1" -qs /proc/mounts && echo "sim" || echo "nao")
-  if [ "$echa1" = "sim" ]; then
-    dialog --title "Informação" --msgbox "Caminho em uso! Escolha outro." 7 30
-    sambaclient
-  else
-  
-  {
-    echo "$path1"
-    echo "$mntpt1"
-    echo "$user1"
-    echo "$pass1"
-    echo "$dmn1"
-  } > "$pathmount"
-
-    sudo mkdir -p "$mntpt1"
-    sudo mount -t cifs -o user="$user1",password="$pass1""$dmn1",iocharset=utf8,file_mode=0777,dir_mode=0777,noperm "$path1" "$mntpt1"
-  fi
 }
 
 function satas {
@@ -252,6 +192,178 @@ function gauge1 {
 
 function ping1 {
   ping -c 1 "$1" | awk 'NR==2{print $7,$8}' |  cut -c7-
+}
+
+function change_hostname {
+  # Captura o hostname atual
+  current_hostname=$(hostname)
+  current_fqdn=$(hostname -f 2>/dev/null || echo "$current_hostname")
+  
+  # Exibe informações atuais
+  dialog --title "Hostname Atual" --msgbox "Hostname atual: $current_hostname\nFQDN atual: $current_fqdn" 8 50
+  
+  # Solicita o novo hostname
+  if ! new_hostname=$(dialog --title "Alterar Hostname" --backtitle "Configuração de Sistema" --inputbox "Digite o novo hostname:\n\nRegras:\n- Apenas letras, números e hífens\n- Máximo 63 caracteres\n- Não pode começar ou terminar com hífen" 12 50 "$current_hostname" 2>&1 > /dev/tty); then
+    return
+  fi
+  
+  # Validação básica do hostname
+  if [ -z "$new_hostname" ]; then
+    dialog --title "ERRO" --msgbox "O hostname não pode estar vazio!" 6 40
+    return
+  fi
+  
+  # Verifica se o hostname contém apenas caracteres válidos
+  if ! echo "$new_hostname" | grep -q '^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$\|^[a-zA-Z0-9]$'; then
+    dialog --title "ERRO" --msgbox "Hostname inválido!\n\nUse apenas:\n- Letras (a-z, A-Z)\n- Números (0-9)\n- Hífens (-)\n\nNão pode começar ou terminar com hífen." 10 50
+    return
+  fi
+  
+  # Verifica o comprimento
+  if [ ${#new_hostname} -gt 63 ]; then
+    dialog --title "ERRO" --msgbox "Hostname muito longo!\nMáximo: 63 caracteres\nAtual: ${#new_hostname} caracteres" 8 40
+    return
+  fi
+  
+  # Confirmação
+  if ! dialog --title "Confirmação" --backtitle "Alteração de Hostname" --yesno "Alterar hostname de:\n'$current_hostname'\npara:\n'$new_hostname'\n\nTem certeza?" 10 50; then
+    dialog --title "Cancelado" --msgbox "Alteração cancelada pelo usuário." 6 40
+    return
+  fi
+  
+  # Executa as alterações
+  change_hostname_execute "$new_hostname"
+}
+
+# Função para executar a alteração do hostname
+function change_hostname_execute {
+  local new_hostname="$1"
+  local current_hostname=$(hostname)
+  local temp_file="/tmp/hosts_backup_$(date +%s)"
+  
+  # Backup do /etc/hosts
+  if ! sudo cp /etc/hosts "$temp_file"; then
+    dialog --title "ERRO" --msgbox "Falha ao criar backup do /etc/hosts!" 6 40
+    return
+  fi
+  
+  dialog --title "Processando" --infobox "Alterando hostname...\nPor favor, aguarde..." 5 30
+  
+  # 1. Altera via hostnamectl
+  if ! sudo hostnamectl set-hostname "$new_hostname"; then
+    dialog --title "ERRO" --msgbox "Falha ao definir hostname via hostnamectl!" 6 40
+    return
+  fi
+  
+  # 2. Atualiza /etc/hosts
+  # Remove entradas antigas do hostname
+  sudo sed -i "/$current_hostname/d" /etc/hosts
+  
+  # Adiciona novas entradas
+  if ! grep -q "127.0.0.1.*$new_hostname" /etc/hosts; then
+    sudo sed -i "1a\\127.0.0.1\t$new_hostname" /etc/hosts
+  fi
+  
+  if ! grep -q "127.0.1.1.*$new_hostname" /etc/hosts; then
+    sudo sed -i "/127.0.0.1.*$new_hostname/a\\127.0.1.1\t$new_hostname" /etc/hosts
+  fi
+  
+  # 3. Atualiza /etc/hostname (backup method)
+  echo "$new_hostname" | sudo tee /etc/hostname > /dev/null
+  
+  sleep 1
+  
+  # Verifica se a alteração foi bem-sucedida
+  local verification_hostname=$(hostnamectl --static)
+  
+  if [ "$verification_hostname" = "$new_hostname" ]; then
+    dialog --title "Sucesso" --msgbox "Hostname alterado com sucesso!\n\nAnterior: $current_hostname\nNovo: $new_hostname\n\nBackup do /etc/hosts salvo em:\n$temp_file\n\nReinicie o sistema para garantir que todas as aplicações reconheçam a mudança." 12 60
+  else
+    # Restaura backup em caso de falha
+    sudo cp "$temp_file" /etc/hosts
+    dialog --title "ERRO" --msgbox "Falha na alteração do hostname!\n\nO /etc/hosts foi restaurado do backup.\nVerifique as permissões e tente novamente." 8 50
+  fi
+}
+
+# Função para visualizar informações do hostname
+function show_hostname_info {
+  local current_hostname=$(hostname)
+  local static_hostname=$(hostnamectl --static)
+  local pretty_hostname=$(hostnamectl --pretty 2>/dev/null || echo "Não definido")
+  local transient_hostname=$(hostnamectl --transient)
+  local fqdn=$(hostname -f 2>/dev/null || echo "Não disponível")
+  local domain=$(hostname -d 2>/dev/null || echo "Não definido")
+  
+  # Captura conteúdo relevante do /etc/hosts
+  local hosts_content=$(grep -E "(127\.0\.0\.1|127\.0\.1\.1)" /etc/hosts | head -5)
+  
+  dialog --title "Informações do Hostname" --msgbox "Hostname atual: $current_hostname
+Hostname estático: $static_hostname  
+Hostname transiente: $transient_hostname
+Hostname pretty: $pretty_hostname
+FQDN: $fqdn
+Domínio: $domain
+
+Entradas relevantes em /etc/hosts:
+$hosts_content" 15 70
+}
+
+# Menu principal para hostname
+function hostname_menu {
+  if ! var0=$(dialog --title "Gerenciamento de Hostname" --backtitle "Configurações do Sistema" --menu "Selecione uma opção:" 0 0 0 \
+  1 'Visualizar informações do hostname' \
+  2 'Alterar hostname' \
+  3 'Verificar arquivo /etc/hosts' \
+  4 'Testar resolução de nome' \
+  X 'Voltar' 2>&1 > /dev/tty); then
+    return
+  fi
+  
+  case "$var0" in
+  1) show_hostname_info ; hostname_menu ;;
+  2) change_hostname ; hostname_menu ;;
+  3) show_hosts_file ; hostname_menu ;;
+  4) test_hostname_resolution ; hostname_menu ;;
+  X) return ;;
+  esac
+}
+
+# Função para mostrar o arquivo /etc/hosts
+function show_hosts_file {
+  local hosts_content=$(cat /etc/hosts)
+  dialog --title "Conteúdo do /etc/hosts" --msgbox "$hosts_content" 20 80
+}
+
+# Função para testar resolução de nome
+function test_hostname_resolution {
+  local current_hostname=$(hostname)
+  local test_results=""
+  
+  dialog --title "Testando" --infobox "Testando resolução de nomes...\nPor favor, aguarde..." 5 40
+  
+  # Testa resolução local
+  if ping -c 1 "$current_hostname" >/dev/null 2>&1; then
+    test_results="✅ Resolução local: OK\n"
+  else
+    test_results="❌ Resolução local: FALHA\n"
+  fi
+  
+  # Testa resolução localhost
+  if ping -c 1 localhost >/dev/null 2>&1; then
+    test_results="${test_results}✅ Localhost: OK\n"
+  else
+    test_results="${test_results}❌ Localhost: FALHA\n"
+  fi
+  
+  # Testa resolução DNS externa
+  if ping -c 1 google.com >/dev/null 2>&1; then
+    test_results="${test_results}✅ DNS externo: OK\n"
+  else
+    test_results="${test_results}❌ DNS externo: FALHA\n"
+  fi
+  
+  # Mostra resultados
+  dialog --title "Resultados do Teste" --msgbox "Resultados da resolução de nomes:\n\n$test_results\nHostname testado: $current_hostname" 10 50
 }
 
 start
