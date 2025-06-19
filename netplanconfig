@@ -608,6 +608,14 @@ EOF
     echo ""
 }
 
+function gerar_backup {
+  sudo mkdir -p /srv/scripts/netplan
+  sudo cp /etc/udev/rules.d/70-persistent-net.rules /srv/scripts/netplan/70-persistent-net.rules
+  sudo cp "$NETPLAN_FILE" /srv/scripts/netplan/50-cloud-init.yaml
+  sudo udevadm control --reload-rules
+  sudo udevadm trigger
+}
+
 # Menu principal
 # Menu principal
 function main_menu() {
@@ -621,6 +629,7 @@ function main_menu() {
         echo "4) Renomear interfaces"
         echo "5) Piscar LED para identificar porta física"
         echo "6) Sincronizar netplan após renomeação"
+	echo "7) Gerar Backup do Netplan"
         echo "0) Sair"
         echo ""
         read -p "Escolha uma opção: " option
@@ -632,6 +641,7 @@ function main_menu() {
             4) rename_interfaces ;;
             5) blink_interface ;;
             6) update_netplan_after_rename ;;
+	    7) gerar_backup ;;
             0) 
                 echo "👋 Saindo..."
                 break 
