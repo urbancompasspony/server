@@ -53,6 +53,7 @@ function start {
   5 'DWAgent (ARM)' \
   6 'Set Wayland (labwc 24.04+)' \
   7 'Set OpenBox ObaMenu' \
+  8 'Netplan Menu' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -65,6 +66,7 @@ function start {
   5) dwgeneric0 ; start ;;
   6) wayland00 ; start ;;
   7) clear ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
+  8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
   X) exit ;;
   esac
 }
