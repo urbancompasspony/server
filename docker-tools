@@ -2,39 +2,37 @@
 
 function tools {
   if ! var0=$(dialog --title "" --backtitle "" --menu " " 0 0 0 \
-  A 'Remove not used images' \
-  B 'Retore a Backup' \
-  C 'Set MACVLAN' \
-  D 'Remove MACVLAN' \
-  E 'PiHole Maintenance' \
-  F 'PiHole Install Error' \
-  G 'Reset Syncthing Password' \
-  H 'NC: filelocks' \
-  I 'NC: add-missing-indices' \
-  J 'NC: check-core & mimetype' \
-  K 'NC: Disable LDAP' \
-  L 'NC: Upgrade Manually CLI' \
-  M 'NC: Scan App Data' \
-  N 'NC: Scan User Data' \
+  1 'Set MACVLAN' \
+  2 'Remove MACVLAN' \
+  3 'PiHole Maintenance' \
+  4 'PiHole Install Error' \
+  5 'Reset Syncthing Password' \
+  6 'NC: filelocks' \
+  7 'NC: add-missing-indices' \
+  8 'NC: check-core & mimetype' \
+  9 'NC: Disable LDAP' \
+  10 'NC: Upgrade Manually CLI' \
+  11 'NC: Scan App Data' \
+  12 'NC: Scan User Data' \
+  13 'Remove All Useless Images' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
   
   case "$var0" in
-  A) clear ; docker image prune -af ; sleep 2 ;;
-  B) clear ; restorebkp ;;
-  C) clear ; macvland ;;
-  D) clear ; rmmacvland ;;
-  E) clear ; piholemnt ;;
-  F) clear ; piholeinst ;;
-  G) clear ; syncpass0 ;;
-  H) clear ; filelocks ;;
-  I) clear ; missingindices ;;
-  J) clear ; checkcore ;;
-  K) clear ; disableldap ;;
-  L) clear ; upgradenc ;;
-  M) clear ; scanapp0 ;;
-  N) clear ; scanuser0 ;;
+  1) clear ; macvland ;;
+  2) clear ; rmmacvland ;;
+  3) clear ; piholemnt ;;
+  4) clear ; piholeinst ;;
+  5) clear ; syncpass0 ;;
+  6) clear ; filelocks ;;
+  7) clear ; missingindices ;;
+  8) clear ; checkcore ;;
+  9) clear ; disableldap ;;
+  10) clear ; upgradenc ;;
+  11) clear ; scanapp0 ;;
+  12) clear ; scanuser0 ;;
+  13) clear ; docker image prune -af ; sleep 2 ;;
   X) return ;;
   esac
 }
@@ -276,21 +274,21 @@ echo "$VALUE0"
   fi
 }
 
-# Função para salvar configurações MACVLAN no settings.yaml
+# Função para salvar configurações MACVLAN no system.yaml
 function save_macvlan_to_yaml {
   local subnet="$1"
   local gateway="$2"
   local interface="$3"
   local network_name="$4"
   
-  local yaml_file="/srv/settings.yaml"
+  local yaml_file="/srv/system.yaml"
   local datetime=$(date +"%d/%m/%Y - %H:%M:%S")
   
-  echo "💾 Salvando configurações MACVLAN no settings.yaml..."
+  echo "💾 Salvando configurações MACVLAN no system.yaml..."
   
   # Verifica se o arquivo existe, se não, cria estrutura básica
   if [ ! -f "$yaml_file" ]; then
-    echo "📝 Criando arquivo settings.yaml..."
+    echo "📝 Criando arquivo system.yaml..."
     sudo mkdir -p /srv
     sudo tee "$yaml_file" > /dev/null << EOF
 # Arquivo de configurações do servidor
@@ -304,22 +302,21 @@ Hardware:
   Tipo: "Servidor"
   Placa: "Desconhecida"
 
-Rede:
-  MACVLAN: {}
+Redes: {}
 EOF
   fi
   
-  # Verifica se já existe a seção Rede.MACVLAN
-  if ! grep -q "MACVLAN:" "$yaml_file"; then
-    echo "📝 Adicionando seção MACVLAN ao settings.yaml..."
-    sudo yq -i '.Rede.MACVLAN = {}' "$yaml_file"
+  # Verifica se já existe a seção Redes
+  if ! grep -q "Redes:" "$yaml_file"; then
+    echo "📝 Adicionando seção Redes ao system.yaml..."
+    sudo yq -i '.Redes = {}' "$yaml_file"
   fi
   
   # Adiciona as configurações da nova rede MACVLAN
-  echo "📝 Salvando rede '$network_name' no settings.yaml..."
+  echo "📝 Salvando rede '$network_name' no system.yaml..."
   
   sudo yq -i "
-    .Rede.MACVLAN.\"$network_name\" = {
+    .Redes.\"$network_name\" = {
       \"subnet\": \"$subnet/24\",
       \"gateway\": \"$gateway\",
       \"interface\": \"$interface\",
@@ -343,31 +340,31 @@ EOF
 
 # Função adicional para listar redes MACVLAN salvas
 function list_saved_macvlans {
-  local yaml_file="/srv/settings.yaml"
+  local yaml_file="/srv/system.yaml"
   
   if [ ! -f "$yaml_file" ]; then
-    echo "❌ Arquivo settings.yaml não encontrado!"
+    echo "❌ Arquivo system.yaml não encontrado!"
     return 1
   fi
   
-  echo "📋 REDES MACVLAN SALVAS NO SETTINGS.YAML:"
-  echo "=========================================="
+  echo "📋 REDES MACVLAN SALVAS NO SYSTEM.YAML:"
+  echo "======================================="
   
   # Lista todas as redes MACVLAN salvas
-  networks=$(yq -r '.Rede.MACVLAN | keys[]' "$yaml_file" 2>/dev/null)
+  networks=$(yq -r '.Redes | keys[]' "$yaml_file" 2>/dev/null)
   
   if [ -z "$networks" ]; then
-    echo "ℹ️  Nenhuma rede MACVLAN encontrada no settings.yaml"
+    echo "ℹ️  Nenhuma rede MACVLAN encontrada no system.yaml"
     return
   fi
   
   echo ""
   for network in $networks; do
-    subnet=$(yq -r ".Rede.MACVLAN.\"$network\".subnet" "$yaml_file")
-    gateway=$(yq -r ".Rede.MACVLAN.\"$network\".gateway" "$yaml_file")
-    interface=$(yq -r ".Rede.MACVLAN.\"$network\".interface" "$yaml_file")
-    data_criacao=$(yq -r ".Rede.MACVLAN.\"$network\".data_criacao" "$yaml_file")
-    status=$(yq -r ".Rede.MACVLAN.\"$network\".status" "$yaml_file")
+    subnet=$(yq -r ".Redes.\"$network\".subnet" "$yaml_file")
+    gateway=$(yq -r ".Redes.\"$network\".gateway" "$yaml_file")
+    interface=$(yq -r ".Redes.\"$network\".interface" "$yaml_file")
+    data_criacao=$(yq -r ".Redes.\"$network\".data_criacao" "$yaml_file")
+    status=$(yq -r ".Redes.\"$network\".status" "$yaml_file")
     
     echo "🌐 Rede: $network"
     echo "   📡 Subnet: $subnet"
@@ -387,10 +384,10 @@ function list_saved_macvlans {
   done
 }
 
-# Função para remover rede MACVLAN e atualizar settings.yaml
+# Função para remover rede MACVLAN e atualizar system.yaml
 function remove_macvlan_and_update_yaml {
   local network_name="$1"
-  local yaml_file="/srv/settings.yaml"
+  local yaml_file="/srv/system.yaml"
   
   if [ -z "$network_name" ]; then
     echo "❌ Nome da rede não fornecido!"
@@ -403,16 +400,16 @@ function remove_macvlan_and_update_yaml {
   if docker network rm "$network_name" 2>/dev/null; then
     echo "✅ Rede '$network_name' removida do Docker"
     
-    # Atualiza o status no settings.yaml ou remove completamente
+    # Atualiza o status no system.yaml ou remove completamente
     if [ -f "$yaml_file" ]; then
       # Opção 1: Marcar como removida (manter histórico)
-      sudo yq -i ".Rede.MACVLAN.\"$network_name\".status = \"removida\"" "$yaml_file" 2>/dev/null
-      sudo yq -i ".Rede.MACVLAN.\"$network_name\".data_remocao = \"$(date '+%d/%m/%Y - %H:%M:%S')\"" "$yaml_file" 2>/dev/null
+      sudo yq -i ".Redes.\"$network_name\".status = \"removida\"" "$yaml_file" 2>/dev/null
+      sudo yq -i ".Redes.\"$network_name\".data_remocao = \"$(date '+%d/%m/%Y - %H:%M:%S')\"" "$yaml_file" 2>/dev/null
       
       # Opção 2: Remover completamente (descomente a linha abaixo se preferir)
-      # sudo yq -i "del(.Rede.MACVLAN.\"$network_name\")" "$yaml_file" 2>/dev/null
+      # sudo yq -i "del(.Redes.\"$network_name\")" "$yaml_file" 2>/dev/null
       
-      echo "✅ Configurações atualizadas no settings.yaml"
+      echo "✅ Configurações atualizadas no system.yaml"
     fi
   else
     echo "❌ Erro ao remover a rede '$network_name' ou rede não existe"
@@ -423,6 +420,180 @@ function remove_macvlan_and_update_yaml {
 # Exemplo de uso das novas funções:
 # list_saved_macvlans
 # remove_macvlan_and_update_yaml "macvlan"
+
+function rmmacvland {
+  local yaml_file="/srv/system.yaml"
+  
+  # Lista redes MACVLAN existentes no Docker
+  existing_networks=($(docker network ls --filter driver=macvlan --format "{{.Name}}" | sort))
+  
+  if [ ${#existing_networks[@]} -eq 0 ]; then
+    dialog --title "Informação" --msgbox "Nenhuma rede MACVLAN encontrada no Docker!" 6 50
+    return
+  fi
+  
+  # Mostra lista de redes para escolher
+  echo "📋 REDES MACVLAN DISPONÍVEIS PARA REMOÇÃO:"
+  echo "=========================================="
+  echo ""
+  
+  for i in "${!existing_networks[@]}"; do
+    network="${existing_networks[$i]}"
+    
+    # Pega informações da rede do Docker
+    subnet=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+    gateway=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "N/A")
+    
+    # Verifica se existe no system.yaml
+    yaml_status="❓ Não registrada"
+    if [ -f "$yaml_file" ]; then
+      yaml_exists=$(yq -r ".Redes.\"$network\"" "$yaml_file" 2>/dev/null)
+      if [ "$yaml_exists" != "null" ]; then
+        yaml_status="📋 Registrada no YAML"
+      fi
+    fi
+    
+    echo "$((i+1))) $network"
+    echo "   📡 Subnet: $subnet"
+    echo "   🚪 Gateway: $gateway"
+    echo "   📄 Status: $yaml_status"
+    echo ""
+  done
+  
+  # Dialog para escolher qual remover
+  menu_options=()
+  for i in "${!existing_networks[@]}"; do
+    network="${existing_networks[$i]}"
+    subnet=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+    menu_options+=("$((i+1))" "$network ($subnet)")
+  done
+  
+  # Adiciona opção manual
+  menu_options+=("0" "Digitar nome manualmente")
+  
+  if ! choice=$(dialog --title "Remover Rede MACVLAN" --backtitle "Docker Tools" --menu "Escolha a rede para remover:" 0 0 0 "${menu_options[@]}" 2>&1 > /dev/tty); then
+    return
+  fi
+  
+  # Determina qual rede remover
+  local network_to_remove=""
+  
+  if [ "$choice" = "0" ]; then
+    # Opção manual
+    if ! network_to_remove=$(dialog --title "Nome da Rede" --backtitle "Docker Tools" --inputbox "Digite o nome da rede MACVLAN para remover:" 8 50 2>&1 > /dev/tty); then
+      return
+    fi
+    
+    if [ -z "$network_to_remove" ]; then
+      dialog --title "ERRO" --msgbox "Nome da rede não pode estar vazio!" 6 40
+      return
+    fi
+  else
+    # Rede selecionada da lista
+    network_to_remove="${existing_networks[$((choice-1))]}"
+  fi
+  
+  # Verifica se a rede existe
+  if ! docker network inspect "$network_to_remove" >/dev/null 2>&1; then
+    dialog --title "ERRO" --msgbox "A rede '$network_to_remove' não existe no Docker!" 6 50
+    return
+  fi
+  
+  # Mostra informações da rede antes de remover
+  subnet=$(docker network inspect "$network_to_remove" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+  gateway=$(docker network inspect "$network_to_remove" --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "N/A")
+  
+  # Verificar se tem containers conectados
+  connected_containers=$(docker network inspect "$network_to_remove" --format '{{range .Containers}}{{.Name}} {{end}}' 2>/dev/null)
+  
+  warning_msg="ATENÇÃO: Você está prestes a remover a rede:\n\n"
+  warning_msg+="🌐 Nome: $network_to_remove\n"
+  warning_msg+="📡 Subnet: $subnet\n"
+  warning_msg+="🚪 Gateway: $gateway\n\n"
+  
+  if [ -n "$connected_containers" ]; then
+    warning_msg+="⚠️  CONTAINERS CONECTADOS:\n$connected_containers\n\n"
+    warning_msg+="Os containers serão desconectados da rede!\n\n"
+  fi
+  
+  warning_msg+="Esta ação é IRREVERSÍVEL!\n\nDeseja continuar?"
+  
+  # Confirmação final
+  if ! dialog --title "CONFIRMAÇÃO" --backtitle "Remoção de Rede MACVLAN" --yesno "$warning_msg" 0 0; then
+    dialog --title "Cancelado" --msgbox "Remoção cancelada pelo usuário." 6 40
+    return
+  fi
+  
+  # Executar remoção
+  echo "🗑️  Removendo rede MACVLAN '$network_to_remove'..."
+  
+  # Remove a rede do Docker
+  if docker network rm "$network_to_remove" 2>/dev/null; then
+    echo "✅ Rede '$network_to_remove' removida do Docker com sucesso!"
+    
+    # Atualiza o system.yaml se a rede estiver registrada
+    if [ -f "$yaml_file" ]; then
+      yaml_exists=$(yq -r ".Redes.\"$network_to_remove\"" "$yaml_file" 2>/dev/null)
+      if [ "$yaml_exists" != "null" ]; then
+        echo "📝 Atualizando system.yaml..."
+        
+        # Opção 1: Marcar como removida (manter histórico)
+        sudo yq -i ".Redes.\"$network_to_remove\".status = \"removida\"" "$yaml_file" 2>/dev/null
+        sudo yq -i ".Redes.\"$network_to_remove\".data_remocao = \"$(date '+%d/%m/%Y - %H:%M:%S')\"" "$yaml_file" 2>/dev/null
+        
+        # Opção 2: Remover completamente do YAML (descomente se preferir)
+        # sudo yq -i "del(.Redes.\"$network_to_remove\")" "$yaml_file" 2>/dev/null
+        
+        echo "✅ system.yaml atualizado com sucesso!"
+        
+        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida com sucesso!\n\n✅ Docker: Rede removida\n✅ YAML: Status atualizado" 10 50
+      else
+        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\n\n(Não estava registrada no system.yaml)" 8 50
+      fi
+    else
+      dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\n\n(Arquivo system.yaml não encontrado)" 8 50
+    fi
+    
+  else
+    dialog --title "ERRO" --msgbox "Erro ao remover a rede '$network_to_remove'!\n\nVerifique se não há containers conectados." 8 50
+    return 1
+  fi
+}
+
+# Função auxiliar para listar informações detalhadas das redes (opcional)
+function show_macvlan_details {
+  local yaml_file="/srv/system.yaml"
+  
+  echo "📋 DETALHES DAS REDES MACVLAN:"
+  echo "=============================="
+  echo ""
+  
+  # Redes no Docker
+  docker_networks=($(docker network ls --filter driver=macvlan --format "{{.Name}}" | sort))
+  
+  if [ ${#docker_networks[@]} -gt 0 ]; then
+    echo "🐳 REDES NO DOCKER:"
+    for network in "${docker_networks[@]}"; do
+      subnet=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+      gateway=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "N/A")
+      echo "   🌐 $network - $subnet (GW: $gateway)"
+    done
+    echo ""
+  fi
+  
+  # Redes no YAML
+  if [ -f "$yaml_file" ]; then
+    yaml_networks=$(yq -r '.Redes | keys[]' "$yaml_file" 2>/dev/null)
+    if [ -n "$yaml_networks" ]; then
+      echo "📄 REDES NO SYSTEM.YAML:"
+      for network in $yaml_networks; do
+        status=$(yq -r ".Redes.\"$network\".status" "$yaml_file")
+        subnet=$(yq -r ".Redes.\"$network\".subnet" "$yaml_file")
+        echo "   📋 $network - $subnet (Status: $status)"
+      done
+    fi
+  fi
+}
 
 function dialognet {
   dialog --title "Informação" --msgbox "Checar a existencia de altnames nas informacoes a seguir!" 7 40
