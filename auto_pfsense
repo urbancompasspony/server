@@ -6,6 +6,8 @@
 # Parameters #
 ##############
 
+pfsense_iso="pfsense2.8"
+
 destpath="/var/lib/libvirt/images"
 
 mkdir -p "$destpath"
@@ -37,11 +39,11 @@ function check {
 }
 
 function start {
-  if [ -f "$destpath/pfsense.img" ]; then
+  if [ -f "$destpath/$pfsense_iso" ]; then
     setinter
     echo "." >/dev/null
   else
-    calling pfsense.img
+    calling "$pfsense_iso"
     setperma
     setinter
   fi
@@ -133,8 +135,8 @@ function createvm_dynamic {
     --vcpus 2 \
     --cpu host \
     "${net_args[@]}" \
-    --disk "$destpath/pfsense.img" \
-    --os-variant=freebsd13.1 \
+    --disk "$destpath/$pfsense_iso" \
+    --os-variant=freebsd14.2 \
     --graphics vnc \
     --import \
     --autostart 1>/dev/null 2>/dev/null &
