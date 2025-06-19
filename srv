@@ -103,8 +103,8 @@ function managers {
 }
 
 function allinfoz0 {
-  if [ -f /srv/settings.yaml ]; then
-    YAML_FILE="/srv/settings.yaml"
+  if [ -f /srv/system.yaml ]; then
+    YAML_FILE="/srv/system.yaml"
 
     meuipwan=$(dig @resolver4.opendns.com myip.opendns.com +short)
     meugateway=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+')
