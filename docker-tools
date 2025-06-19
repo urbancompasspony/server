@@ -220,7 +220,6 @@ function filelocks {
   sleep 3
 }
 
-
 function macvland {
   var1="0"; var2="0"; var3="0"; var4="0"
 
@@ -255,23 +254,175 @@ echo "$VALUE0"
   else
     macvlanr=$(docker inspect "$var4" 1>/dev/null 2>/dev/null && echo yes || echo no)
     if [ "$macvlanr" = "no" ];then
+      # Cria a rede docker
       docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" "$var4"
+      
+      # Verifica se a criação foi bem-sucedida
+      if [ $? -eq 0 ]; then
+        echo "✅ Rede $var4 criada com sucesso!"
+        
+        # Salva no settings.yaml
+        save_macvlan_to_yaml "$var1" "$var2" "$var3" "$var4"
+        
+        dialog --title "Sucesso" --msgbox "Rede MACVLAN '$var4' criada e salva no settings.yaml!\n\nSubnet: $var1/24\nGateway: $var2\nInterface: $var3" 10 50
+      else
+        echo "❌ Erro ao criar a rede $var4"
+        dialog --title "ERRO" --msgbox "Falha ao criar a rede MACVLAN '$var4'!" 6 40
+      fi
     else
       echo "A macvlan $var4 existe! Saindo..."
+      dialog --title "ERRO" --msgbox "A rede MACVLAN '$var4' já existe!" 6 40
     fi
   fi
 }
 
-function rmmacvland {
-  rmmacvland0=$(dialog --title "" --backtitle "" --inputbox "Deseja remover qual macvlan?" 8 35 "macvlan" 2>&1 > /dev/tty)
+# Função para salvar configurações MACVLAN no settings.yaml
+function save_macvlan_to_yaml {
+  local subnet="$1"
+  local gateway="$2"
+  local interface="$3"
+  local network_name="$4"
+  
+  local yaml_file="/srv/settings.yaml"
+  local datetime=$(date +"%d/%m/%Y - %H:%M:%S")
+  
+  echo "💾 Salvando configurações MACVLAN no settings.yaml..."
+  
+  # Verifica se o arquivo existe, se não, cria estrutura básica
+  if [ ! -f "$yaml_file" ]; then
+    echo "📝 Criando arquivo settings.yaml..."
+    sudo mkdir -p /srv
+    sudo tee "$yaml_file" > /dev/null << EOF
+# Arquivo de configurações do servidor
+# Criado automaticamente em $datetime
 
-  if [ -z "$rmmacvland0" ]; then
-    dialog --title "ERRO" --msgbox "O(s) campo(s) exigidos nao pode(m) ficar em branco. \nPreencha-o(s) adequadamente!" 7 40
+Informacoes:
+  Data_Instalacao: "$datetime"
+  Data_Restauracao: "Nunca foi reinstalado."
+
+Hardware:
+  Tipo: "Servidor"
+  Placa: "Desconhecida"
+
+Rede:
+  MACVLAN: {}
+EOF
+  fi
+  
+  # Verifica se já existe a seção Rede.MACVLAN
+  if ! grep -q "MACVLAN:" "$yaml_file"; then
+    echo "📝 Adicionando seção MACVLAN ao settings.yaml..."
+    sudo yq -i '.Rede.MACVLAN = {}' "$yaml_file"
+  fi
+  
+  # Adiciona as configurações da nova rede MACVLAN
+  echo "📝 Salvando rede '$network_name' no settings.yaml..."
+  
+  sudo yq -i "
+    .Rede.MACVLAN.\"$network_name\" = {
+      \"subnet\": \"$subnet/24\",
+      \"gateway\": \"$gateway\",
+      \"interface\": \"$interface\",
+      \"data_criacao\": \"$datetime\",
+      \"status\": \"ativa\"
+    }
+  " "$yaml_file"
+  
+  echo "✅ Configurações salvas com sucesso!"
+  
+  # Mostra confirmação das configurações salvas
+  echo ""
+  echo "📋 CONFIGURAÇÕES SALVAS:"
+  echo "   Nome da rede: $network_name"
+  echo "   Subnet: $subnet/24"
+  echo "   Gateway: $gateway" 
+  echo "   Interface: $interface"
+  echo "   Data: $datetime"
+  echo ""
+}
+
+# Função adicional para listar redes MACVLAN salvas
+function list_saved_macvlans {
+  local yaml_file="/srv/settings.yaml"
+  
+  if [ ! -f "$yaml_file" ]; then
+    echo "❌ Arquivo settings.yaml não encontrado!"
+    return 1
+  fi
+  
+  echo "📋 REDES MACVLAN SALVAS NO SETTINGS.YAML:"
+  echo "=========================================="
+  
+  # Lista todas as redes MACVLAN salvas
+  networks=$(yq -r '.Rede.MACVLAN | keys[]' "$yaml_file" 2>/dev/null)
+  
+  if [ -z "$networks" ]; then
+    echo "ℹ️  Nenhuma rede MACVLAN encontrada no settings.yaml"
+    return
+  fi
+  
+  echo ""
+  for network in $networks; do
+    subnet=$(yq -r ".Rede.MACVLAN.\"$network\".subnet" "$yaml_file")
+    gateway=$(yq -r ".Rede.MACVLAN.\"$network\".gateway" "$yaml_file")
+    interface=$(yq -r ".Rede.MACVLAN.\"$network\".interface" "$yaml_file")
+    data_criacao=$(yq -r ".Rede.MACVLAN.\"$network\".data_criacao" "$yaml_file")
+    status=$(yq -r ".Rede.MACVLAN.\"$network\".status" "$yaml_file")
+    
+    echo "🌐 Rede: $network"
+    echo "   📡 Subnet: $subnet"
+    echo "   🚪 Gateway: $gateway"
+    echo "   🔌 Interface: $interface"
+    echo "   📅 Criada em: $data_criacao"
+    echo "   📊 Status: $status"
+    
+    # Verifica se a rede ainda existe no Docker
+    docker_exists=$(docker network ls --format "{{.Name}}" | grep -x "$network" && echo "exists" || echo "not_found")
+    if [ "$docker_exists" = "exists" ]; then
+      echo "   🐳 Docker: ✅ Rede existe"
+    else
+      echo "   🐳 Docker: ❌ Rede não encontrada"
+    fi
+    echo ""
+  done
+}
+
+# Função para remover rede MACVLAN e atualizar settings.yaml
+function remove_macvlan_and_update_yaml {
+  local network_name="$1"
+  local yaml_file="/srv/settings.yaml"
+  
+  if [ -z "$network_name" ]; then
+    echo "❌ Nome da rede não fornecido!"
+    return 1
+  fi
+  
+  echo "🗑️  Removendo rede MACVLAN '$network_name'..."
+  
+  # Remove a rede do Docker
+  if docker network rm "$network_name" 2>/dev/null; then
+    echo "✅ Rede '$network_name' removida do Docker"
+    
+    # Atualiza o status no settings.yaml ou remove completamente
+    if [ -f "$yaml_file" ]; then
+      # Opção 1: Marcar como removida (manter histórico)
+      sudo yq -i ".Rede.MACVLAN.\"$network_name\".status = \"removida\"" "$yaml_file" 2>/dev/null
+      sudo yq -i ".Rede.MACVLAN.\"$network_name\".data_remocao = \"$(date '+%d/%m/%Y - %H:%M:%S')\"" "$yaml_file" 2>/dev/null
+      
+      # Opção 2: Remover completamente (descomente a linha abaixo se preferir)
+      # sudo yq -i "del(.Rede.MACVLAN.\"$network_name\")" "$yaml_file" 2>/dev/null
+      
+      echo "✅ Configurações atualizadas no settings.yaml"
+    fi
   else
-    clear
-    docker network rm "$rmmacvland0"
+    echo "❌ Erro ao remover a rede '$network_name' ou rede não existe"
+    return 1
   fi
 }
+
+# Exemplo de uso das novas funções:
+# list_saved_macvlans
+# remove_macvlan_and_update_yaml "macvlan"
 
 function dialognet {
   dialog --title "Informação" --msgbox "Checar a existencia de altnames nas informacoes a seguir!" 7 40
