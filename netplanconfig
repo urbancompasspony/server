@@ -2,7 +2,7 @@
 
 # Menu Simples de Configuração de Rede
 
-NETPLAN_FILE="/etc/netplan/00-installer-config.yaml"
+NETPLAN_FILE="/etc/netplan/50-cloud-init.yaml"
 
 echo "🌐 CONFIGURADOR SIMPLES DE REDE"
 echo "================================"
@@ -24,7 +24,7 @@ function show_interface_status() {
         
         # Ícone do status
         case $status in
-            "up") status_icon="🟢 UP" ;;
+            "up") status_icon="🟢 UP  " ;;
             "down") status_icon="🔴 DOWN" ;;
             *) status_icon="⚪ $status" ;;
         esac
@@ -63,7 +63,7 @@ function watch_interface_status() {
         # Tabela de status
         echo "📋 STATUS ATUAL DAS INTERFACES:"
         echo "┌────────────┬─────────────────────────┬─────────┬──────────┬──────────┐"
-        echo "│ Interface  │ Descrição               │ Status  │ Cabo     │ Velocidade│"
+        echo "│ Interface  │ Descrição               │ Status  │ Cabo     │Velocidade│"
         echo "├────────────┼─────────────────────────┼─────────┼──────────┼──────────┤"
         
         for interface in $(ls /sys/class/net/ | grep -E '^(en|lan|wan|dmz|mgmt)' | sort); do
@@ -92,22 +92,22 @@ function watch_interface_status() {
             
             # Ícones do status
             case $status in
-                "up") status_icon="🟢 UP" ;;
+                "up") status_icon="🟢 UP  " ;;
                 "down") status_icon="🔴 DOWN" ;;
                 *) status_icon="⚪ $status" ;;
             esac
             
             # Ícones do cabo
             case $carrier in
-                "1") cable_icon="🔗 SIM" ;;
-                "0") cable_icon="❌ NÃO" ;;
+                "1") cable_icon="🔗 SIM  " ;;
+                "0") cable_icon="❌ NÃO  " ;;
                 *) cable_icon="❓ N/A" ;;
             esac
             
-            printf "│ %-10s │ %-23s │ %-7s │ %-8s │ %-9s │\n" "$interface" "$driver" "$status_icon" "$cable_icon" "$speed"
+            printf "│ %-10s │ %-23s │ %-7s │ %-8s │ %-9s \n" "$interface" "$driver" "$status_icon" "$cable_icon" "$speed"
         done
         
-        echo "└────────────┴─────────────────────────┴─────────┴──────────┴──────────┘"
+        echo "└────────────┴─────────────────────────┴─────────┴──────────┴───────────┘"
         
         # Estatísticas resumidas
         echo ""
@@ -153,7 +153,7 @@ function watch_interface_status() {
         # Tabela de status
         echo "📋 STATUS ATUAL DAS INTERFACES:"
         echo "┌────────────┬─────────────────────────┬─────────┬──────────┬──────────┐"
-        echo "│ Interface  │ Descrição               │ Status  │ Cabo     │ Velocidade│"
+        echo "│ Interface  │ Descrição               │ Status  │ Cabo     │Velocidade│"
         echo "├────────────┼─────────────────────────┼─────────┼──────────┼──────────┤"
         
         for interface in $(ls /sys/class/net/ | grep -E '^(en|lan|wan|dmz|mgmt)' | sort); do
@@ -182,19 +182,19 @@ function watch_interface_status() {
             
             # Ícones do status
             case $status in
-                "up") status_icon="🟢 UP" ;;
+                "up") status_icon="🟢 UP  " ;;
                 "down") status_icon="🔴 DOWN" ;;
                 *) status_icon="⚪ $status" ;;
             esac
             
             # Ícones do cabo
             case $carrier in
-                "1") cable_icon="🔗 SIM" ;;
-                "0") cable_icon="❌ NÃO" ;;
+                "1") cable_icon="🔗 SIM  " ;;
+                "0") cable_icon="❌ NÃO  " ;;
                 *) cable_icon="❓ N/A" ;;
             esac
             
-            printf "│ %-10s │ %-23s │ %-7s │ %-8s │ %-9s │\n" "$interface" "$driver" "$status_icon" "$cable_icon" "$speed"
+            printf "│ %-10s │ %-23s │ %-7s │ %-8s │ %-9s \n" "$interface" "$driver" "$status_icon" "$cable_icon" "$speed"
         done
         
         echo "└────────────┴─────────────────────────┴─────────┴──────────┴──────────┘"
