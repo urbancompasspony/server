@@ -240,7 +240,7 @@ Claro ...... 181.213.132.2 ...: $CLARO_P
 Claro ...... 181.213.132.3 ...: $CLARO_S"
 
 dialog --title "VISUALIZANDO DADOS" --backtitle "" --msgbox "Pressione Enter para visualizar os resultados! \n\nNavegue com as setas para cima e para baixo. \n\nPara sair pressione 'q' !" 12 40
-echo "$TEXTAO01" | less
+clear; echo "$TEXTAO01" | less
 #dialog --title 'Resultados do Teste Ping:' --msgbox "$TEXTAO01" 0 0
 }
 
