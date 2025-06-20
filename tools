@@ -1,6 +1,7 @@
 #!/bin/bash
 
 pathmount="/tmp/pathmount"
+YAML_FILE="/srv/system.yaml"
 
 function start {
   if ! var0=$(dialog --title 'Ferramentas' --backtitle "Ferramentas e Utilidades" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
@@ -29,9 +30,420 @@ function start {
   8) speedtest0 ; start ;;
   9) iperftest ; start ;;
   10) kiosk0 ; start ;;
-  11) hostname_menu ; start ;;
+  11) hostname_menu_with_yaml ; start ;;
   X) echo "." >/dev/null ;;
   esac
+}
+
+# Função para salvar hostname no system.yaml
+function save_hostname_to_yaml {
+  local hostname="$1"
+  local datetime=$(date +"%d/%m/%Y - %H:%M:%S")
+  
+  echo "💾 Salvando hostname no system.yaml..."
+  
+  # Verifica se o arquivo existe, se não, cria estrutura básica
+  if [ ! -f "$YAML_FILE" ]; then
+    echo "📝 Criando arquivo system.yaml..."
+    sudo mkdir -p /srv
+    sudo tee "$YAML_FILE" > /dev/null << EOF
+# Arquivo de configurações do servidor
+# Criado automaticamente em $datetime
+
+Informacoes:
+  Data_Instalacao: "$datetime"
+  Data_Restauracao: "Nunca foi reinstalado."
+
+Hardware:
+  Tipo: "Servidor"
+  Placa: "Desconhecida"
+
+Sistema:
+  Hostname: "$hostname"
+  Data_Hostname: "$datetime"
+
+Redes: {}
+EOF
+  else
+    # Arquivo existe, apenas atualiza a seção Sistema
+    echo "📝 Atualizando hostname no system.yaml..."
+    
+    # Verifica se a seção Sistema existe
+    if ! yq -e '.Sistema' "$YAML_FILE" >/dev/null 2>&1; then
+      sudo yq -i '.Sistema = {}' "$YAML_FILE"
+    fi
+    
+    # Atualiza hostname e data
+    sudo yq -i ".Sistema.Hostname = \"$hostname\"" "$YAML_FILE"
+    sudo yq -i ".Sistema.Data_Hostname = \"$datetime\"" "$YAML_FILE"
+  fi
+  
+  echo "✅ Hostname '$hostname' salvo no system.yaml!"
+}
+
+# Função para obter hostname do system.yaml
+function get_hostname_from_yaml {
+  if [ ! -f "$YAML_FILE" ]; then
+    echo ""
+    return 1
+  fi
+  
+  hostname_from_yaml=$(yq -r '.Sistema.Hostname // empty' "$YAML_FILE" 2>/dev/null)
+  echo "$hostname_from_yaml"
+}
+
+# Função para verificar se hostname no sistema difere do YAML
+function check_hostname_sync {
+  local current_hostname=$(hostname)
+  local yaml_hostname=$(get_hostname_from_yaml)
+  
+  if [ -z "$yaml_hostname" ]; then
+    echo "⚠️  Hostname não definido no system.yaml"
+    return 1
+  elif [ "$current_hostname" != "$yaml_hostname" ]; then
+    echo "⚠️  Hostname desatualizado:"
+    echo "   Sistema atual: $current_hostname"
+    echo "   No system.yaml: $yaml_hostname"
+    return 2
+  else
+    echo "✅ Hostname sincronizado: $current_hostname"
+    return 0
+  fi
+}
+
+# Função modificada para alterar hostname (com salvamento no YAML)
+function change_hostname_with_yaml {
+  # Captura o hostname atual
+  current_hostname=$(hostname)
+  current_fqdn=$(hostname -f 2>/dev/null || echo "$current_hostname")
+  
+  # Exibe informações atuais
+  dialog --title "Hostname Atual" --msgbox "Hostname atual: $current_hostname\nFQDN atual: $current_fqdn" 8 50
+  
+  # Solicita o novo hostname
+  if ! new_hostname=$(dialog --title "Alterar Hostname" --backtitle "Configuração de Sistema" --inputbox "Digite o novo hostname:\n\nRegras:\n- Apenas letras, números e hífens\n- Máximo 63 caracteres\n- Não pode começar ou terminar com hífen" 12 50 "$current_hostname" 2>&1 > /dev/tty); then
+    return
+  fi
+  
+  # Validação básica do hostname
+  if [ -z "$new_hostname" ]; then
+    dialog --title "ERRO" --msgbox "O hostname não pode estar vazio!" 6 40
+    return
+  fi
+  
+  # Verifica se o hostname contém apenas caracteres válidos
+  if ! echo "$new_hostname" | grep -q '^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$\|^[a-zA-Z0-9]$'; then
+    dialog --title "ERRO" --msgbox "Hostname inválido!\n\nUse apenas:\n- Letras (a-z, A-Z)\n- Números (0-9)\n- Hífens (-)\n\nNão pode começar ou terminar com hífen." 10 50
+    return
+  fi
+  
+  # Verifica o comprimento
+  if [ ${#new_hostname} -gt 63 ]; then
+    dialog --title "ERRO" --msgbox "Hostname muito longo!\nMáximo: 63 caracteres\nAtual: ${#new_hostname} caracteres" 8 40
+    return
+  fi
+  
+  # Confirmação
+  if ! dialog --title "Confirmação" --backtitle "Alteração de Hostname" --yesno "Alterar hostname de:\n'$current_hostname'\npara:\n'$new_hostname'\n\nSalvar no system.yaml?\n\nTem certeza?" 12 50; then
+    dialog --title "Cancelado" --msgbox "Alteração cancelada pelo usuário." 6 40
+    return
+  fi
+  
+  # Executa as alterações
+  change_hostname_execute_with_yaml "$new_hostname"
+}
+
+# Função para executar a alteração do hostname (com salvamento no YAML)
+function change_hostname_execute_with_yaml {
+  local new_hostname="$1"
+  local current_hostname=$(hostname)
+  local temp_file="/tmp/hosts_backup_$(date +%s)"
+  
+  # Backup do /etc/hosts
+  if ! sudo cp /etc/hosts "$temp_file"; then
+    dialog --title "ERRO" --msgbox "Falha ao criar backup do /etc/hosts!" 6 40
+    return
+  fi
+  
+  dialog --title "Processando" --infobox "Alterando hostname...\nPor favor, aguarde..." 5 30
+  
+  # 1. Altera via hostnamectl
+  if ! sudo hostnamectl set-hostname "$new_hostname"; then
+    dialog --title "ERRO" --msgbox "Falha ao definir hostname via hostnamectl!" 6 40
+    return
+  fi
+  
+  # 2. Atualiza /etc/hosts
+  # Remove entradas antigas do hostname
+  sudo sed -i "/$current_hostname/d" /etc/hosts
+  
+  # Adiciona novas entradas
+  if ! grep -q "127.0.0.1.*$new_hostname" /etc/hosts; then
+    sudo sed -i "1a\\127.0.0.1\t$new_hostname" /etc/hosts
+  fi
+  
+  if ! grep -q "127.0.1.1.*$new_hostname" /etc/hosts; then
+    sudo sed -i "/127.0.0.1.*$new_hostname/a\\127.0.1.1\t$new_hostname" /etc/hosts
+  fi
+  
+  # 3. Atualiza /etc/hostname (backup method)
+  echo "$new_hostname" | sudo tee /etc/hostname > /dev/null
+  
+  # 4. NOVO: Salva no system.yaml
+  save_hostname_to_yaml "$new_hostname"
+  
+  sleep 1
+  
+  # Verifica se a alteração foi bem-sucedida
+  local verification_hostname=$(hostnamectl --static)
+  
+  if [ "$verification_hostname" = "$new_hostname" ]; then
+    dialog --title "Sucesso" --msgbox "Hostname alterado com sucesso!\n\nAnterior: $current_hostname\nNovo: $new_hostname\n\n✅ Sistema atualizado\n✅ Salvo no system.yaml\n\nBackup do /etc/hosts salvo em:\n$temp_file\n\nReinicie o sistema para garantir que todas as aplicações reconheçam a mudança." 15 60
+  else
+    # Restaura backup em caso de falha
+    sudo cp "$temp_file" /etc/hosts
+    dialog --title "ERRO" --msgbox "Falha na alteração do hostname!\n\nO /etc/hosts foi restaurado do backup.\nVerifique as permissões e tente novamente." 8 50
+  fi
+}
+
+# Função para aplicar hostname do system.yaml ao sistema
+function apply_hostname_from_yaml {
+  local yaml_hostname=$(get_hostname_from_yaml)
+  local current_hostname=$(hostname)
+  
+  if [ -z "$yaml_hostname" ]; then
+    dialog --title "ERRO" --msgbox "Nenhum hostname encontrado no system.yaml!\n\nDefina um hostname primeiro usando a opção 'Alterar hostname'." 8 50
+    return
+  fi
+  
+  if [ "$current_hostname" = "$yaml_hostname" ]; then
+    dialog --title "Informação" --msgbox "O hostname do sistema já está sincronizado!\n\nHostname atual: $current_hostname\nHostname no YAML: $yaml_hostname" 8 50
+    return
+  fi
+  
+  # Mostra informações e pede confirmação
+  if ! dialog --title "Aplicar Hostname do YAML" --backtitle "Sincronização de Hostname" --yesno "Aplicar hostname do system.yaml?\n\nHostname atual: $current_hostname\nHostname no YAML: $yaml_hostname\n\nIsto irá alterar o hostname do sistema.\n\nContinuar?" 12 50; then
+    dialog --title "Cancelado" --msgbox "Operação cancelada pelo usuário." 6 40
+    return
+  fi
+  
+  # Aplica o hostname do YAML
+  apply_hostname_execute "$yaml_hostname"
+}
+
+# Função para executar aplicação do hostname do YAML
+function apply_hostname_execute {
+  local new_hostname="$1"
+  local current_hostname=$(hostname)
+  local temp_file="/tmp/hosts_backup_$(date +%s)"
+  local datetime=$(date +"%d/%m/%Y - %H:%M:%S")
+  
+  # Backup do /etc/hosts
+  if ! sudo cp /etc/hosts "$temp_file"; then
+    dialog --title "ERRO" --msgbox "Falha ao criar backup do /etc/hosts!" 6 40
+    return
+  fi
+  
+  dialog --title "Processando" --infobox "Aplicando hostname do YAML...\nPor favor, aguarde..." 5 40
+  
+  # 1. Altera via hostnamectl
+  if ! sudo hostnamectl set-hostname "$new_hostname"; then
+    dialog --title "ERRO" --msgbox "Falha ao definir hostname via hostnamectl!" 6 40
+    return
+  fi
+  
+  # 2. Atualiza /etc/hosts
+  # Remove entradas antigas do hostname
+  sudo sed -i "/$current_hostname/d" /etc/hosts
+  
+  # Adiciona novas entradas
+  if ! grep -q "127.0.0.1.*$new_hostname" /etc/hosts; then
+    sudo sed -i "1a\\127.0.0.1\t$new_hostname" /etc/hosts
+  fi
+  
+  if ! grep -q "127.0.1.1.*$new_hostname" /etc/hosts; then
+    sudo sed -i "/127.0.0.1.*$new_hostname/a\\127.0.1.1\t$new_hostname" /etc/hosts
+  fi
+  
+  # 3. Atualiza /etc/hostname
+  echo "$new_hostname" | sudo tee /etc/hostname > /dev/null
+  
+  # 4. Atualiza data de aplicação no YAML
+  if [ -f "$YAML_FILE" ]; then
+    sudo yq -i ".Sistema.Data_Aplicacao = \"$datetime\"" "$YAML_FILE"
+  fi
+  
+  sleep 1
+  
+  # Verifica se a alteração foi bem-sucedida
+  local verification_hostname=$(hostnamectl --static)
+  
+  if [ "$verification_hostname" = "$new_hostname" ]; then
+    dialog --title "Sucesso" --msgbox "Hostname aplicado com sucesso!\n\nAnterior: $current_hostname\nNovo: $new_hostname\n\n✅ Hostname do YAML aplicado\n✅ Data de aplicação atualizada\n\nBackup do /etc/hosts salvo em:\n$temp_file\n\nReinicie o sistema para garantir que todas as aplicações reconheçam a mudança." 16 60
+  else
+    # Restaura backup em caso de falha
+    sudo cp "$temp_file" /etc/hosts
+    dialog --title "ERRO" --msgbox "Falha na aplicação do hostname!\n\nO /etc/hosts foi restaurado do backup.\nVerifique as permissões e tente novamente." 8 50
+  fi
+}
+
+# Função para mostrar informações detalhadas do hostname (incluindo YAML)
+function show_hostname_info_with_yaml {
+  local current_hostname=$(hostname)
+  local static_hostname=$(hostnamectl --static)
+  local pretty_hostname=$(hostnamectl --pretty 2>/dev/null || echo "Não definido")
+  local transient_hostname=$(hostnamectl --transient)
+  local fqdn=$(hostname -f 2>/dev/null || echo "Não disponível")
+  local domain=$(hostname -d 2>/dev/null || echo "Não definido")
+  
+  # Informações do YAML
+  local yaml_hostname=$(get_hostname_from_yaml)
+  local yaml_info=""
+  
+  if [ -n "$yaml_hostname" ]; then
+    local yaml_date=$(yq -r '.Sistema.Data_Hostname // "Não disponível"' "$YAML_FILE" 2>/dev/null)
+    local yaml_applied=$(yq -r '.Sistema.Data_Aplicacao // "Nunca aplicado"' "$YAML_FILE" 2>/dev/null)
+    
+    yaml_info="
+INFORMAÇÕES DO SYSTEM.YAML:
+Hostname salvo: $yaml_hostname
+Data de definição: $yaml_date
+Última aplicação: $yaml_applied"
+    
+    if [ "$current_hostname" != "$yaml_hostname" ]; then
+      yaml_info="$yaml_info
+⚠️  STATUS: Desatualizado!"
+    else
+      yaml_info="$yaml_info
+✅ STATUS: Sincronizado"
+    fi
+  else
+    yaml_info="
+INFORMAÇÕES DO SYSTEM.YAML:
+❌ Hostname não definido no YAML"
+  fi
+  
+  # Captura conteúdo relevante do /etc/hosts
+  local hosts_content=$(grep -E "(127\.0\.0\.1|127\.0\.1\.1)" /etc/hosts | head -5)
+  
+  dialog --title "Informações Completas do Hostname" --msgbox "INFORMAÇÕES DO SISTEMA:
+Hostname atual: $current_hostname
+Hostname estático: $static_hostname  
+Hostname transiente: $transient_hostname
+Hostname pretty: $pretty_hostname
+FQDN: $fqdn
+Domínio: $domain
+$yaml_info
+
+ENTRADAS EM /etc/hosts:
+$hosts_content" 20 80
+}
+
+# Menu principal para hostname (modificado)
+function hostname_menu_with_yaml {
+  while true; do
+    # Verifica status de sincronização para mostrar no menu
+    local sync_status=""
+    case $(check_hostname_sync >/dev/null 2>&1; echo $?) in
+      1) sync_status=" [❌ Não definido no YAML]" ;;
+      2) sync_status=" [⚠️ Desatualizado]" ;;
+      0) sync_status=" [✅ Sincronizado]" ;;
+    esac
+    
+    if ! var0=$(dialog --title "Gerenciamento de Hostname${sync_status}" --backtitle "Configurações do Sistema" --menu "Selecione uma opção:" 0 0 0 \
+      1 'Visualizar informações completas do hostname' \
+      2 'Alterar hostname (salva no YAML)' \
+      3 'Aplicar hostname do system.yaml ao sistema' \
+      4 'Verificar sincronização YAML ↔ Sistema' \
+      5 'Verificar arquivo /etc/hosts' \
+      6 'Testar resolução de nome' \
+      X 'Voltar' 2>&1 > /dev/tty); then
+      return
+    fi
+    
+    case "$var0" in
+    1) show_hostname_info_with_yaml ;;
+    2) change_hostname_with_yaml ;;
+    3) apply_hostname_from_yaml ;;
+    4) check_hostname_sync_dialog ;;
+    5) show_hosts_file ;;
+    6) test_hostname_resolution ;;
+    X) return ;;
+    esac
+  done
+}
+
+# Função para exibir status de sincronização em dialog
+function check_hostname_sync_dialog {
+  local current_hostname=$(hostname)
+  local yaml_hostname=$(get_hostname_from_yaml)
+  local message=""
+  
+  if [ -z "$yaml_hostname" ]; then
+    message="STATUS: Hostname não definido no system.yaml
+    
+Hostname atual do sistema: $current_hostname
+Hostname no system.yaml: Não definido
+
+RECOMENDAÇÃO:
+Use a opção 'Alterar hostname' para definir e salvar no YAML."
+  elif [ "$current_hostname" != "$yaml_hostname" ]; then
+    message="STATUS: Hostname desatualizado
+    
+Hostname atual do sistema: $current_hostname
+Hostname no system.yaml: $yaml_hostname
+
+RECOMENDAÇÃO:
+Use 'Aplicar hostname do system.yaml' para sincronizar o sistema com o YAML."
+  else
+    local yaml_date=$(yq -r '.Sistema.Data_Hostname // "Não disponível"' "$YAML_FILE" 2>/dev/null)
+    message="STATUS: Hostname sincronizado ✅
+    
+Hostname atual: $current_hostname
+Definido no YAML em: $yaml_date
+
+Tudo está correto!"
+  fi
+  
+  dialog --title "Status de Sincronização" --msgbox "$message" 12 60
+}
+
+# Função para mostrar o arquivo /etc/hosts
+function show_hosts_file {
+  local hosts_content=$(cat /etc/hosts)
+  dialog --title "Conteúdo do /etc/hosts" --msgbox "$hosts_content" 20 80
+}
+
+# Função para testar resolução de nome
+function test_hostname_resolution {
+  local current_hostname=$(hostname)
+  local test_results=""
+  
+  dialog --title "Testando" --infobox "Testando resolução de nomes...\nPor favor, aguarde..." 5 40
+  
+  # Testa resolução local
+  if ping -c 1 "$current_hostname" >/dev/null 2>&1; then
+    test_results="✅ Resolução local: OK\n"
+  else
+    test_results="❌ Resolução local: FALHA\n"
+  fi
+  
+  # Testa resolução localhost
+  if ping -c 1 localhost >/dev/null 2>&1; then
+    test_results="${test_results}✅ Localhost: OK\n"
+  else
+    test_results="${test_results}❌ Localhost: FALHA\n"
+  fi
+  
+  # Testa resolução DNS externa
+  if ping -c 1 google.com >/dev/null 2>&1; then
+    test_results="${test_results}✅ DNS externo: OK\n"
+  else
+    test_results="${test_results}❌ DNS externo: FALHA\n"
+  fi
+  
+  # Mostra resultados
+  dialog --title "Resultados do Teste" --msgbox "Resultados da resolução de nomes:\n\n$test_results\nHostname testado: $current_hostname" 10 50
 }
 
 function kiosk0 {
