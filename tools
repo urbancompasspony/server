@@ -44,26 +44,8 @@ function save_hostname_to_yaml {
   
   # Verifica se o arquivo existe, se não, cria estrutura básica
   if [ ! -f "$YAML_FILE" ]; then
-    echo "📝 Criando arquivo system.yaml..."
-    sudo mkdir -p /srv
-    sudo tee "$YAML_FILE" > /dev/null << EOF
-# Arquivo de configurações do servidor
-# Criado automaticamente em $datetime
-
-Informacoes:
-  Data_Instalacao: "$datetime"
-  Data_Restauracao: "Nunca foi reinstalado."
-
-Hardware:
-  Tipo: "Servidor"
-  Placa: "Desconhecida"
-
-Sistema:
-  Hostname: "$hostname"
-  Data_Hostname: "$datetime"
-
-Redes: {}
-EOF
+    clear; echo "PADRÃO CDN INEXISTENTE! Saindo."; sleep 5
+    return
   else
     # Arquivo existe, apenas atualiza a seção Sistema
     echo "📝 Atualizando hostname no system.yaml..."
