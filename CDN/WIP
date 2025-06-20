@@ -6,3 +6,59 @@
   } || {
     
   }
+
+
+# =============================================================================
+# EXEMPLO DE SCRIPT INDEPENDENTE PARA APLICAR HOSTNAME DO YAML
+# =============================================================================
+
+function auto_apply_hostname_if_needed {
+  local current_hostname=$(hostname)
+  local yaml_hostname=$(get_hostname_from_yaml)
+  
+  # Se não há hostname definido no YAML, não faz nada
+  if [ -z "$yaml_hostname" ]; then
+    echo "ℹ️  Hostname não definido no system.yaml - pulando configuração automática"
+    return 0
+  fi
+  
+  # Se já está sincronizado, não faz nada
+  if [ "$current_hostname" = "$yaml_hostname" ]; then
+    echo "✅ Hostname já está sincronizado: $current_hostname"
+    return 0
+  fi
+  
+  # Se hostname atual é "ubuntu" ou similar (padrão), aplica automaticamente
+  if [[ "$current_hostname" =~ ^(ubuntu|debian|localhost)$ ]]; then
+    echo "🔄 Aplicando hostname do system.yaml automaticamente..."
+    echo "   De: $current_hostname"
+    echo "   Para: $yaml_hostname"
+    
+    # Aplica sem dialog (para uso em scripts de inicialização)
+    if hostnamectl set-hostname "$yaml_hostname" 2>/dev/null; then
+      echo "$yaml_hostname" | tee /etc/hostname > /dev/null
+      
+      # Atualiza /etc/hosts
+      sed -i "/$current_hostname/d" /etc/hosts
+      if ! grep -q "127.0.0.1.*$yaml_hostname" /etc/hosts; then
+        sed -i "1a\\127.0.0.1\t$yaml_hostname" /etc/hosts
+      fi
+      if ! grep -q "127.0.1.1.*$yaml_hostname" /etc/hosts; then
+        sed -i "/127.0.0.1.*$yaml_hostname/a\\127.0.1.1\t$yaml_hostname" /etc/hosts
+      fi
+      
+      echo "✅ Hostname aplicado com sucesso!"
+      return 0
+    else
+      echo "❌ Falha ao aplicar hostname automaticamente"
+      return 1
+    fi
+  else
+    echo "⚠️  Hostname atual ($current_hostname) difere do YAML ($yaml_hostname)"
+    echo "   Use o menu de gerenciamento para aplicar manualmente"
+    return 1
+  fi
+}
+
+# Esta função pode ser chamada em scripts de inicialização ou no .bashrc
+# para aplicar automaticamente o hostname do YAML em novos sistemas
