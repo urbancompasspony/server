@@ -178,7 +178,6 @@ if ! var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu 
   D 'Instalar ADMX Templates extras W 10' \
   E 'Instalar ADMX Templates extras W 11' \
   F 'Remover ADMX Templates extras' \
-  G 'Atualizar este Menu!' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -190,7 +189,6 @@ if ! var4=$(dialog --title "$ttitle" --backtitle "Manutencao do Dominio" --menu 
   D) clear ; force_msi_w10 ; s_settings_menu ;;
   E) clear ; force_msi_w11 ; s_settings_menu ;;
   F) clear ; rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions ; read -r -p "ADMX Templates removidas. Pressione Enter para continuar!" ; s_settings_menu ;;
-  G) clear ; wget -q https://raw.githubusercontent.com/urbancompasspony/server/main/dominio -O /root/.dominio ; chmod +x /root/.dominio ; s_settings_menu ;;
   X) return ;;
   esac
 }
