@@ -25,6 +25,7 @@ function main_menu {
   F 'Silos de Autenticacao' \
   G 'Informacoes do Dominio' \
   H 'Configuracoes do Dominio' \
+  I 'Configurar WebUI' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -38,6 +39,7 @@ function main_menu {
   F) checksilos0 ; main_menu ;;
   G) info_domain ; main_menu ;;
   H) s_settings_menu ; main_menu ;;
+  I) clear ; auth-toggle.sh ; main_menu ;;
   X) exit ;;
   esac
 }
