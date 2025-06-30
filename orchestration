@@ -45,12 +45,11 @@ function contratos0 {
   7 'Servidor OpenFire (Spark) (W)' \
   8 'OnlyOffice (W)' \
   9 'Tailscale CLIENT (L/W)' \
-  10 'OpenVPN Server (L/W)' \
-  11 'QDir stat (L/W)' \
-  12 'Smoke Ping (L/W)' \
-  13 'Sist2 Indexer (W)' \
-  14 'Network UPS Tools Gui (L)' \
-  15 'SMS PowerViewer (L/W)' \
+  10 'QDir stat (L/W)' \
+  11 'Smoke Ping (L/W)' \
+  12 'Sist2 Indexer (W)' \
+  13 'Network UPS Tools Gui (L)' \
+  14 'SMS PowerViewer (L/W)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -65,12 +64,11 @@ function contratos0 {
   7) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
   8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
   9) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-  10) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-  11) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
-  12) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
-  13) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
-  14) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
-  15) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
+  10) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
+  11) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
+  12) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
+  13) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
+  14) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
   X) return ;;
   esac
 }
