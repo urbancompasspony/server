@@ -17,8 +17,7 @@ function start {
   2 'Somente Contrato' \
   3 'Serviços Gerais' \
   4 'Bancos de Dados' \
-  6 'Aarch64 Supported' \
-  7 'Outros' \
+  5 'Outros' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -28,8 +27,7 @@ function start {
   2) contratos0 ; start ;;
   3) general ; start ;;
   4) database ; start ;;
-  6) arm640 ; start ;;
-  7) personal ; start ;;
+  5) personal ; start ;;
   X) exit ;;
   esac
 }
@@ -163,41 +161,6 @@ function personal {
   3) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
   4) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
   5) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
-  X) return ;;
-  esac
-}
-
-function arm640 {
-  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
-  1 'DashDot (L/W)' \
-  2 'Kuma (L/W)' \
-  3 'MySpeed  Test WAN (L/W)' \
-  4 'OpenSpeedTest LAN (L/W)' \
-  5 'PiHole (L/W)' \
-  6 '(C) Tailscale CLIENT (L/W)' \
-  7 '(C) Headscale SERVER (L/W)' \
-  8 '(C) OpenVPN (L/W)' \
-  9 '(C) PenTest & PentApache (L/W)' \
-  10 'SAMBA/AD (W)' \
-  11 'SSH DW (Backdoor) (L)' \
-  12 'SMS PowerViewer (L/W)' \
-  X '<' 2>&1 > /dev/tty ); then
-    return
-  fi
-
-  case "$var0" in
-  1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
-  2) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-  3) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
-  4) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-  5) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-  6) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-  7) wget "$github"57-headscale-server -O /tmp/headscale-server; sudo bash /tmp/headscale-server ;;
-  8) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-  9) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-  10) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-  11) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-  12) wget "$github"11-SMS-PV -O /tmp/sms; sudo bash /tmp/sms ;;
   X) return ;;
   esac
 }
