@@ -17,9 +17,8 @@ function start {
   2 'Somente Contrato' \
   3 'Serviços Gerais' \
   4 'Bancos de Dados' \
-  5 'Experimental' \
-  6 'Support ARM64' \
-  7 'Pessoal' \
+  6 'Aarch64 Supported' \
+  7 'Outros' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -29,7 +28,6 @@ function start {
   2) contratos0 ; start ;;
   3) general ; start ;;
   4) database ; start ;;
-  5) experimental ; start ;;
   6) arm640 ; start ;;
   7) personal ; start ;;
   X) exit ;;
@@ -132,29 +130,6 @@ function general {
   8) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
   9) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
   X) return ;;
-  esac
-}
-
-function experimental {
-  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
-  1 'Android (VM) (L)' \
-  2 'macOS (VM) (L)' \
-  3 'SnipeIT (W)' \
-  4 'PwnDrop (W)' \
-  6 'Nexterm (W)' \
-  7 'Diskover (W)' \
-  X '<' 2>&1 > /dev/tty ); then
-    return
-  fi
-
-  case "$var0" in
-  1) wget "$github"32-redroid -O /tmp/redroid; sudo bash /tmp/redroid ;;
-  2) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
-  3) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
-  4) wget "$github"47-pwndrop -O /tmp/pwndrop; sudo bash /tmp/pwndrop ;;
-  6) wget "$github"71-nexterm -O /tmp/nexterm; sudo bash /tmp/nexterm ;;
-  7) wget "$github"73-diskover -O /tmp/diskover; sudo bash /tmp/diskover ;;
-  X) echo "." > /dev/null ;;
   esac
 }
 
