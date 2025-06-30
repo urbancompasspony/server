@@ -8,5 +8,6 @@ Os únicos containers que não são auto-restaurados são:
 ORACLE XE 21C
 OPENFIRE (SPARK MSG)
 PENTEST
+NEXTCLOUD
 
 dadas as circunstâncisa e suas naturezas!
