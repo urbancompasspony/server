@@ -38,22 +38,21 @@ function contratos0 {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
   1 'File Browser (L/W)' \
   2 'Homarr (L/W)' \
-  3 'PenTest & PentApache (L/W)' \
+  3 'PenTest (L/W)' \
   4 'SSH Tunnel (A) (W)' \
   5 'WeTTY      (B) (W)' \
-  6 'Gestor UniFi (W)' \
+  6 'UniFi (W)' \
   7 'GLPI (W)' \
   8 'Reverse Proxy (W)' \
-  9 'Servidor RustDesk (W)' \
-  11 'Servidor OpenFire (Spark) (W)' \
-  12 'OnlyOffice (W)' \
-  13 'Tailscale CLIENT (L/W)' \
-  14 'OpenVPN Server (L/W)' \
-  15 'QDir stat (L/W)' \
-  16 'Smoke Ping (L/W)' \
-  17 'Sist2 Indexer (W)' \
-  18 'Network UPS Tools Gui (L)' \
-  19 'SMS PowerViewer (L/W)' \
+  9 'Servidor OpenFire (Spark) (W)' \
+  10 'OnlyOffice (W)' \
+  11 'Tailscale CLIENT (L/W)' \
+  12 'OpenVPN Server (L/W)' \
+  13 'QDir stat (L/W)' \
+  14 'Smoke Ping (L/W)' \
+  15 'Sist2 Indexer (W)' \
+  16 'Network UPS Tools Gui (L)' \
+  17 'SMS PowerViewer (L/W)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -67,16 +66,15 @@ function contratos0 {
   6) wget "$github"03-unifi-net -O /tmp/unifi; sudo bash /tmp/unifi ;;
   7) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
   8) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-  9) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-  11) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-  12) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-  13) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-  14) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-  15) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
-  16) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
-  17) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
-  18) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
-  19) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
+  9) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+  10) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+  11) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+  12) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+  13) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
+  14) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
+  15) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
+  16) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
+  17) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
   X) return ;;
   esac
 }
@@ -109,28 +107,28 @@ function modelstools {
 function general {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
   1 'Ferdium (RAMBOX) (W)' \
-  3 'NextCloud (W)' \
-  4 'ntfy (W)' \
-  5 'Remotely (W)' \
-  6 'Servidor Apache (W)' \
-  7 'Servidor CUPS (W)' \
-  8 'Servidor FTP (W)' \
-  9 'Syncthing CLIENT (L/W)' \
-  10 'Chromium Browser (W/L)' \
+  2 'NextCloud (W)' \
+  3 'ntfy (W)' \
+  4 'Remotely (W)' \
+  5 'Servidor Apache (W)' \
+  6 'Servidor CUPS (W)' \
+  7 'Servidor FTP (W)' \
+  8 'Syncthing CLIENT (L/W)' \
+  9 'Chromium Browser (W/L)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
 
   case "$var0" in
   1) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
-  3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-  4) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-  5) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
-  6) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-  7) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-  8) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-  9) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-  10) wget "$github"17-Chromium -O /tmp/Chromium; sudo bash /tmp/Chromium ;;
+  2) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
+  3) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
+  4) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
+  5) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
+  6) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
+  7) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+  8) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+  9) wget "$github"17-Chromium -O /tmp/Chromium; sudo bash /tmp/Chromium ;;
   X) return ;;
   esac
 }
@@ -162,15 +160,9 @@ function personal {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
   1 'Luanti Server (W)' \
   2 'SSH DW Backup (L)' \
-  4 'Jellyfin (L/W)' \
-  5 'qBitTorrent (W)' \
-  6 'Ollama IA  (A) (L)' \
-  7 'Ollama Web (B) (L)' \
-  8 'WireShark (W)' \
-  9 'Endlessh (W)' \
-  10 'Ejabberd-chat-server (W/L)' \
-  11 'Dominio & CUPS BETA (W)' \
-  12 'Rancher - k3s k8s (W)' \
+  3 'Jellyfin (L/W)' \
+  4 'qBitTorrent (W)' \
+  5 'Dominio & CUPS BETA (W)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -178,15 +170,9 @@ function personal {
   case "$var0" in
   1) wget "$github"12-luanti-server -O /tmp/luanti; sudo bash /tmp/luanti ;;
   2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-  4) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
-  5) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
-  6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
-  7) wget "$github"52-ollama-GUI -O /tmp/ollamaweb; sudo bash /tmp/ollamaweb ;;
-  8) wget "$github"54-wireshark -O /tmp/wireshark; sudo bash /tmp/wireshark ;;
-  9) wget "$github"50-endlessh -O /tmp/endlessh; sudo bash /tmp/endlessh ;;
-  10) wget "$github"55-ejabberd-chatserver -O /tmp/55-ejabberd-chatserver; sudo bash /tmp/55-ejabberd-chatserver ;;
-  11) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
-  12) wget "$github"72-rancher-k8s -O /tmp/rancher; sudo bash /tmp/rancher ;;
+  3) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
+  4) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
+  5) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
   X) return ;;
   esac
 }
@@ -202,7 +188,7 @@ function arm640 {
   7 '(C) Headscale SERVER (L/W)' \
   8 '(C) OpenVPN (L/W)' \
   9 '(C) PenTest & PentApache (L/W)' \
-  10 'Dominio & CUPS (W)' \
+  10 'SAMBA/AD (W)' \
   11 'SSH DW (Backdoor) (L)' \
   12 'SMS PowerViewer (L/W)' \
   X '<' 2>&1 > /dev/tty ); then
