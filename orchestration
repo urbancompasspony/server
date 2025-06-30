@@ -46,10 +46,9 @@ function contratos0 {
   8 'OnlyOffice (W)' \
   9 'Tailscale CLIENT (L/W)' \
   10 'QDir stat (L/W)' \
-  11 'Smoke Ping (L/W)' \
-  12 'Sist2 Indexer (W)' \
-  13 'Network UPS Tools Gui (L)' \
-  14 'SMS PowerViewer (L/W)' \
+  11 'Sist2 Indexer (W)' \
+  12 'Network UPS Tools Gui (L)' \
+  13 'SMS PowerViewer (L/W)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -65,10 +64,9 @@ function contratos0 {
   8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
   9) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
   10) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
-  11) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
-  12) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
-  13) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
-  14) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
+  11) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
+  12) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
+  13) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
   X) return ;;
   esac
 }
