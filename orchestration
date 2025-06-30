@@ -47,12 +47,11 @@ function contratos0 {
   7 'GLPI (W)' \
   8 'Reverse Proxy (W)' \
   9 'Servidor RustDesk (W)' \
-  10 'RustDesk Web Client (W)' \
   11 'Servidor OpenFire (Spark) (W)' \
   12 'OnlyOffice (W)' \
   13 'Tailscale CLIENT (L/W)' \
   14 'OpenVPN Server (L/W)' \
-  15 'Q Dir stat (L/W)' \
+  15 'QDir stat (L/W)' \
   16 'Smoke Ping (L/W)' \
   17 'Sist2 Indexer (W)' \
   18 'Network UPS Tools Gui (L)' \
@@ -71,7 +70,6 @@ function contratos0 {
   7) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
   8) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
   9) wget "$github"31-rustdesk -O /tmp/rustdesk; sudo bash /tmp/rustdesk ;;
-  10) wget "$github"24-rustdesk-web -O /tmp/deskweb; sudo bash /tmp/deskweb ;;
   11) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
   12) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
   13) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
@@ -113,7 +111,6 @@ function modelstools {
 function general {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
   1 'Ferdium (RAMBOX) (W)' \
-  2 'Netboot PXE (W)' \
   3 'NextCloud (W)' \
   4 'ntfy (W)' \
   5 'Remotely (W)' \
@@ -127,7 +124,6 @@ function general {
 
   case "$var0" in
   1) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
-  2) wget "$github"23-netboot-xyz -O /tmp/netboot; sudo bash /tmp/netboot ;;
   3) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
   4) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
   5) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
@@ -145,7 +141,6 @@ function experimental {
   2 'macOS (VM) (L)' \
   3 'SnipeIT (W)' \
   4 'PwnDrop (W)' \
-  5 'Chromium to Web (L/W)' \
   6 'Nexterm (W)' \
   7 'Diskover (W)' \
   X '<' 2>&1 > /dev/tty ); then
@@ -157,7 +152,6 @@ function experimental {
   2) wget "$github"39-macOS -O /tmp/macOS; sudo bash /tmp/macOS ;;
   3) wget "$github"62-snipeit -O /tmp/snipeit; sudo bash /tmp/snipeit ;;
   4) wget "$github"47-pwndrop -O /tmp/pwndrop; sudo bash /tmp/pwndrop ;;
-  5) wget "$github"65-chromium -O /tmp/chromium; sudo bash /tmp/chromium ;;
   6) wget "$github"71-nexterm -O /tmp/nexterm; sudo bash /tmp/nexterm ;;
   7) wget "$github"73-diskover -O /tmp/diskover; sudo bash /tmp/diskover ;;
   X) echo "." > /dev/null ;;
@@ -190,8 +184,7 @@ function database {
 function personal {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
   1 'Luanti Server (W)' \
-  2 'SSH DW (Backdoor) (L)' \
-  3 'Ubuntu 22.04 WebUI (W)' \
+  2 'SSH DW Backup (L)' \
   4 'Jellyfin (L/W)' \
   5 'qBitTorrent (W)' \
   6 'Ollama IA  (A) (L)' \
@@ -209,7 +202,6 @@ function personal {
   case "$var0" in
   1) wget "$github"12-luanti-server -O /tmp/luanti; sudo bash /tmp/luanti ;;
   2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-  3) wget "$github"44.0-xpra-ubuntu2204 -O /tmp/ubuntu2204; sudo bash /tmp/ubuntu2204 ;;
   4) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
   5) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
   6) wget "$github"51-ollama-ia -O /tmp/ollamaia; sudo bash /tmp/ollamaia ;;
