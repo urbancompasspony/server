@@ -105,12 +105,11 @@ function general {
   1 'Ferdium (RAMBOX) (W)' \
   2 'NextCloud (W)' \
   3 'ntfy (W)' \
-  4 'Remotely (W)' \
-  5 'Servidor Apache (W)' \
-  6 'Servidor CUPS (W)' \
-  7 'Servidor FTP (W)' \
-  8 'Syncthing CLIENT (L/W)' \
-  9 'Chromium Browser (W/L)' \
+  4 'Servidor Apache (W)' \
+  5 'Servidor CUPS (W)' \
+  6 'Servidor FTP (W)' \
+  7 'Syncthing CLIENT (L/W)' \
+  8 'Chromium Browser (W/L)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -119,12 +118,11 @@ function general {
   1) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
   2) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
   3) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-  4) wget "$github"59-remotely -O /tmp/remotely; sudo bash /tmp/remotely ;;
-  5) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-  6) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-  7) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-  8) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-  9) wget "$github"17-Chromium -O /tmp/Chromium; sudo bash /tmp/Chromium ;;
+  4) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
+  5) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
+  6) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
+  7) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+  8) wget "$github"17-Chromium -O /tmp/Chromium; sudo bash /tmp/Chromium ;;
   X) return ;;
   esac
 }
