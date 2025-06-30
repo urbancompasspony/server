@@ -39,20 +39,18 @@ function contratos0 {
   1 'File Browser (L/W)' \
   2 'Homarr (L/W)' \
   3 'PenTest (L/W)' \
-  4 'SSH Tunnel (A) (W)' \
-  5 'WeTTY      (B) (W)' \
-  6 'UniFi (W)' \
-  7 'GLPI (W)' \
-  8 'Reverse Proxy (W)' \
-  9 'Servidor OpenFire (Spark) (W)' \
-  10 'OnlyOffice (W)' \
-  11 'Tailscale CLIENT (L/W)' \
-  12 'OpenVPN Server (L/W)' \
-  13 'QDir stat (L/W)' \
-  14 'Smoke Ping (L/W)' \
-  15 'Sist2 Indexer (W)' \
-  16 'Network UPS Tools Gui (L)' \
-  17 'SMS PowerViewer (L/W)' \
+  4 'UniFi (W)' \
+  5 'GLPI (W)' \
+  6 'Reverse Proxy (W)' \
+  7 'Servidor OpenFire (Spark) (W)' \
+  8 'OnlyOffice (W)' \
+  9 'Tailscale CLIENT (L/W)' \
+  10 'OpenVPN Server (L/W)' \
+  11 'QDir stat (L/W)' \
+  12 'Smoke Ping (L/W)' \
+  13 'Sist2 Indexer (W)' \
+  14 'Network UPS Tools Gui (L)' \
+  15 'SMS PowerViewer (L/W)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -61,20 +59,18 @@ function contratos0 {
   1) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
   2) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
   3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-  4) wget "$github"63-ssh-tunnel-A -O /tmp/ssh-tunnel; sudo bash /tmp/ssh-tunnel ;;
-  5) wget "$github"46-wetty-B -O /tmp/wetty; sudo bash /tmp/wetty ;;
-  6) wget "$github"03-unifi-net -O /tmp/unifi; sudo bash /tmp/unifi ;;
-  7) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-  8) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-  9) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-  10) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-  11) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-  12) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
-  13) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
-  14) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
-  15) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
-  16) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
-  17) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
+  4) wget "$github"03-unifi-net -O /tmp/unifi; sudo bash /tmp/unifi ;;
+  5) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
+  6) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+  7) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+  8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+  9) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+  10) wget "$github"53-openvpn -O /tmp/openvpn; sudo bash /tmp/openvpn ;;
+  11) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
+  12) wget "$github"75-smokeping -O /tmp/smokeping; sudo bash /tmp/smokeping ;;
+  13) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
+  14) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
+  15) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
   X) return ;;
   esac
 }
