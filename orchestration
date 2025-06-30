@@ -116,6 +116,7 @@ function general {
   7 'Servidor CUPS (W)' \
   8 'Servidor FTP (W)' \
   9 'Syncthing CLIENT (L/W)' \
+  10 'Chromium Browser (W/L)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -129,6 +130,7 @@ function general {
   7) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
   8) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
   9) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
+  10) wget "$github"17-Chromium -O /tmp/Chromium; sudo bash /tmp/Chromium ;;
   X) return ;;
   esac
 }
@@ -169,7 +171,6 @@ function personal {
   10 'Ejabberd-chat-server (W/L)' \
   11 'Dominio & CUPS BETA (W)' \
   12 'Rancher - k3s k8s (W)' \
-  13 'Chromium Browser (W/L)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -186,7 +187,6 @@ function personal {
   10) wget "$github"55-ejabberd-chatserver -O /tmp/55-ejabberd-chatserver; sudo bash /tmp/55-ejabberd-chatserver ;;
   11) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
   12) wget "$github"72-rancher-k8s -O /tmp/rancher; sudo bash /tmp/rancher ;;
-  13) wget "$github"17-Chromium -O /tmp/Chromium; sudo bash /tmp/Chromium ;;
   X) return ;;
   esac
 }
