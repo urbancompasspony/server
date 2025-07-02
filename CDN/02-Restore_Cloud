@@ -4,7 +4,7 @@ export pty=True
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
-destpath=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
+destpath=$(sed -n '2p' /srv/scripts/config/backupcont)
 
 [ -d "$destpath" ] || {
   clear; echo "ERRO: A pasta de backups definida em $destpath não existe. Verifique!"; sleep 3
