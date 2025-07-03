@@ -165,4 +165,9 @@ function personal {
   esac
 }
 
+if ! command -v yq >/dev/null 2>&1; then
+  clear; echo "yq não foi encontrado no sistema"; sleep 3
+  return 1
+fi
+
 start
