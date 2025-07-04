@@ -1,12 +1,12 @@
 #!/bin/bash
 datetime=$(date +"%d_%m_%y_%H_%M")
-source=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
-destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
+source=$(sed -n '1p' /srv/scripts/config/backupcont)
+destiny=$(sed -n '2p' /srv/scripts/config/backupcont)
+
 function start {
   files=()
-  
-  # Criar array temporário para ordenação
   temp_files=()
+
   while IFS= read -r -d $'\0' file; do
     temp_files+=("$file")
   done < <(find "$destiny" -type f -name "*.tar.lz4" -print0)
@@ -14,17 +14,14 @@ function start {
   # Ordenar por nome do arquivo (basename) ignorando caminho
   IFS=$'\n' sorted_files=($(printf '%s\n' "${temp_files[@]}" | sort -k1,1 -t/ | sort -t/ -k$(($(echo "${temp_files[0]}" | tr -cd '/' | wc -c) + 1))))
   
-  # Método mais simples e confiável para ordenar por basename
   readarray -t sorted_files < <(printf '%s\n' "${temp_files[@]}" | while read -r file; do
     echo "$(basename "$file")|$file"
   done | sort | cut -d'|' -f2)
   
-  # Montar array para dialog
   for file in "${sorted_files[@]}"; do
     files+=("$file" "")
   done
 
-# Verificar se há pelo menos 1 arquivo ou gerar erro.
   [ ${#files[@]} -eq 0 ] && {
     clear
     echo ""
