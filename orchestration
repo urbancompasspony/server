@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# For Ubuntu 22.04!
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
@@ -34,20 +33,20 @@ function start {
 
 function contratos0 {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
-  1 'File Browser (L/W)' \
-  2 'Homarr (L/W)' \
-  3 'PenTest (L/W)' \
-  4 'UniFi (W)' \
-  5 'GLPI (W)' \
-  6 'Reverse Proxy (W)' \
-  7 'Servidor OpenFire (Spark) (W)' \
-  8 'OnlyOffice (W)' \
-  9 'Tailscale CLIENT (L/W)' \
-  10 'QDir stat (L/W)' \
-  11 'Sist2 Indexer (W)' \
+  1 'File Browser' \
+  2 'Homarr' \
+  3 'PenTest' \
+  4 'UniFi' \
+  5 'GLPI' \
+  6 'Reverse Proxy' \
+  7 'Servidor OpenFire (Spark)' \
+  8 'OnlyOffice' \
+  9 'Tailscale CLIENT' \
+  10 'QDir Stat' \
+  11 'Sist2 Indexer' \
   12 'Network UPS Tools Gui (L)' \
-  13 'SMS PowerViewer (L/W)' \
-  14 'Kuma (L/W)' \
+  13 'SMS PowerViewer' \
+  14 'Kuma' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -75,10 +74,10 @@ function modelstools {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
   1 'DashDot' \
   2 'Active Directory' \
-  4 'MySpeed  Test WAN' \
-  5 'OpenSpeedTest LAN' \
-  6 'PiHole' \
-  7 'XPRA VM MGR' \
+  3 'MySpeed  Test WAN' \
+  4 'OpenSpeedTest LAN' \
+  5 'PiHole' \
+  6 'XPRA VM MGR' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -86,10 +85,10 @@ function modelstools {
   case "$var0" in
   1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
   2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-  4) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
-  5) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-  6) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-  7) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+  3) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
+  4) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
+  5) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
+  6) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
   X) return ;;
   esac
 }
@@ -143,7 +142,7 @@ function database {
 function personal {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
   1 'Luanti Server' \
-  2 'SSH DW Backup' \
+  2 'SSH DW Backup (L)' \
   3 'Jellyfin' \
   4 'qBitTorrent' \
   5 'Dominio & CUPS (BETA)' \
