@@ -47,6 +47,7 @@ function contratos0 {
   11 'Sist2 Indexer (W)' \
   12 'Network UPS Tools Gui (L)' \
   13 'SMS PowerViewer (L/W)' \
+  14 'Kuma (L/W)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -65,19 +66,19 @@ function contratos0 {
   11) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
   12) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
   13) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
+  14) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
   X) return ;;
   esac
 }
 
 function modelstools {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
-  1 'DashDot (L/W)' \
-  2 'SAMBA/AD (W)' \
-  3 'Kuma (L/W)' \
-  4 'MySpeed  Test WAN (L/W)' \
-  5 'OpenSpeedTest LAN (L/W)' \
-  6 'PiHole (L/W)' \
-  7 'XPRA (L/W)' \
+  1 'DashDot' \
+  2 'Active Directory' \
+  4 'MySpeed  Test WAN' \
+  5 'OpenSpeedTest LAN' \
+  6 'PiHole' \
+  7 'XPRA VM MGR' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -85,7 +86,6 @@ function modelstools {
   case "$var0" in
   1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
   2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-  3) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
   4) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
   5) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
   6) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
@@ -96,14 +96,14 @@ function modelstools {
 
 function general {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
-  1 'Ferdium (RAMBOX) (W)' \
-  2 'NextCloud (W)' \
-  3 'ntfy (W)' \
-  4 'Servidor Apache (W)' \
-  5 'Servidor CUPS (W)' \
-  6 'Servidor FTP (W)' \
-  7 'Syncthing CLIENT (L/W)' \
-  8 'Chromium Browser (W/L)' \
+  1 'Ferdium (RAMBOX)' \
+  2 'NextCloud' \
+  3 'ntfy' \
+  4 'Servidor Apache' \
+  5 'Servidor CUPS' \
+  6 'Servidor FTP' \
+  7 'Syncthing CLIENT' \
+  8 'Chromium Browser' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -123,12 +123,10 @@ function general {
 
 function database {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
-  1 'MySQL (W)' \
-  2 'MariaDB (W)' \
-  3 'OracleXE 21C (W)' \
-  4 'Firebird (W)' \
-  5 'PHPMyAdmin (L)' \
-  6 'ElasticSearch 7.17.22 (W)' \
+  1 'MySQL' \
+  2 'MariaDB' \
+  3 'OracleXE 21C' \
+  4 'ElasticSearch 7.17.22' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -137,21 +135,19 @@ function database {
   1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
   2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
   3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
-  4) wget "$github"49-firebird -O /tmp/firebird; sudo bash /tmp/firebird ;;
-  5) wget "$github"48-phpmyadmin -O /tmp/phpmyadmin; sudo bash /tmp/phpmyadmin ;;
-  6) wget "$github"78-elasticsearch -O /tmp/elasticsearch; sudo bash /tmp/elasticsearch ;;
+  4) wget "$github"78-elasticsearch -O /tmp/elasticsearch; sudo bash /tmp/elasticsearch ;;
   X) return ;;
   esac
 }
 
 function personal {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
-  1 'Luanti Server (W)' \
-  2 'SSH DW Backup (L)' \
-  3 'Jellyfin (L/W)' \
-  4 'qBitTorrent (W)' \
-  5 'Dominio & CUPS BETA (W)' \
-  6 'Simple Chat Server (W)' \
+  1 'Luanti Server' \
+  2 'SSH DW Backup' \
+  3 'Jellyfin' \
+  4 'qBitTorrent' \
+  5 'Dominio & CUPS (BETA)' \
+  6 'Simple Chat Server' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
