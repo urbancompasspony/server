@@ -27,5 +27,5 @@ Destination IP: Any IP address
 6. Configurar Protocol and Ports:
 
 Protocol: TCP
-From this source port: Any
+From this source port: 445 (SMB)
 To this destination port: 445 (SMB)
