@@ -28,15 +28,3 @@ Destination IP: This IP address or subnet: IP_DO_SERVIDOR/24 (ex: 192.168.1.10/2
 Protocol: TCP
 From this source port: Any
 To this destination port: 445 (SMB)
-
-#####################
-TESTAR COM POWERSHELL
-
-# Verificar políticas QoS
-Get-NetQosPolicy | Where-Object {$_.Name -like "*SMB*"}
-
-# Verificar configuração
-Get-NetQosFlowControl
-
-# Testar velocidade
-Test-NetConnection -ComputerName "servidor" -Port 445 -InformationLevel Detailed
