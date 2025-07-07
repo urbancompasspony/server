@@ -17,7 +17,6 @@ Specify Outbound Throttle Rate: 2048 Kbps (2 Mbps)
 4. Configurar Application:
 
 Selecionar: "All applications"
-OU específico: "Only applications with this executable name: explorer.exe"
 
 5. Configurar Protocol and Ports:
 
