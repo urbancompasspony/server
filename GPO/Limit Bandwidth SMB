@@ -29,3 +29,14 @@ To this destination port: 445 (SMB)
 
 Source IP: Any IP address
 Destination IP: This IP address or subnet: IP_DO_SERVIDOR (ex: 192.168.1.100)
+
+TESTAR
+
+# Verificar políticas QoS
+Get-NetQosPolicy | Where-Object {$_.Name -like "*SMB*"}
+
+# Verificar configuração
+Get-NetQosFlowControl
+
+# Testar velocidade
+Test-NetConnection -ComputerName "servidor" -Port 445 -InformationLevel Detailed
