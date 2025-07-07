@@ -1,0 +1,31 @@
+Método 1: GPO com QoS Policy (Recomendado)
+Criando a GPO
+1. Abrir Group Policy Management Console:
+
+Criar nova GPO: "Limitacao_Velocidade_SMB"
+Aplicar na OU desejada
+
+2. Navegar para:
+Computer Configuration > Policies > Windows Settings > Policy-based QoS
+3. Criar Política QoS:
+
+Clique direito > "Create new policy"
+Policy name: "Limitar_SMB_2Mbps"
+Specify DSCP Value: 8 (CS1 - Baixa prioridade)
+Specify Outbound Throttle Rate: 2048 Kbps (2 Mbps)
+
+4. Configurar Application:
+
+Selecionar: "All applications"
+OU específico: "Only applications with this executable name: explorer.exe"
+
+5. Configurar Protocol and Ports:
+
+Protocol: TCP
+From this source port: Any
+To this destination port: 445 (SMB)
+
+6. Configurar Source and Destination IPs:
+
+Source IP: Any IP address
+Destination IP: This IP address or subnet: IP_DO_SERVIDOR (ex: 192.168.1.100)
