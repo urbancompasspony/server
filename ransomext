@@ -19,6 +19,11 @@ alternative_path="$path_alternative/Ransomware_Detectado"
 
 message00="Nenhum ransomware detectado!"
 
+# Configurações para detecção de massa
+threshold=100  # Arquivos modificados para considerar suspeito
+time_window=60  # Janela de tempo em minutos
+extension_threshold=5  # Quantidade de arquivos da mesma extensão para alerta
+
 ################################################################################
 
 extensoes="\\.micro$|\\.zepto$|\\.cerber$|\\.locky$|\\.cerber3$|\\.cryp1$|\\.mole$|\\.onion$|\\.axx$|\\.osiris$|\\.crypz$|\\.crypt$|\\.locked$|\\.odin$|\\.ccc$|\\.cerber2$|\\.sage$|\\.globe$|\\.exx$|\\.good$|\\.wallet$|\\.1txt$|\\.decrypt2017$|\\.encrypt$|\\.ezz$|\\.zzzzz$|\\.MERRY$|\\.enciphered$|\\.r5a$|\\.aesir$|\\.ecc$|\\.enigma$|\\.cryptowall$|\\.encrypted$|\\.loli$|\\.breaking_bad$|\\.coded$|\\.ha3$|\\.damage$|\\.wcry$|\\.lol!$|\\.cryptolocker$|\\.dharma$|\\.MRCR1$|\\.sexy$|\\.crjoker$|\\.fantom$|\\.keybtc@inbox_com$|\\.rrk$|\\.legion$|\\.kratos$|\\.LeChiffre$|\\.kraken$|\\.zcrypt$|\\.maya$|\\.enc$|\\.file0locked$|\\.crinf$|\\.serp$|\\.potato$|\\.ytbl$|\\.surprise$|\\.angelamerkel$|\\.windows10$|\\.lesli$|\\.serpent$|\\.PEGS1$|\\.dale$|\\.pdcr$|\\.zzz$|\\.xyz$|\\.1cbu1$|\\.venusf$|\\.coverton$|\\.thor$|\\.rnsmwr$|\\.evillock$|\\.R16m01d05$|\\.wflx$|\\.nuclear55$|\\.darkness$|\\.encr$|\\.rekt$|\\.kernel_time$|\\.zyklon$|\\.Dexter$|\\.locklock$|\\.cry$|\\.VforVendetta$|\\.btc$|\\.raid10$|\\.dCrypt$|\\.zorro$|\\.AngleWare$|\\.EnCiPhErEd$|\\.purge$|\\.realfs0ciety@sigaint.org.fs0ciety$|\\.shit$|\\.atlas$|\\.exotic$|\\.crypted$|\\.padcrypt$|\\.xxx$|\\.hush$|\\.vbransom$|\\.RMCM1$|\\.cryeye$|\\.unavailable$|\\.braincrypt$|\\.fucked$|\\.crypte$|\\._AiraCropEncrypted$|\\.stn$|\\.paym$|\\.spora$|\\.RARE1$|\\.alcatraz$|\\.pzdc$|\\.aaa$|\\.encrypted$|\\.ttt$|\\.odcodc$|\\.vvv$|\\.ruby$|\\.pays$|\\.comrade$|\\.enc$|\\.abc$|\\.xxx$|\\.antihacker2017$|\\.herbst$|\\.szf$|\\.rekt$|\\.bript$|\\.crptrgr$|\\.kkk$|\\.rdm$|\\.BarRax$|\\.vindows$|\\.helpmeencedfiles$|\\.hnumkhotep$|\\.CCCRRRPPP$|\\.kyra$|\\.fun$|\\.rip$|\\.73i87A$|\\.bitstak$|\\.kernel_complete$|\\.payrms$|\\.a5zfn$|\\.perl$|\\.noproblemwedecfiles$|\\.lcked$|\\.p5tkjw$|\\.paymrss$|\\.dxxd$|\\.pec$|\\.rokku$|\\.lock93$|\\.vxlock$|\\.pubg$|\\.crab$"
@@ -38,26 +43,97 @@ notefiles=("HELPDECRYPT.TXT" "HELP_YOUR_FILES.TXT" "HELP_TO_DECRYPT_YOUR_FILES.t
 [ -f "$path_pentests/Nenhum malware detectado na rede." ] && { sudo rm "$path_pentests/$message00"; }
 [ -f "$path_alternative/Nenhum malware detectado na rede." ] && { sudo rm "$path_alternative/$message00"; }
 
-function ransom {
-  cat "$1" | grep -E -i "$extensoes" | sudo tee -a "$2"
-  cat "$1" | grep -E -i "$extensoes2" | sudo tee -a "$2"
+################################################################################
+# NOVAS FUNÇÕES DE DETECÇÃO
+################################################################################
 
-  for i in "${notefiles[@]}"; do
-    find "$main_paths01" "$main_paths02" "$main_paths03" "$main_paths04" "$main_paths05" -type f -name "$i" | sudo tee -a "$2"
-  done
+function detect_mass_encryption() {
+    local output_file="$1"
+    local temp_file="/tmp/extension_analysis_$$"
+    
+    # Procura arquivos com extensões suspeitas nos caminhos definidos
+    for path in "$main_paths01" "$main_paths02" "$main_paths03" "$main_paths04" "$main_paths05"; do
+        if [ -d "$path" ]; then
+            find "$path" -type f 2>/dev/null | \
+            grep -E -i "$extensoes|$extensoes2" | \
+            sed 's/.*\.//' | \
+            tr '[:upper:]' '[:lower:]' >> "$temp_file"
+        fi
+    done
+    
+    # Analisa quantidade por extensão
+    if [ -f "$temp_file" ]; then
+        cat "$temp_file" | sort | uniq -c | \
+        awk -v threshold="$extension_threshold" '$1 > threshold {print "ALERTA MASSA: " $1 " arquivos com extensão ." $2}' | \
+        sudo tee -a "$output_file"
+        rm -f "$temp_file"
+    fi
+}
+
+function detect_mass_changes() {
+    local output_file="$1"
+    
+    for path in "$main_paths01" "$main_paths02" "$main_paths03" "$main_paths04" "$main_paths05"; do
+        if [ -d "$path" ]; then
+            local count
+            count=$(find "$path" -type f -mmin -"$time_window" 2>/dev/null | wc -l)
+            
+            if [ "$count" -gt "$threshold" ]; then
+                echo "ALERTA MASSA: $count arquivos modificados em $path nas últimas $time_window min" | \
+                sudo tee -a "$output_file"
+                
+                # Lista os tipos de arquivo mais modificados
+                find "$path" -type f -mmin -"$time_window" 2>/dev/null | \
+                sed 's/.*\.//' | sort | uniq -c | sort -nr | head -5 | \
+                awk '{print "  Extensão ." $2 ": " $1 " arquivos"}' | \
+                sudo tee -a "$output_file"
+            fi
+        fi
+    done
+}
+
+################################################################################
+# FUNÇÃO PRINCIPAL MODIFICADA
+################################################################################
+
+function ransom {
+    local log_file="$1"
+    local output_file="$2"
+    
+    # Detecção original por extensões nos logs
+    cat "$log_file" | grep -E -i "$extensoes" | sudo tee -a "$output_file"
+    cat "$log_file" | grep -E -i "$extensoes2" | sudo tee -a "$output_file"
+
+    # NOVAS DETECÇÕES
+    echo "=== ANÁLISE DE DETECÇÃO DE MASSA ===" | sudo tee -a "$output_file"
+    
+    # Detecção por quantidade de extensões repetidas
+    detect_mass_encryption "$output_file"
+    
+    # Detecção por alterações recentes em massa
+    detect_mass_changes "$output_file"
+    
+    echo "=== BUSCA POR ARQUIVOS DE RESGATE ===" | sudo tee -a "$output_file"
+    
+    # Busca por notefiles (arquivos de resgate)
+    for i in "${notefiles[@]}"; do
+        find "$main_paths01" "$main_paths02" "$main_paths03" "$main_paths04" "$main_paths05" -type f -name "$i" 2>/dev/null | sudo tee -a "$output_file"
+    done
+    
+    echo "=== FIM DA ANÁLISE ===" | sudo tee -a "$output_file"
 }
 
 function start {
-  sudo find /srv/containers/*/log -name "syslog" | tee /tmp/listfiles
-  cat /tmp/listfiles | while read -r LINE; do
-    if [ -d /srv/containers/pentest ]; then
-      ransom "$LINE" "$path_to_pentest"
-      [ -s "$path_to_pentest" ] || { sudo mv "$path_to_pentest" "$path_pentests/$message00" ; }
-    else
-      ransom "$LINE" "$alternative_path"
-      [ -s "$alternative_path" ] || { sudo mv "$alternative_path" "$path_alternative/$message00" ; }
-    fi
-  done
+    sudo find /srv/containers/*/log -name "syslog" | tee /tmp/listfiles
+    cat /tmp/listfiles | while read -r LINE; do
+        if [ -d /srv/containers/pentest ]; then
+            ransom "$LINE" "$path_to_pentest"
+            [ -s "$path_to_pentest" ] || { sudo mv "$path_to_pentest" "$path_pentests/$message00" ; }
+        else
+            ransom "$LINE" "$alternative_path"
+            [ -s "$alternative_path" ] || { sudo mv "$alternative_path" "$path_alternative/$message00" ; }
+        fi
+    done
 }
 
 start
