@@ -8,24 +8,31 @@ Aplicar na OU desejada
 2. Navegar para:
 Computer Configuration > Policies > Windows Settings > Policy-based QoS
 
+3.0. Configurações de QOS
+Substituição de Marcação
+TICK, IGNORADA.
+
 3. Criar Política QoS:
 
 Clique direito > "Create new policy"
-Policy name: "Limitar_SMB_2Mbps"
+Policy name: "Porta_1024+"
 Specify DSCP Value: 8 (CS1 - Baixa prioridade)
 Specify Outbound Throttle Rate: 2048 Kbps (2 Mbps)
 
-4. Configurar Application:
-
-Selecionar: "All applications"
-
-5. Configurar Source and Destination IPs:
-
-Source IP: Any IP address
-Destination IP: Any IP address
-
-6. Configurar Protocol and Ports:
+4. Configurar Protocol and Ports:
 
 Protocol: TCP
-From this source port: 445 (SMB)
-To this destination port: 445 (SMB)
+From this source port: 1024:65535 (SMB)
+To this destination port: 1024:65535 (SMB)
+
+Same for:
+445
+139
+135
+
+Protocol: UDP
+From this source port: 137
+To this destination port: 137
+
+Same for:
+138
