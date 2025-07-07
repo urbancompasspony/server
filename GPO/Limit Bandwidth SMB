@@ -6,7 +6,7 @@ Criar nova GPO: "Limitacao_Velocidade_SMB"
 Aplicar na OU desejada
 
 2. Navegar para:
-Computer Configuration > Policies > Windows Settings > Policy-based QoS
+USER Configuration > Policies > Windows Settings > Policy-based QoS
 
 3.0. Configurações de QOS
 Substituição de Marcação
