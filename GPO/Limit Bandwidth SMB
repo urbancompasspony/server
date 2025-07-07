@@ -7,6 +7,7 @@ Aplicar na OU desejada
 
 2. Navegar para:
 Computer Configuration > Policies > Windows Settings > Policy-based QoS
+
 3. Criar Política QoS:
 
 Clique direito > "Create new policy"
@@ -21,7 +22,7 @@ Selecionar: "All applications"
 5. Configurar Source and Destination IPs:
 
 Source IP: Any IP address
-Destination IP: This IP address or subnet: IP_DO_SERVIDOR/24 (ex: 192.168.1.10/24)
+Destination IP: Any IP address
 
 6. Configurar Protocol and Ports:
 
