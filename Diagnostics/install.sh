@@ -493,7 +493,10 @@ create_cgi_script() {
 # Criar página HTML
 create_html_page() {
     log "Criando página HTML..."
-    wget https://raw.githubusercontent.com/urbancompasspony/urbancompasspony.github.io/refs/heads/main/system-diagnostic/index.html -O "$WEBROOT/index.html"
+    wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/index.html -O "$WEBROOT/index.html"
+    wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/style.css -O "$WEBROOT/style.css"
+    wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/script.js -O "$WEBROOT/script.js"
+
     log_success "Página HTML criada em $WEBROOT/index.html"
 }
 
