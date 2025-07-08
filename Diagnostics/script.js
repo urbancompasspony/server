@@ -630,10 +630,3 @@
                 resultActions.insertBefore(htmlBtn, resultActions.lastElementChild);
             }
         }
-
-        // Modificar a função showResults para incluir o botão HTML
-        const originalShowResults = showResults;
-        showResults = function(output, testName, analysis) {
-            originalShowResults(output, testName, analysis);
-            setTimeout(addHTMLExportButton, 100);
-        };
