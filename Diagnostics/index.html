@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Diagnóstico WebUI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Sistema de Diagnóstico</h1>
+            <p>Interface Web para Diagnóstico e Monitoramento do Sistema - v3.7</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Menu Principal -->
+            <div id="main-menu" class="menu-grid">
+                <div class="menu-card full-diagnostic" onclick="runFullDiagnostic()">
+                    <h3>🚀 Diagnóstico Completo</h3>
+                    <p>Executa todos os testes de diagnóstico do sistema de uma vez.</p>
+                </div>
+
+                <div class="menu-card" onclick="runSpecificTest('storage')">
+                    <h3>💾 Teste de Armazenamento</h3>
+                    <p>Verifica integridade, bad blocks e uso de espaço em disco.</p>
+                </div>
+
+                <div class="menu-card" onclick="runSpecificTest('network')">
+                    <h3>🌐 Teste de Rede</h3>
+                    <p>Testa conectividade, DNS e interfaces de rede.</p>
+                </div>
+
+                <div class="menu-card" onclick="runSpecificTest('services')">
+                    <h3>⚙️ Teste de Serviços</h3>
+                    <p>Verifica status de serviços essenciais, Docker e LibVirt.</p>
+                </div>
+
+                <div class="menu-card" onclick="runSpecificTest('system')">
+                    <h3>🖥️ Teste de Sistema</h3>
+                    <p>Analisa carga, memória, processos e logs do sistema.</p>
+                </div>
+
+                <div class="menu-card warning" onclick="showSystemInfo()">
+                    <h3>ℹ️ Informações do Sistema</h3>
+                    <p>Exibe informações detalhadas sobre o sistema.</p>
+                </div>
+            </div>
+
+            <!-- Informações do Sistema -->
+            <div id="system-info" class="system-info" style="display: none;">
+                <h4>📊 Informações do Sistema</h4>
+                <div id="system-details">
+                    <p>🔄 Carregando informações...</p>
+                </div>
+            </div>
+
+            <!-- Barra de Progresso -->
+            <div id="progress-container" style="display: none;">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <p id="progress-text" style="text-align: center; margin-top: 10px;">Iniciando diagnóstico...</p>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p id="loading-text">Executando diagnóstico do sistema...</p>
+            </div>
+
+            <!-- Container de Resultado -->
+            <div id="result-container" class="result-container">
+                <div class="result-header">
+                    <h4 id="result-title">Resultado do Diagnóstico</h4>
+                    <div class="result-actions">
+                        <button class="btn btn-success" onclick="downloadResults()">📥 Baixar</button>
+                        <button class="btn" onclick="printResults()">🖨️ Imprimir</button>
+                        <button class="btn btn-warning" onclick="clearResults()">🗑️ Limpar</button>
+                    </div>
+                </div>
+
+                <div id="result-summary" class="result-summary" style="display: none;">
+                    <h5 style="margin-bottom: 15px; color: #2c3e50;">📋 Resumo do Diagnóstico</h5>
+                    <div class="summary-item">
+                        <span class="summary-label">Status Geral:</span>
+                        <span id="summary-status" class="summary-value">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Erros Críticos:</span>
+                        <span id="summary-errors" class="summary-value">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Avisos:</span>
+                        <span id="summary-warnings" class="summary-value">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Testes Realizados:</span>
+                        <span id="summary-tests" class="summary-value">-</span>
+                    </div>
+                </div>
+
+                <div id="result-content" class="result-content"></div>
+            </div>
+
+            <!-- Container de Alerta -->
+            <div id="alert-container" class="alert"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
