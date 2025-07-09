@@ -262,7 +262,7 @@ echo "$VALUE0"
         # Salva no settings.yaml
         save_macvlan_to_yaml "$var1" "$var2" "$var3" "$var4"
         
-        dialog --title "Sucesso" --msgbox "Rede MACVLAN '$var4' criada e salva no settings.yaml!\n\nSubnet: $var1/24\nGateway: $var2\nInterface: $var3" 10 50
+        dialog --title "Sucesso" --msgbox "Rede MACVLAN '$var4' criada e salva no /srv/system.yaml!\n\nSubnet: $var1/24\nGateway: $var2\nInterface: $var3" 10 50
       else
         echo "❌ Erro ao criar a rede $var4"
         dialog --title "ERRO" --msgbox "Falha ao criar a rede MACVLAN '$var4'!" 6 40
