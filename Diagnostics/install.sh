@@ -233,6 +233,8 @@ EOFVHOST
         systemctl restart apache2
         log_success "Apache configurado para porta 1298 e reiniciado"
     fi
+
+    sudo sed -i 's/^Listen 80$/Listen 1298/' /etc/apache2/ports.conf
 }
 
 # Configurar sudoers para permitir execução sem senha
