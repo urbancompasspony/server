@@ -39,7 +39,7 @@ function contratos0 {
   4 'UniFi' \
   5 'GLPI' \
   6 'Reverse Proxy' \
-  7 'Servidor OpenFire (Spark)' \
+  7 'OpenFire (Spark)' \
   8 'OnlyOffice' \
   9 'Tailscale CLIENT' \
   10 'QDir Stat' \
