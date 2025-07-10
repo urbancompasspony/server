@@ -2,13 +2,6 @@
 
 version="v3.7 - 04.06.2025"
 
-# Cores para output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
 # Contadores de problemas
 WARNINGS=0
 ERRORS=0
@@ -133,24 +126,39 @@ fi
 echo ""
 sleep 3
 
-echo -e "🔍 Teste 03: Verificando conectividade de rede..."
+echo -e "🔍 Teste 03: Verificando conectividade de rede e possíveis problemas de rotas..."
 
-dns_servers=("1.1.1.1" "1.0.0.1" "8.8.8.8" "8.8.4.4" "208.67.222.222" "208.67.220.220")
+#!/bin/bash
+
+dns_servers=("1.1.1.1" "1.0.0.1" "8.8.8.8" "8.8.4.4" "208.67.222.222" "208.67.220.220" "200.225.197.34" "200.225.197.37")
+dns_name=("Cloudflare 1" "Cloudflare 2" "Google 1" "Google 2" "OpenDNS 1" "OpenDNS 2" "Algar 1" "Algar 2")
 dns_working=0
 
-for dns in "${dns_servers[@]}"; do
+echo "Testando servidores DNS..."
+echo "=========================="
+
+for i in "${!dns_servers[@]}"; do
+    dns="${dns_servers[$i]}"
+    name="${dns_name[$i]}"
+    
+    echo -n "Testando $name ($dns)... "
+    
     ping_output=$(ping -c 1 -W 2 "$dns" 2>&1)
     ping_status=$?
-
+    
     if [ $ping_status -eq 0 ]; then
-        echo -e "✅ DNS $dns respondendo!"
-        echo "$ping_output" | grep "time="
+        echo "✅ Respondendo!"
+        echo "$ping_output" | grep "time=" | head -1
         ((dns_working++))
     else
-        echo -e "❌ DNS $dns não está acessível!"
-        echo "$ping_output"
+        echo "❌ Não acessível!"
+        echo "Erro: $ping_output"
     fi
+    echo ""
 done
+
+echo "=========================="
+echo "Resumo: $dns_working de ${#dns_servers[@]} servidores DNS estão funcionando."
 
 echo ""
 sleep 3
@@ -209,10 +217,11 @@ done
     log_message "Verificando Docker..."
     if systemctl is-active --quiet docker 2>/dev/null; then
       echo -e "✅ OK: Docker está ativo"
-      echo -e "⚠️  AVISO: Docker não está respondendo adequadamente."
-      add_warning
+    elif command -v docker >/dev/null 2>&1; then
+      echo -e "❌ ERRO: Docker está instalado mas não está executando! Isso está correto?"
+      add_error
     else
-      echo -e "✅ OK: Docker está ativo."
+      echo -e "✅ OK: Docker não está instalado, mas isto está correto?"
     fi
     
     # Verifica containers problemáticos
@@ -244,13 +253,6 @@ done
     else
         echo -e "✅ OK: Não há containers com alto consumo de CPU."
     fi
-    
-elif command -v docker >/dev/null 2>&1; then
-    echo -e "❌ ERRO: Docker está instalado mas não está executando! Isso está correto?"
-    add_error
-else
-    echo -e "✅ OK: Docker não está instalado, mas isto está correto?"
-fi
 
 # Testando LibVirt (melhorado)
 log_message "Verificando LibVirt..."
