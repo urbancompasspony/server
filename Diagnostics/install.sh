@@ -248,14 +248,12 @@ www-data ALL=(root) NOPASSWD: /usr/local/bin/diagnostic-system.sh
 www-data ALL=(root) NOPASSWD: /bin/mount
 www-data ALL=(root) NOPASSWD: /usr/sbin/smartctl
 www-data ALL=(root) NOPASSWD: /usr/bin/virsh
+www-data ALL=(root) NOPASSWD: /bin/journalctl
 apache ALL=(root) NOPASSWD: /usr/local/bin/diagnostic-system.sh
 apache ALL=(root) NOPASSWD: /bin/mount
 apache ALL=(root) NOPASSWD: /usr/sbin/smartctl
 apache ALL=(root) NOPASSWD: /usr/bin/virsh
-nginx ALL=(root) NOPASSWD: /usr/local/bin/diagnostic-system.sh
-nginx ALL=(root) NOPASSWD: /bin/mount
-nginx ALL=(root) NOPASSWD: /usr/sbin/smartctl
-nginx ALL=(root) NOPASSWD: /usr/bin/virsh
+apache ALL=(root) NOPASSWD: /bin/journalctl
 EOFSUDO
 
     chmod 440 /etc/sudoers.d/diagnostic-webui
