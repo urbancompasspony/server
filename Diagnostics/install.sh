@@ -137,7 +137,7 @@ create_diagnostic_script() {
 create_cgi_script() {
     log "Criando script CGI..."
     
-    if sudo wget https://raw.githubusercontent.com/urbancompasspony/urbancompasspony.github.io/refs/heads/main/system-diagnostic/system-diagnostic.cgi -O "$CGI_DIR/system-diagnostic.cgi"; then
+    if sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/system-diagnostic.cgi -O "$CGI_DIR/system-diagnostic.cgi"; then
       chmod +x "$CGI_DIR/system-diagnostic.cgi"
       log_success "Script CGI criado em $CGI_DIR/system-diagnostic.cgi"
     else
