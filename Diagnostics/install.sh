@@ -348,20 +348,13 @@ show_final_info() {
     echo -e "   📁 Diretório Web: $WEBROOT"
     echo -e "   🔧 Diretório CGI: $CGI_DIR"
     echo -e "   📄 Página HTML: $WEBROOT/index.html"
+    echo -e "   🔌 Porta: 1298"
     echo ""
     echo -e "${BLUE}🔗 Acesso ao Sistema:${NC}"
-    echo -e "   http://localhost/index.html"
-    echo -e "   http://$(hostname -I | awk '{print $1}')/index.html"
+    echo -e "   http://localhost:1298/index.html"
+    echo -e "   http://$(hostname -I | awk '{print $1}'):1298/index.html"
     echo ""
-    echo -e "${YELLOW}📝 Arquivos Criados:${NC}"
-    echo -e "   • /usr/local/bin/diagnostic-system.sh"
-    echo -e "   • $CGI_DIR/system-diagnostic.cgi"
-    echo -e "   • $WEBROOT/index.html"
-    echo -e "   • /etc/diagnostic-webui.conf"
-    echo -e "   • /etc/sudoers.d/diagnostic-webui"
-    echo ""
-    echo -e "${GREEN}✅ O sistema está pronto para uso!${NC}"
-    echo ""
+    # ... resto da função
 }
 
 # Função principal
