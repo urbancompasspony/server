@@ -315,7 +315,7 @@ fi
 
 # Verifica logs de erro recentes
 log_message "Verificando logs de sistema..."
-recent_errors=$(journalctl --since "1 hour ago" -p err -q --no-pager | wc -l)
+recent_errors=$(sudo journalctl --since "1 hour ago" -p err -q --no-pager | wc -l)
 if [ "$recent_errors" -gt 10 ]; then
     echo -e "⚠️  AVISO: $recent_errors erros no log da última hora"
     add_warning
