@@ -1,49 +1,49 @@
 #!/bin/bash
 
-# CGI Script para Sistema de Diagnóstico
+# CGI Script para Sistema de Diagnostico
 # system-diagnostic.cgi
-# Versão: 1.0
+# Versao: 1.0
 
 # Cabeçalhos CGI
 echo "Content-Type: text/plain"
 echo "Cache-Control: no-cache"
 echo ""
 
-# Diretório onde está o script de diagnóstico
+# Diretorio onde esta o script de diagnostico
 DIAGNOSTIC_SCRIPT="/usr/local/bin/diagnostic-system.sh"
 
-# Função para log de debug (opcional)
+# Funçao para log de debug (opcional)
 log_debug() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] DEBUG: $1" >&2
 }
 
-# Função para retornar erro JSON
+# Funçao para retornar erro JSON
 return_error() {
     echo "{\"status\":\"error\",\"message\":\"$1\"}"
     exit 1
 }
 
-# Função para retornar sucesso
+# Funçao para retornar sucesso
 return_success() {
     echo "$1"
     exit 0
 }
 
-# Verificar se o script de diagnóstico existe
+# Verificar se o script de diagnostico existe
 if [ ! -f "$DIAGNOSTIC_SCRIPT" ]; then
-    return_error "Script de diagnóstico não encontrado em $DIAGNOSTIC_SCRIPT"
+    return_error "Script de diagnostico nao encontrado em $DIAGNOSTIC_SCRIPT"
 fi
 
-# Verificar se o script é executável
+# Verificar se o script e executavel
 if [ ! -x "$DIAGNOSTIC_SCRIPT" ]; then
-    return_error "Script de diagnóstico não é executável"
+    return_error "Script de diagnostico nao e executavel"
 fi
 
 # Ler dados POST
 if [ "$REQUEST_METHOD" = "POST" ]; then
     read -r POST_DATA
 else
-    return_error "Método não suportado. Use POST."
+    return_error "Metodo nao suportado. Use POST."
 fi
 
 # Decodificar URL
@@ -51,7 +51,7 @@ decode_url() {
     echo -e "$(echo "$1" | sed 's/+/ /g; s/%\([0-9a-fA-F][0-9a-fA-F]\)/\\x\1/g')"
 }
 
-# Parsear parâmetros POST
+# Parsear parametros POST
 parse_params() {
     local data="$1"
     IFS='&' read -ra PARAMS <<< "$data"
@@ -66,7 +66,7 @@ parse_params() {
         fi
     done
     
-    # Exportar como variáveis globais
+    # Exportar como variaveis globais
     ACTION="${PARSED[action]}"
     TEST_TYPE="${PARSED[test]}"
 }
@@ -74,24 +74,24 @@ parse_params() {
 # Parsear dados recebidos
 parse_params "$POST_DATA"
 
-log_debug "Ação recebida: $ACTION"
+log_debug "Açao recebida: $ACTION"
 log_debug "Tipo de teste: $TEST_TYPE"
 
-# Executar ação baseada no parâmetro
+# Executar açao baseada no parametro
 case "$ACTION" in
     "full-diagnostic")
-        log_debug "Executando diagnóstico completo"
+        log_debug "Executando diagnostico completo"
         
         # Executar o script completo
         if output=$($DIAGNOSTIC_SCRIPT 2>&1); then
             return_success "$output"
         else
-            return_error "Erro ao executar diagnóstico completo: $output"
+            return_error "Erro ao executar diagnostico completo: $output"
         fi
         ;;
         
     "specific-test")
-        log_debug "Executando teste específico: $TEST_TYPE"
+        log_debug "Executando teste especifico: $TEST_TYPE"
         
         case "$TEST_TYPE" in
             "storage")
@@ -99,7 +99,7 @@ case "$ACTION" in
                 if output=$(timeout 300 bash -c "
                     source '$DIAGNOSTIC_SCRIPT'
                     
-                    # Executar apenas as seções de armazenamento
+                    # Executar apenas as seçoes de armazenamento
                     echo '🔍 Teste 01: Verificando armazenamento...'
                     
                     # Verifica fstab vs montagens atuais
@@ -108,39 +108,39 @@ case "$ACTION" in
                     diskmount_status=\$?
                     
                     if [ \$diskmount_status -eq 0 ]; then
-                        echo '✅ OK: Todos os sistemas de arquivos do fstab estão montados'
+                        echo 'OK: Todos os sistemas de arquivos do fstab estao montados'
                     else
-                        echo '❌ ERRO: Problemas na montagem de sistemas de arquivos!'
+                        echo 'ERRO: Problemas na montagem de sistemas de arquivos!'
                         echo \"Detalhes: \$diskmount_output\"
                     fi
                     
                     echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando integridade dos sistemas de arquivos...'
                     fs_errors=\$(dmesg | grep -i \"ext[234]\|xfs\|btrfs\" | grep -i \"error\|corrupt\|remount.*read-only\" | tail -10)
                     if [ -n \"\$fs_errors\" ]; then
-                        echo '❌ ERRO: Detectados erros no sistema de arquivos!'
+                        echo 'ERRO: Detectados erros no sistema de arquivos!'
                         echo \"\$fs_errors\"
                     else
-                        echo '✅ OK: Nenhum erro de sistema de arquivos detectado'
+                        echo 'OK: Nenhum erro de sistema de arquivos detectado'
                     fi
                     
-                    echo '🔍 Teste 02: Verificando utilização de armazenamento...'
+                    echo '🔍 Teste 02: Verificando utilizaçao de armazenamento...'
                     
                     # Verifica 100% de uso
                     diskfull=\$(df -h | awk '\$5 == \"100%\" {print \$0}')
                     if [ -z \"\$diskfull\" ]; then
-                        echo '✅ OK: Nenhum disco com 100% de uso'
+                        echo 'OK: Nenhum disco com 100% de uso'
                     else
-                        echo '❌ CRÍTICO: Armazenamento(s) lotado(s)!'
+                        echo 'CRiTICO: Armazenamento(s) lotado(s)!'
                         echo \"\$diskfull\"
                     fi
                     
                     # Verifica uso acima de 90%
                     disk_high=\$(df -h | awk 'NR>1 && \$5 != \"-\" {gsub(/%/, \"\", \$5); if (\$5 > 90) print \$0}')
                     if [ -n \"\$disk_high\" ]; then
-                        echo '⚠️  AVISO: Armazenamento(s) com mais de 90% de uso:'
+                        echo 'AVISO: Armazenamento(s) com mais de 90% de uso:'
                         echo \"\$disk_high\"
                     else
-                        echo '✅ OK: Nenhum disco com +90% de uso'
+                        echo 'OK: Nenhum disco com +90% de uso'
                     fi
                 " 2>&1); then
                     return_success "$output"
@@ -162,11 +162,11 @@ case "$ACTION" in
                         ping_status=\$?
                         
                         if [ \$ping_status -eq 0 ]; then
-                            echo \"✅ DNS \$dns respondendo!\"
+                            echo \"DNS \$dns respondendo!\"
                             echo \"\$ping_output\" | grep \"time=\"
                             ((dns_working++))
                         else
-                            echo \"❌ DNS \$dns não está acessível!\"
+                            echo \"DNS \$dns nao esta acessivel!\"
                         fi
                     done
                     
@@ -174,18 +174,18 @@ case "$ACTION" in
                     echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando interfaces de rede...'
                     network_down=\$(ip -o link show | awk '/state DOWN/ {print \$2,\$17}')
                     if [ -n \"\$network_down\" ]; then
-                        echo '⚠️  AVISO: Interface(s) de rede inativa(s) detectadas:'
+                        echo 'AVISO: Interface(s) de rede inativa(s) detectadas:'
                         echo \"\$network_down\"
                     else
-                        echo '✅ Todas as interfaces de rede existentes estão ativas!'
+                        echo 'Todas as interfaces de rede existentes estao ativas!'
                     fi
                     
-                    # Verifica resolução DNS
-                    echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando resolução DNS...'
+                    # Verifica resoluçao DNS
+                    echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando resoluçao DNS...'
                     if ! nslookup google.com >/dev/null 2>&1; then
-                        echo '⚠️  AVISO: Problemas na resolução DNS'
+                        echo 'AVISO: Problemas na resoluçao DNS'
                     else
-                        echo '✅ Resolução DNS OK'
+                        echo 'Resoluçao DNS OK'
                         meuipwan=\$(dig @resolver4.opendns.com myip.opendns.com +short 2>/dev/null || echo 'N/A')
                         meugateway=\$(ip route get 1.1.1.1 2>/dev/null | grep -oP 'via \K\S+' || echo 'N/A')
                         meudevice=\$(ip route get 1.1.1.1 2>/dev/null | grep -oP 'dev \K\S+' || echo 'N/A')
@@ -207,16 +207,16 @@ case "$ACTION" in
                 if output=$(timeout 120 bash -c "
                     echo '🔍 Teste 04: Verificando serviços essenciais...'
                     
-                    # Lista de serviços críticos para verificar
+                    # Lista de serviços criticos para verificar
                     critical_services=('ssh.socket' 'systemd-resolved' 'NetworkManager' 'cron')
                     
                     # Verifica serviços do sistema
                     for service in \"\${critical_services[@]}\"; do
                         if systemctl is-active --quiet \"\$service\" 2>/dev/null; then
-                            echo \"✅ OK: Serviço \$service está ativo\"
+                            echo \"OK: Serviço \$service esta ativo\"
                         else
                             if systemctl list-unit-files --type=service | grep -q \"^\$service\"; then
-                                echo \"⚠️  AVISO: Serviço \$service está inativo\"
+                                echo \"AVISO: Serviço \$service esta inativo\"
                             fi
                         fi
                     done
@@ -224,27 +224,27 @@ case "$ACTION" in
                     # Testando Docker
                     echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando Docker...'
                     if systemctl is-active --quiet docker 2>/dev/null; then
-                        echo '✅ OK: Docker está ativo'
+                        echo 'OK: Docker esta ativo'
                         
                         if ! docker system df >/dev/null 2>&1; then
-                            echo '⚠️  AVISO: Docker não está respondendo adequadamente'
+                            echo 'AVISO: Docker nao esta respondendo adequadamente'
                         else
-                            echo '✅ OK: Docker está respondendo aos comandos normalmente'
+                            echo 'OK: Docker esta respondendo aos comandos normalmente'
                         fi
                     elif command -v docker >/dev/null 2>&1; then
-                        echo '❌ ERRO: Docker está instalado mas não está executando!'
+                        echo 'ERRO: Docker esta instalado mas nao esta executando!'
                     else
-                        echo '✅ OK: Docker não está instalado'
+                        echo 'OK: Docker nao esta instalado'
                     fi
                     
                     # Testando LibVirt
                     echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando LibVirt...'
                     if systemctl is-active --quiet libvirtd 2>/dev/null; then
-                        echo '✅ OK: LibVirt está ativo'
+                        echo 'OK: LibVirt esta ativo'
                     elif command -v libvirtd >/dev/null 2>&1; then
-                        echo '⚠️  AVISO: LibVirt está instalado mas não está executando!'
+                        echo 'AVISO: LibVirt esta instalado mas nao esta executando!'
                     else
-                        echo '✅ OK: LibVirt não está instalado neste servidor'
+                        echo 'OK: LibVirt nao esta instalado neste servidor'
                     fi
                 " 2>&1); then
                     return_success "$output"
@@ -256,7 +256,7 @@ case "$ACTION" in
             "system")
                 # Executar apenas teste de sistema (Teste 05)
                 if output=$(timeout 60 bash -c "
-                    echo '🔍 Teste 05: Verificações adicionais do sistema...'
+                    echo '🔍 Teste 05: Verificaçoes adicionais do sistema...'
                     
                     # Verifica carga do sistema
                     load_avg=\$(uptime | awk '{print \$(NF-2)}' | sed 's/,//')
@@ -264,36 +264,36 @@ case "$ACTION" in
                     load_threshold=\$(echo \"\$cpu_cores * 2\" | bc -l 2>/dev/null || echo \"8\")
                     
                     if (( \$(echo \"\$load_avg > \$load_threshold\" | bc -l 2>/dev/null || echo \"0\") )); then
-                        echo \"⚠️  AVISO: Carga do sistema alta (\$load_avg com \$cpu_cores cores)\"
+                        echo \"AVISO: Carga do sistema alta (\$load_avg com \$cpu_cores cores)\"
                     else
-                        echo \"✅ OK: Carga do sistema normal (\$load_avg)\"
+                        echo \"OK: Carga do sistema normal (\$load_avg)\"
                     fi
                     
-                    # Verifica memória
+                    # Verifica memoria
                     mem_usage=\$(free | awk 'NR==2{printf \"%.0f\", \$3*100/\$2}')
                     if [ \"\$mem_usage\" -gt 90 ]; then
-                        echo \"❌ ERRO: Uso de memória crítico (\${mem_usage}%)\"
+                        echo \"ERRO: Uso de memoria critico (\${mem_usage}%)\"
                     elif [ \"\$mem_usage\" -gt 80 ]; then
-                        echo \"⚠️  AVISO: Uso de memória alto (\${mem_usage}%)\"
+                        echo \"AVISO: Uso de memoria alto (\${mem_usage}%)\"
                     else
-                        echo \"✅ OK: Uso de memória normal (\${mem_usage}%)\"
+                        echo \"OK: Uso de memoria normal (\${mem_usage}%)\"
                     fi
                     
                     # Verifica processos zumbis
                     zombies=\$(ps aux | awk '\$8 ~ /^Z/ { count++ } END { print count+0 }')
                     if [ \"\$zombies\" -gt 0 ]; then
-                        echo \"⚠️  AVISO: \$zombies processo(s) zumbi detectado(s)\"
+                        echo \"AVISO: \$zombies processo(s) zumbi detectado(s)\"
                     else
-                        echo \"✅ OK: Nenhum processo zumbi detectado\"
+                        echo \"OK: Nenhum processo zumbi detectado\"
                     fi
                     
                     # Verifica logs de erro recentes
                     echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando logs de sistema...'
                     recent_errors=\$(journalctl --since \"1 hour ago\" -p err -q --no-pager 2>/dev/null | wc -l)
                     if [ \"\$recent_errors\" -gt 10 ]; then
-                        echo \"⚠️  AVISO: \$recent_errors erros no log da última hora\"
+                        echo \"AVISO: \$recent_errors erros no log da ultima hora\"
                     else
-                        echo \"✅ OK: Poucos erros nos logs recentes\"
+                        echo \"OK: Poucos erros nos logs recentes\"
                     fi
                 " 2>&1); then
                     return_success "$output"
@@ -303,34 +303,34 @@ case "$ACTION" in
                 ;;
                 
             *)
-                return_error "Tipo de teste não reconhecido: $TEST_TYPE"
+                return_error "Tipo de teste nao reconhecido: $TEST_TYPE"
                 ;;
         esac
         ;;
         
     "system-info")
-        log_debug "Coletando informações do sistema"
+        log_debug "Coletando informaçoes do sistema"
         
         if output=$(timeout 30 bash -c "
-            echo '📊 INFORMAÇÕES DO SISTEMA'
+            echo '📊 INFORMAÇoES DO SISTEMA'
             echo '=========================='
             echo ''
             echo '🖥️  Sistema Operacional:'
             if [ -f /etc/os-release ]; then
                 source /etc/os-release
                 echo \"   Distro: \$PRETTY_NAME\"
-                echo \"   Versão: \$VERSION\"
+                echo \"   Versao: \$VERSION\"
             else
-                echo '   Informações não disponíveis'
+                echo '   Informaçoes nao disponiveis'
             fi
             echo ''
             
             echo '💻 Hardware:'
-            echo \"   CPU: \$(nproc) núcleo(s)\"
+            echo \"   CPU: \$(nproc) nucleo(s)\"
             echo \"   Modelo: \$(cat /proc/cpuinfo | grep 'model name' | head -1 | cut -d: -f2 | sed 's/^ *//')\"
-            echo \"   Memória Total: \$(free -h | awk 'NR==2{print \$2}')\"
-            echo \"   Memória Usada: \$(free -h | awk 'NR==2{print \$3}')\"
-            echo \"   Memória Livre: \$(free -h | awk 'NR==2{print \$4}')\"
+            echo \"   Memoria Total: \$(free -h | awk 'NR==2{print \$2}')\"
+            echo \"   Memoria Usada: \$(free -h | awk 'NR==2{print \$3}')\"
+            echo \"   Memoria Livre: \$(free -h | awk 'NR==2{print \$4}')\"
             echo ''
             
             echo '💾 Armazenamento:'
@@ -347,7 +347,7 @@ case "$ACTION" in
             done
             echo ''
             
-            echo '⏰ Sistema:'
+            echo 'Sistema:'
             echo \"   Uptime: \$(uptime -p)\"
             echo \"   Data/Hora: \$(date)\"
             echo \"   Carga: \$(uptime | awk '{print \$(NF-2), \$(NF-1), \$NF}')\"
@@ -357,20 +357,20 @@ case "$ACTION" in
             services=('ssh' 'cron' 'systemd-resolved' 'NetworkManager')
             for service in \"\${services[@]}\"; do
                 if systemctl is-active --quiet \$service 2>/dev/null; then
-                    echo \"   \$service: ✅ Ativo\"
+                    echo \"   \$service: Ativo\"
                 else
-                    echo \"   \$service: ❌ Inativo\"
+                    echo \"   \$service: Inativo\"
                 fi
             done
         " 2>&1); then
             return_success "$output"
         else
-            return_error "Erro ao coletar informações do sistema"
+            return_error "Erro ao coletar informaçoes do sistema"
         fi
         ;;
         
     "quick-info")
-        log_debug "Coletando informações rápidas"
+        log_debug "Coletando informaçoes rapidas"
         
         if output=$(timeout 10 bash -c "
             echo \"Hostname: \$(hostname)\"
@@ -381,7 +381,7 @@ case "$ACTION" in
         " 2>&1); then
             return_success "$output"
         else
-            return_error "Erro ao coletar informações rápidas"
+            return_error "Erro ao coletar informaçoes rapidas"
         fi
         ;;
         
@@ -391,9 +391,9 @@ case "$ACTION" in
         ;;
         
     *)
-        return_error "Ação não reconhecida: $ACTION"
+        return_error "Açao nao reconhecida: $ACTION"
         ;;
 esac
 
-# Se chegou até aqui, algo deu errado
+# Se chegou ate aqui, algo deu errado
 return_error "Erro interno do script"
