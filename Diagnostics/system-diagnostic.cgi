@@ -94,60 +94,86 @@ case "$ACTION" in
         log_debug "Executando teste especifico: $TEST_TYPE"
         
         case "$TEST_TYPE" in
-            "storage")
-                # Executar apenas testes de armazenamento (Testes 01 e 02)
-                if output=$(timeout 300 bash -c "
-                    source '$DIAGNOSTIC_SCRIPT'
-                    
-                    # Executar apenas as seçoes de armazenamento
-                    echo '🔍 Teste 01: Verificando armazenamento...'
-                    
-                    # Verifica fstab vs montagens atuais
-                    echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando consistência do /etc/fstab...'
-                    diskmount_output=\$(sudo mount -a 2>&1)
-                    diskmount_status=\$?
-                    
-                    if [ \$diskmount_status -eq 0 ]; then
-                        echo 'OK: Todos os sistemas de arquivos do fstab estao montados'
-                    else
-                        echo 'ERRO: Problemas na montagem de sistemas de arquivos!'
-                        echo \"Detalhes: \$diskmount_output\"
-                    fi
-                    
-                    echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando integridade dos sistemas de arquivos...'
-                    fs_errors=\$(dmesg | grep -i \"ext[234]\|xfs\|btrfs\" | grep -i \"error\|corrupt\|remount.*read-only\" | tail -10)
-                    if [ -n \"\$fs_errors\" ]; then
-                        echo 'ERRO: Detectados erros no sistema de arquivos!'
-                        echo \"\$fs_errors\"
-                    else
-                        echo 'OK: Nenhum erro de sistema de arquivos detectado'
-                    fi
-                    
-                    echo '🔍 Teste 02: Verificando utilizaçao de armazenamento...'
-                    
-                    # Verifica 100% de uso
-                    diskfull=\$(df -h | awk '\$5 == \"100%\" {print \$0}')
-                    if [ -z \"\$diskfull\" ]; then
-                        echo 'OK: Nenhum disco com 100% de uso'
-                    else
-                        echo 'CRiTICO: Armazenamento(s) lotado(s)!'
-                        echo \"\$diskfull\"
-                    fi
-                    
-                    # Verifica uso acima de 90%
-                    disk_high=\$(df -h | awk 'NR>1 && \$5 != \"-\" {gsub(/%/, \"\", \$5); if (\$5 > 90) print \$0}')
-                    if [ -n \"\$disk_high\" ]; then
-                        echo 'AVISO: Armazenamento(s) com mais de 90% de uso:'
-                        echo \"\$disk_high\"
-                    else
-                        echo 'OK: Nenhum disco com +90% de uso'
-                    fi
-                " 2>&1); then
-                    return_success "$output"
-                else
-                    return_error "Erro ao executar teste de armazenamento"
-                fi
-                ;;
+    "storage")
+        # Executar apenas testes de armazenamento (Testes 01 e 02)
+        if output=$(timeout 300 bash -c "
+        # Remover o source - executar diretamente
+        
+        # Executar apenas as seções de armazenamento
+        echo '🔍 Teste 01: Verificando armazenamento...'
+        
+        # Verifica fstab vs montagens atuais
+        echo \"   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando consistência do /etc/fstab...\"
+        
+        # Usar teste de montagem sem executar
+        if mount -a --test 2>/dev/null; then
+            echo '✅ OK: Configuração do fstab está válida'
+        else
+            echo '⚠️  AVISO: Possíveis problemas na configuração do fstab'
+            # Mostrar apenas os primeiros erros para não sobrecarregar
+            mount_errors=\$(mount -a --test 2>&1 | head -3)
+            if [ -n \"\$mount_errors\" ]; then
+                echo \"Detalhes: \$mount_errors\"
+            fi
+        fi
+        
+        # Verificar montagens atuais sem sudo
+        echo \"   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando montagens atuais...\"
+        missing_mounts=\$(awk '!/^#/ && NF>0 && \$3!=\"swap\" && \$2!=\"/\" && \$2!=\"none\" {print \$2}' /etc/fstab 2>/dev/null | while read mountpoint; do
+            if [ -n \"\$mountpoint\" ] && ! mountpoint -q \"\$mountpoint\" 2>/dev/null; then
+                echo \"Não montado: \$mountpoint\"
+            fi
+        done)
+        
+        if [ -n \"\$missing_mounts\" ]; then
+            echo '⚠️  AVISO: Pontos de montagem não encontrados:'
+            echo \"\$missing_mounts\"
+        else
+            echo '✅ OK: Todos os pontos de montagem críticos estão ativos'
+        fi
+        
+        echo \"   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando integridade dos sistemas de arquivos...\"
+        fs_errors=\$(dmesg 2>/dev/null | grep -i \"ext[234]\\|xfs\\|btrfs\" | grep -i \"error\\|corrupt\\|remount.*read-only\" | tail -10)
+        if [ -n \"\$fs_errors\" ]; then
+            echo '❌ ERRO: Detectados erros no sistema de arquivos!'
+            echo \"\$fs_errors\"
+        else
+            echo '✅ OK: Nenhum erro de sistema de arquivos detectado'
+        fi
+        
+        echo '🔍 Teste 02: Verificando utilização de armazenamento...'
+        
+        # Verifica 100% de uso - melhor tratamento
+        diskfull=\$(df -h 2>/dev/null | awk 'NR>1 && \$5 == \"100%\" {print \$0}')
+        if [ -z \"\$diskfull\" ]; then
+            echo '✅ OK: Nenhum disco com 100% de uso'
+        else
+            echo '❌ CRÍTICO: Armazenamento(s) lotado(s)!'
+            echo \"\$diskfull\"
+        fi
+        
+        # Verifica uso acima de 90% - correção na lógica AWK
+        disk_high=\$(df -h 2>/dev/null | awk 'NR>1 && \$5 != \"-\" && \$5 != \"Use%\" && \$5 ~ /%/ {
+            gsub(/%/, \"\", \$5); 
+            if (\$5 >= 90) print \$0
+        }')
+        if [ -n \"\$disk_high\" ]; then
+            echo '⚠️  AVISO: Armazenamento(s) com 90% ou mais de uso:'
+            echo \"\$disk_high\"
+        else
+            echo '✅ OK: Nenhum disco com +90% de uso'
+        fi
+        
+        # Informações de debug
+        echo \"   \$(date \"+%Y-%m-%d %H:%M:%S\") - Resumo do armazenamento:\"
+        df -h 2>/dev/null | head -10
+        
+        " 2>&1); then
+            return_success "$output"
+        else
+            return_error "Erro ao executar teste de armazenamento: $output"
+        fi
+       ;;
                 
             "network")
                 # Executar apenas teste de rede (Teste 03)
