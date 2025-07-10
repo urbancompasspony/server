@@ -188,10 +188,40 @@ configure_permissions() {
     log_success "Permissões configuradas"
 }
 
-# Configurar Apache (se necessário)
+# Adicionar configuração de porta personalizada
 configure_apache() {
     if [ "$WEBSERVER" = "apache2" ]; then
-        log "Configurando Apache..."
+        log "Configurando Apache para porta 1298..."
+        
+        # Configurar porta customizada
+        echo "Listen 1298" >> /etc/apache2/ports.conf
+        
+        # Criar VirtualHost para porta 1298
+        cat > /etc/apache2/sites-available/diagnostic-1298.conf << 'EOFVHOST'
+<VirtualHost *:1298>
+    DocumentRoot /var/www/html
+    ServerName localhost
+    
+    <Directory "/var/www/html">
+        AllowOverride None
+        Options Indexes FollowSymLinks
+        Require all granted
+    </Directory>
+    
+    <Directory "/usr/lib/cgi-bin">
+        AllowOverride None
+        Options +ExecCGI
+        AddHandler cgi-script .cgi
+        Require all granted
+    </Directory>
+    
+    ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+</VirtualHost>
+EOFVHOST
+
+        # Habilitar o site
+        a2ensite diagnostic-1298.conf
+        a2dissite 000-default.conf
         
         # Verificar se CGI já está habilitado
         if ! apache2ctl -M 2>/dev/null | grep -q cgi_module; then
@@ -201,7 +231,7 @@ configure_apache() {
         
         # Reiniciar Apache
         systemctl restart apache2
-        log_success "Apache configurado e reiniciado"
+        log_success "Apache configurado para porta 1298 e reiniciado"
     fi
 }
 
