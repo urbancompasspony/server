@@ -92,8 +92,8 @@ sudo chmod 440 /etc/sudoers.d/diagnostic-webui
 ## 🌐 Acesso ao Sistema
 
 Após a instalação, acesse:
-- **Local**: http://localhost/system-diagnostic.html
-- **Rede**: http://SEU_IP/system-diagnostic.html
+- **Local**: http://localhost:1298/system-diagnostic.html
+- **Rede**: http://IP_DO_HOST:1298/system-diagnostic.html
 
 ## 📊 Funcionalidades
 
