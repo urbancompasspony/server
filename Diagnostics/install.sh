@@ -235,6 +235,8 @@ EOFVHOST
     fi
 
     sudo sed -i 's/^Listen 80$/Listen 1298/' /etc/apache2/ports.conf
+
+    sudo usermod -aG docker www-data
 }
 
 # Configurar sudoers para permitir execução sem senha
