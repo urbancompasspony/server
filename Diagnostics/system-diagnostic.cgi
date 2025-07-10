@@ -106,12 +106,12 @@ case "$ACTION" in
         echo \"   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando consistência do /etc/fstab...\"
         
         # Usar teste de montagem sem executar
-        if mount -a --test 2>/dev/null; then
+        if mount -a 2>/dev/null; then
             echo '✅ OK: Configuração do fstab está válida'
         else
             echo '⚠️  AVISO: Possíveis problemas na configuração do fstab'
             # Mostrar apenas os primeiros erros para não sobrecarregar
-            mount_errors=\$(mount -a --test 2>&1 | head -3)
+            mount_errors=\$(mount -a 2>&1 | head -3)
             if [ -n \"\$mount_errors\" ]; then
                 echo \"Detalhes: \$mount_errors\"
             fi
