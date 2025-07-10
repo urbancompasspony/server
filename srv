@@ -54,6 +54,7 @@ function start {
   6 'Set Wayland (labwc 24.04+)' \
   7 'Set OpenBox ObaMenu' \
   8 'Netplan Menu' \
+  9 'Update or Install Web Panel' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -67,6 +68,7 @@ function start {
   6) wayland00 ; start ;;
   7) clear ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
   8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
+  9) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
   X) exit ;;
   esac
 }
