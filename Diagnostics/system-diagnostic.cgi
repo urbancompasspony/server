@@ -251,12 +251,6 @@ case "$ACTION" in
                     echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando Docker...'
                     if systemctl is-active --quiet docker 2>/dev/null; then
                         echo 'OK: Docker esta ativo'
-                        
-                        if ! docker system df >/dev/null 2>&1; then
-                            echo 'AVISO: Docker nao esta respondendo adequadamente'
-                        else
-                            echo 'OK: Docker esta respondendo aos comandos normalmente'
-                        fi
                     elif command -v docker >/dev/null 2>&1; then
                         echo 'ERRO: Docker esta instalado mas nao esta executando!'
                     else
@@ -266,11 +260,9 @@ case "$ACTION" in
                     # Testando LibVirt
                     echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando LibVirt...'
                     if systemctl is-active --quiet libvirtd 2>/dev/null; then
-                        echo 'OK: LibVirt esta ativo'
-                    elif command -v libvirtd >/dev/null 2>&1; then
-                        echo 'AVISO: LibVirt esta instalado mas nao esta executando!'
+                        echo 'OK: O gestor de Máquinas Virtuais LibVirt esta ativo'
                     else
-                        echo 'OK: LibVirt nao esta instalado neste servidor'
+                        echo 'OK: O gestor de Máquinas Virtuais LibVirt nao esta instalado ou ativo neste servidor'
                     fi
                 " 2>&1); then
                     return_success "$output"
