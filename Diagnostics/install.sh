@@ -125,24 +125,24 @@ create_directories() {
 create_diagnostic_script() {
     log "Criando script de diagnóstico..."
     
-    if wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/diagnostic-system.sh -O /usr/local/bin/diagnostic-system.sh; then
-        chmod +x /usr/local/bin/diagnostic-system.sh
-        log_success "Script diagnóstico criado com sucesso"
+    if sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/diagnostic-system.sh -O /usr/local/bin/diagnostic-system.sh; then
+      chmod +x /usr/local/bin/diagnostic-system.sh
+      log_success "Script diagnóstico criado com sucesso"
     else
-        log_error "Falha ao baixar script diagnóstico. Verifique a conexão com internet."
-        exit 1
+      log_error "Falha ao baixar script diagnóstico. Verifique a conexão com internet."
+      exit 1
     fi
 }
 
 create_cgi_script() {
     log "Criando script CGI..."
     
-    if wget https://raw.githubusercontent.com/urbancompasspony/urbancompasspony.github.io/refs/heads/main/system-diagnostic/system-diagnostic.cgi -O "$CGI_DIR/system-diagnostic.cgi"; then
-        chmod +x "$CGI_DIR/system-diagnostic.cgi"
-        log_success "Script CGI criado em $CGI_DIR/system-diagnostic.cgi"
+    if sudo wget https://raw.githubusercontent.com/urbancompasspony/urbancompasspony.github.io/refs/heads/main/system-diagnostic/system-diagnostic.cgi -O "$CGI_DIR/system-diagnostic.cgi"; then
+      chmod +x "$CGI_DIR/system-diagnostic.cgi"
+      log_success "Script CGI criado em $CGI_DIR/system-diagnostic.cgi"
     else
-        log_error "Falha ao baixar script CGI. Verifique a conexão com internet."
-        exit 1
+      log_error "Falha ao baixar script CGI. Verifique a conexão com internet."
+      exit 1
     fi
 }
 
@@ -150,13 +150,13 @@ create_html_page() {
     log "Criando página HTML..."
     
     # Verificar cada download individualmente
-    if wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/index.html -O "$WEBROOT/index.html" && \
-       wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/style.css -O "$WEBROOT/style.css" && \
-       wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/script.js -O "$WEBROOT/script.js"; then
-        log_success "Página HTML criada em $WEBROOT/index.html"
+    if sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/index.html -O "$WEBROOT/index.html" && \
+       sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/style.css -O "$WEBROOT/style.css" && \
+       sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/script.js -O "$WEBROOT/script.js"; then
+       log_success "Página HTML criada em $WEBROOT/index.html"
     else
-        log_error "Falha ao baixar arquivos HTML. Verifique a conexão com internet."
-        exit 1
+       log_error "Falha ao baixar arquivos HTML. Verifique a conexão com internet."
+       exit 1
     fi
 }
 
