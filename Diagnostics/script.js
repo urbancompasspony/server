@@ -1,5 +1,6 @@
         // Configurações
         const CGI_URL = '/cgi-bin/system-diagnostic.cgi';
+        const WEB_PORT = '1298'; // Adicionar esta linha
 
         // Elementos DOM
         let currentTest = null;
