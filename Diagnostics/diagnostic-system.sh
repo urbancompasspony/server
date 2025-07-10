@@ -225,27 +225,27 @@ done
     fi
     
     # Verifica containers problemáticos
-    exited_containers=$(docker ps -f status=exited -q 2>/dev/null)
+    exited_containers=$(sudo docker ps -f status=exited -q 2>/dev/null)
     if [ -n "$exited_containers" ]; then
         exited_count=$(echo "$exited_containers" | wc -l)
         echo -e "⚠️  AVISO: $exited_count container(s) em estado de EXITED, isto está correto?"
-        docker ps -f status=exited --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
+        sudo docker ps -f status=exited --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
         add_warning
     else
         echo -e "✅ OK: Containers ativos e operando normalmente de acordo com o sistema."
     fi
     
-    restarting_containers=$(docker ps -f status=restarting -q 2>/dev/null)
+    restarting_containers=$(sudo docker ps -f status=restarting -q 2>/dev/null)
     if [ -n "$restarting_containers" ]; then
         echo -e "❌ ERRO: Container(s) em estado de restart infinito!"
-        docker ps -f status=restarting --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
+        sudo docker ps -f status=restarting --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
         add_error
     else
         echo -e "✅ OK: Não há containers reiniciando em estado de erro."
     fi
     
     # Verifica containers com uso alto de recursos
-    high_cpu_containers=$(docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}" | awk 'NR>1 {gsub(/%/, "", $2); if ($2 > 80) print $0}')
+    high_cpu_containers=$(sudo docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}" | awk 'NR>1 {gsub(/%/, "", $2); if ($2 > 80) print $0}')
     if [ -n "$high_cpu_containers" ]; then
         echo -e "⚠️  AVISO: Container(s) com alto uso de CPU:"
         echo "$high_cpu_containers"
