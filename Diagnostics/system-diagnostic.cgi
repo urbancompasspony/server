@@ -133,7 +133,7 @@ case "$ACTION" in
         fi
         
         echo \"   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando integridade dos sistemas de arquivos...\"
-        fs_errors=\$(dmesg 2>/dev/null | grep -i \"ext[234]\\|xfs\\|btrfs\" | grep -i \"error\\|corrupt\\|remount.*read-only\" | tail -10)
+        fs_errors=\$(sudo dmesg 2>/dev/null | grep -i \"ext[234]\\|xfs\\|btrfs\" | grep -i \"error\\|corrupt\\|remount.*read-only\" | tail -10)
         if [ -n \"\$fs_errors\" ]; then
             echo '❌ ERRO: Detectados erros no sistema de arquivos!'
             echo \"\$fs_errors\"
