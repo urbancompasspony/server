@@ -1,5 +1,6 @@
         // Configurações
         const CGI_URL = '/cgi-bin/system-diagnostic.cgi';
+        const WEB_PORT = '1298'; // Adicionar esta linha
 
         // Elementos DOM
         let currentTest = null;
@@ -234,34 +235,94 @@
             }
         }
 
-        // Mostrar informações do sistema
+// Mostrar/ocultar informações do sistema (com timeout e fallback)
         async function showSystemInfo() {
             const infoContainer = document.getElementById('system-info');
             const detailsElement = document.getElementById('system-details');
 
+            // Verificar se está visível
+            const computedDisplay = window.getComputedStyle(infoContainer).display;
+            const isVisible = computedDisplay === 'block';
+            
+            if (isVisible) {
+                infoContainer.style.display = 'none';
+                return;
+            }
+
+            // Mostrar container
             infoContainer.style.display = 'block';
+            
+            // Verificar se já tem conteúdo válido (não é "Carregando..." nem erro)
+            const currentContent = detailsElement.innerHTML;
+            const hasValidContent = currentContent.includes('<pre style=') || 
+                                  currentContent.includes('Sistema Operacional') ||
+                                  (currentContent.length > 100 && !currentContent.includes('🔄 Carregando'));
+            
+            if (hasValidContent) {
+                return; // Já tem conteúdo válido
+            }
+
+            // Carregar informações com timeout
             detailsElement.innerHTML = '<p>🔄 Carregando informações do sistema...</p>';
 
             try {
-                const response = await fetch(CGI_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        action: 'system-info'
-                    })
+                // Criar uma Promise com timeout
+                const fetchWithTimeout = new Promise(async (resolve, reject) => {
+                    const timeoutId = setTimeout(() => {
+                        reject(new Error('Timeout: CGI não respondeu em 3 segundos'));
+                    }, 3000);
+
+                    try {
+                        const response = await fetch(CGI_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                action: 'system-info'
+                            })
+                        });
+
+                        clearTimeout(timeoutId);
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+
+                        const data = await response.text();
+                        resolve(data);
+                    } catch (error) {
+                        clearTimeout(timeoutId);
+                        reject(error);
+                    }
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const data = await response.text();
+                const data = await fetchWithTimeout;
                 detailsElement.innerHTML = `<pre style="background: white; padding: 15px; border-radius: 8px; color: #2c3e50; font-family: monospace;">${data}</pre>`;
 
             } catch (error) {
-                detailsElement.innerHTML = `<p style="color: #e74c3c;">❌ Erro ao carregar informações: ${error.message}</p>`;
+                console.log('Erro ao carregar do CGI:', error.message);
+                
+                // Mostrar informações de fallback (do navegador)
+                const fallbackInfo = `
+📊 Informações do Sistema (Navegador)
+=====================================
+
+🖥️ Sistema Operacional: ${navigator.platform}
+🌐 Navegador: ${navigator.userAgent.split(' ')[0]} ${navigator.appVersion.split(' ')[0]}
+📱 Resolução da Tela: ${screen.width}x${screen.height}
+🎨 Profundidade de Cor: ${screen.colorDepth} bits
+🕐 Data/Hora Local: ${new Date().toLocaleString('pt-BR')}
+🌍 Idioma: ${navigator.language}
+⚡ Cookies Habilitados: ${navigator.cookieEnabled ? 'Sim' : 'Não'}
+🔌 Online: ${navigator.onLine ? 'Sim' : 'Não'}
+💾 Memória (estimada): ${navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'Não disponível'}
+🔄 Cores do Processador: ${navigator.hardwareConcurrency || 'Não disponível'}
+
+⚠️ Nota: Servidor CGI não disponível. Exibindo informações do navegador.
+                `;
+
+                detailsElement.innerHTML = `<pre style="background: white; padding: 15px; border-radius: 8px; color: #2c3e50; font-family: monospace;">${fallbackInfo}</pre>`;
             }
         }
 
