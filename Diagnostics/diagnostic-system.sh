@@ -98,13 +98,30 @@ test_storage() {
 
     # Verifica sistemas de arquivos com erros
     log_message "Verificando integridade dos sistemas de arquivos..."
-    fs_errors=$(dmesg | grep -i "ext[234]\|xfs\|btrfs" | grep -i "error\|corrupt\|remount.*read-only" | tail -10)
-    if [ -n "$fs_errors" ]; then
-        echo -e "❌ ERRO: Detectados erros no sistema de arquivos!"
-        echo "$fs_errors"
-        add_error
+    if command -v dmesg >/dev/null 2>&1; then
+        # Tentar dmesg com sudo primeiro
+        if fs_errors=$(sudo dmesg 2>/dev/null | grep -i "ext[234]\|xfs\|btrfs" | grep -i "error\|corrupt\|remount.*read-only" | tail -10); then
+            if [ -n "$fs_errors" ]; then
+                echo -e "❌ ERRO: Detectados erros no sistema de arquivos!"
+                echo "$fs_errors"
+                add_error
+            else
+                echo -e "✅ OK: Nenhum erro de sistema de arquivos detectado"
+            fi
+        else
+            # Fallback para journalctl
+            fs_errors=$(sudo journalctl --dmesg --since "24 hours ago" --no-pager -q 2>/dev/null | grep -i "ext[234]\|xfs\|btrfs" | grep -i "error\|corrupt\|remount.*read-only" | tail -10)
+            if [ -n "$fs_errors" ]; then
+                echo -e "❌ ERRO: Detectados erros no sistema de arquivos!"
+                echo "$fs_errors"
+                add_error
+            else
+                echo -e "✅ OK: Verificação de filesystem OK (via journalctl)"
+            fi
+        fi
     else
-        echo -e "✅ OK: Nenhum erro de sistema de arquivos detectado"
+        echo -e "⚠️  AVISO: dmesg não disponível, pulando verificação de filesystem"
+        add_warning
     fi
 
     echo ""
