@@ -127,8 +127,7 @@ test_storage() {
     echo ""
     sleep 3
 
-    # Verifica dispositivos com bad blocks
-    # ANÁLISE SMART MELHORADA - Detecta setores defeituosos
+# ANÁLISE SMART MELHORADA - Detecta setores defeituosos E CONTABILIZA CORRETAMENTE
     log_message "Verificando armazenamento com análise SMART detalhada..."
     smart_devices=$(lsblk -d -o NAME,TYPE | grep disk | awk '{print $1}')
     
@@ -163,6 +162,8 @@ test_storage() {
             # 3. Verificar setores defeituosos e problemas críticos
             has_critical_issues=false
             critical_details=""
+            device_errors=0
+            device_warnings=0
             
             # DEBUG: Mostrar saída completa para troubleshooting do sdb
             if [ "$device" = "sdb" ]; then
@@ -233,35 +234,35 @@ test_storage() {
                 echo "    Erros CRC: '$crc_errors'"
             fi
             
-            # Análise dos atributos críticos (com validação mais robusta)
+            # Análise dos atributos críticos (com contabilização correta)
             if [ -n "$reallocated_sectors" ] && [ "$reallocated_sectors" != "0" ] && [ "$reallocated_sectors" -gt 0 ] 2>/dev/null; then
                 has_critical_issues=true
                 critical_details+="  ⚠️  Setores realocados: $reallocated_sectors\n"
-                add_warning
+                ((device_warnings++))
             fi
             
             if [ -n "$pending_sectors" ] && [ "$pending_sectors" != "0" ] && [ "$pending_sectors" -gt 0 ] 2>/dev/null; then
                 has_critical_issues=true
                 critical_details+="  ❌ CRÍTICO: Setores pendentes: $pending_sectors (possível falha iminente)\n"
-                add_error
+                ((device_errors++))
             fi
             
             if [ -n "$uncorrectable_sectors" ] && [ "$uncorrectable_sectors" != "0" ] && [ "$uncorrectable_sectors" -gt 0 ] 2>/dev/null; then
                 has_critical_issues=true
                 critical_details+="  ❌ CRÍTICO: Setores não corrigíveis: $uncorrectable_sectors\n"
-                add_error
+                ((device_errors++))
             fi
             
             if [ -n "$spin_retry_count" ] && [ "$spin_retry_count" != "0" ] && [ "$spin_retry_count" -gt 0 ] 2>/dev/null; then
                 has_critical_issues=true
                 critical_details+="  ⚠️  Tentativas de spin: $spin_retry_count\n"
-                add_warning
+                ((device_warnings++))
             fi
             
             if [ -n "$crc_errors" ] && [ "$crc_errors" != "0" ] && [ "$crc_errors" -gt 5 ] 2>/dev/null; then
                 has_critical_issues=true
                 critical_details+="  ⚠️  Erros CRC: $crc_errors (possível problema de cabo)\n"
-                add_warning
+                ((device_warnings++))
             fi
             
             # Verificar temperatura (extrair apenas número)
@@ -269,33 +270,65 @@ test_storage() {
             if [ -n "$temp_num" ] && [ "$temp_num" -gt 60 ] 2>/dev/null; then
                 has_critical_issues=true
                 critical_details+="  ⚠️  Temperatura alta: ${temp_num}°C\n"
-                add_warning
+                ((device_warnings++))
             fi
             
-            # FALLBACK: Verificar smartd logs se não encontrou problemas
-            if [ "$has_critical_issues" = false ]; then
-                smartd_errors=$(sudo journalctl -u smartd --since "24 hours ago" -q 2>/dev/null | grep -i "$device" | grep -i "pending\|reallocated\|uncorrectable")
-                if [ -n "$smartd_errors" ]; then
+            # FALLBACK: Verificar smartd logs (CORRIGIDO para contabilizar)
+            smartd_errors=$(sudo journalctl -u smartd --since "24 hours ago" -q 2>/dev/null | grep -i "$device")
+            if [ -n "$smartd_errors" ]; then
+                
+                # Verificar diferentes tipos de problemas nos logs
+                pending_logs=$(echo "$smartd_errors" | grep -i "pending")
+                reallocated_logs=$(echo "$smartd_errors" | grep -i "reallocated")
+                uncorrectable_logs=$(echo "$smartd_errors" | grep -i "uncorrectable")
+                temperature_logs=$(echo "$smartd_errors" | grep -i "temperature.*high\|overheat")
+                
+                if [ -n "$pending_logs" ]; then
                     has_critical_issues=true
-                    critical_details+="  ❌ CRÍTICO: Problemas detectados pelo smartd:\n"
-                    echo "$smartd_errors" | while read line; do
-                        critical_details+="    $line\n"
-                    done
-                    add_error
+                    critical_details+="  ❌ CRÍTICO: Setores pendentes detectados pelo smartd\n"
+                    pending_count=$(echo "$pending_logs" | grep -o '[0-9]\+' | tail -1)
+                    if [ -n "$pending_count" ]; then
+                        critical_details+="    Quantidade reportada: $pending_count setores\n"
+                    fi
+                    ((device_errors++))
+                fi
+                
+                if [ -n "$reallocated_logs" ]; then
+                    has_critical_issues=true
+                    critical_details+="  ⚠️  Setores realocados detectados pelo smartd\n"
+                    ((device_warnings++))
+                fi
+                
+                if [ -n "$uncorrectable_logs" ]; then
+                    has_critical_issues=true
+                    critical_details+="  ❌ CRÍTICO: Setores não corrigíveis detectados pelo smartd\n"
+                    ((device_errors++))
+                fi
+                
+                if [ -n "$temperature_logs" ]; then
+                    has_critical_issues=true
+                    critical_details+="  ⚠️  Problemas de temperatura detectados pelo smartd\n"
+                    ((device_warnings++))
                 fi
             fi
             
             # Verificar status geral vs atributos
             if echo "$smart_status" | grep -q "FAILED"; then
                 echo "❌ CRÍTICO: Dispositivo $device com falha SMART GERAL!"
-                add_error
+                ((device_errors++))
             elif [ "$has_critical_issues" = true ]; then
                 echo "⚠️  DISPOSITIVO $device COM PROBLEMAS SMART DETECTADOS:"
                 echo -e "$critical_details"
-                if echo "$critical_details" | grep -q "CRÍTICO"; then
+                if [ "$device_errors" -gt 0 ]; then
                     echo "🚨 RECOMENDAÇÃO: Considere substituir o disco $device urgentemente!"
                 else
                     echo "📊 RECOMENDAÇÃO: Monitore o disco $device de perto"
+                fi
+                
+                # Mostrar logs do smartd se relevantes
+                if [ -n "$smartd_errors" ] && { [ -n "$pending_logs" ] || [ -n "$reallocated_logs" ] || [ -n "$uncorrectable_logs" ]; }; then
+                    echo "📋 Logs relevantes do smartd:"
+                    echo "$smartd_errors" | grep -E "(pending|reallocated|uncorrectable)" | sed 's/^/  /'
                 fi
             else
                 echo "✅ OK: Dispositivo $device sem problemas SMART para relatar."
@@ -311,6 +344,14 @@ test_storage() {
                 if [ -n "$power_on_hours" ]; then
                     echo "  ℹ️  Horas de uso: $power_on_hours"
                 fi
+            fi
+            
+            # CONTABILIZAR nos contadores globais
+            if [ "$device_errors" -gt 0 ]; then
+                add_error
+            fi
+            if [ "$device_warnings" -gt 0 ]; then
+                add_warning
             fi
             
             echo ""
