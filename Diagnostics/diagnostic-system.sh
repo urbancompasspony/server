@@ -393,14 +393,141 @@ test_system() {
     # Verifica logs de erro recentes
     log_message "Verificando logs de sistema..."
     recent_errors=$(sudo journalctl --since "1 hour ago" -p err -q --no-pager | wc -l)
-    if [ "$recent_errors" -gt 10 ]; then
+    if [ "$recent_errors" -gt 50 ]; then
+        echo -e "❌ CRÍTICO: $recent_errors erros no log da última hora (>50)"
+        add_error
+    elif [ "$recent_errors" -gt 10 ]; then
         echo -e "⚠️  AVISO: $recent_errors erros no log da última hora"
         add_warning
+    elif [ "$recent_errors" -gt 0 ]; then
+        echo -e "ℹ️  INFO: $recent_errors erro(s) no log da última hora (normal)"
+    else
+        echo -e "✅ OK: Nenhum erro no log da última hora"
     fi
 
     echo ""
 }
 
+show_recent_errors() {
+    echo -e "🔍 Últimos 10 erros do sistema..."
+    echo ""
+    
+    log_message "Coletando últimos erros do log do sistema..."
+    
+    # Tentar diferentes métodos para coletar logs de erro
+    local error_output=""
+    local method_used=""
+    
+    # Método 1: journalctl (mais moderno)
+    if command -v journalctl >/dev/null 2>&1; then
+        error_output=$(sudo journalctl -p err -n 10 --no-pager -q --since "7 days ago" 2>/dev/null | head -20)
+        if [ -n "$error_output" ]; then
+            method_used="journalctl"
+        fi
+    fi
+    
+    # Método 2: Fallback para dmesg se journalctl não funcionar ou estiver vazio
+    if [ -z "$error_output" ] && command -v dmesg >/dev/null 2>&1; then
+        error_output=$(sudo dmesg --level=err,crit,alert,emerg -T 2>/dev/null | tail -10)
+        if [ -n "$error_output" ]; then
+            method_used="dmesg"
+        fi
+    fi
+    
+    # Método 3: Fallback para arquivos de log tradicionais
+    if [ -z "$error_output" ]; then
+        if [ -f "/var/log/syslog" ]; then
+            error_output=$(grep -i "error\|critical\|fatal" /var/log/syslog 2>/dev/null | tail -10)
+            method_used="syslog"
+        elif [ -f "/var/log/messages" ]; then
+            error_output=$(grep -i "error\|critical\|fatal" /var/log/messages 2>/dev/null | tail -10)
+            method_used="messages"
+        fi
+    fi
+    
+    # Exibir resultados
+    if [ -n "$error_output" ]; then
+        echo -e "❌ Últimos erros encontrados (via $method_used):"
+        echo "=================================================="
+        echo "$error_output"
+        echo "=================================================="
+        
+        # Contar erros
+        local error_count=$(echo "$error_output" | wc -l)
+        if [ "$error_count" -ge 5 ]; then
+            echo -e "⚠️  AVISO: $error_count erros recentes encontrados no sistema"
+            add_warning
+        fi
+    else
+        echo -e "✅ OK: Nenhum erro crítico encontrado nos logs recentes"
+    fi
+    
+    echo ""
+    sleep 3
+}
+
+# === FUNÇÃO: ANÁLISE DETALHADA DE LOGS (OPCIONAL - MAIS COMPLETA) ===
+show_detailed_log_analysis() {
+    echo -e "📋 Análise detalhada dos logs do sistema..."
+    echo ""
+    
+    log_message "Analisando logs do sistema das últimas 24 horas..."
+    
+    # Análise por categoria
+    local categories=("error" "warning" "critical" "failed")
+    local total_issues=0
+    
+    for category in "${categories[@]}"; do
+        echo "Verificando: $category"
+        echo "------------------------"
+        
+        local count=0
+        local sample=""
+        
+        if command -v journalctl >/dev/null 2>&1; then
+            case "$category" in
+                "error")
+                    count=$(sudo journalctl -p err --since "24 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p err --since "24 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    ;;
+                "warning")
+                    count=$(sudo journalctl -p warning --since "24 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p warning --since "24 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    ;;
+                "critical")
+                    count=$(sudo journalctl -p crit --since "24 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p crit --since "24 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    ;;
+                "failed")
+                    count=$(sudo journalctl --since "24 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | wc -l)
+                    sample=$(sudo journalctl --since "24 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | head -3)
+                    ;;
+            esac
+        fi
+        
+        if [ "$count" -gt 0 ]; then
+            echo "  Encontrados: $count ocorrências"
+            if [ -n "$sample" ]; then
+                echo "  Exemplos:"
+                echo "$sample" | sed 's/^/    /'
+            fi
+            total_issues=$((total_issues + count))
+        else
+            echo "  ✅ Nenhuma ocorrência"
+        fi
+        echo ""
+    done
+    
+    # Resumo final
+    echo "RESUMO DA ANÁLISE DE LOGS:"
+    echo "=========================="
+    echo "Total de problemas nas últimas 24h: $total_issues"
+       
+    echo ""
+    sleep 3
+}
+
+# === FUNÇÃO: INFORMAÇÕES COMPLETAS DO SISTEMA ===
 # === FUNÇÃO: INFORMAÇÕES COMPLETAS DO SISTEMA ===
 show_system_info() {
     echo '📊 INFORMAÇÕES DO SISTEMA'
@@ -425,17 +552,11 @@ show_system_info() {
     echo ''
     
     echo '💾 Armazenamento:'
-    df -h | grep -E '^/dev/' | while read line; do
-        echo "   $line"
-    done
+    df -h | awk '/^\/dev\// {print "   " $0}'
     echo ''
     
     echo '🔗 Rede:'
-    ip -o link show | grep -E 'state UP' | while read line; do
-        interface=$(echo $line | awk '{print $2}' | sed 's/://')
-        state=$(echo $line | awk '{print $9}')
-        echo "   Interface $interface: $state"
-    done
+    ip -o link show | awk '/state UP/ {gsub(/:/, "", $2); print "   Interface " $2 ": " $9}'
     echo ''
     
     echo 'Sistema:'
@@ -491,12 +612,19 @@ case "$TEST_TYPE" in
     "system")
         test_system
         ;;
+    "logs")
+        show_recent_errors
+        ;;
+    "logs-detailed")
+        show_detailed_log_analysis
+        ;;
     *)
-        # Teste completo (padrão) - EXECUTA TODOS OS TESTES SEQUENCIALMENTE
+        # Teste completo (padrão)
         test_storage
         test_network
         test_services
         test_system
+        show_recent_errors
         ;;
 esac
 
