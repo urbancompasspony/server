@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # CGI Script COMPLETO para Sistema de Diagnostico
-# system-diagnostic.cgi v3.7 - 04.06.2025
+# system-diagnostic.cgi v3.8 - 11.07.2025
 # ZERO redundância - delega 100% para o script principal
 
 # Cabeçalhos CGI
@@ -98,10 +98,8 @@ case "$ACTION" in
         
         case "$TEST_TYPE" in
             "storage")
-                # Delegar para o script principal com parâmetro --test=storage
-                output=$(timeout 300 "$DIAGNOSTIC_SCRIPT" --no-auth 2>&1)
-                exit_code=$?
-                if [ $exit_code -le 2 ]; then
+                # CORRIGIDO: Delegar para o script principal com parâmetro --test=storage
+                if output=$(timeout 300 "$DIAGNOSTIC_SCRIPT" --test=storage --no-auth 2>&1); then
                     return_success "$output"
                 else
                     return_error "Erro ao executar teste de armazenamento: $output"
@@ -136,16 +134,29 @@ case "$ACTION" in
                 ;;
 
             "logs")
+                # Delegar para o script principal com parâmetro --test=logs
                 if output=$(timeout 60 "$DIAGNOSTIC_SCRIPT" --test=logs --no-auth 2>&1); then
                     return_success "$output"
                 else
                     return_error "Erro ao executar análise de logs: $output"
                 fi
                 ;;
+                
             *)
                 return_error "Tipo de teste não reconhecido: $TEST_TYPE"
                 ;;
         esac
+        ;;
+        
+    "status")
+        # CORRIGIDO: Status API no nível principal
+        log_debug "Verificando status de execução"
+        if find /tmp -name "diagnostic_*.lock" -mmin -10 2>/dev/null | grep -q .; then
+            echo "running"
+        else
+            echo "idle"
+        fi
+        exit 0
         ;;
         
     "system-info")
