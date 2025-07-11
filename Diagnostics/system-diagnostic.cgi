@@ -83,10 +83,13 @@ case "$ACTION" in
         log_debug "Executando diagnóstico completo"
         
         # Executar o script completo com --no-auth para pular autenticação
-        if output=$(timeout 300 "$DIAGNOSTIC_SCRIPT" --no-auth 2>&1); then
+        output=$(timeout 300 "$DIAGNOSTIC_SCRIPT" --no-auth 2>&1)
+        exit_code=$?
+
+        if [ $exit_code -le 2 ]; then
             return_success "$output"
         else
-            return_error "Erro ao executar diagnóstico completo: $output"
+            return_error "Timeout ou falha crítica na execução"
         fi
         ;;
         
