@@ -104,68 +104,43 @@
             updateSummary(analysis);
         }
 
-        // Analisar resultados
         function analyzeResults(output) {
-            const analysis = {
-                status: 'unknown',
-                errors: 0,
-                warnings: 0,
-                tests: 0,
-                sections: []
-            };
+    const analysis = {
+        status: 'unknown',
+        errors: 0,
+        warnings: 0,
+        tests: 0,
+        sections: []
+    };
 
-            if (!output) return analysis;
+    if (!output) return analysis;
 
-            const lines = output.split('\n');
-            let currentSection = null;
-            let sectionContent = [];
+    // MÉTODO MAIS CONFIÁVEL: Extrair do resumo final
+    const errorMatch = output.match(/Erros críticos encontrados: (\d+)/);
+    const warningMatch = output.match(/Avisos encontrados: (\d+)/);
+    
+    if (errorMatch) {
+        analysis.errors = parseInt(errorMatch[1]);
+    }
+    if (warningMatch) {
+        analysis.warnings = parseInt(warningMatch[1]);
+    }
 
-            for (const line of lines) {
-                // Detectar início de teste
-                if (line.includes('Teste 0') && line.includes('🔍')) {
-                    if (currentSection) {
-                        analysis.sections.push({
-                            title: currentSection,
-                            content: sectionContent.join('\n'),
-                                               status: getSectionStatus(sectionContent.join('\n'))
-                        });
-                    }
-                    currentSection = line.trim();
-                    sectionContent = [];
-                    analysis.tests++;
-                }
+    // Contar testes
+    const testMatches = output.match(/🔍 Teste \d+:/g);
+    analysis.tests = testMatches ? testMatches.length : 0;
 
-                // Contabilizar erros e avisos
-                if (line.includes('❌') || line.includes('ERRO') || line.includes('CRÍTICO')) {
-                    analysis.errors++;
-                }
-                if (line.includes('⚠️') || line.includes('AVISO')) {
-                    analysis.warnings++;
-                }
+    // Determinar status
+    if (analysis.errors > 0) {
+        analysis.status = 'error';
+    } else if (analysis.warnings > 0) {
+        analysis.status = 'warning';  
+    } else {
+        analysis.status = 'success';
+    }
 
-                sectionContent.push(line);
-            }
-
-            // Adicionar última seção
-            if (currentSection) {
-                analysis.sections.push({
-                    title: currentSection,
-                    content: sectionContent.join('\n'),
-                                       status: getSectionStatus(sectionContent.join('\n'))
-                });
-            }
-
-            // Determinar status geral
-            if (analysis.errors > 0) {
-                analysis.status = 'error';
-            } else if (analysis.warnings > 0) {
-                analysis.status = 'warning';
-            } else {
-                analysis.status = 'success';
-            }
-
-            return analysis;
-        }
+    return analysis;
+}
 
         // Obter status da seção
         function getSectionStatus(content) {
