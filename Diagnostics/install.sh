@@ -194,7 +194,7 @@ configure_apache() {
         log "Configurando Apache para porta 1298..."
         
         # Configurar porta customizada
-        echo "Listen 1298" >> /etc/apache2/ports.conf
+        sudo sed -i 's/^Listen 80$/Listen 1298/' /etc/apache2/ports.conf
         
         # Criar VirtualHost para porta 1298
         cat > /etc/apache2/sites-available/diagnostic-1298.conf << 'EOFVHOST'
@@ -233,8 +233,6 @@ EOFVHOST
         systemctl restart apache2
         log_success "Apache configurado para porta 1298 e reiniciado"
     fi
-
-    sudo sed -i 's/^Listen 80$/Listen 1298/' /etc/apache2/ports.conf
 
     sudo usermod -aG docker www-data
 }
