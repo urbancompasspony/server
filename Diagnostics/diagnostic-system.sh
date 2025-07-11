@@ -4,7 +4,7 @@
 # diagnostic-system.sh v3.7 - 04.06.2025
 # Mantém TODAS as funcionalidades originais + suporte a parâmetros
 
-version="v3.7 - 04.06.2025"
+version="v3.8 - 10.07.2025"
 
 # Verificar se está sendo executado via CGI
 if [ -n "$REQUEST_METHOD" ]; then
