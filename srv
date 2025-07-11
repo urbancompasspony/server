@@ -48,13 +48,11 @@ function start {
   if ! var0=$(dialog --title "SUPERVISOR" --backtitle "Bem-Vindo ao USM $version" --ok-label "Acessar" --cancel-label "Sair" --menu " " 0 0 0 \
   1 'Docker Orchestration' \
   2 'Docker Maintenance' \
-  3 'Linite Model-1' \
-  4 'AutoConfig pfSense (VM)' \
-  5 'DWAgent (ARM)' \
-  6 'Set Wayland (labwc 24.04+)' \
-  7 'Set OpenBox ObaMenu' \
-  8 'Netplan Menu' \
-  9 'Update or Install Web Panel' \
+  3 'AutoConfig pfSense (VM)' \
+  4 'DWAgent (ARM)' \
+  5 'Set Wayland (labwc)' \
+  6 'Netplan Menu' \
+  7 'Install or Upgrade WebUI' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -62,13 +60,11 @@ function start {
   case "$var0" in
   1) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
   2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
-  3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/main/model-1 | bash ; start ;;
-  4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; start ;;
-  5) dwgeneric0 ; start ;;
-  6) wayland00 ; start ;;
-  7) clear ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
-  8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
-  9) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
+  3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; start ;;
+  4) dwgeneric0 ; start ;;
+  5) wayland00 ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
+  6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
+  7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
   X) exit ;;
   esac
 }
@@ -80,10 +76,10 @@ function startocult {
 function managers {
   if ! var0=$(dialog --title 'Suporte ao Servidor' --backtitle "Bem-Vindo ao USM $version" --ok-label "Acessar" --cancel-label "Sair" --menu " " 0 0 0 \
   1 'Informacoes do Servidor' \
-  2 'Iniciar Area de Trabalho (localhost)' \
+  2 'Iniciar Area de Trabalho (local apenas)' \
   3 'Gerir o Active Directory (se existente)' \
-  4 'Ferramentas & Ajustes Diversos' \
-  5 'Solucao de Problemas' \
+  4 'Ferramentas Diversas' \
+  5 'Diagnóstico do Sistema' \
   6 'Continuidade do Negocio (CdN)' \
   7 'Reiniciar Servidor' \
   8 'Desligar Servidor' \
