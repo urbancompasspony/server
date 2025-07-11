@@ -245,19 +245,30 @@ configure_sudoers() {
     
     # Criar arquivo sudoers específico
     cat > /etc/sudoers.d/diagnostic-webui << 'EOFSUDO'
-# Permitir que o usuário do servidor web execute comandos necessários para diagnóstico
 www-data ALL=(root) NOPASSWD: /usr/local/bin/diagnostic-system.sh
 www-data ALL=(root) NOPASSWD: /bin/mount
 www-data ALL=(root) NOPASSWD: /usr/sbin/smartctl
 www-data ALL=(root) NOPASSWD: /usr/bin/virsh
 www-data ALL=(root) NOPASSWD: /usr/bin/journalctl
 www-data ALL=(root) NOPASSWD: /usr/bin/dmesg
+www-data ALL=(root) NOPASSWD: /usr/bin/docker
+www-data ALL=(root) NOPASSWD: /usr/bin/systemctl
 apache ALL=(root) NOPASSWD: /usr/local/bin/diagnostic-system.sh
 apache ALL=(root) NOPASSWD: /bin/mount
 apache ALL=(root) NOPASSWD: /usr/sbin/smartctl
 apache ALL=(root) NOPASSWD: /usr/bin/virsh
 apache ALL=(root) NOPASSWD: /usr/bin/journalctl
 apache ALL=(root) NOPASSWD: /usr/bin/dmesg
+apache ALL=(root) NOPASSWD: /usr/bin/docker
+apache ALL=(root) NOPASSWD: /usr/bin/systemctl
+nginx ALL=(root) NOPASSWD: /usr/local/bin/diagnostic-system.sh
+nginx ALL=(root) NOPASSWD: /bin/mount
+nginx ALL=(root) NOPASSWD: /usr/sbin/smartctl
+nginx ALL=(root) NOPASSWD: /usr/bin/virsh
+nginx ALL=(root) NOPASSWD: /usr/bin/journalctl
+nginx ALL=(root) NOPASSWD: /usr/bin/dmesg
+nginx ALL=(root) NOPASSWD: /usr/bin/docker
+nginx ALL=(root) NOPASSWD: /usr/bin/systemctl
 EOFSUDO
 
     chmod 440 /etc/sudoers.d/diagnostic-webui
@@ -270,6 +281,29 @@ EOFSUDO
     fi
     
     log_success "Sudoers configurado"
+}
+
+configure_permissions() {
+# Script principal
+sudo chmod +x /usr/local/bin/diagnostic-system.sh
+sudo chown root:root /usr/local/bin/diagnostic-system.sh
+
+# Script CGI
+sudo chmod +x /usr/lib/cgi-bin/system-diagnostic.cgi
+sudo chown www-data:www-data /usr/lib/cgi-bin/system-diagnostic.cgi
+
+# Página HTML
+sudo chmod 644 /var/www/html/index.html
+sudo chmod 644 /var/www/html/style.css
+sudo chmod 644 /var/www/html/script.js
+sudo chown www-data:www-data /var/www/html/index.html
+sudo chown www-data:www-data /var/www/html/style.css
+sudo chown www-data:www-data /var/www/html/script.js
+
+# Logs
+sudo mkdir -p /var/log/diagnostic-webui
+sudo chmod 755 /var/log/diagnostic-webui
+sudo chown www-data:www-data /var/log/diagnostic-webui
 }
 
 # Criar arquivo de configuração
@@ -378,6 +412,7 @@ main() {
     configure_permissions
     configure_apache
     configure_sudoers
+    configure_permissions
     create_config_file
     test_installation
     show_final_info
