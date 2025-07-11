@@ -134,7 +134,14 @@ case "$ACTION" in
                     return_error "Erro ao executar teste de sistema: $output"
                 fi
                 ;;
-                
+
+            "logs")
+                if output=$(timeout 60 "$DIAGNOSTIC_SCRIPT" --test=logs --no-auth 2>&1); then
+                    return_success "$output"
+                else
+                    return_error "Erro ao executar análise de logs: $output"
+                fi
+                ;;
             *)
                 return_error "Tipo de teste não reconhecido: $TEST_TYPE"
                 ;;
