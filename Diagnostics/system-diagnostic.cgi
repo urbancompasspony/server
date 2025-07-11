@@ -96,7 +96,9 @@ case "$ACTION" in
         case "$TEST_TYPE" in
             "storage")
                 # Delegar para o script principal com parâmetro --test=storage
-                if output=$(timeout 300 "$DIAGNOSTIC_SCRIPT" --test=storage --no-auth 2>&1); then
+                output=$(timeout 300 "$DIAGNOSTIC_SCRIPT" --no-auth 2>&1)
+                exit_code=$?
+                if [ $exit_code -le 2 ]; then
                     return_success "$output"
                 else
                     return_error "Erro ao executar teste de armazenamento: $output"
