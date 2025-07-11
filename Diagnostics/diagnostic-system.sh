@@ -165,15 +165,14 @@ sleep 3
 
 # Verifica interfaces de rede
 log_message "Verificando interfaces de rede..."
-network_down=$(ip -o link show | awk '/state DOWN/ {print $2,$17}')
+network_down=$(ip -o link show | awk '/state DOWN/ && !/virbr/ && !/br-/ && !/docker/ && !/lo/ {print $2,$17}')
 if [ -n "$network_down" ]; then
-    echo -e "⚠️  AVISO: Interface(s) de rede inativa(s) detectadas (ignore as interfaces BR-xxxxx, VIRBR0 e/ou DOCKER0):"
+    echo -e "⚠️  AVISO: Interface(s) de rede física(s) inativa(s) detectadas:"
     echo "$network_down"
     add_warning
 else
-    echo -e "✅ Todas as interfaces de rede existentes estão ativas!"
+    echo -e "✅ OK: Todas as interfaces de rede físicas estão ativas!"
 fi
-
 echo ""
 sleep 3
 
