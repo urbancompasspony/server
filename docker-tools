@@ -250,8 +250,7 @@ echo "$VALUE0"
     dialog --title "ERRO" --msgbox "O(s) campo(s) exigidos nao pode(m) ficar em branco. \nPreencha-o(s) adequadamente!" 7 40
     macvland
   else
-    macvlanr=$(docker inspect "$var4" 1>/dev/null 2>/dev/null && echo yes || echo no)
-    if [ "$macvlanr" = "no" ];then
+    if ! docker network inspect macvlan &>/dev/null; then
       # Cria a rede docker
       docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" "$var4"
       
@@ -268,7 +267,6 @@ echo "$VALUE0"
         dialog --title "ERRO" --msgbox "Falha ao criar a rede MACVLAN '$var4'!" 6 40
       fi
     else
-      echo "A macvlan $var4 existe! Saindo..."
       dialog --title "ERRO" --msgbox "A rede MACVLAN '$var4' já existe!" 6 40
     fi
   fi
