@@ -198,14 +198,15 @@ case "$ACTION" in
                     
                     # Verifica interfaces de rede
                     echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando interfaces de rede...'
-                    network_down=\$(ip -o link show | awk '/state DOWN/ {print \$2,\$17}')
-                    if [ -n \"\$network_down\" ]; then
-                        echo 'AVISO: Interface(s) de rede inativa(s) detectadas:'
-                        echo \"\$network_down\"
+                    network_down=$(ip -o link show | awk '/state DOWN/ && !/virbr/ && !/br-/ && !/docker/ && !/lo/ {print $2,$17}')
+                    if [ -n "$network_down" ]; then
+                        echo -e "⚠️  AVISO: Interface(s) de rede física(s) inativa(s) detectadas:"
+                        echo "$network_down"
+                        add_warning
                     else
-                        echo 'Todas as interfaces de rede existentes estao ativas!'
+                        echo -e "✅ OK: Todas as interfaces de rede físicas estão ativas!"
                     fi
-                    
+
                     # Verifica resoluçao DNS
                     echo '   \$(date \"+%Y-%m-%d %H:%M:%S\") - Verificando resoluçao DNS...'
                     if ! nslookup google.com >/dev/null 2>&1; then
