@@ -96,7 +96,7 @@ function managers {
   2) desktop00 ; managers ;;
   3) domain00 ; managers ;;
   4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | tee /home/administrador/.t00lz ; chmod +x /home/administrador/.t00lz ; clear ; bash /home/administrador/.t00lz ; managers ;;
-  5) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/solucao_de_problemas | tee /home/administrador/.sp ; chmod +x /home/administrador/.sp ; clear ; bash /home/administrador/.sp ; managers ;;
+  5) clear ; sudo bash /usr/local/bin/diagnostic-system.sh ; managers ;;
   6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/00-Base | tee /home/administrador/.base ; chmod +x /home/administrador/.base ; clear ; bash /home/administrador/.base ; managers ;;
   7) reb00t ; managers ;;
   8) shutd0 ; managers ;;
