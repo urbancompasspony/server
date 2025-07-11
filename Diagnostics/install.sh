@@ -70,44 +70,15 @@ detect_webserver() {
 install_apache() {
     log "Instalando Apache..."
     
-    if command -v apt-get >/dev/null 2>&1; then
+    if ! command -v apache2 >/dev/null 2>&1; then
         apt-get update
         apt-get install -y apache2
         a2enmod cgi
         systemctl enable apache2
         systemctl start apache2
-    elif command -v yum >/dev/null 2>&1; then
-        yum install -y httpd
-        systemctl enable httpd
-        systemctl start httpd
-    elif command -v dnf >/dev/null 2>&1; then
-        dnf install -y httpd
-        systemctl enable httpd
-        systemctl start httpd
-    else
-        log_error "Gerenciador de pacotes não suportado"
-        exit 1
     fi
     
     log_success "Apache instalado e configurado"
-}
-
-# Instalar dependências
-install_dependencies() {
-    log "Instalando dependências..."
-    
-    if command -v apt-get >/dev/null 2>&1; then
-        apt-get update
-        apt-get install -y bc curl dnsutils smartmontools
-    elif command -v yum >/dev/null 2>&1; then
-        yum install -y bc curl bind-utils smartmontools
-    elif command -v dnf >/dev/null 2>&1; then
-        dnf install -y bc curl bind-utils smartmontools
-    else
-        log_warning "Gerenciador de pacotes não suportado. Instale manualmente: bc, curl, bind-utils/dnsutils, smartmontools"
-    fi
-    
-    log_success "Dependências instaladas"
 }
 
 # Criar diretórios necessários
@@ -402,7 +373,6 @@ main() {
     
     check_root
     detect_webserver
-    install_dependencies
     create_directories
     create_diagnostic_script
     create_cgi_script
