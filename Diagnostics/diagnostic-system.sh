@@ -1,10 +1,25 @@
 #!/bin/bash
 
-# Enhanced Diagnostic System Script - VERSÃO COMPLETA
-# diagnostic-system.sh v3.7 - 04.06.2025
-# Mantém TODAS as funcionalidades originais + suporte a parâmetros
+version="v3.9 - 10.07.2025"
+LOCK_FILE="/tmp/diagnostic_${USER}_$$.lock"
+LOCK_DIR="/tmp"
 
-version="v3.8 - 10.07.2025"
+cleanup() {
+    rm -f "$LOCK_FILE"
+    exit $1
+}
+
+trap 'cleanup $?' EXIT INT TERM
+
+# Verificar se já está rodando
+if find "$LOCK_DIR" -name "diagnostic_*.lock" -mmin -10 2>/dev/null | grep -q .; then
+    echo "❌ ERRO: Diagnóstico já está executando!"
+    echo "Aguarde a conclusão ou remova manualmente: rm /tmp/diagnostic_*.lock"
+    exit 1
+fi
+
+# Criar lock file
+echo "$$:$(date):$(whoami)" > "$LOCK_FILE"
 
 # Verificar se está sendo executado via CGI
 if [ -n "$REQUEST_METHOD" ]; then
