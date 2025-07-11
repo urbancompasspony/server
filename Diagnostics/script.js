@@ -420,17 +420,299 @@ function downloadResults() {
         return;
     }
 
-    const blob = new Blob([content.textContent], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `diagnostico-sistema-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-    showAlert('Resultado baixado com sucesso!', 'success');
+    // Criar modal simples de escolha
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
+
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    `;
+
+    modalContent.innerHTML = `
+        <h3 style="margin-bottom: 25px; color: #2c3e50;">Baixar Relatorio</h3>
+        
+        <button onclick="downloadTXT()" style="
+            width: 100%; 
+            margin: 10px 0; 
+            padding: 15px; 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            transition: background 0.3s ease;
+        " onmouseover="this.style.background='#2980b9'" onmouseout="this.style.background='#3498db'">
+            Arquivo de Texto (TXT)
+        </button>
+        
+        <button onclick="downloadPDF()" style="
+            width: 100%; 
+            margin: 10px 0; 
+            padding: 15px; 
+            background: #e74c3c; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            transition: background 0.3s ease;
+        " onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'">
+            Relatorio PDF
+        </button>
+        
+        <button onclick="closeModal()" style="
+            width: 100%; 
+            margin: 10px 0; 
+            padding: 12px; 
+            background: #95a5a6; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer;
+            transition: background 0.3s ease;
+        " onmouseover="this.style.background='#7f8c8d'" onmouseout="this.style.background='#95a5a6'">
+            Cancelar
+        </button>
+    `;
+
+    modal.appendChild(modalContent);
+    modal.id = 'download-modal';
+    document.body.appendChild(modal);
+
+    // Funções do modal
+    window.downloadTXT = () => {
+        const blob = new Blob([content.textContent], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `diagnostico-sistema-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        showAlert('Arquivo TXT baixado com sucesso!', 'success');
+        closeModal();
+    };
+
+    window.downloadPDF = () => {
+        closeModal();
+        generateMinimalPDF();
+    };
+
+    window.closeModal = () => {
+        const modal = document.getElementById('download-modal');
+        if (modal) document.body.removeChild(modal);
+    };
+
+    // Fechar clicando fora
+    modal.onclick = (e) => {
+        if (e.target === modal) closeModal();
+    };
 }
+
+// Função para limpar texto de emojis e caracteres especiais
+function cleanText(text) {
+    return text
+        // Remover emojis
+        .replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F700}-\u{1F77F}]|[\u{1F780}-\u{1F7FF}]|[\u{1F800}-\u{1F8FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '')
+        // Substituir caracteres acentuados
+        .replace(/[áàâãä]/g, 'a')
+        .replace(/[ÁÀÂÃÄ]/g, 'A')
+        .replace(/[éèêë]/g, 'e')
+        .replace(/[ÉÈÊË]/g, 'E')
+        .replace(/[íìîï]/g, 'i')
+        .replace(/[ÍÌÎÏ]/g, 'I')
+        .replace(/[óòôõö]/g, 'o')
+        .replace(/[ÓÒÔÕÖ]/g, 'O')
+        .replace(/[úùûü]/g, 'u')
+        .replace(/[ÚÙÛÜ]/g, 'U')
+        .replace(/[ç]/g, 'c')
+        .replace(/[Ç]/g, 'C')
+        .replace(/[ñ]/g, 'n')
+        .replace(/[Ñ]/g, 'N')
+        // Substituir símbolos por equivalentes ASCII
+        .replace(/✅/g, '[OK]')
+        .replace(/❌/g, '[ERRO]')
+        .replace(/⚠️/g, '[AVISO]')
+        .replace(/🔍/g, '')
+        .replace(/📋/g, '')
+        .replace(/📅/g, '')
+        .replace(/🌐/g, '')
+        .replace(/💾/g, '')
+        .replace(/🔧/g, '')
+        .replace(/🚨/g, '[CRITICO]')
+        .replace(/ℹ️/g, '[INFO]')
+        // Limpar espaços extras
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+async function generateMinimalPDF() {
+    try {
+        showAlert('Gerando PDF...', 'info');
+        
+        // Carregar jsPDF se necessário
+        if (typeof window.jsPDF === 'undefined') {
+            await loadJsPDF();
+        }
+
+        const content = document.getElementById('result-content').textContent;
+        const title = document.getElementById('result-title').textContent;
+        const timestamp = new Date().toLocaleString('pt-BR');
+
+        // Criar PDF
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // Configurações
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 20;
+        const lineHeight = 4;
+        const maxWidth = pageWidth - (margin * 2);
+        
+        let currentY = margin;
+
+        // Função para verificar quebra de página
+        const checkPageBreak = (neededSpace = 10) => {
+            if (currentY + neededSpace > pageHeight - margin) {
+                doc.addPage();
+                currentY = margin;
+                return true;
+            }
+            return false;
+        };
+
+        // Função para adicionar texto
+        const addText = (text, fontSize = 10, isBold = false) => {
+            doc.setFontSize(fontSize);
+            doc.setFont(undefined, isBold ? 'bold' : 'normal');
+            
+            const lines = doc.splitTextToSize(text, maxWidth);
+            lines.forEach(line => {
+                checkPageBreak();
+                doc.text(line, margin, currentY);
+                currentY += lineHeight;
+            });
+        };
+
+        // === CABEÇALHO ===
+        doc.setTextColor(41, 128, 185);
+        addText('RELATORIO DE DIAGNOSTICO DO SISTEMA', 16, true);
+        currentY += 5;
+        
+        // Linha separadora
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, currentY, pageWidth - margin, currentY);
+        currentY += 10;
+
+        // === INFORMAÇÕES BÁSICAS ===
+        doc.setTextColor(0, 0, 0);
+        addText(cleanText(title), 12, true);
+        addText(`Data/Hora: ${timestamp}`, 10);
+        addText(`Servidor: ${window.location.hostname}`, 10);
+        currentY += 5;
+
+        // === CONTEÚDO PRINCIPAL ===
+        doc.setTextColor(52, 73, 94);
+        addText('RESULTADO DO DIAGNOSTICO:', 12, true);
+        currentY += 5;
+
+        // Processar conteúdo removendo emojis e caracteres especiais
+        doc.setTextColor(0, 0, 0);
+        const lines = content.split('\n');
+        
+        lines.forEach(line => {
+            if (line.trim()) {
+                // Limpar linha de emojis e caracteres especiais
+                const cleanedLine = cleanText(line);
+                
+                // Ajustar fonte baseado no tipo de linha
+                if (cleanedLine.includes('===') || cleanedLine.includes('Teste')) {
+                    currentY += 3;
+                    addText(cleanedLine, 11, true);
+                    currentY += 2;
+                } else if (cleanedLine.includes('OK:') || cleanedLine.includes('ERRO:') || 
+                          cleanedLine.includes('AVISO:') || cleanedLine.includes('CRITICO:')) {
+                    addText(cleanedLine, 10);
+                } else {
+                    addText(cleanedLine, 9);
+                }
+            } else {
+                currentY += 2; // Espaço para linhas vazias
+            }
+        });
+
+        // === RODAPÉ ===
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(128, 128, 128);
+            doc.text(`Pagina ${i} de ${totalPages}`, pageWidth - margin - 20, pageHeight - 8);
+            doc.text(`Sistema de Diagnostico WebUI`, margin, pageHeight - 8);
+        }
+
+        // Salvar
+        const filename = `diagnostico-sistema-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.pdf`;
+        doc.save(filename);
+        
+        showAlert('PDF gerado com sucesso!', 'success');
+
+    } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        showAlert('Erro ao gerar PDF: ' + error.message, 'error');
+    }
+}
+
+// Carregar jsPDF
+function loadJsPDF() {
+    return new Promise((resolve, reject) => {
+        if (window.jsPDF) {
+            resolve();
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        script.onload = () => {
+            window.jsPDF = window.jspdf.jsPDF;
+            resolve();
+        };
+        script.onerror = () => reject(new Error('Falha ao carregar jsPDF'));
+        document.head.appendChild(script);
+    });
+}
+
+// Fechar modal com ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('download-modal');
+        if (modal) document.body.removeChild(modal);
+    }
+});
 
 function printResults() {
     const content = document.getElementById('result-content');
