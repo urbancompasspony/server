@@ -694,8 +694,6 @@ show_recent_errors() {
     else
         echo -e "✅ OK: Nenhum erro crítico encontrado nos logs recentes"
     fi
-    
-    echo ""
     sleep 3
 }
 
