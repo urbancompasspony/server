@@ -128,21 +128,198 @@ test_storage() {
     sleep 3
 
     # Verifica dispositivos com bad blocks
-    log_message "Verificando armazenamento com possíveis BAD BLOCKS..."
+    # ANÁLISE SMART MELHORADA - Detecta setores defeituosos
+    log_message "Verificando armazenamento com análise SMART detalhada..."
     smart_devices=$(lsblk -d -o NAME,TYPE | grep disk | awk '{print $1}')
-    for device in $smart_devices; do
-        if command -v smartctl >/dev/null 2>&1; then
-            smart_status=$(sudo smartctl -H /dev/"$device" 2>/dev/null | grep "SMART overall-health")
-            if echo "$smart_status" | grep -q "FAILED"; then
-                echo -e "❌ CRÍTICO: Dispositivo /dev/$device com falha SMART!"
-                add_error
-            else
-                echo -e "✅ OK: Dispositivo /dev/$device sem problemas SMART para relatar."
+    
+    if [ -z "$smart_devices" ]; then
+        echo -e "⚠️  AVISO: Nenhum dispositivo de armazenamento encontrado"
+        add_warning
+    else
+        echo "Dispositivos encontrados para análise SMART:"
+        echo "=============================================="
+        
+        for device in $smart_devices; do
+            echo "Analisando $device..."
+            
+            # Verificar se SMART está disponível
+            if ! command -v smartctl >/dev/null 2>&1; then
+                echo "⚠️  AVISO: smartctl não disponível para $device"
+                continue
             fi
-        fi
-    done
-    echo -e "OBSERVAÇÃO: Este assistente não consegue verificar SMART de discos em RAID por Hardware."
-
+            
+            # Verificar se o dispositivo suporta SMART
+            if ! sudo smartctl -i "/dev/$device" >/dev/null 2>&1; then
+                echo "⚠️  AVISO: $device não suporta SMART"
+                continue
+            fi
+            
+            # 1. Status geral primeiro
+            smart_status=$(sudo smartctl -H "/dev/$device" 2>/dev/null | grep "SMART overall-health")
+            
+            # 2. Análise detalhada dos atributos críticos
+            smart_attributes=$(sudo smartctl -A "/dev/$device" 2>/dev/null)
+            
+            # 3. Verificar setores defeituosos e problemas críticos
+            has_critical_issues=false
+            critical_details=""
+            
+            # DEBUG: Mostrar saída completa para troubleshooting do sdb
+            if [ "$device" = "sdb" ]; then
+                echo "  🔍 DEBUG: Analisando atributos de $device..."
+                echo "$smart_attributes" | grep -E "(197|5|198|199|194)" | while read line; do
+                    echo "    Debug linha: $line"
+                done
+            fi
+            
+            # MÉTODO MELHORADO: Múltiplas formas de extrair valores
+            
+            # Atributo 197 - Current Pending Sector (múltiplos métodos)
+            pending_sectors=""
+            # Método 1: Busca por ID e nome
+            pending_sectors=$(echo "$smart_attributes" | awk '$1 == "197" && $2 ~ /current.pending/ {print $10}' | tr -d ',' | head -1)
+            # Método 2: Apenas por ID 197
+            if [ -z "$pending_sectors" ]; then
+                pending_sectors=$(echo "$smart_attributes" | awk '$1 == "197" {print $10}' | tr -d ',' | head -1)
+            fi
+            # Método 3: Busca por palavra-chave
+            if [ -z "$pending_sectors" ]; then
+                pending_sectors=$(echo "$smart_attributes" | grep -i "pending" | awk '{print $10}' | tr -d ',' | head -1)
+            fi
+            # Método 4: Raw value (último campo)
+            if [ -z "$pending_sectors" ]; then
+                pending_sectors=$(echo "$smart_attributes" | grep "197" | awk '{print $NF}' | tr -d ',' | head -1)
+            fi
+            
+            # Atributo 5 - Reallocated Sector Count
+            reallocated_sectors=""
+            reallocated_sectors=$(echo "$smart_attributes" | awk '$1 == "5" {print $10}' | tr -d ',' | head -1)
+            if [ -z "$reallocated_sectors" ]; then
+                reallocated_sectors=$(echo "$smart_attributes" | grep -i "reallocated" | awk '{print $10}' | tr -d ',' | head -1)
+            fi
+            
+            # Atributo 198 - Offline Uncorrectable
+            uncorrectable_sectors=""
+            uncorrectable_sectors=$(echo "$smart_attributes" | awk '$1 == "198" {print $10}' | tr -d ',' | head -1)
+            if [ -z "$uncorrectable_sectors" ]; then
+                uncorrectable_sectors=$(echo "$smart_attributes" | grep -i "uncorrectable" | awk '{print $10}' | tr -d ',' | head -1)
+            fi
+            
+            # Atributo 10 - Spin Retry Count
+            spin_retry_count=""
+            spin_retry_count=$(echo "$smart_attributes" | awk '$1 == "10" {print $10}' | tr -d ',' | head -1)
+            
+            # Atributo 199 - CRC Error Count
+            crc_errors=""
+            crc_errors=$(echo "$smart_attributes" | awk '$1 == "199" {print $10}' | tr -d ',' | head -1)
+            if [ -z "$crc_errors" ]; then
+                crc_errors=$(echo "$smart_attributes" | grep -i "crc" | awk '{print $10}' | tr -d ',' | head -1)
+            fi
+            
+            # Atributo 194 - Temperature
+            temperature=""
+            temperature=$(echo "$smart_attributes" | awk '$1 == "194" {print $10}' | head -1)
+            if [ -z "$temperature" ]; then
+                temperature=$(echo "$smart_attributes" | grep -i "temperature" | awk '{print $10}' | head -1)
+            fi
+            
+            # DEBUG para o disco problemático
+            if [ "$device" = "sdb" ]; then
+                echo "  🔍 Valores extraídos para $device:"
+                echo "    Setores pendentes: '$pending_sectors'"
+                echo "    Setores realocados: '$reallocated_sectors'"
+                echo "    Setores não corrigíveis: '$uncorrectable_sectors'"
+                echo "    Temperatura: '$temperature'"
+                echo "    Erros CRC: '$crc_errors'"
+            fi
+            
+            # Análise dos atributos críticos (com validação mais robusta)
+            if [ -n "$reallocated_sectors" ] && [ "$reallocated_sectors" != "0" ] && [ "$reallocated_sectors" -gt 0 ] 2>/dev/null; then
+                has_critical_issues=true
+                critical_details+="  ⚠️  Setores realocados: $reallocated_sectors\n"
+                add_warning
+            fi
+            
+            if [ -n "$pending_sectors" ] && [ "$pending_sectors" != "0" ] && [ "$pending_sectors" -gt 0 ] 2>/dev/null; then
+                has_critical_issues=true
+                critical_details+="  ❌ CRÍTICO: Setores pendentes: $pending_sectors (possível falha iminente)\n"
+                add_error
+            fi
+            
+            if [ -n "$uncorrectable_sectors" ] && [ "$uncorrectable_sectors" != "0" ] && [ "$uncorrectable_sectors" -gt 0 ] 2>/dev/null; then
+                has_critical_issues=true
+                critical_details+="  ❌ CRÍTICO: Setores não corrigíveis: $uncorrectable_sectors\n"
+                add_error
+            fi
+            
+            if [ -n "$spin_retry_count" ] && [ "$spin_retry_count" != "0" ] && [ "$spin_retry_count" -gt 0 ] 2>/dev/null; then
+                has_critical_issues=true
+                critical_details+="  ⚠️  Tentativas de spin: $spin_retry_count\n"
+                add_warning
+            fi
+            
+            if [ -n "$crc_errors" ] && [ "$crc_errors" != "0" ] && [ "$crc_errors" -gt 5 ] 2>/dev/null; then
+                has_critical_issues=true
+                critical_details+="  ⚠️  Erros CRC: $crc_errors (possível problema de cabo)\n"
+                add_warning
+            fi
+            
+            # Verificar temperatura (extrair apenas número)
+            temp_num=$(echo "$temperature" | grep -o '[0-9]*' | head -1)
+            if [ -n "$temp_num" ] && [ "$temp_num" -gt 60 ] 2>/dev/null; then
+                has_critical_issues=true
+                critical_details+="  ⚠️  Temperatura alta: ${temp_num}°C\n"
+                add_warning
+            fi
+            
+            # FALLBACK: Verificar smartd logs se não encontrou problemas
+            if [ "$has_critical_issues" = false ]; then
+                smartd_errors=$(sudo journalctl -u smartd --since "24 hours ago" -q 2>/dev/null | grep -i "$device" | grep -i "pending\|reallocated\|uncorrectable")
+                if [ -n "$smartd_errors" ]; then
+                    has_critical_issues=true
+                    critical_details+="  ❌ CRÍTICO: Problemas detectados pelo smartd:\n"
+                    echo "$smartd_errors" | while read line; do
+                        critical_details+="    $line\n"
+                    done
+                    add_error
+                fi
+            fi
+            
+            # Verificar status geral vs atributos
+            if echo "$smart_status" | grep -q "FAILED"; then
+                echo "❌ CRÍTICO: Dispositivo $device com falha SMART GERAL!"
+                add_error
+            elif [ "$has_critical_issues" = true ]; then
+                echo "⚠️  DISPOSITIVO $device COM PROBLEMAS SMART DETECTADOS:"
+                echo -e "$critical_details"
+                if echo "$critical_details" | grep -q "CRÍTICO"; then
+                    echo "🚨 RECOMENDAÇÃO: Considere substituir o disco $device urgentemente!"
+                else
+                    echo "📊 RECOMENDAÇÃO: Monitore o disco $device de perto"
+                fi
+            else
+                echo "✅ OK: Dispositivo $device sem problemas SMART para relatar."
+                
+                # Mostrar informações básicas se disponíveis
+                if [ -n "$temperature" ]; then
+                    temp_display=$(echo "$temperature" | grep -o '[0-9]*' | head -1)
+                    if [ -n "$temp_display" ]; then
+                        echo "  ℹ️  Temperatura: ${temp_display}°C"
+                    fi
+                fi
+                power_on_hours=$(echo "$smart_attributes" | awk '$1 == "9" {print $10}' | head -1)
+                if [ -n "$power_on_hours" ]; then
+                    echo "  ℹ️  Horas de uso: $power_on_hours"
+                fi
+            fi
+            
+            echo ""
+            sleep 1
+        done
+        
+        echo "=============================================="
+        echo -e "OBSERVAÇÃO: Discos em RAID por Hardware podem não reportar SMART individualmente."
+    fi
     echo ""
     sleep 3
 
