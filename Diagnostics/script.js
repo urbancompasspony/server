@@ -27,7 +27,7 @@ async function runFullDiagnostic() {
         button.style.cursor = 'not-allowed';
     }
         
-    showLoading('Executando diagnóstico completo do sistema...');
+    showLoading('Executando diagnóstico completo do sistema... por favor, não feche ou saia desta página!');
     
     // Progresso OTIMIZADO
     const progressSteps = [
