@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version="v3.9 - 10.07.2025"
+version="v3.9.1 - 13.07.2025"
 LOCK_FILE="/tmp/diagnostic_${USER}_$$.lock"
 LOCK_DIR="/tmp"
 
@@ -11,15 +11,19 @@ cleanup() {
 
 trap 'cleanup $?' EXIT INT TERM
 
-# Verificar se já está rodando
-if find "$LOCK_DIR" -name "diagnostic_*.lock" -mmin -10 2>/dev/null | grep -q .; then
-    echo "❌ ERRO: Diagnóstico já está executando!"
-    echo "Aguarde a conclusão ou remova manualmente: rm /tmp/diagnostic_*.lock"
-    exit 1
+# Verificar se já está rodando (apenas para operações que precisam)
+if [ "$NEEDS_LOCK_CHECK" = "true" ]; then
+    if find "$LOCK_DIR" -name "diagnostic_*.lock" -mmin -10 2>/dev/null | grep -q .; then
+        echo "❌ ERRO: Diagnóstico já está executando!"
+        echo "Aguarde a conclusão ou remova manualmente: rm /tmp/diagnostic_*.lock"
+        exit 1
+    fi
 fi
 
-# Criar lock file
-echo "$$:$(date):$(whoami)" > "$LOCK_FILE"
+# Criar lock file apenas para operações que precisam
+if [ "$NEEDS_LOCK_CHECK" = "true" ]; then
+    echo "$$:$(date):$(whoami)" > "$LOCK_FILE"
+fi
 
 # Verificar se está sendo executado via CGI
 if [ -n "$REQUEST_METHOD" ]; then
@@ -28,6 +32,14 @@ if [ -n "$REQUEST_METHOD" ]; then
 else
     IS_CGI=false
     SKIP_AUTH=false
+fi
+
+# CORREÇÃO: Verificar lock apenas para operações que realmente precisam de exclusividade
+# Operações de leitura (info, quick) não precisam verificar locks
+NEEDS_LOCK_CHECK=true
+
+if [ "$MODE" = "info" ] || [ "$MODE" = "quick" ]; then
+    NEEDS_LOCK_CHECK=false
 fi
 
 # Processar parâmetros da linha de comando
