@@ -147,6 +147,7 @@ function personal {
   4 'qBitTorrent' \
   5 'Dominio & CUPS (BETA)' \
   6 'Simple Chat Server' \
+  7 'Honeygain' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -158,6 +159,7 @@ function personal {
   4) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
   5) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
   6) wget "$github"07-simple-web-chat -O /tmp/chatsimple; sudo bash /tmp/chatsimple ;;
+  7) wget "$github"08-honeygain -O /tmp/honeygain; sudo bash /tmp/honeygain ;;
   X) return ;;
   esac
 }
