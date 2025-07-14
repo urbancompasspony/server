@@ -3,10 +3,8 @@
 # Script para extrair caminhos do rsnapshot.conf e buscar arquivos/pastas
 
 if [ -f /srv/scripts/rsnapshot ]; then
-  clear; echo "Encontrei o Rsnapshot CDN!"
   RSNAPSHOT_CONFIG="/srv/scripts/rsnapshot"
 else
-  clear; echo "Fallback procurando rsnapshot do modelo antigo"
   RSNAPSHOT_CONFIG="/srv/containers/scripts/rsnapshot"
 fi
 
