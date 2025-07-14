@@ -14,11 +14,15 @@ if [ -z "$1" ]; then
     echo "💡 Para termos com espaços: azul engenharia"
     echo "💡 Para uma palavra: arquivo"
     echo
+    
+    # Força redirecionamento para /dev/tty para funcionar dentro de dialog
+    exec < /dev/tty
     read -p "🔍 Termo: " SEARCH_NAME
     
     # Verificar se o usuário digitou algo
     if [ -z "$SEARCH_NAME" ]; then
         echo "❌ Nenhum termo foi digitado. Saindo..."
+        read -p "Pressione Enter para continuar..."
         exit 1
     fi
 else
@@ -89,7 +93,6 @@ fi
 
 # Regex patterns utilizados (para referência)
 echo "=========================================="
-echo "📝 Regex utilizados:"
-echo "snapshot_root: ^snapshot_root\\s+(.+)$"
-echo "backup paths:  ^backup\\s+([^\\t]+)\\t.*"
-echo "syslog search: grep -i \"$SEARCH_NAME\" $SYSLOG_PATH"
+echo "✅ Busca concluída!"
+echo
+read -p "Pressione Enter para voltar ao menu..." -t 30
