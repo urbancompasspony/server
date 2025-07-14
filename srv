@@ -52,7 +52,8 @@ function start {
   4 'DWAgent (ARM)' \
   5 'Set Wayland (labwc)' \
   6 'Netplan Menu' \
-  7 'Install or Upgrade WebUI' \
+  7 'Install DiagnosticUI' \
+  8 'Install AD-DC-WebUI' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -65,6 +66,7 @@ function start {
   5) wayland00 ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
   6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
   7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
+  8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash ; start ;;
   X) exit ;;
   esac
 }
