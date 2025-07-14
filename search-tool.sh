@@ -3,13 +3,26 @@
 # Script para extrair caminhos do rsnapshot.conf e buscar arquivos/pastas
 
 RSNAPSHOT_CONFIG="/srv/containers/scripts/rsnapshot"
-SEARCH_NAME="$1"
 
-if [ -z "$SEARCH_NAME" ]; then
-    echo "Uso: $0 <nome_para_buscar>"
-    echo "Exemplo: $0 'azul engenharia'"
-    echo "Exemplo: $0 arquivo"
-    exit 1
+# Se não foi passado argumento, perguntar interativamente
+if [ -z "$1" ]; then
+    echo "╔════════════════════════════════════════════════════════════════╗"
+    echo "║                    BUSCA EM RSNAPSHOT BACKUP                   ║"
+    echo "╚════════════════════════════════════════════════════════════════╝"
+    echo
+    echo "Digite o termo que deseja buscar:"
+    echo "💡 Para termos com espaços: azul engenharia"
+    echo "💡 Para uma palavra: arquivo"
+    echo
+    read -p "🔍 Termo: " SEARCH_NAME
+    
+    # Verificar se o usuário digitou algo
+    if [ -z "$SEARCH_NAME" ]; then
+        echo "❌ Nenhum termo foi digitado. Saindo..."
+        exit 1
+    fi
+else
+    SEARCH_NAME="$1"
 fi
 
 # Verificar se o termo tem espaços e ajustar para busca
