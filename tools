@@ -5,6 +5,7 @@ YAML_FILE="/srv/system.yaml"
 
 function start {
   if ! var0=$(dialog --title 'Ferramentas' --backtitle "Ferramentas e Utilidades" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
+  0 'Buscar em RSNAPSHOTs' \
   1 'Instalar o DWService' \
   2 'Tailscale Localhost' \
   3 'Baixar Imagens .ISO (XPRA)' \
@@ -20,6 +21,7 @@ function start {
     return
   fi
   case "$var0" in
+  0) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/search-tool.sh | sudo bash ; start ;;
   1) dwservice0 ; start ;;
   2) tailscale0 ; start ;;
   3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; start ;;
