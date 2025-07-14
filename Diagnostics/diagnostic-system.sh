@@ -137,7 +137,7 @@ test_storage() {
             fi
         else
             # Fallback para journalctl
-            fs_errors=$(sudo journalctl --dmesg --since "24 hours ago" --no-pager -q 2>/dev/null | grep -i "ext[234]\|xfs\|btrfs" | grep -i "error\|corrupt\|remount.*read-only" | tail -10)
+            fs_errors=$(sudo journalctl --dmesg --since "48 hours ago" --no-pager -q 2>/dev/null | grep -i "ext[234]\|xfs\|btrfs" | grep -i "error\|corrupt\|remount.*read-only" | tail -10)
             if [ -n "$fs_errors" ]; then
                 echo -e "❌ ERRO: Detectados erros no sistema de arquivos!"
                 echo "$fs_errors"
@@ -301,7 +301,7 @@ test_storage() {
             fi
             
             # FALLBACK: Verificar smartd logs (CORRIGIDO para contabilizar)
-            smartd_errors=$(sudo journalctl -u smartd --since "24 hours ago" -q 2>/dev/null | grep -i "$device")
+            smartd_errors=$(sudo journalctl -u smartd --since "48 hours ago" -q 2>/dev/null | grep -i "$device")
             if [ -n "$smartd_errors" ]; then
                 
                 # Verificar diferentes tipos de problemas nos logs
@@ -637,56 +637,58 @@ test_system() {
 
     # Verifica logs de erro recentes
     log_message "Verificando logs de sistema..."
-    recent_errors=$(sudo journalctl --since "1 hour ago" -p err -q --no-pager | wc -l)
+    recent_errors=$(sudo journalctl --since "48 hours ago" -p err -q --no-pager | wc -l)
     if [ "$recent_errors" -gt 50 ]; then
-        echo -e "❌ CRÍTICO: $recent_errors erros no log da última hora (>50)"
+        echo -e "❌ CRÍTICO: $recent_errors erros no log das últimas 48 horas (>50)"
         add_error
     elif [ "$recent_errors" -gt 10 ]; then
-        echo -e "⚠️  AVISO: $recent_errors erros no log da última hora"
+        echo -e "⚠️  AVISO: $recent_errors erros no log das últimas 48 horas"
         add_warning
     elif [ "$recent_errors" -gt 0 ]; then
-        echo -e "ℹ️  INFO: $recent_errors erro(s) no log da última hora (normal)"
+        echo -e "ℹ️  INFO: $recent_errors erro(s) no log das últimas 48 horas (normal)"
     else
-        echo -e "✅ OK: Nenhum erro no log da última hora"
+        echo -e "✅ OK: Nenhum erro no log das últimas 48 horas"
     fi
 
     echo ""
 }
 
 show_recent_errors() {
-    echo -e "🔍 Últimos 10 erros do sistema..."
+    echo -e "🔍 Últimos 10 erros do sistema (48h)..."
     echo ""
     
-    log_message "Coletando últimos erros do log do sistema..."
+    log_message "Coletando últimos erros do log do sistema das últimas 48 horas..."
     
     # Tentar diferentes métodos para coletar logs de erro
     local error_output=""
     local method_used=""
     
-    # Método 1: journalctl (mais moderno)
+    # Método 1: journalctl (mais moderno) - CORRIGIDO PARA 48H
     if command -v journalctl >/dev/null 2>&1; then
-        error_output=$(sudo journalctl -p err -n 10 --no-pager -q --since "7 days ago" 2>/dev/null | head -20)
+        error_output=$(sudo journalctl -p err --no-pager -q --since "48 hours ago" 2>/dev/null | tail -10)
         if [ -n "$error_output" ]; then
-            method_used="journalctl"
+            method_used="journalctl (48h)"
         fi
     fi
     
     # Método 2: Fallback para dmesg se journalctl não funcionar ou estiver vazio
     if [ -z "$error_output" ] && command -v dmesg >/dev/null 2>&1; then
+        # dmesg não tem filtro de tempo específico, mas vamos pegar os mais recentes
         error_output=$(sudo dmesg --level=err,crit,alert,emerg -T 2>/dev/null | tail -10)
         if [ -n "$error_output" ]; then
-            method_used="dmesg"
+            method_used="dmesg (recentes)"
         fi
     fi
     
-    # Método 3: Fallback para arquivos de log tradicionais
+    # Método 3: Fallback para arquivos de log tradicionais com filtro de 48h
     if [ -z "$error_output" ]; then
         if [ -f "/var/log/syslog" ]; then
-            error_output=$(grep -i "error\|critical\|fatal" /var/log/syslog 2>/dev/null | tail -10)
-            method_used="syslog"
+            # Filtrar por timestamp das últimas 48h nos arquivos de log
+            error_output=$(find /var/log -name "syslog*" -mtime -2 -exec grep -h -i "error\|critical\|fatal" {} \; 2>/dev/null | tail -10)
+            method_used="syslog (48h)"
         elif [ -f "/var/log/messages" ]; then
-            error_output=$(grep -i "error\|critical\|fatal" /var/log/messages 2>/dev/null | tail -10)
-            method_used="messages"
+            error_output=$(find /var/log -name "messages*" -mtime -2 -exec grep -h -i "error\|critical\|fatal" {} \; 2>/dev/null | tail -10)
+            method_used="messages (48h)"
         fi
     fi
     
@@ -700,21 +702,21 @@ show_recent_errors() {
         # Contar erros
         local error_count=$(echo "$error_output" | wc -l)
         if [ "$error_count" -ge 5 ]; then
-            echo -e "⚠️  AVISO: $error_count erros recentes encontrados no sistema"
+            echo -e "⚠️  AVISO: $error_count erros encontrados nas últimas 48 horas"
             add_warning
         fi
     else
-        echo -e "✅ OK: Nenhum erro crítico encontrado nos logs recentes"
+        echo -e "✅ OK: Nenhum erro crítico encontrado nos logs das últimas 48 horas"
     fi
     sleep 3
 }
 
 # === FUNÇÃO: ANÁLISE DETALHADA DE LOGS (OPCIONAL - MAIS COMPLETA) ===
 show_detailed_log_analysis() {
-    echo -e "📋 Análise detalhada dos logs do sistema..."
+    echo -e "📋 Análise detalhada dos logs do sistema (48h)..."
     echo ""
     
-    log_message "Analisando logs do sistema das últimas 24 horas..."
+    log_message "Analisando logs do sistema das últimas 48 horas..."
     
     # Análise por categoria
     local categories=("error" "warning" "critical" "failed")
@@ -730,20 +732,20 @@ show_detailed_log_analysis() {
         if command -v journalctl >/dev/null 2>&1; then
             case "$category" in
                 "error")
-                    count=$(sudo journalctl -p err --since "24 hours ago" --no-pager -q 2>/dev/null | wc -l)
-                    sample=$(sudo journalctl -p err --since "24 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    count=$(sudo journalctl -p err --since "48 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p err --since "48 hours ago" --no-pager -q 2>/dev/null | head -3)
                     ;;
                 "warning")
-                    count=$(sudo journalctl -p warning --since "24 hours ago" --no-pager -q 2>/dev/null | wc -l)
-                    sample=$(sudo journalctl -p warning --since "24 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    count=$(sudo journalctl -p warning --since "48 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p warning --since "48 hours ago" --no-pager -q 2>/dev/null | head -3)
                     ;;
                 "critical")
-                    count=$(sudo journalctl -p crit --since "24 hours ago" --no-pager -q 2>/dev/null | wc -l)
-                    sample=$(sudo journalctl -p crit --since "24 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    count=$(sudo journalctl -p crit --since "48 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p crit --since "48 hours ago" --no-pager -q 2>/dev/null | head -3)
                     ;;
                 "failed")
-                    count=$(sudo journalctl --since "24 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | wc -l)
-                    sample=$(sudo journalctl --since "24 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | head -3)
+                    count=$(sudo journalctl --since "48 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | wc -l)
+                    sample=$(sudo journalctl --since "48 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | head -3)
                     ;;
             esac
         fi
@@ -762,9 +764,9 @@ show_detailed_log_analysis() {
     done
     
     # Resumo final
-    echo "RESUMO DA ANÁLISE DE LOGS:"
-    echo "=========================="
-    echo "Total de problemas nas últimas 24h: $total_issues"
+    echo "RESUMO DA ANÁLISE DE LOGS (48h):"
+    echo "================================"
+    echo "Total de problemas nas últimas 48h: $total_issues"
        
     echo ""
     sleep 3
