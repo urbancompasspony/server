@@ -5,7 +5,7 @@ YAML_FILE="/srv/system.yaml"
 
 function start {
   if ! var0=$(dialog --title 'Ferramentas' --backtitle "Ferramentas e Utilidades" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
-  0 'Buscar em RSNAPSHOTs' \
+  0 'Buscar Pastas ou Arquivos' \
   1 'Instalar o DWService' \
   2 'Tailscale Localhost' \
   3 'Baixar Imagens .ISO (XPRA)' \
