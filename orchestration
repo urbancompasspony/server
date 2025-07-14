@@ -37,16 +37,15 @@ function contratos0 {
   2 'Homarr' \
   3 'PenTest' \
   4 'UniFi' \
-  5 'GLPI' \
-  6 'Reverse Proxy' \
-  7 'OpenFire (Spark)' \
-  8 'OnlyOffice' \
-  9 'Tailscale CLIENT' \
-  10 'QDir Stat' \
-  11 'Sist2 Indexer' \
-  12 'Network UPS Tools Gui (L)' \
-  13 'SMS PowerViewer' \
-  14 'Kuma' \
+  5 'Reverse Proxy' \
+  6 'OpenFire (Spark)' \
+  7 'OnlyOffice' \
+  8 'Tailscale CLIENT' \
+  9 'QDir Stat' \
+  10 'Sist2 Indexer' \
+  11 'Network UPS Tools Gui (L)' \
+  12 'SMS PowerViewer' \
+  13 'Kuma' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -56,16 +55,15 @@ function contratos0 {
   2) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
   3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
   4) wget "$github"03-unifi-net -O /tmp/unifi; sudo bash /tmp/unifi ;;
-  5) wget "$github"40-glpi -O /tmp/glpi; sudo bash /tmp/glpi ;;
-  6) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-  7) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-  8) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-  9) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-  10) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
-  11) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
-  12) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
-  13) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
-  14) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
+  5) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
+  6) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
+  7) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
+  8) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
+  9) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
+  10) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
+  11) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
+  12) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
+  13) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
   X) return ;;
   esac
 }
@@ -145,7 +143,7 @@ function personal {
   2 'SSH DW Backup (L)' \
   3 'Jellyfin' \
   4 'qBitTorrent' \
-  5 'Dominio & CUPS (BETA)' \
+  5 'Active Directory (BETA)' \
   6 'Simple Chat Server' \
   7 'Honeygain' \
   X '<' 2>&1 > /dev/tty ); then
