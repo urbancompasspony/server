@@ -1,5 +1,7 @@
 #!/bin/bash
 
+YAML_FILE="/srv/containers.yaml"
+
 function tools {
   if ! var0=$(dialog --title "" --backtitle "" --menu " " 0 0 0 \
   1 'Set MACVLAN' \
@@ -38,78 +40,426 @@ function tools {
 }
 
 function scanapp0 {
-  VALUE1="nextcloud"
-
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
   if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
   "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
   3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
-
+  
+  # Extrai o valor do dialog
   var1=$(echo "$VALUE0" | sed -n 1p)
-  clear; echo "Checking core integrity..."
+  
+  clear; echo "Scanning app data..."
   docker exec -u 33 "$var1" ./occ files:scan-app-data
   sleep 3
 }
 
-function scanuser0 {
-  VALUE1="nextcloud"
-
+function scanuser0 {  
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
   if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
   "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
   3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
-
+  
+  # Extrai o valor do dialog
   var1=$(echo "$VALUE0" | sed -n 1p)
-  clear; echo "Checking core integrity..."
+  
+  clear; echo "Scanning all user files..."
   docker exec -u 33 "$var1" ./occ files:scan --all
   sleep 3
 }
 
-function syncpass0 {
-  VALUE1="syncthing"
-
+function syncpass0 { 
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "syncthing" no nome
+  SYNCTHING_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "syncthing"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ syncthing ]]; then
+        # Verifica se é um container Syncthing lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container syncthing, adiciona à lista
+        if [[ -n "$nome_custom" ]]; then
+          SYNCTHING_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#SYNCTHING_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container Syncthing encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#SYNCTHING_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${SYNCTHING_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers Syncthing encontrados:"
+    for i in "${!SYNCTHING_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${SYNCTHING_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#SYNCTHING_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#SYNCTHING_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${SYNCTHING_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
   if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Syncthing" 8 35 0 \
   "NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
   3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
-
+  
+  # Extrai o valor do dialog
   var1=$(echo "$VALUE0" | sed -n 1p)
+  
   clear
   docker exec -it "$var1" syncthing generate --gui-password=admin --gui-user=admin
   echo ""; echo "Usuario e senha da WebGUI foram modificados para admin/admin!"
 }
 
-function upgradenc {
-  VALUE1="nextcloud"
-
+function upgradenc { 
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
   if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
   "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
   3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
-
+  
+  # Extrai o valor do dialog
   var1=$(echo "$VALUE0" | sed -n 1p)
-
+  
   clear
   echo "Upgrading..."
   docker exec -u 33 "$var1" ./occ upgrade
   sleep 3
 }
 
-function disableldap {
-  VALUE1="nextcloud"
-
+function disableldap { 
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
   if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Disable LDAP" 9 35 0 \
   "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
   3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
-
+  
+  # Extrai o valor do dialog
   var1=$(echo "$VALUE0" | sed -n 1p)
-
+  
   clear
   echo "Disabling LDAP Backend!"
   docker exec -u 33 "$var1" ./occ ldap:set-config "s01" "ldapConfigurationActive" "0"
@@ -118,16 +468,86 @@ function disableldap {
   sleep 3
 }
 
-function checkcore {
-VALUE1="nextcloud"
-
+function checkcore { 
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
   if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
   "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
   3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
-
+  
+  # Extrai o valor do dialog
   var1=$(echo "$VALUE0" | sed -n 1p)
+  
   clear; echo "Checking core integrity..."
   docker exec -u 33 "$var1" ./occ integrity:check-core
   docker exec -u 33 "$var1" ./occ maintenance:mimetype:update-js
@@ -136,27 +556,94 @@ VALUE1="nextcloud"
   sleep 3
 }
 
-function missingindices {
-  VALUE1="nextcloud"
-
+function missingindices {  
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
   if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
   "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
   3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
-
+  
+  # Extrai o valor do dialog
   var1=$(echo "$VALUE0" | sed -n 1p)
-
+  
   clear
   echo "Adding missing indices..."
   docker exec -u 33 "$var1" ./occ db:add-missing-indices
   echo "ok"; sleep 3
-
   clear
   echo "Fixing mimetypes..."
   docker exec -u 33 "$var1" ./occ maintenance:repair --include-expensive
   echo "ok"; sleep 3
-
   sleep 3
 }
 
@@ -192,19 +679,93 @@ function piholeinst {
   docker restart "$var1"
 }
 
-function filelocks {
-  VALUE1="nextcloud-mysql"
-
+function filelocks {  
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome e tenham img_base: mysql
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container MySQL lendo as próximas linhas
+        img_base=""
+        mysql_pw=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base, mysql_pw e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*mysql_pw:[[:space:]]*(.+)$ ]]; then
+            mysql_pw="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud com img_base mysql, adiciona à lista
+        if [[ "$img_base" == "mysql" ]] && [[ -n "$mysql_pw" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom|$mysql_pw")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud com MySQL encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    IFS='|' read -r SELECTED_CONTAINER SELECTED_PASSWORD <<< "${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      IFS='|' read -r container_name password <<< "${NEXTCLOUD_CONTAINERS[$i]}"
+      echo "$((i+1)). $container_name"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      IFS='|' read -r SELECTED_CONTAINER SELECTED_PASSWORD <<< "${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche os valores encontrados
+  VALUE1="$SELECTED_CONTAINER"
+  VALUE2="$SELECTED_PASSWORD"
+  
+  # Mostra dialog para confirmação/edição
   if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "MySQL - NextCloud" 9 35 0 \
   "mSQLcont:" 1 1 "$VALUE1" 1 11 30 0 \
   "Password:" 2 1 "$VALUE2" 2 11 30 0 \
   3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
-
+  
+  # Extrai os valores do dialog
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
-
+  
   clear
   echo "File Locks atualmente no Banco de Dados:"
   docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
