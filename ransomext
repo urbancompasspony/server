@@ -16,10 +16,10 @@ alternative_path="$path_alternative/Ransomware_Detectado"
 
 message00="Nenhum ransomware detectado!"
 
-# Configurações para detecção de massa
+# Configuracoes para deteccAo de massa
 threshold=100  # Arquivos modificados para considerar suspeito
 time_window=60  # Janela de tempo em minutos
-extension_threshold=5  # Quantidade de arquivos da mesma extensão para alerta
+extension_threshold=5  # Quantidade de arquivos da mesma extensAo para alerta
 
 ################################################################################
 
@@ -43,14 +43,14 @@ notefiles=("HELPDECRYPT.TXT" "HELP_YOUR_FILES.TXT" "HELP_TO_DECRYPT_YOUR_FILES.t
 sudo mkdir -p $path_pentests
 
 ################################################################################
-# NOVAS FUNÇÕES DE DETECÇÃO
+# NOVAS FUNcoES DE DETECcAO
 ################################################################################
 
 function detect_mass_encryption() {
     local output_file="$1"
     local temp_file="/tmp/extension_analysis_$$"
     
-    # Procura arquivos com extensões suspeitas nos caminhos definidos
+    # Procura arquivos com extensoes suspeitas nos caminhos definidos
     for path in "$main_paths01" "$main_paths02" "$main_paths03" "$main_paths04" "$main_paths05"; do
         if [ -d "$path" ]; then
             find "$path" -type f 2>/dev/null | \
@@ -60,10 +60,10 @@ function detect_mass_encryption() {
         fi
     done
     
-    # Analisa quantidade por extensão
+    # Analisa quantidade por extensAo
     if [ -f "$temp_file" ]; then
         cat "$temp_file" | sort | uniq -c | \
-        awk -v threshold="$extension_threshold" '$1 > threshold {print "ALERTA MASSA: " $1 " arquivos com extensão ." $2}' | \
+        awk -v threshold="$extension_threshold" '$1 > threshold {print "ALERTA MASSA: " $1 " arquivos com extensAo ." $2}' | \
         sudo tee -a "$output_file"
         rm -f "$temp_file"
     fi
@@ -84,7 +84,7 @@ function detect_mass_changes() {
                 # Lista os tipos de arquivo mais modificados
                 find "$path" -type f -mmin -"$time_window" 2>/dev/null | \
                 sed 's/.*\.//' | sort | uniq -c | sort -nr | head -5 | \
-                awk '{print "  Extensão ." $2 ": " $1 " arquivos"}' | \
+                awk '{print "  ExtensAo ." $2 ": " $1 " arquivos"}' | \
                 sudo tee -a "$output_file"
             fi
         fi
@@ -92,24 +92,24 @@ function detect_mass_changes() {
 }
 
 ################################################################################
-# FUNÇÃO PRINCIPAL MODIFICADA
+# FUNcAO PRINCIPAL MODIFICADA
 ################################################################################
 
 function ransom {
     local log_file="$1"
     local output_file="$2"
     
-    # Detecção original por extensões nos logs
+    # DeteccAo original por extensoes nos logs
     cat "$log_file" | grep -E -i "$extensoes" | sudo tee -a "$output_file"
     cat "$log_file" | grep -E -i "$extensoes2" | sudo tee -a "$output_file"
 
-    # NOVAS DETECÇÕES
-    echo "=== ANÁLISE DE DETECÇÃO DE MASSA ===" | sudo tee -a "$output_file"
+    # NOVAS DETECcoES
+    echo "=== ANALISE DE DETECcAO DE MASSA ===" | sudo tee -a "$output_file"
     
-    # Detecção por quantidade de extensões repetidas
+    # DeteccAo por quantidade de extensoes repetidas
     detect_mass_encryption "$output_file"
     
-    # Detecção por alterações recentes em massa
+    # DeteccAo por alteracoes recentes em massa
     detect_mass_changes "$output_file"
     
     echo "=== BUSCA POR ARQUIVOS DE RESGATE ===" | sudo tee -a "$output_file"
@@ -119,7 +119,7 @@ function ransom {
         find "$main_paths01" "$main_paths02" "$main_paths03" "$main_paths04" "$main_paths05" -type f -name "$i" 2>/dev/null | sudo tee -a "$output_file"
     done
     
-    echo "=== FIM DA ANÁLISE ===" | sudo tee -a "$output_file"
+    echo "=== FIM DA ANALISE ===" | sudo tee -a "$output_file"
 }
 
 function start {
