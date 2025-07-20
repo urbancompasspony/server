@@ -2,9 +2,6 @@
 
 ################################################################################
 
-# RansomExt
-# 00 8,12,15,18 * * * bash /srv/containers/scripts/ransomext
-
 main_paths01="/tmp"
 main_paths02="/tmp"
 main_paths03="/tmp"
