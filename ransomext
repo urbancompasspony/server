@@ -8,7 +8,7 @@ main_paths03="/tmp"
 main_paths04="/tmp"
 main_paths05="/tmp"
 
-path_pentests="/srv/containers/pentest/Pentests"
+path_pentests="/srv/containers/pentest/Pentests/Todos_os_Resultados/X_Ransom_Ext"
 path_to_pentest="$path_pentests/Ransomware_Detectado"
 
 path_alternative="/home/administrador"
@@ -39,6 +39,8 @@ notefiles=("HELPDECRYPT.TXT" "HELP_YOUR_FILES.TXT" "HELP_TO_DECRYPT_YOUR_FILES.t
 
 [ -f "$path_pentests/Nenhum malware detectado na rede." ] && { sudo rm "$path_pentests/$message00"; }
 [ -f "$path_alternative/Nenhum malware detectado na rede." ] && { sudo rm "$path_alternative/$message00"; }
+
+sudo mkdir -p $path_pentests
 
 ################################################################################
 # NOVAS FUNÇÕES DE DETECÇÃO
