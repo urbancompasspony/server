@@ -17,6 +17,7 @@ function tools {
   11 'NC: Scan App Data' \
   12 'NC: Scan User Data' \
   13 'Remove All Useless Images' \
+  14 'Elevate Functional Level AD' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -35,9 +36,18 @@ function tools {
   11) clear ; scanapp0 ;;
   12) clear ; scanuser0 ;;
   13) clear ; docker image prune -af ; sleep 2 ;;
+  14) clear; functional0 ;;
   X) return ;;
   esac
 }
+
+function functional0 {
+  echo WIP
+  sleep 1
+  #samba-tool domain schemaupgrade --schema=2019
+  #samba-tool domain functionalprep --function-level=2016
+  #samba-tool domain level raise --domain-level=2016 --forest-level=2016
+: }
 
 function scanapp0 {
   # Verifica se o arquivo YAML existe
