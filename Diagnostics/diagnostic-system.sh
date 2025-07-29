@@ -440,8 +440,8 @@ test_network() {
     echo -e "🔍 Teste 03: Verificando conectividade de rede e possíveis problemas de rotas..."
 
     # TESTE COMPLETO DE DNS - TODOS OS 8 SERVIDORES
-    dns_servers=("1.1.1.1" "1.0.0.1" "8.8.8.8" "8.8.4.4" "208.67.222.222" "208.67.220.220" "200.225.197.34" "200.225.197.37")
-    dns_name=("Cloudflare 1" "Cloudflare 2" "Google 1" "Google 2" "OpenDNS 1" "OpenDNS 2" "Algar 1" "Algar 2")
+    dns_servers=("1.1.1.1" "8.8.4.4" "208.67.222.222" "200.225.197.34")
+    dns_name=("Cloudflare" "Google" "OpenDNS" "Algar")
     dns_working=0
 
     echo "Testando servidores DNS..."
@@ -473,15 +473,72 @@ test_network() {
     echo ""
     sleep 3
 
-    # Verifica interfaces de rede
+    # Verifica interfaces de rede - CORRIGIDO para filtrar interfaces ignoráveis
     log_message "Verificando interfaces de rede..."
-    network_down=$(ip -o link show | awk '/state DOWN/ {print $2,$17}')
-    if [ -n "$network_down" ]; then
-        echo -e "⚠️  AVISO: Interface(s) de rede inativa(s) detectadas (ignore as interfaces BR-xxxxx, VIRBR0 e/ou DOCKER0):"
-        echo "$network_down"
+    
+    # Obter todas as interfaces inativas
+    all_down_interfaces=$(ip -o link show | awk '/state DOWN/ {print $2}' | sed 's/:$//')
+    
+    # Filtrar interfaces com lógica mais inteligente
+    filtered_down_interfaces=""
+    ignore_count=0
+    veth_warnings=0
+    
+    if [ -n "$all_down_interfaces" ]; then
+        while IFS= read -r interface; do
+            # Verificar se a interface deve ser ignorada SEMPRE
+            if [[ "$interface" =~ ^(br-|virbr|docker) ]] || \
+               [[ "$interface" =~ ^(br[0-9]+|virbr[0-9]+|docker[0-9]+)$ ]]; then
+                ((ignore_count++))
+                log_message "Interface $interface ignorada (Docker/LibVirt/Bridge virtual)"
+                
+            # veth: verificação especial - só avisar se containers estão rodando
+            elif [[ "$interface" =~ ^veth ]]; then
+                # Verificar se há containers rodando (indicaria problema real)
+                if command -v docker >/dev/null 2>&1 && systemctl is-active --quiet docker; then
+                    running_containers=$(sudo docker ps -q 2>/dev/null | wc -l)
+                    if [ "$running_containers" -gt 0 ]; then
+                        # Há containers rodando, veth DOWN pode indicar problema
+                        if [ -n "$filtered_down_interfaces" ]; then
+                            filtered_down_interfaces="$filtered_down_interfaces
+$interface (possível problema de rede do container)"
+                        else
+                            filtered_down_interfaces="$interface (possível problema de rede do container)"
+                        fi
+                        ((veth_warnings++))
+                    else
+                        # Nenhum container rodando, veth DOWN é normal
+                        ((ignore_count++))
+                        log_message "Interface $interface ignorada (nenhum container ativo)"
+                    fi
+                else
+                    # Docker não está rodando, veth DOWN é normal
+                    ((ignore_count++))
+                    log_message "Interface $interface ignorada (Docker inativo)"
+                fi
+                
+            else
+                # Interface que realmente importa (eth, wlan, ens, etc.)
+                if [ -n "$filtered_down_interfaces" ]; then
+                    filtered_down_interfaces="$filtered_down_interfaces
+$interface"
+                else
+                    filtered_down_interfaces="$interface"
+                fi
+            fi
+        done <<< "$all_down_interfaces"
+    fi
+    
+    # Avaliar resultado
+    if [ -n "$filtered_down_interfaces" ]; then
+        echo -e "⚠️  AVISO: Interface(s) de rede física/importante(s) inativa(s) detectadas:"
+        echo "$filtered_down_interfaces"
         add_warning
     else
-        echo -e "✅ Todas as interfaces de rede existentes estão ativas!"
+        echo -e "✅ Todas as interfaces de rede importantes estão ativas!"
+        if [ "$ignore_count" -gt 0 ]; then
+            echo -e "ℹ️  INFO: $ignore_count interface(s) virtual/docker ignoradas"
+        fi
     fi
 
     echo ""
@@ -574,28 +631,58 @@ test_services() {
         fi
     fi
 
-    # Testando LibVirt (melhorado)
+    # Testando LibVirt (LÓGICA CORRIGIDA)
     log_message "Verificando LibVirt..."
-    if systemctl is-active --quiet libvirtd 2>/dev/null; then
-        echo -e "✅ OK: LibVirt está ativo e operando."
+    
+    if command -v virsh >/dev/null 2>&1; then
+        # LibVirt está instalado, verificar VMs primeiro
+        all_vms=$(sudo virsh list --all --name 2>/dev/null | grep -v "^$")
+        vm_count=$(echo "$all_vms" | grep -c ".")
         
-        # Verifica VMs com problemas
-        if command -v virsh >/dev/null 2>&1; then
-            vm_problems=$(sudo virsh list --all | grep -E "shut off|crashed|paused")
-            if [ -n "$vm_problems" ]; then
-                echo -e "⚠️  AVISO: VMs em algum estado de pausa, travado ou desligado:"
-                echo "$vm_problems"
-                add_warning
+        if [ "$vm_count" -eq 0 ]; then
+            # Nenhuma VM definida - é normal o LibVirt estar parado
+            if systemctl is-active --quiet libvirtd 2>/dev/null; then
+                echo -e "✅ OK: LibVirt está ativo (nenhuma VM definida)"
             else
-                echo -e "✅ OK: As VMs existentes estão executando."
+                echo -e "✅ OK: LibVirt está parado - normal, pois não há VMs definidas"
+            fi
+        else
+            # Há VMs definidas - LibVirt deveria estar rodando
+            if systemctl is-active --quiet libvirtd 2>/dev/null; then
+                echo -e "✅ OK: LibVirt está ativo e operando ($vm_count VM(s) definida(s))"
+                
+                # Verificar VMs com problemas apenas se LibVirt estiver ativo
+                running_vms=$(sudo virsh list --state-running --name 2>/dev/null | grep -v "^$")
+                stopped_vms=$(sudo virsh list --state-shutoff --name 2>/dev/null | grep -v "^$")
+                problem_vms=$(sudo virsh list --all | grep -E "shut off|crashed|paused" 2>/dev/null)
+                
+                if [ -n "$problem_vms" ]; then
+                    echo -e "ℹ️  INFO: Status das VMs:"
+                    if [ -n "$running_vms" ]; then
+                        echo "  🟢 Executando: $(echo "$running_vms" | tr '\n' ' ')"
+                    fi
+                    if [ -n "$stopped_vms" ]; then
+                        echo "  ⚪ Paradas: $(echo "$stopped_vms" | tr '\n' ' ')"
+                    fi
+                else
+                    echo -e "✅ OK: Todas as VMs estão executando normalmente"
+                fi
+            else
+                # LibVirt parado MAS há VMs definidas - PROBLEMA!
+                echo -e "❌ ERRO: LibVirt está parado mas há $vm_count VM(s) definida(s)!"
+                echo "VMs afetadas:"
+                while IFS= read -r vm_name; do
+                    if [ -n "$vm_name" ]; then
+                        echo "  • $vm_name (parada - LibVirt inativo)"
+                    fi
+                done <<< "$all_vms"
+                add_error
             fi
         fi
-    elif command -v libvirtd >/dev/null 2>&1; then
-        echo -e "⚠️  AVISO: LibVirt está instalado mas não está executando!"
-        add_warning
     else
-        echo -e "✅ OK: LibVirt não está instalado neste servidor. Sem capacidades de virtualização."
+        echo -e "✅ OK: LibVirt não está instalado neste servidor"
     fi
+    
     echo ""
     sleep 3
 }
@@ -635,39 +722,39 @@ test_system() {
         echo -e "✅ OK: Nenhum processo zumbi detectado."
     fi
 
-    # Verifica logs de erro recentes
-    log_message "Verificando logs de sistema..."
-    recent_errors=$(sudo journalctl --since "48 hours ago" -p err -q --no-pager | wc -l)
+    # Verifica logs de erro recentes - CORRIGIDO PARA 12H COM NOVA LÓGICA
+    log_message "Verificando logs de sistema das últimas 12 horas..."
+    recent_errors=$(sudo journalctl --since "12 hours ago" -p err -q --no-pager | wc -l)
+    
     if [ "$recent_errors" -gt 50 ]; then
-        echo -e "❌ CRÍTICO: $recent_errors erros no log das últimas 48 horas (>50)"
+        echo -e "❌ CRÍTICO: $recent_errors erros no log das últimas 12 horas (>50)"
         add_error
-    elif [ "$recent_errors" -gt 10 ]; then
-        echo -e "⚠️  AVISO: $recent_errors erros no log das últimas 48 horas"
-        add_warning
     elif [ "$recent_errors" -gt 0 ]; then
-        echo -e "ℹ️  INFO: $recent_errors erro(s) no log das últimas 48 horas (normal)"
+        echo -e "⚠️  AVISO: $recent_errors erro(s) no log das últimas 12 horas"
+        add_warning
     else
-        echo -e "✅ OK: Nenhum erro no log das últimas 48 horas"
+        echo -e "✅ OK: Nenhum erro no log das últimas 12 horas"
     fi
 
     echo ""
 }
 
+# === FUNÇÃO: ANÁLISE DETALHADA DE LOGS (CORRIGIDA PARA 12H) ===
 show_recent_errors() {
-    echo -e "🔍 Últimos 10 erros do sistema (48h)..."
+    echo -e "🔍 Últimos 10 erros do sistema (12h)..."
     echo ""
     
-    log_message "Coletando últimos erros do log do sistema das últimas 48 horas..."
+    log_message "Coletando últimos erros do log do sistema das últimas 12 horas..."
     
     # Tentar diferentes métodos para coletar logs de erro
     local error_output=""
     local method_used=""
     
-    # Método 1: journalctl (mais moderno) - CORRIGIDO PARA 48H
+    # Método 1: journalctl (mais moderno) - CORRIGIDO PARA 12H
     if command -v journalctl >/dev/null 2>&1; then
-        error_output=$(sudo journalctl -p err --no-pager -q --since "48 hours ago" 2>/dev/null | tail -10)
+        error_output=$(sudo journalctl -p err --no-pager -q --since "12 hours ago" 2>/dev/null | tail -10)
         if [ -n "$error_output" ]; then
-            method_used="journalctl (48h)"
+            method_used="journalctl (12h)"
         fi
     fi
     
@@ -680,15 +767,15 @@ show_recent_errors() {
         fi
     fi
     
-    # Método 3: Fallback para arquivos de log tradicionais com filtro de 48h
+    # Método 3: Fallback para arquivos de log tradicionais com filtro de 12h
     if [ -z "$error_output" ]; then
         if [ -f "/var/log/syslog" ]; then
-            # Filtrar por timestamp das últimas 48h nos arquivos de log
-            error_output=$(find /var/log -name "syslog*" -mtime -2 -exec grep -h -i "error\|critical\|fatal" {} \; 2>/dev/null | tail -10)
-            method_used="syslog (48h)"
+            # Filtrar por timestamp das últimas 12h nos arquivos de log
+            error_output=$(find /var/log -name "syslog*" -mtime -1 -exec grep -h -i "error\|critical\|fatal" {} \; 2>/dev/null | tail -10)
+            method_used="syslog (12h)"
         elif [ -f "/var/log/messages" ]; then
-            error_output=$(find /var/log -name "messages*" -mtime -2 -exec grep -h -i "error\|critical\|fatal" {} \; 2>/dev/null | tail -10)
-            method_used="messages (48h)"
+            error_output=$(find /var/log -name "messages*" -mtime -1 -exec grep -h -i "error\|critical\|fatal" {} \; 2>/dev/null | tail -10)
+            method_used="messages (12h)"
         fi
     fi
     
@@ -702,21 +789,21 @@ show_recent_errors() {
         # Contar erros
         local error_count=$(echo "$error_output" | wc -l)
         if [ "$error_count" -ge 5 ]; then
-            echo -e "⚠️  AVISO: $error_count erros encontrados nas últimas 48 horas"
+            echo -e "⚠️  AVISO: $error_count erros encontrados nas últimas 12 horas"
             add_warning
         fi
     else
-        echo -e "✅ OK: Nenhum erro crítico encontrado nos logs das últimas 48 horas"
+        echo -e "✅ OK: Nenhum erro crítico encontrado nos logs das últimas 12 horas"
     fi
     sleep 3
 }
 
-# === FUNÇÃO: ANÁLISE DETALHADA DE LOGS (OPCIONAL - MAIS COMPLETA) ===
+# === FUNÇÃO: ANÁLISE DETALHADA DE LOGS (CORRIGIDA PARA 12H) ===
 show_detailed_log_analysis() {
-    echo -e "📋 Análise detalhada dos logs do sistema (48h)..."
+    echo -e "📋 Análise detalhada dos logs do sistema (12h)..."
     echo ""
     
-    log_message "Analisando logs do sistema das últimas 48 horas..."
+    log_message "Analisando logs do sistema das últimas 12 horas..."
     
     # Análise por categoria
     local categories=("error" "warning" "critical" "failed")
@@ -732,20 +819,20 @@ show_detailed_log_analysis() {
         if command -v journalctl >/dev/null 2>&1; then
             case "$category" in
                 "error")
-                    count=$(sudo journalctl -p err --since "48 hours ago" --no-pager -q 2>/dev/null | wc -l)
-                    sample=$(sudo journalctl -p err --since "48 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    count=$(sudo journalctl -p err --since "12 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p err --since "12 hours ago" --no-pager -q 2>/dev/null | head -3)
                     ;;
                 "warning")
-                    count=$(sudo journalctl -p warning --since "48 hours ago" --no-pager -q 2>/dev/null | wc -l)
-                    sample=$(sudo journalctl -p warning --since "48 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    count=$(sudo journalctl -p warning --since "12 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p warning --since "12 hours ago" --no-pager -q 2>/dev/null | head -3)
                     ;;
                 "critical")
-                    count=$(sudo journalctl -p crit --since "48 hours ago" --no-pager -q 2>/dev/null | wc -l)
-                    sample=$(sudo journalctl -p crit --since "48 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    count=$(sudo journalctl -p crit --since "12 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p crit --since "12 hours ago" --no-pager -q 2>/dev/null | head -3)
                     ;;
                 "failed")
-                    count=$(sudo journalctl --since "48 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | wc -l)
-                    sample=$(sudo journalctl --since "48 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | head -3)
+                    count=$(sudo journalctl --since "12 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | wc -l)
+                    sample=$(sudo journalctl --since "12 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | head -3)
                     ;;
             esac
         fi
@@ -764,15 +851,128 @@ show_detailed_log_analysis() {
     done
     
     # Resumo final
-    echo "RESUMO DA ANÁLISE DE LOGS (48h):"
+    echo "RESUMO DA ANÁLISE DE LOGS (12h):"
     echo "================================"
-    echo "Total de problemas nas últimas 48h: $total_issues"
+    echo "Total de problemas nas últimas 12h: $total_issues"
        
     echo ""
     sleep 3
 }
 
-# === FUNÇÃO: INFORMAÇÕES COMPLETAS DO SISTEMA ===
+# === FUNÇÃO: ANÁLISE DETALHADA DE LOGS (CORRIGIDA PARA 12H) ===
+show_recent_errors() {
+    echo -e "🔍 Últimos 10 erros do sistema (12h)..."
+    echo ""
+    
+    log_message "Coletando últimos erros do log do sistema das últimas 12 horas..."
+    
+    # Tentar diferentes métodos para coletar logs de erro
+    local error_output=""
+    local method_used=""
+    
+    # Método 1: journalctl (mais moderno) - CORRIGIDO PARA 12H
+    if command -v journalctl >/dev/null 2>&1; then
+        error_output=$(sudo journalctl -p err --no-pager -q --since "12 hours ago" 2>/dev/null | tail -10)
+        if [ -n "$error_output" ]; then
+            method_used="journalctl (12h)"
+        fi
+    fi
+    
+    # Método 2: Fallback para dmesg se journalctl não funcionar ou estiver vazio
+    if [ -z "$error_output" ] && command -v dmesg >/dev/null 2>&1; then
+        # dmesg não tem filtro de tempo específico, mas vamos pegar os mais recentes
+        error_output=$(sudo dmesg --level=err,crit,alert,emerg -T 2>/dev/null | tail -10)
+        if [ -n "$error_output" ]; then
+            method_used="dmesg (recentes)"
+        fi
+    fi
+    
+    # Método 3: Fallback para arquivos de log tradicionais com filtro de 12h
+    if [ -z "$error_output" ]; then
+        if [ -f "/var/log/syslog" ]; then
+            # Filtrar por timestamp das últimas 12h nos arquivos de log
+            error_output=$(find /var/log -name "syslog*" -mtime -1 -exec grep -h -i "error\|critical\|fatal" {} \; 2>/dev/null | tail -10)
+            method_used="syslog (12h)"
+        elif [ -f "/var/log/messages" ]; then
+            error_output=$(find /var/log -name "messages*" -mtime -1 -exec grep -h -i "error\|critical\|fatal" {} \; 2>/dev/null | tail -10)
+            method_used="messages (12h)"
+        fi
+    fi
+    
+    # Exibir resultados - SEM CONTABILIZAR (já foi feito em test_system)
+    if [ -n "$error_output" ]; then
+        echo -e "📋 Últimos erros encontrados (via $method_used):"
+        echo "=================================================="
+        echo "$error_output"
+        echo "=================================================="
+        echo -e "ℹ️  INFO: Acima estão os 10 erros mais recentes para análise"
+    else
+        echo -e "✅ OK: Nenhum erro crítico encontrado nos logs das últimas 12 horas"
+    fi
+    sleep 3
+}
+
+# === FUNÇÃO: ANÁLISE DETALHADA DE LOGS (CORRIGIDA PARA 12H) ===
+show_detailed_log_analysis() {
+    echo -e "📋 Análise detalhada dos logs do sistema (12h)..."
+    echo ""
+    
+    log_message "Analisando logs do sistema das últimas 12 horas..."
+    
+    # Análise por categoria
+    local categories=("error" "warning" "critical" "failed")
+    local total_issues=0
+    
+    for category in "${categories[@]}"; do
+        echo "Verificando: $category"
+        echo "------------------------"
+        
+        local count=0
+        local sample=""
+        
+        if command -v journalctl >/dev/null 2>&1; then
+            case "$category" in
+                "error")
+                    count=$(sudo journalctl -p err --since "12 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p err --since "12 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    ;;
+                "warning")
+                    count=$(sudo journalctl -p warning --since "12 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p warning --since "12 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    ;;
+                "critical")
+                    count=$(sudo journalctl -p crit --since "12 hours ago" --no-pager -q 2>/dev/null | wc -l)
+                    sample=$(sudo journalctl -p crit --since "12 hours ago" --no-pager -q 2>/dev/null | head -3)
+                    ;;
+                "failed")
+                    count=$(sudo journalctl --since "12 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | wc -l)
+                    sample=$(sudo journalctl --since "12 hours ago" --no-pager -q 2>/dev/null | grep -i "failed" | head -3)
+                    ;;
+            esac
+        fi
+        
+        if [ "$count" -gt 0 ]; then
+            echo "  Encontrados: $count ocorrências"
+            if [ -n "$sample" ]; then
+                echo "  Exemplos:"
+                echo "$sample" | sed 's/^/    /'
+            fi
+            total_issues=$((total_issues + count))
+        else
+            echo "  ✅ Nenhuma ocorrência"
+        fi
+        echo ""
+    done
+    
+    # Resumo final
+    echo "RESUMO DA ANÁLISE DE LOGS (12h):"
+    echo "================================"
+    echo "Total de problemas nas últimas 12h: $total_issues"
+       
+    echo ""
+    sleep 3
+}
+
 # === FUNÇÃO: INFORMAÇÕES COMPLETAS DO SISTEMA ===
 show_system_info() {
     echo '📊 INFORMAÇÕES DO SISTEMA'
