@@ -39,16 +39,6 @@ chmod +x srv
 
 ## 📋 Funcionalidades
 
-### Menu Principal (Supervisor)
-- **Docker Orchestration** - Gerenciamento avançado de containers
-- **Docker Maintenance** - Ferramentas de manutenção Docker
-- **AutoConfig pfSense (VM)** - Configuração automática pfSense
-- **DWAgent (ARM)** - Instalação do agente DWService
-- **Set Wayland (labwc)** - Configuração do ambiente Wayland
-- **Netplan Menu** - Configuração de rede
-- **Install DiagnosticUI** - Interface de diagnóstico
-- **Install AD-DC-WebUI** - Interface web para Active Directory
-
 ### Menu de Suporte (Managers)
 - **Informações do Servidor** - Dados detalhados do sistema
 - **Área de Trabalho** - Acesso ao desktop local
