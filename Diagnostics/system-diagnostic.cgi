@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # CGI Script CORRIGIDO para Sistema de Diagnostico
-# system-diagnostic.cgi v3.9 - CORRIGIDO PARA ZUMBIS
 # Previne processos apache2ctl zumbis
 
 # Cabeçalhos CGI
