@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version="v3.9.1 - 13.07.2025"
+version="v4.0 - 29.07.2025"
 LOCK_FILE="/tmp/diagnostic_${USER}_$$.lock"
 LOCK_DIR="/tmp"
 
