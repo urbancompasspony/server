@@ -19,8 +19,11 @@ O **Ubuntu Server Manager (USM)** é um script bash interativo desenvolvido por 
 
 ### Instalação e Execução
 ```bash
-# Baixar e executar o script
-curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/srv | bash
+# Apenas executar:
+srv
+
+# Baixar e executar o script caso não exista no sistema:
+curl -sSL srv.linuxuniverse.com.br | bash
 
 # Ou salvar localmente
 wget https://raw.githubusercontent.com/urbancompasspony/server/main/srv
