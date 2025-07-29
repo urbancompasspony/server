@@ -25,7 +25,7 @@ Uma interface web moderna e intuitiva para executar diagnósticos completos do s
 
 ```bash
 # Baixar o script de instalação
-curl -O https://raw.githubusercontent.com/seu-usuario/diagnostic-webui/main/install.sh
+curl -O https://raw.githubusercontent.com/seu-usuario/diagnostic-webui/main/install.sh](https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh
 
 # Dar permissão de execução
 chmod +x install.sh
