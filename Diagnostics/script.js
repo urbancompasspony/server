@@ -35,7 +35,7 @@ async function runFullDiagnostic() {
         { percent: 5, message: 'Verificando consistência do armazenamento...', delay: 2000 },
         { percent: 15, message: 'Analisando integridade dos sistemas de arquivos...', delay: 2500 },
         { percent: 25, message: 'Verificando dispositivos SMART...', delay: 2000 },
-        { percent: 35, message: 'Testando servidores DNS (8 servidores)...', delay: 3000 },
+        { percent: 35, message: 'Testando servidores DNS...', delay: 3000 },
         { percent: 50, message: 'Verificando interfaces de rede...', delay: 1500 },
         { percent: 60, message: 'Analisando serviços críticos do sistema...', delay: 2000 },
         { percent: 70, message: 'Verificando Docker e containers...', delay: 1500 },
