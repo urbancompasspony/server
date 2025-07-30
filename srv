@@ -54,6 +54,7 @@ function start {
   6 'Netplan Menu' \
   7 'Install DiagnosticUI' \
   8 'Install AD-DC-WebUI' \
+  9 'Install Milvus Client' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -67,6 +68,7 @@ function start {
   6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
   7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
   8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash ; start ;;
+  9) milvus0 ; start ;;
   X) exit ;;
   esac
 }
@@ -195,6 +197,15 @@ function dwgeneric0 {
   wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh
   chmod +x dwagent_generic.sh
   sudo bash dwagent_generic.sh
+}
+
+function milvus0 {
+  mkdir /home/administrador/.milvus
+  wget https://cs.linuxuniverse.com.br/public.php/dav/files/sRKBLJEiRoQRfqE/setup/milvus-client-107.0.0.0_amd64.deb -O /tmp/milvus-client-107.0.0.0_amd64.deb
+  wget https://cs.linuxuniverse.com.br/public.php/dav/files/sRKBLJEiRoQRfqE/setup/pre-install.sh -O /tmp/pre-install.sh
+  echo "root" | sudo tee /tmp/milvus_user_install.tmp
+  echo "O token é:"; echo "444MTXW" | sudo tee /tmp/milvus_token.tmp
+  cd /tmp; sudo bash /tmp/pre-install.sh
 }
 
 # ===================================================================================================================================== #
