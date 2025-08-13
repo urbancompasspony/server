@@ -7,32 +7,30 @@ function start {
   if ! var0=$(dialog --title 'Ferramentas' --backtitle "Ferramentas e Utilidades" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
   0 'Buscar Pastas ou Arquivos' \
   1 'Instalar o DWService' \
-  2 'Tailscale Localhost' \
-  3 'Baixar Imagens .ISO (XPRA)' \
-  4 'Atualizar Driver VirtIO (XPRA)' \
-  5 'Testar o Beep' \
-  6 'Sync SATAs' \
-  7 'Ping DNS (para pfSense)' \
-  8 'SpeedTest by Ookla' \
-  9 'Teste de Placa de Rede' \
-  10 'Ajustar Modo Kiosk' \
-  11 'Alterar Hostname do Servidor' \
+  2 'Baixar Imagens .ISO (XPRA)' \
+  3 'Atualizar Driver VirtIO (XPRA)' \
+  4 'Testar o Beep' \
+  5 'Sync SATAs' \
+  6 'Ping DNS (para pfSense)' \
+  7 'SpeedTest by Ookla' \
+  8 'Teste de Placa de Rede' \
+  9 'Ajustar Modo Kiosk' \
+  10 'Alterar Hostname do Servidor' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
   case "$var0" in
   0) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/search-tool.sh | sudo bash ; start ;;
   1) dwservice0 ; start ;;
-  2) tailscale0 ; start ;;
-  3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; start ;;
-  4) clear; sudo wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso -O /var/lib/libvirt/images/virtio-win.iso ; start ;;
-  5) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
-  6) clear ; satas ; start ;;
-  7) clear ; dnstest ; start ;;
-  8) speedtest0 ; start ;;
-  9) iperftest ; start ;;
-  10) kiosk0 ; start ;;
-  11) hostname_menu_with_yaml ; start ;;
+  2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; start ;;
+  3) clear; sudo wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso -O /var/lib/libvirt/images/virtio-win.iso ; start ;;
+  4) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
+  5) clear ; satas ; start ;;
+  6) clear ; dnstest ; start ;;
+  7) speedtest0 ; start ;;
+  8) iperftest ; start ;;
+  9) kiosk0 ; start ;;
+  10) hostname_menu_with_yaml ; start ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -444,22 +442,6 @@ function speedtest0 {
   curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3
   echo ""; sleep 3
   read -r -p "Teste concluido! Pressione Enter para fechar"
-}
-
-function tailscale0 {
-  clear
-  version0=$(lsb_release -a 2>/dev/null | sed -ne '4p' | awk '{print $2}')
-
-  [ -f /usr/share/keyrings/tailscale-archive-keyring.gpg ] || {
-    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/"$version0".noarmor.gpg | sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null
-  }
-
-  [ -f /etc/apt/sources.list.d/tailscale.list ] || {
-    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/"$version0".tailscale-keyring.list | sudo tee /etc/apt/sources.list.d/tailscale.list
-  }
-
-  clear; sudo apt update
-  sudo apt install tailscale -y; clear
 }
 
 function iperftest {
