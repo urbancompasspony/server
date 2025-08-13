@@ -49,12 +49,13 @@ function start {
   1 'Docker Orchestration' \
   2 'Docker Maintenance' \
   3 'AutoConfig pfSense (VM)' \
-  4 'DWAgent (ARM)' \
-  5 'Set Wayland (labwc)' \
-  6 'Netplan Menu' \
-  7 'Install DiagnosticUI' \
-  8 'Install AD-DC-WebUI' \
-  9 'Install Milvus Client' \
+  4 'Set Wayland (labwc)' \
+  5 'Netplan Setup' \
+  6 'Install DWService' \
+  7 'Install Tailscale' \
+  8 'Install DiagnosticUI' \
+  9 'Install AD-DC-WebUI' \
+  10 'Install DWService ARM' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -63,12 +64,13 @@ function start {
   1) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | sudo bash ; start ;;
   2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker-tools | bash ; start ;;
   3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; start ;;
-  4) dwgeneric0 ; start ;;
-  5) wayland00 ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
-  6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
-  7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
-  8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash ; start ;;
-  9) milvus0 ; start ;;
+  4) wayland00 ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
+  5) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
+  6) dwservice0 ; start ;;
+  7) clear ; curl -fsSL https://tailscale.com/install.sh | sh ; clear ; tailscale up ;;
+  8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
+  9) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash ; start ;;
+  10) dwgeneric0 ; start ;;
   X) exit ;;
   esac
 }
@@ -193,19 +195,18 @@ function domain00 {
   fi
 }
 
+function dwservice0 {
+  clear
+  wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
+  chmod +x dwagent_x86.sh
+  sudo bash dwagent_x86.sh
+}
+
 function dwgeneric0 {
+  clear
   wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh
   chmod +x dwagent_generic.sh
   sudo bash dwagent_generic.sh
-}
-
-function milvus0 {
-  mkdir /home/administrador/.milvus
-  wget https://cs.linuxuniverse.com.br/public.php/dav/files/sRKBLJEiRoQRfqE/setup/milvus-client-107.0.0.0_amd64.deb -O /tmp/milvus-client-107.0.0.0_amd64.deb
-  wget https://cs.linuxuniverse.com.br/public.php/dav/files/sRKBLJEiRoQRfqE/setup/pre-install.sh -O /tmp/pre-install.sh
-  echo "root" | sudo tee /tmp/milvus_user_install.tmp
-  echo "O token é:"; echo "444MTXW" | sudo tee /tmp/milvus_token.tmp
-  cd /tmp; sudo bash /tmp/pre-install.sh
 }
 
 # ===================================================================================================================================== #
