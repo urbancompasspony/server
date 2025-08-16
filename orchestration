@@ -14,7 +14,7 @@ function start {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
   1 'Modelo & Ferramentas' \
   2 'Somente Contrato' \
-  3 'Serviços Gerais' \
+  3 'Servicos Gerais' \
   4 'Bancos de Dados' \
   5 'Outros' \
   X 'Sair' 2>&1 > /dev/tty ); then
