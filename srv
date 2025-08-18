@@ -67,7 +67,7 @@ function start {
   4) wayland00 ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
   5) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
   6) dwservice0 ; start ;;
-  7) clear ; [ "$HOSTNAME" = "ubuntu-server" ] && echo "TROQUE O HOSTNAME DESTE SERVIDOR!" ; exit 1 || curl -fsSL https://tailscale.com/install.sh | sh ; clear ; tailscale up ;;
+  7) [ $HOSTNAME = "ubuntu-server" ] && echo "TROQUE O HOSTNAME DESTE SERVIDOR!" || curl -fsSL https://tailscale.com/install.sh | sh ; tailscale up ; start ;;
   8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
   9) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash ; start ;;
   10) dwgeneric0 ; start ;;
