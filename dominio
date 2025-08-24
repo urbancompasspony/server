@@ -1229,7 +1229,9 @@ function expiracy_now {
     repeated=$(samba-tool user list | grep -x "$validusr")
     if [ "$repeated" = "$validusr" ]; then
       if dialog --title 'Politica de Senha' --backtitle 'Configuracao de Senha' --yesno "O usuario $validusr deve trocar a senha imediatamente?" 0 0; then
-        net sam set pwdmustchangenow "$validusr" yes
+        samba-tool user setexpiry "$validusr" --days=90
+        samba-tool user setpassword "$validusr" --must-change-at-next-login
+        #net sam set pwdmustchangenow "$validusr" yes
         dialog --title "Informacao" --msgbox "O usuario deve trocar a senha imediatamente!" 8 40
       fi
     else
