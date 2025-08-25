@@ -116,7 +116,7 @@ search_with_locate() {
     local patterns=("*$search_term*" "*${search_term,,}*" "*${search_term^^}*")
     
     for pattern in "${patterns[@]}"; do
-        local results=$(locate --database="$LOCATE_DB" "$pattern" 2>/dev/null)
+        local results=$(locate --database="$LOCATE_DB" "$pattern" 2>/dev/null) | tee /tmp/search_output.txt
         if [ -n "$results" ]; then
             if [ $results_found -eq 0 ]; then
                 echo "📋 Resultados encontrados:"
@@ -142,7 +142,7 @@ search_in_syslog() {
     
     if [ -f "$SYSLOG_PATH" ]; then
         echo "   Resultados encontrados no syslog:"
-        local syslog_results=$(grep -i "$search_term" "$SYSLOG_PATH" 2>/dev/null | head -20)
+        local syslog_results=$(grep -i "$search_term" "$SYSLOG_PATH" 2>/dev/null) | tee -a /tmp/search_output.txt
         if [ -n "$syslog_results" ]; then
             echo "$syslog_results"
         else
@@ -247,11 +247,10 @@ search_in_syslog "$SEARCH_PATTERN"
 
 echo "=========================================="
 echo "✅ Busca concluída!"
-echo "⚡ Tempo de resposta: Super rápido com locate!"
 echo "💾 Banco de dados: $LOCATE_DB"
 echo
 echo "💡 Dicas:"
 echo "   • Para recriar o índice: sudo rm $LOCATE_DB"
-echo "   • Para busca em tempo real: use o script original com find"
+echo "   • Para ver o resultado completo da busca acesse /tmp/search_output.txt"
 echo
 read -p "Pressione Enter para voltar ao menu..." -t 30
