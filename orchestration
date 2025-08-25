@@ -46,6 +46,7 @@ function contratos0 {
   11 'Network UPS Tools Gui (L)' \
   12 'SMS PowerViewer' \
   13 'Kuma' \
+  14 'pLocate (W/L)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -64,6 +65,7 @@ function contratos0 {
   11) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
   12) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
   13) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
+  14) wget "$github"24-plocate -O /tmp/plocate; sudo bash /tmp/plocate ;;
   X) return ;;
   esac
 }
