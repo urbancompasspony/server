@@ -20,7 +20,7 @@ function start {
     return
   fi
   case "$var0" in
-  0) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/search-tool.sh | sudo bash ; start ;;
+  0) wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/search-tool.sh -O /tmp/search-tool.sh ; clear; sudo bash /tmp/search-tool.sh ; start ;;
   1) dwservice0 ; start ;;
   2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; start ;;
   3) clear; sudo wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso -O /var/lib/libvirt/images/virtio-win.iso ; start ;;
