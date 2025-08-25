@@ -116,7 +116,7 @@ search_with_locate() {
     local patterns=("*$search_term*" "*${search_term,,}*" "*${search_term^^}*")
     
     for pattern in "${patterns[@]}"; do
-        local results=$(locate --database="$LOCATE_DB" "$pattern" 2>/dev/null | head -50)
+        local results=$(locate --database="$LOCATE_DB" "$pattern" 2>/dev/null)
         if [ -n "$results" ]; then
             if [ $results_found -eq 0 ]; then
                 echo "📋 Resultados encontrados:"
