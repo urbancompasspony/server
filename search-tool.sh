@@ -1,5 +1,9 @@
 #!/bin/bash
-# Script para extrair caminhos do rsnapshot.conf e buscar arquivos/pastas
+# Script para busca rápida usando locate em backups rsnapshot
+
+# Configurações
+LOCATE_DB="/var/lib/mlocate/rsnapshot.db"
+SYSLOG_PATH="/srv/containers/dominio/log/syslog"
 
 # Função para buscar todos os arquivos rsnapshot
 find_rsnapshot_configs() {
@@ -22,15 +26,164 @@ find_rsnapshot_configs() {
     printf '%s\n' "${configs[@]}"
 }
 
+# Função para extrair snapshot_root
+extract_snapshot_root() {
+    local config_file="$1"
+    grep -E "^snapshot_root\s+" "$config_file" | sed -E 's/^snapshot_root\s+(.+)$/\1/' | tr -d '\t'
+}
+
+# Função para extrair caminhos de backup
+extract_backup_paths() {
+    local config_file="$1"
+    grep -E "^backup\s+" "$config_file" | sed -E 's/^backup\s+([^\t]+)\t.*/\1/' | tr -d '\t'
+}
+
+# Função para coletar todos os caminhos únicos
+collect_all_paths() {
+    local paths=()
+    local RSNAPSHOT_CONFIGS=($(find_rsnapshot_configs))
+    
+    for config in "${RSNAPSHOT_CONFIGS[@]}"; do
+        # Adicionar snapshot_root
+        local snapshot_root=$(extract_snapshot_root "$config")
+        if [ -n "$snapshot_root" ] && [ -d "$snapshot_root" ]; then
+            paths+=("$snapshot_root")
+        fi
+        
+        # Adicionar backup paths
+        local backup_paths=$(extract_backup_paths "$config")
+        while IFS= read -r path; do
+            if [ -n "$path" ] && [ -d "$path" ]; then
+                paths+=("$path")
+            fi
+        done <<< "$backup_paths"
+    done
+    
+    # Remover duplicatas e retornar
+    printf '%s\n' "${paths[@]}" | sort -u
+}
+
+# Função para verificar e criar índice
+check_and_create_index() {
+    local paths=($(collect_all_paths))
+    
+    if [ ${#paths[@]} -eq 0 ]; then
+        echo "❌ Nenhum caminho de backup encontrado!"
+        return 1
+    fi
+    
+    # Verificar se o banco existe e não está muito antigo (mais de 1 dia)
+    if [ ! -f "$LOCATE_DB" ] || [ $(find "$LOCATE_DB" -mtime +1 2>/dev/null | wc -l) -gt 0 ]; then
+        echo "🔄 Criando/atualizando índice do locate..."
+        echo "📁 Caminhos que serão indexados:"
+        for path in "${paths[@]}"; do
+            echo "   - $path"
+        done
+        echo
+        
+        # Criar string de caminhos separados por espaço
+        local paths_string=""
+        for path in "${paths[@]}"; do
+            paths_string="$paths_string $path"
+        done
+        
+        echo "⏳ Indexando... (isso pode demorar alguns minutos)"
+        sudo updatedb --localpaths="$paths_string" --database-root="$LOCATE_DB"
+        
+        if [ $? -eq 0 ]; then
+            echo "✅ Índice criado com sucesso!"
+        else
+            echo "❌ Erro ao criar índice!"
+            return 1
+        fi
+        echo
+    else
+        echo "✅ Índice do locate já existe e está atualizado"
+        echo
+    fi
+}
+
+# Função para buscar com locate
+search_with_locate() {
+    local search_term="$1"
+    local results_found=0
+    
+    echo "🔍 Buscando arquivos e pastas com locate..."
+    echo "⚡ Termo: $search_term"
+    echo
+    
+    # Buscar com diferentes padrões
+    local patterns=("*$search_term*" "*${search_term,,}*" "*${search_term^^}*")
+    
+    for pattern in "${patterns[@]}"; do
+        local results=$(locate --database="$LOCATE_DB" "$pattern" 2>/dev/null | head -50)
+        if [ -n "$results" ]; then
+            if [ $results_found -eq 0 ]; then
+                echo "📋 Resultados encontrados:"
+            fi
+            echo "$results"
+            results_found=1
+        fi
+    done
+    
+    if [ $results_found -eq 0 ]; then
+        echo "ℹ️  Nenhum arquivo/pasta encontrado com locate"
+        echo "💡 Dica: O índice pode estar desatualizado. Execute o script novamente para recriar."
+    fi
+    echo
+}
+
+# Função para buscar no syslog
+search_in_syslog() {
+    local search_term="$1"
+    
+    echo "📁 Buscando nos logs do sistema:"
+    echo "   $SYSLOG_PATH"
+    
+    if [ -f "$SYSLOG_PATH" ]; then
+        echo "   Resultados encontrados no syslog:"
+        local syslog_results=$(grep -i "$search_term" "$SYSLOG_PATH" 2>/dev/null | head -20)
+        if [ -n "$syslog_results" ]; then
+            echo "$syslog_results"
+        else
+            echo "   ℹ️  Nenhum resultado encontrado no syslog"
+        fi
+    else
+        echo "   ⚠️  Arquivo de syslog não encontrado: $SYSLOG_PATH"
+    fi
+    echo
+}
+
+# Função para mostrar estatísticas do índice
+show_index_stats() {
+    if [ -f "$LOCATE_DB" ]; then
+        local count=$(locate --database="$LOCATE_DB" "*" 2>/dev/null | wc -l)
+        local size=$(du -h "$LOCATE_DB" 2>/dev/null | cut -f1)
+        local modified=$(stat -c '%y' "$LOCATE_DB" 2>/dev/null | cut -d' ' -f1,2 | cut -d'.' -f1)
+        
+        echo "📊 Estatísticas do índice:"
+        echo "   Arquivos indexados: $count"
+        echo "   Tamanho do banco: $size"
+        echo "   Última atualização: $modified"
+        echo
+    fi
+}
+
+# ==================== MAIN ====================
+
 # Se não foi passado argumento, perguntar interativamente
 if [ -z "$1" ]; then
     echo "╔══════════════════════════════════════════════════════════════════╗"
-    echo "║                BUSCA EM RSNAPSHOT / SAMBA AD BACKUP              ║"
+    echo "║            BUSCA RÁPIDA EM RSNAPSHOT / SAMBA AD BACKUP          ║"
+    echo "║                      (Powered by locate)                        ║"
     echo "╚══════════════════════════════════════════════════════════════════╝"
     echo
-    echo "As buscas serão realizadas dentro do arquivo de Log do SAMBA-AD e também dos backups RSnapshots (se existentes)"
-    echo ""
-    echo "💡 Para termos com espaços, conforme exemplo: azul engenharia"
+    echo "🚀 Busca super rápida usando índice do locate!"
+    echo "📂 As buscas serão realizadas em:"
+    echo "   • Backups RSnapshots (arquivos e pastas)"
+    echo "   • Logs do SAMBA-AD (conteúdo de arquivos)"
+    echo
+    echo "💡 Para termos com espaços: \"azul engenharia\""
     echo "💡 Para uma única palavra: arquivo"
     echo
     
@@ -48,20 +201,10 @@ else
     SEARCH_NAME="$1"
 fi
 
-# Verificar se o termo tem espaços e ajustar para busca
-if [[ "$SEARCH_NAME" == *" "* ]]; then
-    SEARCH_PATTERN="'$SEARCH_NAME'"
-    echo "Buscando por: $SEARCH_PATTERN (termo com espaços)"
-else
-    SEARCH_PATTERN="$SEARCH_NAME"
-    echo "Buscando por: $SEARCH_PATTERN"
-fi
-
 echo "=========================================="
 
-# Encontrar todos os arquivos rsnapshot
+# Verificar se rsnapshot configs existem
 RSNAPSHOT_CONFIGS=($(find_rsnapshot_configs))
-
 if [ ${#RSNAPSHOT_CONFIGS[@]} -eq 0 ]; then
     echo "❌ Nenhum arquivo rsnapshot encontrado!"
     echo "   Procurado em:"
@@ -72,74 +215,43 @@ fi
 
 echo "📋 Arquivos rsnapshot encontrados:"
 for config in "${RSNAPSHOT_CONFIGS[@]}"; do
-    echo "   - $config"
+    echo "   - $(basename "$config")"
 done
 echo
 
-# Função para extrair snapshot_root
-extract_snapshot_root() {
-    local config_file="$1"
-    grep -E "^snapshot_root\s+" "$config_file" | sed -E 's/^snapshot_root\s+(.+)$/\1/' | tr -d '\t'
-}
-
-# Função para extrair caminhos de backup
-extract_backup_paths() {
-    local config_file="$1"
-    grep -E "^backup\s+" "$config_file" | sed -E 's/^backup\s+([^\t]+)\t.*/\1/' | tr -d '\t'
-}
-
-# Processar cada arquivo rsnapshot encontrado
-for RSNAPSHOT_CONFIG in "${RSNAPSHOT_CONFIGS[@]}"; do
-    echo "🔧 Processando: $(basename "$RSNAPSHOT_CONFIG")"
-    echo "   Arquivo: $RSNAPSHOT_CONFIG"
-    echo
-    
-    # Extrair snapshot_root
-    SNAPSHOT_ROOT=$(extract_snapshot_root "$RSNAPSHOT_CONFIG")
-    if [ -n "$SNAPSHOT_ROOT" ]; then
-        echo "📁 Snapshot Root: $SNAPSHOT_ROOT"
-        if [ -d "$SNAPSHOT_ROOT" ]; then
-            echo "   Buscando em $SNAPSHOT_ROOT..."
-            find "$SNAPSHOT_ROOT" -type f -name "*$SEARCH_NAME*" -o -type d -name "*$SEARCH_NAME*" 2>/dev/null
-        else
-            echo "   ⚠️  Diretório não encontrado: $SNAPSHOT_ROOT"
-        fi
-        echo
-    fi
-    
-    # Extrair e buscar em caminhos de backup
-    BACKUP_PATHS=$(extract_backup_paths "$RSNAPSHOT_CONFIG")
-    if [ -n "$BACKUP_PATHS" ]; then
-        echo "📁 Caminhos de Backup:"
-        while IFS= read -r path; do
-            if [ -n "$path" ]; then
-                echo "   $path"
-                if [ -d "$path" ]; then
-                    echo "   Buscando em $path..."
-                    find "$path" -type f -name "*$SEARCH_NAME*" -o -type d -name "*$SEARCH_NAME*" 2>/dev/null
-                else
-                    echo "   ⚠️  Diretório não encontrado: $path"
-                fi
-                echo
-            fi
-        done <<< "$BACKUP_PATHS"
-    fi
-    
-    echo "────────────────────────────────────────"
-done
-
-# Buscar também nos logs do syslog
-SYSLOG_PATH="/srv/containers/dominio/log/syslog"
-if [ -f "$SYSLOG_PATH" ]; then
-    echo "📁 Buscando nos logs do sistema:"
-    echo "   $SYSLOG_PATH"
-    echo "   Resultados encontrados no syslog:"
-    grep -i "$SEARCH_NAME" "$SYSLOG_PATH" 2>/dev/null || echo "   ℹ️  Nenhum resultado encontrado no syslog"
-    echo
+# Verificar e criar/atualizar índice
+check_and_create_index
+if [ $? -ne 0 ]; then
+    echo "❌ Não foi possível criar o índice. Abortando..."
+    exit 1
 fi
+
+# Mostrar estatísticas
+show_index_stats
+
+# Processar termo de busca
+if [[ "$SEARCH_NAME" == *" "* ]]; then
+    SEARCH_PATTERN="$SEARCH_NAME"
+    echo "🔍 Buscando por: \"$SEARCH_PATTERN\" (termo com espaços)"
+else
+    SEARCH_PATTERN="$SEARCH_NAME"
+    echo "🔍 Buscando por: $SEARCH_PATTERN"
+fi
+echo
+
+# Executar busca com locate
+search_with_locate "$SEARCH_PATTERN"
+
+# Executar busca no syslog (locate não busca conteúdo de arquivos)
+search_in_syslog "$SEARCH_PATTERN"
 
 echo "=========================================="
 echo "✅ Busca concluída!"
-echo "📊 Resumo: Processados ${#RSNAPSHOT_CONFIGS[@]} arquivo(s) rsnapshot"
+echo "⚡ Tempo de resposta: Super rápido com locate!"
+echo "💾 Banco de dados: $LOCATE_DB"
+echo
+echo "💡 Dicas:"
+echo "   • Para recriar o índice: sudo rm $LOCATE_DB"
+echo "   • Para busca em tempo real: use o script original com find"
 echo
 read -p "Pressione Enter para voltar ao menu..." -t 30
