@@ -2,7 +2,7 @@
 # Script para busca rápida usando locate em backups rsnapshot
 
 # Configurações
-LOCATE_DB="/var/lib/mlocate/rsnapshot.db"
+LOCATE_DB="/var/lib/plocate/plocate.db"
 SYSLOG_PATH="/srv/containers/dominio/log/syslog"
 
 # Função para buscar todos os arquivos rsnapshot
