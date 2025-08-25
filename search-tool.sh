@@ -116,7 +116,7 @@ search_with_locate() {
     local patterns=("*$search_term*" "*${search_term,,}*" "*${search_term^^}*")
     
     for pattern in "${patterns[@]}"; do
-        local results=$(locate --database="$LOCATE_DB" "$pattern" 2>/dev/null) | tee /tmp/search_output.txt
+        local results=$(locate --database="$LOCATE_DB" "$pattern" | tee /tmp/search_output.txt 2>/dev/null)
         if [ -n "$results" ]; then
             if [ $results_found -eq 0 ]; then
                 echo "📋 Resultados encontrados:"
@@ -142,7 +142,7 @@ search_in_syslog() {
     
     if [ -f "$SYSLOG_PATH" ]; then
         echo "   Resultados encontrados no syslog:"
-        local syslog_results=$(grep -i "$search_term" "$SYSLOG_PATH" 2>/dev/null) | tee -a /tmp/search_output.txt
+        local syslog_results=$(grep -i "$search_term" "$SYSLOG_PATH" | tee -a /tmp/search_output.txt 2>/dev/null)
         if [ -n "$syslog_results" ]; then
             echo "$syslog_results"
         else
