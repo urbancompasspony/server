@@ -2,7 +2,7 @@
 
 #####################################################################################################
 # Sistema Interativo de Túneis SSH
-# Versão com memória de configurações - salva em /tmp para reutilizar em caso de erro
+# Versão simplificada - sempre customizada com exemplos de conexão
 #####################################################################################################
 
 # Cores para output
@@ -34,10 +34,6 @@ servidor2_full="$servidor2_full"
 password_servidor2="$password_servidor2"
 target_ip="$target_ip"
 target_port="$target_port"
-service_name="$service_name"
-service_type="$service_type"
-access_info="$access_info"
-custom_access="$custom_access"
 porta_local_tunel1="$porta_local_tunel1"
 porta_local_service="$porta_local_service"
 EOF
@@ -59,7 +55,7 @@ print_header() {
     clear
     echo -e "${CYAN}================================================================${NC}"
     echo -e "${CYAN}           Sistema Interativo de Túneis SSH                     ${NC}"
-    echo -e "${CYAN}           (com memória de configurações)                       ${NC}"
+    echo -e "${CYAN}           (versão simplificada)                                ${NC}"
     echo -e "${CYAN}================================================================${NC}"
     echo ""
 }
@@ -155,7 +151,7 @@ get_user_input() {
     fi
     echo ""
 
-    # Serviço alvo
+    # Serviço alvo - Simplificado
     echo -e "${YELLOW}3. Serviço de destino:${NC}"
     if $config_loaded && [[ -n "$target_ip" ]]; then
         echo -e "   IP anterior: ${GREEN}$target_ip${NC}"
@@ -174,89 +170,23 @@ get_user_input() {
         return
     fi
 
-    echo ""
-    echo -e "${CYAN}   Tipos de serviço disponíveis:${NC}"
-    echo "   1) RDP (Windows Remote Desktop) - Porta 3389"
-    echo "   2) SSH - Porta 22"
-    echo "   3) HTTP - Porta 80"
-    echo "   4) HTTPS - Porta 443"
-    echo "   5) FTP - Porta 21"
-    echo "   6) Telnet - Porta 23"
-    echo "   7) SMTP - Porta 25"
-    echo "   8) DNS - Porta 53"
-    echo "   9) DHCP - Porta 67"
-    echo "   10) POP3 - Porta 110"
-    echo "   11) IMAP - Porta 143"
-    echo "   12) SNMP - Porta 161"
-    echo "   13) LDAP - Porta 389"
-    echo "   14) SMTPS - Porta 465"
-    echo "   15) IMAPS - Porta 993"
-    echo "   16) POP3S - Porta 995"
-    echo "   17) VNC - Porta 5900"
-    echo "   18) Personalizada"
-    echo ""
-
-    if $config_loaded && [[ -n "$service_type" ]]; then
-        echo -e "   Tipo anterior: ${GREEN}$service_type${NC} ($service_name)"
-        read -p "   Escolha o tipo (1-18) [$service_type]: " input_service_type
-        service_type="${input_service_type:-$service_type}"
+    # Porta - sempre customizada
+    if $config_loaded && [[ -n "$target_port" ]]; then
+        echo -e "   Porta anterior: ${GREEN}$target_port${NC}"
+        read -p "   Porta do serviço [$target_port]: " input_target_port
+        target_port="${input_target_port:-$target_port}"
     else
-        read -p "   Escolha o tipo (1-18): " service_type
+        read -p "   Porta do serviço: " target_port
     fi
 
-    case $service_type in
-        1) target_port=3389; service_name="RDP (Windows Remote Desktop)"; access_info="Conecte seu cliente RDP em localhost:PORTA" ;;
-        2) target_port=22; service_name="SSH"; access_info="ssh usuario@localhost -p PORTA" ;;
-        3) target_port=80; service_name="HTTP"; access_info="Acesse http://localhost:PORTA no navegador" ;;
-        4) target_port=443; service_name="HTTPS"; access_info="Acesse https://localhost:PORTA no navegador" ;;
-        5) target_port=21; service_name="FTP"; access_info="Conecte seu cliente FTP em localhost:PORTA" ;;
-        6) target_port=23; service_name="Telnet"; access_info="telnet localhost PORTA" ;;
-        7) target_port=25; service_name="SMTP"; access_info="Configure cliente email para localhost:PORTA" ;;
-        8) target_port=53; service_name="DNS"; access_info="Configure DNS para localhost:PORTA" ;;
-        9) target_port=67; service_name="DHCP"; access_info="Serviço DHCP em localhost:PORTA" ;;
-        10) target_port=110; service_name="POP3"; access_info="Configure cliente email POP3 para localhost:PORTA" ;;
-        11) target_port=143; service_name="IMAP"; access_info="Configure cliente email IMAP para localhost:PORTA" ;;
-        12) target_port=161; service_name="SNMP"; access_info="Cliente SNMP para localhost:PORTA" ;;
-        13) target_port=389; service_name="LDAP"; access_info="Conecte cliente LDAP em localhost:PORTA" ;;
-        14) target_port=465; service_name="SMTPS"; access_info="Configure cliente email SMTPS para localhost:PORTA" ;;
-        15) target_port=993; service_name="IMAPS"; access_info="Configure cliente email IMAPS para localhost:PORTA" ;;
-        16) target_port=995; service_name="POP3S"; access_info="Configure cliente email POP3S para localhost:PORTA" ;;
-        17) target_port=5900; service_name="VNC"; access_info="Conecte cliente VNC em localhost:PORTA" ;;
-        18)
-            if $config_loaded && [[ -n "$target_port" ]] && [[ "$service_type" == "18" ]]; then
-                echo -e "   Porta anterior: ${GREEN}$target_port${NC}"
-                read -p "   Digite a porta personalizada [$target_port]: " input_target_port
-                target_port="${input_target_port:-$target_port}"
-            else
-                read -p "   Digite a porta personalizada: " target_port
-            fi
-
-            if $config_loaded && [[ -n "$service_name" ]] && [[ "$service_type" == "18" ]]; then
-                echo -e "   Nome anterior: ${GREEN}$service_name${NC}"
-                read -p "   Nome do serviço [$service_name]: " input_service_name
-                service_name="${input_service_name:-$service_name}"
-            else
-                read -p "   Nome do serviço: " service_name
-            fi
-
-            if $config_loaded && [[ -n "$custom_access" ]] && [[ "$service_type" == "18" ]]; then
-                echo -e "   Acesso anterior: ${GREEN}$custom_access${NC}"
-                read -p "   Como acessar [$custom_access]: " input_custom_access
-                custom_access="${input_custom_access:-$custom_access}"
-            else
-                read -p "   Como acessar (ex: 'Acesse no navegador'): " custom_access
-            fi
-            access_info="$custom_access localhost:PORTA"
-            ;;
-        *)
-            echo -e "${RED}❌ Opção inválida!${NC}"
-            echo -e "${YELLOW}Salvando dados preenchidos...${NC}"
-            save_config
-            sleep 2
-            get_user_input
-            return
-            ;;
-    esac
+    if [[ ! "$target_port" =~ ^[0-9]+$ ]] || [ "$target_port" -lt 1 ] || [ "$target_port" -gt 65535 ]; then
+        echo -e "${RED}❌ Porta inválida! Use um número entre 1 e 65535${NC}"
+        echo -e "${YELLOW}Salvando dados preenchidos...${NC}"
+        save_config
+        sleep 2
+        get_user_input
+        return
+    fi
 
     # Definir portas locais automáticamente
     porta_local_tunel1=2221
@@ -265,6 +195,9 @@ get_user_input() {
     # Se a porta calculada for muito alta, usa uma alternativa
     if [ $porta_local_service -gt 65535 ]; then
         porta_local_service=$((target_port + 1000))
+        if [ $porta_local_service -gt 65535 ]; then
+            porta_local_service=$((target_port - 1000))
+        fi
     fi
 
     # Salvar configuração completa
@@ -277,7 +210,7 @@ show_summary() {
     echo -e "${CYAN}================================${NC}"
     echo -e "🖥️  Servidor Tailscale: ${GREEN}$servidor1_full${NC}"
     echo -e "🔧 Servidor Gateway: ${GREEN}$servidor2_full${NC}"
-    echo -e "🎯 Serviço alvo: ${GREEN}$target_ip:$target_port${NC} ($service_name)"
+    echo -e "🎯 Serviço alvo: ${GREEN}$target_ip:$target_port${NC}"
     echo -e "🔗 Porta local: ${GREEN}$porta_local_service${NC}"
     echo ""
     echo -e "${YELLOW}Opções:${NC}"
@@ -369,6 +302,27 @@ create_tunnels() {
     echo -e "${GREEN}   ✓ Segundo túnel estabelecido (PID: $tunel2_pid)${NC}"
 }
 
+get_connection_examples() {
+    local examples=""
+
+    # Detectar tipo comum de serviço baseado na porta
+    case $target_port in
+        22)   examples="ssh usuario@localhost -p $porta_local_service" ;;
+        80)   examples="curl http://localhost:$porta_local_service\nou acesse no navegador: http://localhost:$porta_local_service" ;;
+        443)  examples="curl -k https://localhost:$porta_local_service\nou acesse no navegador: https://localhost:$porta_local_service" ;;
+        3389) examples="Conectar RDP: localhost:$porta_local_service\nUsuário: [seu_usuario]\nSenha: [sua_senha]" ;;
+        21)   examples="ftp localhost $porta_local_service" ;;
+        23)   examples="telnet localhost $porta_local_service" ;;
+        3306) examples="mysql -h localhost -P $porta_local_service -u [usuario] -p" ;;
+        5432) examples="psql -h localhost -p $porta_local_service -U [usuario] [database]" ;;
+        5900) examples="Conectar VNC: localhost:$porta_local_service" ;;
+        8080) examples="curl http://localhost:$porta_local_service\nou acesse no navegador: http://localhost:$porta_local_service" ;;
+        *)    examples="Conectar em: localhost:$porta_local_service\nUse o cliente apropriado para o serviço na porta $target_port" ;;
+    esac
+
+    echo "$examples"
+}
+
 show_success() {
     echo ""
     echo -e "${GREEN}================================================================${NC}"
@@ -379,11 +333,15 @@ show_success() {
     echo -e "   Túnel 1: ${GREEN}Ativo${NC} (PID: $tunel1_pid)"
     echo -e "   Túnel 2: ${GREEN}Ativo${NC} (PID: $tunel2_pid)"
     echo ""
-    echo -e "${YELLOW}🎯 COMO ACESSAR SEU SERVIÇO:${NC}"
-    echo -e "${YELLOW}================================${NC}"
-    echo -e "   Serviço: ${CYAN}$service_name${NC}"
+    echo -e "${YELLOW}🎯 INFORMAÇÕES DE CONEXÃO:${NC}"
+    echo -e "${YELLOW}===============================${NC}"
     echo -e "   Destino original: ${CYAN}$target_ip:$target_port${NC}"
-    echo -e "   ${GREEN}${access_info/PORTA/$porta_local_service}${NC}"
+    echo -e "   Acesso local: ${GREEN}localhost:$porta_local_service${NC}"
+    echo ""
+    echo -e "${BLUE}💡 EXEMPLOS DE CONEXÃO:${NC}"
+    echo -e "${BLUE}========================${NC}"
+    local examples=$(get_connection_examples)
+    echo -e "${GREEN}$examples${NC}"
     echo ""
     echo -e "${CYAN}📄 Configuração salva em: ${CONFIG_FILE}${NC}"
     echo ""
