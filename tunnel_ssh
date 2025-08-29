@@ -1,0 +1,316 @@
+#!/bin/bash
+
+#####################################################################################################
+# Sistema Interativo de Túneis SSH
+# Versão ampla e interativa para diversos serviços
+#####################################################################################################
+
+# Cores para output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Configurações SSH
+scpoptions="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=60 -o ServerAliveCountMax=5"
+
+# Variáveis globais
+tunel1_pid=""
+tunel2_pid=""
+
+#####################################################################################################
+# FUNÇÕES
+#####################################################################################################
+
+print_header() {
+    clear
+    echo -e "${CYAN}================================================================${NC}"
+    echo -e "${CYAN}           Sistema Interativo de Túneis SSH                     ${NC}"
+    echo -e "${CYAN}================================================================${NC}"
+    echo ""
+}
+
+cleanup() {
+    echo ""
+    echo -e "${YELLOW}Encerrando túneis...${NC}"
+
+    if [[ -n "$tunel1_pid" ]] && kill -0 $tunel1_pid 2>/dev/null; then
+        kill $tunel1_pid 2>/dev/null
+        echo -e "${GREEN}✓ Túnel 1 encerrado${NC}"
+    fi
+
+    if [[ -n "$tunel2_pid" ]] && kill -0 $tunel2_pid 2>/dev/null; then
+        kill $tunel2_pid 2>/dev/null
+        echo -e "${GREEN}✓ Túnel 2 encerrado${NC}"
+    fi
+
+    echo -e "${CYAN}Obrigado por usar o sistema de túneis!${NC}"
+    exit 0
+}
+
+get_user_input() {
+    print_header
+
+    echo -e "${BLUE}📋 CONFIGURAÇÃO DOS SERVIDORES${NC}"
+    echo ""
+
+    # Servidor 1 (Tailscale)
+    echo -e "${YELLOW}1. Servidor Tailscale (com chaves SSH configuradas):${NC}"
+    read -p "   Digite usuario@servidor: " servidor1_full
+
+    if [[ ! "$servidor1_full" =~ ^[^@]+@[^@]+$ ]]; then
+        echo -e "${RED}❌ Formato inválido! Use: usuario@servidor${NC}"
+        sleep 2
+        get_user_input
+        return
+    fi
+
+    echo ""
+
+    # Servidor 2 (pfSense/Gateway)
+    echo -e "${YELLOW}2. Servidor pfSense/Gateway:${NC}"
+    read -p "   Digite usuario@IP (ex: admin@192.168.1.1): " servidor2_full
+
+    if [[ ! "$servidor2_full" =~ ^[^@]+@[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo -e "${RED}❌ Formato inválido! Use: usuario@IP${NC}"
+        sleep 2
+        get_user_input
+        return
+    fi
+
+    read -s -p "   Senha do $servidor2_full: " password_servidor2
+    echo ""
+    echo ""
+
+    # Serviço alvo
+    echo -e "${YELLOW}3. Serviço de destino:${NC}"
+    read -p "   IP do serviço alvo: " target_ip
+
+    if [[ ! "$target_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo -e "${RED}❌ IP inválido!${NC}"
+        sleep 2
+        get_user_input
+        return
+    fi
+
+    echo ""
+    echo -e "${CYAN}   Tipos de serviço disponíveis:${NC}"
+    echo "   1) RDP (Windows Remote Desktop) - Porta 3389"
+    echo "   2) SSH - Porta 22"
+    echo "   3) HTTP - Porta 80"
+    echo "   4) HTTPS - Porta 443"
+    echo "   5) FTP - Porta 21"
+    echo "   6) Telnet - Porta 23"
+    echo "   7) SMTP - Porta 25"
+    echo "   8) DNS - Porta 53"
+    echo "   9) DHCP - Porta 67"
+    echo "   10) POP3 - Porta 110"
+    echo "   11) IMAP - Porta 143"
+    echo "   12) SNMP - Porta 161"
+    echo "   13) LDAP - Porta 389"
+    echo "   14) SMTPS - Porta 465"
+    echo "   15) IMAPS - Porta 993"
+    echo "   16) POP3S - Porta 995"
+    echo "   17) VNC - Porta 5900"
+    echo "   18) Personalizada"
+    echo ""
+
+    read -p "   Escolha o tipo (1-18): " service_type
+
+    case $service_type in
+        1) target_port=3389; service_name="RDP (Windows Remote Desktop)"; access_info="Conecte seu cliente RDP em localhost:PORTA" ;;
+        2) target_port=22; service_name="SSH"; access_info="ssh usuario@localhost -p PORTA" ;;
+        3) target_port=80; service_name="HTTP"; access_info="Acesse http://localhost:PORTA no navegador" ;;
+        4) target_port=443; service_name="HTTPS"; access_info="Acesse https://localhost:PORTA no navegador" ;;
+        5) target_port=21; service_name="FTP"; access_info="Conecte seu cliente FTP em localhost:PORTA" ;;
+        6) target_port=23; service_name="Telnet"; access_info="telnet localhost PORTA" ;;
+        7) target_port=25; service_name="SMTP"; access_info="Configure cliente email para localhost:PORTA" ;;
+        8) target_port=53; service_name="DNS"; access_info="Configure DNS para localhost:PORTA" ;;
+        9) target_port=67; service_name="DHCP"; access_info="Serviço DHCP em localhost:PORTA" ;;
+        10) target_port=110; service_name="POP3"; access_info="Configure cliente email POP3 para localhost:PORTA" ;;
+        11) target_port=143; service_name="IMAP"; access_info="Configure cliente email IMAP para localhost:PORTA" ;;
+        12) target_port=161; service_name="SNMP"; access_info="Cliente SNMP para localhost:PORTA" ;;
+        13) target_port=389; service_name="LDAP"; access_info="Conecte cliente LDAP em localhost:PORTA" ;;
+        14) target_port=465; service_name="SMTPS"; access_info="Configure cliente email SMTPS para localhost:PORTA" ;;
+        15) target_port=993; service_name="IMAPS"; access_info="Configure cliente email IMAPS para localhost:PORTA" ;;
+        16) target_port=995; service_name="POP3S"; access_info="Configure cliente email POP3S para localhost:PORTA" ;;
+        17) target_port=5900; service_name="VNC"; access_info="Conecte cliente VNC em localhost:PORTA" ;;
+        18)
+            read -p "   Digite a porta personalizada: " target_port
+            read -p "   Nome do serviço: " service_name
+            read -p "   Como acessar (ex: 'Acesse no navegador'): " custom_access
+            access_info="$custom_access localhost:PORTA"
+            ;;
+        *)
+            echo -e "${RED}❌ Opção inválida!${NC}"
+            sleep 2
+            get_user_input
+            return
+            ;;
+    esac
+
+    # Definir portas locais automáticamente
+    porta_local_tunel1=2221
+    porta_local_service=$((8000 + target_port))  # Evita conflitos
+
+    # Se a porta calculada for muito alta, usa uma alternativa
+    if [ $porta_local_service -gt 65535 ]; then
+        porta_local_service=$((target_port + 1000))
+    fi
+}
+
+show_summary() {
+    echo ""
+    echo -e "${CYAN}📋 RESUMO DA CONFIGURAÇÃO${NC}"
+    echo -e "${CYAN}================================${NC}"
+    echo -e "🖥️  Servidor Tailscale: ${GREEN}$servidor1_full${NC}"
+    echo -e "🔧 Servidor Gateway: ${GREEN}$servidor2_full${NC}"
+    echo -e "🎯 Serviço alvo: ${GREEN}$target_ip:$target_port${NC} ($service_name)"
+    echo -e "🔗 Porta local: ${GREEN}$porta_local_service${NC}"
+    echo ""
+    read -p "Confirma a configuração? (s/N): " confirm
+
+    if [[ ! "$confirm" =~ ^[Ss]$ ]]; then
+        get_user_input
+        return
+    fi
+}
+
+create_tunnels() {
+    echo ""
+    echo -e "${CYAN}🚀 INICIANDO TÚNEIS${NC}"
+    echo -e "${CYAN}====================${NC}"
+
+    # Extrair informações
+    servidor2_user=$(echo $servidor2_full | cut -d'@' -f1)
+    servidor2_ip=$(echo $servidor2_full | cut -d'@' -f2)
+
+    # Primeiro túnel
+    echo -e "${YELLOW}1. Criando primeiro túnel...${NC}"
+    echo "   $servidor1_full → $servidor2_ip:22 (porta local: $porta_local_tunel1)"
+
+    ssh $scpoptions "$servidor1_full" -N -L "$porta_local_tunel1:$servidor2_ip:22" &
+    tunel1_pid=$!
+
+    sleep 3
+
+    if ! kill -0 $tunel1_pid 2>/dev/null; then
+        echo -e "${RED}❌ ERRO: Primeiro túnel falhou!${NC}"
+        echo -e "${RED}   Verifique se as chaves SSH estão configuradas para $servidor1_full${NC}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}   ✓ Primeiro túnel estabelecido (PID: $tunel1_pid)${NC}"
+
+    # Segundo túnel
+    echo ""
+    echo -e "${YELLOW}2. Criando segundo túnel...${NC}"
+    echo "   localhost:$porta_local_tunel1 → $target_ip:$target_port (porta local: $porta_local_service)"
+
+    sshpass -p "$password_servidor2" ssh $scpoptions "$servidor2_user@localhost" \
+        -p "$porta_local_tunel1" \
+        -N -L "$porta_local_service:$target_ip:$target_port" &
+    tunel2_pid=$!
+
+    sleep 3
+
+    if ! kill -0 $tunel2_pid 2>/dev/null; then
+        echo -e "${RED}❌ ERRO: Segundo túnel falhou!${NC}"
+        echo -e "${RED}   Verifique as credenciais do $servidor2_full${NC}"
+        kill $tunel1_pid 2>/dev/null
+        exit 1
+    fi
+
+    echo -e "${GREEN}   ✓ Segundo túnel estabelecido (PID: $tunel2_pid)${NC}"
+}
+
+show_success() {
+    echo ""
+    echo -e "${GREEN}================================================================${NC}"
+    echo -e "${GREEN}            🎉 TÚNEIS ESTABELECIDOS COM SUCESSO! 🎉            ${NC}"
+    echo -e "${GREEN}================================================================${NC}"
+    echo ""
+    echo -e "${CYAN}📊 STATUS DOS TÚNEIS:${NC}"
+    echo -e "   Túnel 1: ${GREEN}Ativo${NC} (PID: $tunel1_pid)"
+    echo -e "   Túnel 2: ${GREEN}Ativo${NC} (PID: $tunel2_pid)"
+    echo ""
+    echo -e "${YELLOW}🎯 COMO ACESSAR SEU SERVIÇO:${NC}"
+    echo -e "${YELLOW}================================${NC}"
+    echo -e "   Serviço: ${CYAN}$service_name${NC}"
+    echo -e "   Destino original: ${CYAN}$target_ip:$target_port${NC}"
+    echo -e "   ${GREEN}${access_info/PORTA/$porta_local_service}${NC}"
+    echo ""
+    echo -e "${RED}⚠️  IMPORTANTE:${NC}"
+    echo -e "   • Mantenha este terminal aberto enquanto usar o serviço"
+    echo -e "   • Pressione ${YELLOW}Ctrl+C${NC} para encerrar os túneis"
+    echo -e "   • O sistema tentará reconectar automaticamente em caso de queda"
+    echo ""
+}
+
+monitor_tunnels() {
+    local reconnect_count=0
+
+    while true; do
+        # Verificar túnel 1
+        if ! kill -0 $tunel1_pid 2>/dev/null; then
+            reconnect_count=$((reconnect_count + 1))
+            echo -e "${RED}❌ Túnel 1 perdido! Tentativa de reconexão $reconnect_count...${NC}"
+
+            ssh $scpoptions "$servidor1_full" -N -L "$porta_local_tunel1:$servidor2_ip:22" &
+            tunel1_pid=$!
+            sleep 3
+
+            if kill -0 $tunel1_pid 2>/dev/null; then
+                echo -e "${GREEN}✓ Túnel 1 reconectado!${NC}"
+            fi
+        fi
+
+        # Verificar túnel 2
+        if ! kill -0 $tunel2_pid 2>/dev/null; then
+            reconnect_count=$((reconnect_count + 1))
+            echo -e "${RED}❌ Túnel 2 perdido! Tentativa de reconexão $reconnect_count...${NC}"
+
+            servidor2_user=$(echo $servidor2_full | cut -d'@' -f1)
+            sshpass -p "$password_servidor2" ssh $scpoptions "$servidor2_user@localhost" \
+                -p "$porta_local_tunel1" \
+                -N -L "$porta_local_service:$target_ip:$target_port" &
+            tunel2_pid=$!
+            sleep 3
+
+            if kill -0 $tunel2_pid 2>/dev/null; then
+                echo -e "${GREEN}✓ Túnel 2 reconectado!${NC}"
+            fi
+        fi
+
+        # Mostrar status a cada 30 segundos se houver reconexões
+        if [ $reconnect_count -gt 0 ] && [ $((reconnect_count % 3)) -eq 0 ]; then
+            echo -e "${CYAN}ℹ️  Status: Túneis ativos. Reconexões: $reconnect_count${NC}"
+        fi
+
+        sleep 10
+    done
+}
+
+#####################################################################################################
+# MAIN
+#####################################################################################################
+
+# Verificar dependências
+if ! command -v sshpass &> /dev/null; then
+    echo -e "${RED}❌ ERRO: sshpass não está instalado!${NC}"
+    echo -e "${YELLOW}   Ubuntu/Debian: sudo apt install sshpass${NC}"
+    echo -e "${YELLOW}   CentOS/RHEL: sudo yum install sshpass${NC}"
+    exit 1
+fi
+
+# Configurar trap para cleanup
+trap cleanup SIGINT SIGTERM
+
+# Executar fluxo principal
+get_user_input
+show_summary
+create_tunnels
+show_success
+monitor_tunnels
