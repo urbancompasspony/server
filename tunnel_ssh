@@ -2,7 +2,7 @@
 
 #####################################################################################################
 # Sistema Interativo de Túneis SSH
-# Versão ampla e interativa para diversos serviços
+# Versão com memória de configurações - salva em /tmp para reutilizar em caso de erro
 #####################################################################################################
 
 # Cores para output
@@ -16,18 +16,50 @@ NC='\033[0m' # No Color
 # Configurações SSH
 scpoptions="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=60 -o ServerAliveCountMax=5"
 
+# Arquivo temporário para salvar configurações
+CONFIG_FILE="/tmp/ssh-tunnel-config-$$"
+
 # Variáveis globais
 tunel1_pid=""
 tunel2_pid=""
 
 #####################################################################################################
-# FUNÇÕES
+# FUNÇÕES DE PERSISTÊNCIA
+#####################################################################################################
+
+save_config() {
+    cat > "$CONFIG_FILE" << EOF
+servidor1_full="$servidor1_full"
+servidor2_full="$servidor2_full"
+password_servidor2="$password_servidor2"
+target_ip="$target_ip"
+target_port="$target_port"
+service_name="$service_name"
+service_type="$service_type"
+access_info="$access_info"
+custom_access="$custom_access"
+porta_local_tunel1="$porta_local_tunel1"
+porta_local_service="$porta_local_service"
+EOF
+}
+
+load_config() {
+    if [[ -f "$CONFIG_FILE" ]]; then
+        source "$CONFIG_FILE"
+        return 0
+    fi
+    return 1
+}
+
+#####################################################################################################
+# FUNÇÕES PRINCIPAIS
 #####################################################################################################
 
 print_header() {
     clear
     echo -e "${CYAN}================================================================${NC}"
     echo -e "${CYAN}           Sistema Interativo de Túneis SSH                     ${NC}"
+    echo -e "${CYAN}           (com memória de configurações)                       ${NC}"
     echo -e "${CYAN}================================================================${NC}"
     echo ""
 }
@@ -46,6 +78,9 @@ cleanup() {
         echo -e "${GREEN}✓ Túnel 2 encerrado${NC}"
     fi
 
+    # Limpar arquivo temporário
+    rm -f "$CONFIG_FILE"
+
     echo -e "${CYAN}Obrigado por usar o sistema de túneis!${NC}"
     exit 0
 }
@@ -53,15 +88,31 @@ cleanup() {
 get_user_input() {
     print_header
 
+    # Tentar carregar configuração anterior
+    local config_loaded=false
+    if load_config; then
+        config_loaded=true
+        echo -e "${YELLOW}📂 Configuração anterior encontrada! Você pode reutilizar os valores ou alterá-los.${NC}"
+        echo ""
+    fi
+
     echo -e "${BLUE}📋 CONFIGURAÇÃO DOS SERVIDORES${NC}"
     echo ""
 
     # Servidor 1 (Tailscale)
     echo -e "${YELLOW}1. Servidor Tailscale (com chaves SSH configuradas):${NC}"
-    read -p "   Digite usuario@servidor: " servidor1_full
+    if $config_loaded && [[ -n "$servidor1_full" ]]; then
+        echo -e "   Valor anterior: ${GREEN}$servidor1_full${NC}"
+        read -p "   Digite usuario@servidor [$servidor1_full]: " input_servidor1
+        servidor1_full="${input_servidor1:-$servidor1_full}"
+    else
+        read -p "   Digite usuario@servidor: " servidor1_full
+    fi
 
     if [[ ! "$servidor1_full" =~ ^[^@]+@[^@]+$ ]]; then
         echo -e "${RED}❌ Formato inválido! Use: usuario@servidor${NC}"
+        echo -e "${YELLOW}Salvando dados preenchidos...${NC}"
+        save_config
         sleep 2
         get_user_input
         return
@@ -71,25 +122,53 @@ get_user_input() {
 
     # Servidor 2 (pfSense/Gateway)
     echo -e "${YELLOW}2. Servidor pfSense/Gateway:${NC}"
-    read -p "   Digite usuario@IP (ex: admin@192.168.1.1): " servidor2_full
+    if $config_loaded && [[ -n "$servidor2_full" ]]; then
+        echo -e "   Valor anterior: ${GREEN}$servidor2_full${NC}"
+        read -p "   Digite usuario@IP [$servidor2_full]: " input_servidor2
+        servidor2_full="${input_servidor2:-$servidor2_full}"
+    else
+        read -p "   Digite usuario@IP (ex: admin@192.168.1.1): " servidor2_full
+    fi
 
     if [[ ! "$servidor2_full" =~ ^[^@]+@[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo -e "${RED}❌ Formato inválido! Use: usuario@IP${NC}"
+        echo -e "${YELLOW}Salvando dados preenchidos...${NC}"
+        save_config
         sleep 2
         get_user_input
         return
     fi
 
-    read -s -p "   Senha do $servidor2_full: " password_servidor2
-    echo ""
+    # Senha do servidor 2
+    if $config_loaded && [[ -n "$password_servidor2" ]]; then
+        echo -e "   Senha anterior: ${GREEN}[SALVA]${NC}"
+        read -p "   Usar senha anterior? (s/N): " use_old_pass
+        if [[ "$use_old_pass" =~ ^[Ss]$ ]]; then
+            echo -e "   ${GREEN}✓ Usando senha salva${NC}"
+        else
+            read -s -p "   Nova senha para $servidor2_full: " password_servidor2
+            echo ""
+        fi
+    else
+        read -s -p "   Senha do $servidor2_full: " password_servidor2
+        echo ""
+    fi
     echo ""
 
     # Serviço alvo
     echo -e "${YELLOW}3. Serviço de destino:${NC}"
-    read -p "   IP do serviço alvo: " target_ip
+    if $config_loaded && [[ -n "$target_ip" ]]; then
+        echo -e "   IP anterior: ${GREEN}$target_ip${NC}"
+        read -p "   IP do serviço alvo [$target_ip]: " input_target_ip
+        target_ip="${input_target_ip:-$target_ip}"
+    else
+        read -p "   IP do serviço alvo: " target_ip
+    fi
 
     if [[ ! "$target_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo -e "${RED}❌ IP inválido!${NC}"
+        echo -e "${YELLOW}Salvando dados preenchidos...${NC}"
+        save_config
         sleep 2
         get_user_input
         return
@@ -117,7 +196,13 @@ get_user_input() {
     echo "   18) Personalizada"
     echo ""
 
-    read -p "   Escolha o tipo (1-18): " service_type
+    if $config_loaded && [[ -n "$service_type" ]]; then
+        echo -e "   Tipo anterior: ${GREEN}$service_type${NC} ($service_name)"
+        read -p "   Escolha o tipo (1-18) [$service_type]: " input_service_type
+        service_type="${input_service_type:-$service_type}"
+    else
+        read -p "   Escolha o tipo (1-18): " service_type
+    fi
 
     case $service_type in
         1) target_port=3389; service_name="RDP (Windows Remote Desktop)"; access_info="Conecte seu cliente RDP em localhost:PORTA" ;;
@@ -138,13 +223,35 @@ get_user_input() {
         16) target_port=995; service_name="POP3S"; access_info="Configure cliente email POP3S para localhost:PORTA" ;;
         17) target_port=5900; service_name="VNC"; access_info="Conecte cliente VNC em localhost:PORTA" ;;
         18)
-            read -p "   Digite a porta personalizada: " target_port
-            read -p "   Nome do serviço: " service_name
-            read -p "   Como acessar (ex: 'Acesse no navegador'): " custom_access
+            if $config_loaded && [[ -n "$target_port" ]] && [[ "$service_type" == "18" ]]; then
+                echo -e "   Porta anterior: ${GREEN}$target_port${NC}"
+                read -p "   Digite a porta personalizada [$target_port]: " input_target_port
+                target_port="${input_target_port:-$target_port}"
+            else
+                read -p "   Digite a porta personalizada: " target_port
+            fi
+
+            if $config_loaded && [[ -n "$service_name" ]] && [[ "$service_type" == "18" ]]; then
+                echo -e "   Nome anterior: ${GREEN}$service_name${NC}"
+                read -p "   Nome do serviço [$service_name]: " input_service_name
+                service_name="${input_service_name:-$service_name}"
+            else
+                read -p "   Nome do serviço: " service_name
+            fi
+
+            if $config_loaded && [[ -n "$custom_access" ]] && [[ "$service_type" == "18" ]]; then
+                echo -e "   Acesso anterior: ${GREEN}$custom_access${NC}"
+                read -p "   Como acessar [$custom_access]: " input_custom_access
+                custom_access="${input_custom_access:-$custom_access}"
+            else
+                read -p "   Como acessar (ex: 'Acesse no navegador'): " custom_access
+            fi
             access_info="$custom_access localhost:PORTA"
             ;;
         *)
             echo -e "${RED}❌ Opção inválida!${NC}"
+            echo -e "${YELLOW}Salvando dados preenchidos...${NC}"
+            save_config
             sleep 2
             get_user_input
             return
@@ -153,12 +260,15 @@ get_user_input() {
 
     # Definir portas locais automáticamente
     porta_local_tunel1=2221
-    porta_local_service=$((8000 + target_port))  # Evita conflitos
+    porta_local_service=$((8000 + target_port))
 
     # Se a porta calculada for muito alta, usa uma alternativa
     if [ $porta_local_service -gt 65535 ]; then
         porta_local_service=$((target_port + 1000))
     fi
+
+    # Salvar configuração completa
+    save_config
 }
 
 show_summary() {
@@ -170,12 +280,33 @@ show_summary() {
     echo -e "🎯 Serviço alvo: ${GREEN}$target_ip:$target_port${NC} ($service_name)"
     echo -e "🔗 Porta local: ${GREEN}$porta_local_service${NC}"
     echo ""
-    read -p "Confirma a configuração? (s/N): " confirm
+    echo -e "${YELLOW}Opções:${NC}"
+    echo "   s) Confirmar e iniciar túneis"
+    echo "   e) Editar configurações"
+    echo "   q) Sair"
+    echo ""
+    read -p "Escolha (s/e/q): " confirm
 
-    if [[ ! "$confirm" =~ ^[Ss]$ ]]; then
-        get_user_input
-        return
-    fi
+    case "$confirm" in
+        [Ss]*)
+            return 0
+            ;;
+        [Ee]*)
+            get_user_input
+            show_summary
+            return $?
+            ;;
+        [Qq]*)
+            echo -e "${YELLOW}Saindo...${NC}"
+            rm -f "$CONFIG_FILE"
+            exit 0
+            ;;
+        *)
+            echo -e "${YELLOW}Opção inválida, confirmando configuração...${NC}"
+            sleep 1
+            return 0
+            ;;
+    esac
 }
 
 create_tunnels() {
@@ -199,7 +330,13 @@ create_tunnels() {
     if ! kill -0 $tunel1_pid 2>/dev/null; then
         echo -e "${RED}❌ ERRO: Primeiro túnel falhou!${NC}"
         echo -e "${RED}   Verifique se as chaves SSH estão configuradas para $servidor1_full${NC}"
-        exit 1
+        echo ""
+        echo -e "${YELLOW}Pressione Enter para voltar às configurações...${NC}"
+        read
+        get_user_input
+        show_summary
+        create_tunnels
+        return
     fi
 
     echo -e "${GREEN}   ✓ Primeiro túnel estabelecido (PID: $tunel1_pid)${NC}"
@@ -220,7 +357,13 @@ create_tunnels() {
         echo -e "${RED}❌ ERRO: Segundo túnel falhou!${NC}"
         echo -e "${RED}   Verifique as credenciais do $servidor2_full${NC}"
         kill $tunel1_pid 2>/dev/null
-        exit 1
+        echo ""
+        echo -e "${YELLOW}Pressione Enter para voltar às configurações...${NC}"
+        read
+        get_user_input
+        show_summary
+        create_tunnels
+        return
     fi
 
     echo -e "${GREEN}   ✓ Segundo túnel estabelecido (PID: $tunel2_pid)${NC}"
@@ -242,10 +385,13 @@ show_success() {
     echo -e "   Destino original: ${CYAN}$target_ip:$target_port${NC}"
     echo -e "   ${GREEN}${access_info/PORTA/$porta_local_service}${NC}"
     echo ""
+    echo -e "${CYAN}📄 Configuração salva em: ${CONFIG_FILE}${NC}"
+    echo ""
     echo -e "${RED}⚠️  IMPORTANTE:${NC}"
     echo -e "   • Mantenha este terminal aberto enquanto usar o serviço"
     echo -e "   • Pressione ${YELLOW}Ctrl+C${NC} para encerrar os túneis"
     echo -e "   • O sistema tentará reconectar automaticamente em caso de queda"
+    echo -e "   • Execute novamente o script para reutilizar esta configuração"
     echo ""
 }
 
