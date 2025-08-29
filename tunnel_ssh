@@ -55,7 +55,6 @@ print_header() {
     clear
     echo -e "${CYAN}================================================================${NC}"
     echo -e "${CYAN}           Sistema Interativo de Túneis SSH                     ${NC}"
-    echo -e "${CYAN}           (versão simplificada)                                ${NC}"
     echo -e "${CYAN}================================================================${NC}"
     echo ""
 }
