@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #####################################################################################################
-# Sistema Interativo de Túneis SSH
-# Versão simplificada - sempre customizada com exemplos de conexão
+# Sistema Gerenciador de Túneis SSH Independentes
+# Versão Interativa - Controle independente de múltiplos túneis
 #####################################################################################################
 
 # Cores para output
@@ -11,17 +11,30 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Configurações SSH
 scpoptions="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=60 -o ServerAliveCountMax=5"
 
-# Arquivo temporário para salvar configurações
-CONFIG_FILE="/tmp/ssh-tunnel-config-$$"
+# Arquivo de configuração e estado
+CONFIG_DIR="/tmp/ssh-tunnel-manager"
+CONFIG_FILE="$CONFIG_DIR/config"
+STATE_FILE="$CONFIG_DIR/state"
+TUNNEL1_PID_FILE="$CONFIG_DIR/tunnel1.pid"
+TUNNEL2_PID_FILE="$CONFIG_DIR/tunnel2.pid"
+
+# Criar diretório se não existir
+mkdir -p "$CONFIG_DIR"
 
 # Variáveis globais
-tunel1_pid=""
-tunel2_pid=""
+servidor1_full=""
+servidor2_full=""
+password_servidor2=""
+porta_local_tunel1="2221"
+current_service_port=""
+current_target_ip=""
+current_target_port=""
 
 #####################################################################################################
 # FUNÇÕES DE PERSISTÊNCIA
@@ -32,10 +45,7 @@ save_config() {
 servidor1_full="$servidor1_full"
 servidor2_full="$servidor2_full"
 password_servidor2="$password_servidor2"
-target_ip="$target_ip"
-target_port="$target_port"
 porta_local_tunel1="$porta_local_tunel1"
-porta_local_service="$porta_local_service"
 EOF
 }
 
@@ -47,353 +57,576 @@ load_config() {
     return 1
 }
 
+save_tunnel1_pid() {
+    echo "$1" > "$TUNNEL1_PID_FILE"
+}
+
+save_tunnel2_pid() {
+    echo "$1" > "$TUNNEL2_PID_FILE"
+}
+
+get_tunnel1_pid() {
+    if [[ -f "$TUNNEL1_PID_FILE" ]]; then
+        cat "$TUNNEL1_PID_FILE"
+    else
+        echo ""
+    fi
+}
+
+get_tunnel2_pid() {
+    if [[ -f "$TUNNEL2_PID_FILE" ]]; then
+        cat "$TUNNEL2_PID_FILE"
+    else
+        echo ""
+    fi
+}
+
+save_service_config() {
+    local service_id="$1"
+    cat > "$CONFIG_DIR/service_$service_id" << EOF
+target_ip="$2"
+target_port="$3"
+local_port="$4"
+EOF
+}
+
+load_service_config() {
+    local service_id="$1"
+    if [[ -f "$CONFIG_DIR/service_$service_id" ]]; then
+        source "$CONFIG_DIR/service_$service_id"
+        return 0
+    fi
+    return 1
+}
+
 #####################################################################################################
-# FUNÇÕES PRINCIPAIS
+# FUNÇÕES DE INTERFACE
 #####################################################################################################
 
 print_header() {
     clear
-    echo -e "${CYAN}================================================================${NC}"
-    echo -e "${CYAN}           Sistema Interativo de Túneis SSH                     ${NC}"
-    echo -e "${CYAN}================================================================${NC}"
+    echo -e "${CYAN}╔════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║        Sistema Gerenciador de Túneis SSH Independentes        ║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
 }
 
-cleanup() {
-    echo ""
-    echo -e "${YELLOW}Encerrando túneis...${NC}"
+print_status() {
+    echo -e "${YELLOW}┌─────────────────────────────────────────────────────────────┐${NC}"
+    echo -e "${YELLOW}│                     STATUS DOS TÚNEIS                      │${NC}"
+    echo -e "${YELLOW}└─────────────────────────────────────────────────────────────┘${NC}"
 
-    if [[ -n "$tunel1_pid" ]] && kill -0 $tunel1_pid 2>/dev/null; then
-        kill $tunel1_pid 2>/dev/null
-        echo -e "${GREEN}✓ Túnel 1 encerrado${NC}"
-    fi
-
-    if [[ -n "$tunel2_pid" ]] && kill -0 $tunel2_pid 2>/dev/null; then
-        kill $tunel2_pid 2>/dev/null
-        echo -e "${GREEN}✓ Túnel 2 encerrado${NC}"
-    fi
-
-    # Limpar arquivo temporário
-    rm -f "$CONFIG_FILE"
-
-    echo -e "${CYAN}Obrigado por usar o sistema de túneis!${NC}"
-    exit 0
-}
-
-get_user_input() {
-    print_header
-
-    # Tentar carregar configuração anterior
-    local config_loaded=false
-    if load_config; then
-        config_loaded=true
-        echo -e "${YELLOW}📂 Configuração anterior encontrada! Você pode reutilizar os valores ou alterá-los.${NC}"
-        echo ""
-    fi
-
-    echo -e "${BLUE}📋 CONFIGURAÇÃO DOS SERVIDORES${NC}"
-    echo ""
-
-    # Servidor 1 (Tailscale)
-    echo -e "${YELLOW}1. Servidor Tailscale (com chaves SSH configuradas):${NC}"
-    if $config_loaded && [[ -n "$servidor1_full" ]]; then
-        echo -e "   Valor anterior: ${GREEN}$servidor1_full${NC}"
-        read -p "   Digite usuario@servidor [$servidor1_full]: " input_servidor1
-        servidor1_full="${input_servidor1:-$servidor1_full}"
+    # Status do Túnel 1
+    local tunnel1_pid=$(get_tunnel1_pid)
+    if [[ -n "$tunnel1_pid" ]] && kill -0 "$tunnel1_pid" 2>/dev/null; then
+        echo -e "  📡 Túnel 1 (Gateway): ${GREEN}● ATIVO${NC} [PID: $tunnel1_pid]"
+        if [[ -n "$servidor1_full" ]]; then
+            echo -e "     └─ $servidor1_full → Gateway SSH"
+        fi
     else
-        read -p "   Digite usuario@servidor: " servidor1_full
+        echo -e "  📡 Túnel 1 (Gateway): ${RED}○ INATIVO${NC}"
     fi
+
+    # Status do Túnel 2
+    local tunnel2_pid=$(get_tunnel2_pid)
+    if [[ -n "$tunnel2_pid" ]] && kill -0 "$tunnel2_pid" 2>/dev/null; then
+        echo -e "  🎯 Túnel 2 (Serviço): ${GREEN}● ATIVO${NC} [PID: $tunnel2_pid]"
+        if [[ -n "$current_target_ip" ]]; then
+            echo -e "     └─ localhost:$current_service_port → $current_target_ip:$current_target_port"
+        fi
+    else
+        echo -e "  🎯 Túnel 2 (Serviço): ${RED}○ INATIVO${NC}"
+    fi
+    echo ""
+}
+
+show_main_menu() {
+    print_header
+    print_status
+
+    echo -e "${BLUE}┌─────────────────────────────────────────────────────────────┐${NC}"
+    echo -e "${BLUE}│                      MENU PRINCIPAL                        │${NC}"
+    echo -e "${BLUE}└─────────────────────────────────────────────────────────────┘${NC}"
+    echo ""
+    echo -e "  ${CYAN}[1]${NC} 🔧 Configurar/Iniciar Túnel 1 (Gateway)"
+    echo -e "  ${CYAN}[2]${NC} 🎯 Configurar/Iniciar Túnel 2 (Serviço)"
+    echo -e "  ${CYAN}[3]${NC} 🔄 Trocar serviço do Túnel 2 (mantém Túnel 1)"
+    echo -e "  ${CYAN}[4]${NC} 📊 Monitorar túneis ativos"
+    echo -e "  ${CYAN}[5]${NC} 🛑 Parar Túnel 1"
+    echo -e "  ${CYAN}[6]${NC} 🛑 Parar Túnel 2"
+    echo -e "  ${CYAN}[7]${NC} 🔄 Reiniciar todos os túneis"
+    echo -e "  ${CYAN}[8]${NC} 📋 Ver configurações salvas"
+    echo -e "  ${CYAN}[9]${NC} 🗑️  Limpar todas as configurações"
+    echo -e "  ${CYAN}[0]${NC} ❌ Sair"
+    echo ""
+    echo -e "${YELLOW}────────────────────────────────────────────────────────────${NC}"
+    read -p "Escolha uma opção: " choice
+
+    case $choice in
+        1) setup_tunnel1 ;;
+        2) setup_tunnel2 ;;
+        3) switch_service ;;
+        4) monitor_tunnels ;;
+        5) stop_tunnel1 ;;
+        6) stop_tunnel2 ;;
+        7) restart_all ;;
+        8) show_configs ;;
+        9) clear_all ;;
+        0) cleanup_and_exit ;;
+        *) echo -e "${RED}Opção inválida!${NC}"; sleep 1 ;;
+    esac
+}
+
+#####################################################################################################
+# FUNÇÕES DO TÚNEL 1
+#####################################################################################################
+
+setup_tunnel1() {
+    print_header
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}              CONFIGURAÇÃO DO TÚNEL 1 (GATEWAY)              ${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    # Verificar se já está rodando
+    local tunnel1_pid=$(get_tunnel1_pid)
+    if [[ -n "$tunnel1_pid" ]] && kill -0 "$tunnel1_pid" 2>/dev/null; then
+        echo -e "${YELLOW}⚠️  Túnel 1 já está ativo!${NC}"
+        echo ""
+        echo "  [1] Reconfigurar (irá parar o túnel atual)"
+        echo "  [2] Voltar ao menu"
+        read -p "Escolha: " choice
+        if [[ "$choice" != "1" ]]; then
+            return
+        fi
+        stop_tunnel1
+    fi
+
+    # Carregar configuração se existir
+    if load_config && [[ -n "$servidor1_full" ]]; then
+        echo -e "${GREEN}📂 Configuração anterior encontrada:${NC}"
+        echo -e "   Servidor: $servidor1_full"
+        echo -e "   Gateway: $servidor2_full"
+        echo ""
+        echo "  [1] Usar configuração existente"
+        echo "  [2] Nova configuração"
+        read -p "Escolha: " use_existing
+
+        if [[ "$use_existing" == "1" ]]; then
+            start_tunnel1
+            return
+        fi
+    fi
+
+    # Nova configuração
+    echo -e "${YELLOW}Digite as informações do servidor Tailscale:${NC}"
+    read -p "Usuario@Servidor: " servidor1_full
 
     if [[ ! "$servidor1_full" =~ ^[^@]+@[^@]+$ ]]; then
         echo -e "${RED}❌ Formato inválido! Use: usuario@servidor${NC}"
-        echo -e "${YELLOW}Salvando dados preenchidos...${NC}"
-        save_config
         sleep 2
-        get_user_input
         return
     fi
 
     echo ""
-
-    # Servidor 2 (pfSense/Gateway)
-    echo -e "${YELLOW}2. Servidor pfSense/Gateway:${NC}"
-    if $config_loaded && [[ -n "$servidor2_full" ]]; then
-        echo -e "   Valor anterior: ${GREEN}$servidor2_full${NC}"
-        read -p "   Digite usuario@IP [$servidor2_full]: " input_servidor2
-        servidor2_full="${input_servidor2:-$servidor2_full}"
-    else
-        read -p "   Digite usuario@IP (ex: admin@192.168.1.1): " servidor2_full
-    fi
+    echo -e "${YELLOW}Digite as informações do Gateway/pfSense:${NC}"
+    read -p "Usuario@IP: " servidor2_full
 
     if [[ ! "$servidor2_full" =~ ^[^@]+@[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo -e "${RED}❌ Formato inválido! Use: usuario@IP${NC}"
-        echo -e "${YELLOW}Salvando dados preenchidos...${NC}"
-        save_config
         sleep 2
-        get_user_input
         return
     fi
 
-    # Senha do servidor 2
-    if $config_loaded && [[ -n "$password_servidor2" ]]; then
-        echo -e "   Senha anterior: ${GREEN}[SALVA]${NC}"
-        read -p "   Usar senha anterior? (s/N): " use_old_pass
-        if [[ "$use_old_pass" =~ ^[Ss]$ ]]; then
-            echo -e "   ${GREEN}✓ Usando senha salva${NC}"
-        else
-            read -s -p "   Nova senha para $servidor2_full: " password_servidor2
-            echo ""
-        fi
-    else
-        read -s -p "   Senha do $servidor2_full: " password_servidor2
-        echo ""
-    fi
+    read -s -p "Senha do Gateway: " password_servidor2
     echo ""
 
-    # Serviço alvo - Simplificado
-    echo -e "${YELLOW}3. Serviço de destino:${NC}"
-    if $config_loaded && [[ -n "$target_ip" ]]; then
-        echo -e "   IP anterior: ${GREEN}$target_ip${NC}"
-        read -p "   IP do serviço alvo [$target_ip]: " input_target_ip
-        target_ip="${input_target_ip:-$target_ip}"
+    # Salvar e iniciar
+    save_config
+    start_tunnel1
+}
+
+start_tunnel1() {
+    echo ""
+    echo -e "${YELLOW}🚀 Iniciando Túnel 1...${NC}"
+
+    local servidor2_ip=$(echo $servidor2_full | cut -d'@' -f2)
+
+    ssh $scpoptions "$servidor1_full" -N -L "$porta_local_tunel1:$servidor2_ip:22" &
+    local pid=$!
+
+    sleep 3
+
+    if kill -0 $pid 2>/dev/null; then
+        save_tunnel1_pid $pid
+        echo -e "${GREEN}✅ Túnel 1 estabelecido com sucesso! [PID: $pid]${NC}"
+        echo -e "${CYAN}   Gateway SSH disponível em: localhost:$porta_local_tunel1${NC}"
     else
-        read -p "   IP do serviço alvo: " target_ip
+        echo -e "${RED}❌ Falha ao estabelecer Túnel 1${NC}"
+        echo -e "${YELLOW}   Verifique as chaves SSH para $servidor1_full${NC}"
     fi
+
+    echo ""
+    read -p "Pressione Enter para continuar..."
+}
+
+stop_tunnel1() {
+    local tunnel1_pid=$(get_tunnel1_pid)
+    if [[ -n "$tunnel1_pid" ]] && kill -0 "$tunnel1_pid" 2>/dev/null; then
+        kill "$tunnel1_pid"
+        rm -f "$TUNNEL1_PID_FILE"
+        echo -e "${GREEN}✅ Túnel 1 parado${NC}"
+
+        # Parar Túnel 2 também se estiver ativo
+        local tunnel2_pid=$(get_tunnel2_pid)
+        if [[ -n "$tunnel2_pid" ]] && kill -0 "$tunnel2_pid" 2>/dev/null; then
+            echo -e "${YELLOW}⚠️  Parando Túnel 2 (dependente do Túnel 1)...${NC}"
+            stop_tunnel2
+        fi
+    else
+        echo -e "${YELLOW}Túnel 1 não está ativo${NC}"
+    fi
+}
+
+#####################################################################################################
+# FUNÇÕES DO TÚNEL 2
+#####################################################################################################
+
+setup_tunnel2() {
+    print_header
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}              CONFIGURAÇÃO DO TÚNEL 2 (SERVIÇO)              ${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    # Verificar se Túnel 1 está ativo
+    local tunnel1_pid=$(get_tunnel1_pid)
+    if [[ -z "$tunnel1_pid" ]] || ! kill -0 "$tunnel1_pid" 2>/dev/null; then
+        echo -e "${RED}❌ ERRO: Túnel 1 não está ativo!${NC}"
+        echo -e "${YELLOW}   É necessário estabelecer o Túnel 1 primeiro.${NC}"
+        echo ""
+        read -p "Deseja configurar o Túnel 1 agora? (s/n): " setup_t1
+        if [[ "$setup_t1" =~ ^[Ss]$ ]]; then
+            setup_tunnel1
+        fi
+        return
+    fi
+
+    # Verificar se já está rodando
+    local tunnel2_pid=$(get_tunnel2_pid)
+    if [[ -n "$tunnel2_pid" ]] && kill -0 "$tunnel2_pid" 2>/dev/null; then
+        echo -e "${YELLOW}⚠️  Túnel 2 já está ativo!${NC}"
+        echo -e "   Conectado a: $current_target_ip:$current_target_port"
+        echo ""
+        echo "  [1] Parar e reconfigurar"
+        echo "  [2] Voltar ao menu"
+        read -p "Escolha: " choice
+        if [[ "$choice" != "1" ]]; then
+            return
+        fi
+        stop_tunnel2
+    fi
+
+    configure_service
+}
+
+configure_service() {
+    echo ""
+    echo -e "${YELLOW}Configure o serviço de destino:${NC}"
+    read -p "IP do serviço: " target_ip
 
     if [[ ! "$target_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo -e "${RED}❌ IP inválido!${NC}"
-        echo -e "${YELLOW}Salvando dados preenchidos...${NC}"
-        save_config
         sleep 2
-        get_user_input
         return
     fi
 
-    # Porta - sempre customizada
-    if $config_loaded && [[ -n "$target_port" ]]; then
-        echo -e "   Porta anterior: ${GREEN}$target_port${NC}"
-        read -p "   Porta do serviço [$target_port]: " input_target_port
-        target_port="${input_target_port:-$target_port}"
-    else
-        read -p "   Porta do serviço: " target_port
-    fi
+    read -p "Porta do serviço: " target_port
 
     if [[ ! "$target_port" =~ ^[0-9]+$ ]] || [ "$target_port" -lt 1 ] || [ "$target_port" -gt 65535 ]; then
-        echo -e "${RED}❌ Porta inválida! Use um número entre 1 e 65535${NC}"
-        echo -e "${YELLOW}Salvando dados preenchidos...${NC}"
-        save_config
+        echo -e "${RED}❌ Porta inválida!${NC}"
         sleep 2
-        get_user_input
         return
     fi
 
-    # Definir portas locais automáticamente
-    porta_local_tunel1=2221
-    porta_local_service=$((8000 + target_port))
-
-    # Se a porta calculada for muito alta, usa uma alternativa
-    if [ $porta_local_service -gt 65535 ]; then
-        porta_local_service=$((target_port + 1000))
-        if [ $porta_local_service -gt 65535 ]; then
-            porta_local_service=$((target_port - 1000))
+    # Calcular porta local
+    local local_port=$((8000 + target_port))
+    if [ $local_port -gt 65535 ]; then
+        local_port=$((target_port + 1000))
+        if [ $local_port -gt 65535 ]; then
+            local_port=$((9000 + (target_port % 1000)))
         fi
     fi
 
-    # Salvar configuração completa
-    save_config
+    read -p "Porta local [$local_port]: " custom_port
+    if [[ -n "$custom_port" ]]; then
+        local_port=$custom_port
+    fi
+
+    # Salvar e iniciar
+    current_target_ip="$target_ip"
+    current_target_port="$target_port"
+    current_service_port="$local_port"
+
+    # Gerar ID único para o serviço
+    local service_id=$(date +%s)
+    save_service_config "$service_id" "$target_ip" "$target_port" "$local_port"
+
+    start_tunnel2
 }
 
-show_summary() {
+start_tunnel2() {
     echo ""
-    echo -e "${CYAN}📋 RESUMO DA CONFIGURAÇÃO${NC}"
-    echo -e "${CYAN}================================${NC}"
-    echo -e "🖥️  Servidor Tailscale: ${GREEN}$servidor1_full${NC}"
-    echo -e "🔧 Servidor Gateway: ${GREEN}$servidor2_full${NC}"
-    echo -e "🎯 Serviço alvo: ${GREEN}$target_ip:$target_port${NC}"
-    echo -e "🔗 Porta local: ${GREEN}$porta_local_service${NC}"
-    echo ""
-    echo -e "${YELLOW}Opções:${NC}"
-    echo "   s) Confirmar e iniciar túneis"
-    echo "   e) Editar configurações"
-    echo "   q) Sair"
-    echo ""
-    read -p "Escolha (s/e/q): " confirm
+    echo -e "${YELLOW}🚀 Iniciando Túnel 2...${NC}"
 
-    case "$confirm" in
-        [Ss]*)
-            return 0
-            ;;
-        [Ee]*)
-            get_user_input
-            show_summary
-            return $?
-            ;;
-        [Qq]*)
-            echo -e "${YELLOW}Saindo...${NC}"
-            rm -f "$CONFIG_FILE"
-            exit 0
-            ;;
-        *)
-            echo -e "${YELLOW}Opção inválida, confirmando configuração...${NC}"
-            sleep 1
-            return 0
-            ;;
-    esac
-}
-
-create_tunnels() {
-    echo ""
-    echo -e "${CYAN}🚀 INICIANDO TÚNEIS${NC}"
-    echo -e "${CYAN}====================${NC}"
-
-    # Extrair informações
-    servidor2_user=$(echo $servidor2_full | cut -d'@' -f1)
-    servidor2_ip=$(echo $servidor2_full | cut -d'@' -f2)
-
-    # Primeiro túnel
-    echo -e "${YELLOW}1. Criando primeiro túnel...${NC}"
-    echo "   $servidor1_full → $servidor2_ip:22 (porta local: $porta_local_tunel1)"
-
-    ssh $scpoptions "$servidor1_full" -N -L "$porta_local_tunel1:$servidor2_ip:22" &
-    tunel1_pid=$!
-
-    sleep 3
-
-    if ! kill -0 $tunel1_pid 2>/dev/null; then
-        echo -e "${RED}❌ ERRO: Primeiro túnel falhou!${NC}"
-        echo -e "${RED}   Verifique se as chaves SSH estão configuradas para $servidor1_full${NC}"
-        echo ""
-        echo -e "${YELLOW}Pressione Enter para voltar às configurações...${NC}"
-        read
-        get_user_input
-        show_summary
-        create_tunnels
+    if ! load_config; then
+        echo -e "${RED}❌ Configuração do Gateway não encontrada!${NC}"
         return
     fi
 
-    echo -e "${GREEN}   ✓ Primeiro túnel estabelecido (PID: $tunel1_pid)${NC}"
-
-    # Segundo túnel
-    echo ""
-    echo -e "${YELLOW}2. Criando segundo túnel...${NC}"
-    echo "   localhost:$porta_local_tunel1 → $target_ip:$target_port (porta local: $porta_local_service)"
+    local servidor2_user=$(echo $servidor2_full | cut -d'@' -f1)
 
     sshpass -p "$password_servidor2" ssh $scpoptions "$servidor2_user@localhost" \
         -p "$porta_local_tunel1" \
-        -N -L "$porta_local_service:$target_ip:$target_port" &
-    tunel2_pid=$!
+        -N -L "$current_service_port:$current_target_ip:$current_target_port" &
+    local pid=$!
 
     sleep 3
 
-    if ! kill -0 $tunel2_pid 2>/dev/null; then
-        echo -e "${RED}❌ ERRO: Segundo túnel falhou!${NC}"
-        echo -e "${RED}   Verifique as credenciais do $servidor2_full${NC}"
-        kill $tunel1_pid 2>/dev/null
+    if kill -0 $pid 2>/dev/null; then
+        save_tunnel2_pid $pid
+        echo -e "${GREEN}✅ Túnel 2 estabelecido com sucesso! [PID: $pid]${NC}"
         echo ""
-        echo -e "${YELLOW}Pressione Enter para voltar às configurações...${NC}"
-        read
-        get_user_input
-        show_summary
-        create_tunnels
+        show_connection_info
+    else
+        echo -e "${RED}❌ Falha ao estabelecer Túnel 2${NC}"
+        echo -e "${YELLOW}   Verifique as credenciais do Gateway${NC}"
+    fi
+
+    echo ""
+    read -p "Pressione Enter para continuar..."
+}
+
+stop_tunnel2() {
+    local tunnel2_pid=$(get_tunnel2_pid)
+    if [[ -n "$tunnel2_pid" ]] && kill -0 "$tunnel2_pid" 2>/dev/null; then
+        kill "$tunnel2_pid"
+        rm -f "$TUNNEL2_PID_FILE"
+        echo -e "${GREEN}✅ Túnel 2 parado${NC}"
+    else
+        echo -e "${YELLOW}Túnel 2 não está ativo${NC}"
+    fi
+}
+
+switch_service() {
+    print_header
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}                    TROCAR SERVIÇO DO TÚNEL 2                ${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    # Verificar se Túnel 1 está ativo
+    local tunnel1_pid=$(get_tunnel1_pid)
+    if [[ -z "$tunnel1_pid" ]] || ! kill -0 "$tunnel1_pid" 2>/dev/null; then
+        echo -e "${RED}❌ Túnel 1 não está ativo!${NC}"
+        echo -e "${YELLOW}   É necessário que o Túnel 1 esteja ativo.${NC}"
+        echo ""
+        read -p "Pressione Enter para voltar..."
         return
     fi
 
-    echo -e "${GREEN}   ✓ Segundo túnel estabelecido (PID: $tunel2_pid)${NC}"
+    echo -e "${GREEN}✅ Túnel 1 está ativo - Gateway disponível${NC}"
+    echo ""
+
+    # Parar Túnel 2 se estiver ativo
+    local tunnel2_pid=$(get_tunnel2_pid)
+    if [[ -n "$tunnel2_pid" ]] && kill -0 "$tunnel2_pid" 2>/dev/null; then
+        echo -e "${YELLOW}Parando Túnel 2 atual...${NC}"
+        stop_tunnel2
+        echo ""
+    fi
+
+    echo -e "${CYAN}Configure o novo serviço:${NC}"
+    configure_service
 }
 
-get_connection_examples() {
-    local examples=""
-
-    # Detectar tipo comum de serviço baseado na porta
-    case $target_port in
-        22)   examples="ssh usuario@localhost -p $porta_local_service" ;;
-        80)   examples="curl http://localhost:$porta_local_service\nou acesse no navegador: http://localhost:$porta_local_service" ;;
-        443)  examples="curl -k https://localhost:$porta_local_service\nou acesse no navegador: https://localhost:$porta_local_service" ;;
-        3389) examples="Conectar RDP: localhost:$porta_local_service\nUsuário: [seu_usuario]\nSenha: [sua_senha]" ;;
-        21)   examples="ftp localhost $porta_local_service" ;;
-        23)   examples="telnet localhost $porta_local_service" ;;
-        3306) examples="mysql -h localhost -P $porta_local_service -u [usuario] -p" ;;
-        5432) examples="psql -h localhost -p $porta_local_service -U [usuario] [database]" ;;
-        5900) examples="Conectar VNC: localhost:$porta_local_service" ;;
-        8080) examples="curl http://localhost:$porta_local_service\nou acesse no navegador: http://localhost:$porta_local_service" ;;
-        *)    examples="Conectar em: localhost:$porta_local_service\nUse o cliente apropriado para o serviço na porta $target_port" ;;
-    esac
-
-    echo "$examples"
-}
-
-show_success() {
-    echo ""
-    echo -e "${GREEN}================================================================${NC}"
-    echo -e "${GREEN}            🎉 TÚNEIS ESTABELECIDOS COM SUCESSO! 🎉            ${NC}"
-    echo -e "${GREEN}================================================================${NC}"
-    echo ""
-    echo -e "${CYAN}📊 STATUS DOS TÚNEIS:${NC}"
-    echo -e "   Túnel 1: ${GREEN}Ativo${NC} (PID: $tunel1_pid)"
-    echo -e "   Túnel 2: ${GREEN}Ativo${NC} (PID: $tunel2_pid)"
-    echo ""
-    echo -e "${YELLOW}🎯 INFORMAÇÕES DE CONEXÃO:${NC}"
-    echo -e "${YELLOW}===============================${NC}"
-    echo -e "   Destino original: ${CYAN}$target_ip:$target_port${NC}"
-    echo -e "   Acesso local: ${GREEN}localhost:$porta_local_service${NC}"
-    echo ""
-    echo -e "${BLUE}💡 EXEMPLOS DE CONEXÃO:${NC}"
-    echo -e "${BLUE}========================${NC}"
-    local examples=$(get_connection_examples)
-    echo -e "${GREEN}$examples${NC}"
-    echo ""
-    echo -e "${CYAN}📄 Configuração salva em: ${CONFIG_FILE}${NC}"
-    echo ""
-    echo -e "${RED}⚠️  IMPORTANTE:${NC}"
-    echo -e "   • Mantenha este terminal aberto enquanto usar o serviço"
-    echo -e "   • Pressione ${YELLOW}Ctrl+C${NC} para encerrar os túneis"
-    echo -e "   • O sistema tentará reconectar automaticamente em caso de queda"
-    echo -e "   • Execute novamente o script para reutilizar esta configuração"
-    echo ""
-}
+#####################################################################################################
+# FUNÇÕES DE MONITORAMENTO
+#####################################################################################################
 
 monitor_tunnels() {
-    local reconnect_count=0
+    print_header
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}                    MONITORAMENTO DOS TÚNEIS                 ${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${YELLOW}Pressione Ctrl+C para voltar ao menu${NC}"
+    echo ""
+
+    # Configurar trap local para esta função
+    trap 'echo ""; echo -e "${CYAN}Voltando ao menu...${NC}"; sleep 1; return' SIGINT
 
     while true; do
-        # Verificar túnel 1
-        if ! kill -0 $tunel1_pid 2>/dev/null; then
-            reconnect_count=$((reconnect_count + 1))
-            echo -e "${RED}❌ Túnel 1 perdido! Tentativa de reconexão $reconnect_count...${NC}"
+        echo -e "\r\033[K${CYAN}[$(date '+%H:%M:%S')]${NC} Verificando status..."
 
-            ssh $scpoptions "$servidor1_full" -N -L "$porta_local_tunel1:$servidor2_ip:22" &
-            tunel1_pid=$!
-            sleep 3
+        local tunnel1_pid=$(get_tunnel1_pid)
+        local tunnel2_pid=$(get_tunnel2_pid)
 
-            if kill -0 $tunel1_pid 2>/dev/null; then
-                echo -e "${GREEN}✓ Túnel 1 reconectado!${NC}"
-            fi
+        # Status Túnel 1
+        if [[ -n "$tunnel1_pid" ]] && kill -0 "$tunnel1_pid" 2>/dev/null; then
+            echo -e "\r\033[K${GREEN}● Túnel 1:${NC} Ativo [PID: $tunnel1_pid]"
+        else
+            echo -e "\r\033[K${RED}○ Túnel 1:${NC} Inativo"
         fi
 
-        # Verificar túnel 2
-        if ! kill -0 $tunel2_pid 2>/dev/null; then
-            reconnect_count=$((reconnect_count + 1))
-            echo -e "${RED}❌ Túnel 2 perdido! Tentativa de reconexão $reconnect_count...${NC}"
-
-            servidor2_user=$(echo $servidor2_full | cut -d'@' -f1)
-            sshpass -p "$password_servidor2" ssh $scpoptions "$servidor2_user@localhost" \
-                -p "$porta_local_tunel1" \
-                -N -L "$porta_local_service:$target_ip:$target_port" &
-            tunel2_pid=$!
-            sleep 3
-
-            if kill -0 $tunel2_pid 2>/dev/null; then
-                echo -e "${GREEN}✓ Túnel 2 reconectado!${NC}"
-            fi
+        # Status Túnel 2
+        if [[ -n "$tunnel2_pid" ]] && kill -0 "$tunnel2_pid" 2>/dev/null; then
+            echo -e "${GREEN}● Túnel 2:${NC} Ativo [PID: $tunnel2_pid] → $current_target_ip:$current_target_port"
+        else
+            echo -e "${RED}○ Túnel 2:${NC} Inativo"
         fi
 
-        # Mostrar status a cada 30 segundos se houver reconexões
-        if [ $reconnect_count -gt 0 ] && [ $((reconnect_count % 3)) -eq 0 ]; then
-            echo -e "${CYAN}ℹ️  Status: Túneis ativos. Reconexões: $reconnect_count${NC}"
-        fi
-
-        sleep 10
+        sleep 5
+        echo -e "\033[2A"  # Move cursor 2 linhas para cima
     done
+
+    # Restaurar trap padrão ao sair
+    trap - SIGINT
+}
+
+#####################################################################################################
+# FUNÇÕES AUXILIARES
+#####################################################################################################
+
+show_connection_info() {
+    echo -e "${MAGENTA}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${MAGENTA}║                   INFORMAÇÕES DE CONEXÃO                  ║${NC}"
+    echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "  🎯 Serviço original: ${CYAN}$current_target_ip:$current_target_port${NC}"
+    echo -e "  🔗 Acesso local: ${GREEN}localhost:$current_service_port${NC}"
+    echo ""
+
+    # Exemplos baseados na porta
+    echo -e "${YELLOW}Exemplos de conexão:${NC}"
+    case $current_target_port in
+        22)   echo "  ssh usuario@localhost -p $current_service_port" ;;
+        80)   echo "  curl http://localhost:$current_service_port" ;;
+        443)  echo "  curl -k https://localhost:$current_service_port" ;;
+        3389) echo "  RDP: localhost:$current_service_port" ;;
+        3306) echo "  mysql -h localhost -P $current_service_port -u usuario -p" ;;
+        5432) echo "  psql -h localhost -p $current_service_port -U usuario" ;;
+        *)    echo "  Conectar em: localhost:$current_service_port" ;;
+    esac
+}
+
+show_configs() {
+    print_header
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}                    CONFIGURAÇÕES SALVAS                     ${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    if load_config; then
+        echo -e "${GREEN}Configuração do Gateway:${NC}"
+        echo -e "  Servidor Tailscale: $servidor1_full"
+        echo -e "  Gateway/pfSense: $servidor2_full"
+        echo -e "  Porta local SSH: $porta_local_tunel1"
+    else
+        echo -e "${YELLOW}Nenhuma configuração de Gateway salva${NC}"
+    fi
+
+    echo ""
+
+    # Listar serviços salvos
+    local services=$(ls -1 "$CONFIG_DIR"/service_* 2>/dev/null)
+    if [[ -n "$services" ]]; then
+        echo -e "${GREEN}Serviços configurados:${NC}"
+        for service_file in $services; do
+            source "$service_file"
+            local service_name=$(basename "$service_file")
+            echo -e "  • $target_ip:$target_port → localhost:$local_port"
+        done
+    else
+        echo -e "${YELLOW}Nenhum serviço configurado${NC}"
+    fi
+
+    echo ""
+    read -p "Pressione Enter para continuar..."
+}
+
+restart_all() {
+    echo -e "${YELLOW}Reiniciando todos os túneis...${NC}"
+
+    # Parar tudo
+    stop_tunnel2
+    stop_tunnel1
+
+    sleep 2
+
+    # Reiniciar se houver configuração
+    if load_config && [[ -n "$servidor1_full" ]]; then
+        echo -e "${CYAN}Reiniciando Túnel 1...${NC}"
+        start_tunnel1
+
+        if [[ -n "$current_target_ip" ]]; then
+            sleep 2
+            echo -e "${CYAN}Reiniciando Túnel 2...${NC}"
+            start_tunnel2
+        fi
+    else
+        echo -e "${YELLOW}Nenhuma configuração salva para reiniciar${NC}"
+    fi
+
+    echo ""
+    read -p "Pressione Enter para continuar..."
+}
+
+clear_all() {
+    echo -e "${RED}⚠️  ATENÇÃO: Isso irá:${NC}"
+    echo "  • Parar todos os túneis ativos"
+    echo "  • Apagar todas as configurações salvas"
+    echo ""
+    read -p "Tem certeza? (s/n): " confirm
+
+    if [[ "$confirm" =~ ^[Ss]$ ]]; then
+        stop_tunnel2
+        stop_tunnel1
+        rm -rf "$CONFIG_DIR"
+        mkdir -p "$CONFIG_DIR"
+        echo -e "${GREEN}✅ Todas as configurações foram limpas${NC}"
+    else
+        echo -e "${YELLOW}Operação cancelada${NC}"
+    fi
+
+    sleep 2
+}
+
+cleanup_and_exit() {
+    echo ""
+    echo -e "${YELLOW}Encerrando...${NC}"
+
+    echo "  [1] Manter túneis ativos em background"
+    echo "  [2] Parar todos os túneis e sair"
+    echo "  [3] Cancelar"
+    read -p "Escolha: " exit_choice
+
+    case $exit_choice in
+        1)
+            echo -e "${GREEN}✅ Túneis mantidos em background${NC}"
+            echo -e "${CYAN}   Execute o script novamente para gerenciar${NC}"
+            exit 0
+            ;;
+        2)
+            stop_tunnel2
+            stop_tunnel1
+            echo -e "${GREEN}✅ Todos os túneis foram parados${NC}"
+            exit 0
+            ;;
+        *)
+            return
+            ;;
+    esac
 }
 
 #####################################################################################################
@@ -408,12 +641,9 @@ if ! command -v sshpass &> /dev/null; then
     exit 1
 fi
 
-# Configurar trap para cleanup
-trap cleanup SIGINT SIGTERM
+# Não usar trap global - deixar cada função gerenciar seu próprio trap
 
-# Executar fluxo principal
-get_user_input
-show_summary
-create_tunnels
-show_success
-monitor_tunnels
+# Loop principal
+while true; do
+    show_main_menu
+done
