@@ -16,8 +16,9 @@ function tools {
   10 'NC: Upgrade Manually CLI' \
   11 'NC: Scan App Data' \
   12 'NC: Scan User Data' \
-  13 'Remove All Useless Images' \
-  14 'Elevate Functional Level AD' \
+  13 'NC: Update htaccess' \
+  14 'Remove All Useless Images' \
+  15 'Elevate Functional Level AD' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -35,10 +36,17 @@ function tools {
   10) clear ; upgradenc ;;
   11) clear ; scanapp0 ;;
   12) clear ; scanuser0 ;;
-  13) clear ; docker image prune -af ; sleep 2 ;;
-  14) clear ; functional0 ;;
+  13) clear ; updateht0 ;;
+  14) clear ; docker image prune -af ; sleep 2 ;;
+  15) clear ; functional0 ;;
   X) return ;;
   esac
+}
+
+function updateht0 {
+  clear
+  docker exec -u www-data nextcloud php /var/www/html/occ maintenance:update:htaccess
+  sleep 5
 }
 
 function functional0 {
