@@ -30,7 +30,7 @@ function tools {
   3) clear ; piholemnt ;;
   4) clear ; piholeinst ;;
   5) clear ; syncpass0 ;;
-  6) clear ; comparedocker ; exit ;;
+  6) clear ; comparedocker ;;
   7) clear ; filelocks ;;
   8) clear ; missingindices ;;
   9) clear ; checkcore ;;
