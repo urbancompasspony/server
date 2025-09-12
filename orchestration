@@ -36,7 +36,7 @@ function contratos0 {
   1 'File Browser' \
   2 'Homarr' \
   3 'PenTest' \
-  4 'UniFi' \
+  4 'UniFi Network' \
   5 'Reverse Proxy' \
   6 'OpenFire (Spark)' \
   7 'OnlyOffice' \
@@ -55,7 +55,7 @@ function contratos0 {
   1) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
   2) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
   3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-  4) wget "$github"03-unifi-net -O /tmp/unifi; sudo bash /tmp/unifi ;;
+  4) wget "$github"31-unifi-network -O /tmp/unifi; sudo bash /tmp/unifi ;;
   5) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
   6) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
   7) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
@@ -126,6 +126,7 @@ function database {
   2 'MariaDB' \
   3 'OracleXE 21C' \
   4 'ElasticSearch 7.17.22' \
+  5 'MongoDB (Unifi)' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -135,6 +136,7 @@ function database {
   2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
   3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
   4) wget "$github"78-elasticsearch -O /tmp/elasticsearch; sudo bash /tmp/elasticsearch ;;
+  5) wget "$github"32-mongodb -O /tmp/mongodb; sudo bash /tmp/mongodb ;;
   X) return ;;
   esac
 }
