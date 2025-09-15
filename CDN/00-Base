@@ -4,16 +4,49 @@ function urgencies0 {
 var0=$(dialog --title ' ' --backtitle "Restauracao de Containers" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
 1 'Restaurar Containers Localmente' \
 2 'Download Backups de Containers' \
-3 'Refazer Todo o Servidor' \
+3 'Refazer Todo o Servidor!' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/01-Restore_BKP | bash ; urgencies0 ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/02-Restore_Cloud | bash ; urgencies0 ;;
-3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/03-ReDo-SRV | bash ; urgencies0 ;;
+3) clear ; restoreconfirm0 ; urgencies0 ;;
 X) echo "." >/dev/null ;;
 esac
 }
 
+function restoreconfirm0 {
+  VALUE0=$(dialog --ok-label "Restaurar" --title "Restauracao Total" --form "Restaurando o servidor: \n\n$file\n\nPOR FAVOR CONFIRME QUE VOCE ESTA DE ACORDO COM OS RISCOS INERENTES A ESTA RESTAURACAO! \n\nRepita no campo abaixo: \neu estou ciente dos riscos" 18 50 0 \
+"." 1 1 "$VALUE1" 1 1 50 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit 0 ;;
+    esac
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    [ "$var1" = "eu estou ciente dos riscos" ] && {
+      clear
+      echo "O SERVIDOR SERÁ COMPLETAMENTE RESTAURADO!"
+      echo "NÃO DESLIGUE O SERVIDOR ATÉ O REINÍCIO AUTOMÁTICO."
+      echo "NÃO TENTE INTERAGIR COM O SISTEMA DURANTE A RESTAURAÇÃO COMPLETA."
+      echo "5"
+      sleep 1
+      echo "4"
+      sleep 1
+      echo "3"
+      sleep 1
+      echo "2"
+      sleep 1
+      echo "1"
+      sleep 1
+      echo "Restauração Iniciada..."
+      curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/03-ReDo-SRV
+      sleep 3
+    } || {
+      clear; echo ""; echo "Repete a frase por favor! Saindo..."
+      sleep 3
+    }
+}
+
 urgencies0
 
-exit 1
+exit 0
