@@ -1,9 +1,0 @@
-  datetime1=$(yq -r '.Informacoes.Data_Instalacao' "$YAML_FILE")
-  [ "$datetime1" = null ] && {
-    datetime0=$(date +"%d/%m/%Y - %H:%M")
-    sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" /srv/system.yaml
-    sudo yq -i ".Informacoes.Data_Restauracao = \"Nunca foi reinstalado.\"" /srv/system.yaml
-  } || {
-    
-  }
-
