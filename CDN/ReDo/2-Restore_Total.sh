@@ -23,3 +23,15 @@ while IFS= read -r -d '' file; do
     sudo tar -I 'lz4 -d -c -' -xf "$file" -C "$DESTINO"
     echo "Concluído: $(basename "$file")"
 done
+
+
+# 1. Parar VM se estiver rodando
+virsh destroy pfsense
+# 2. Remover VM atual
+virsh undefine pfsense
+# 3. Restaurar arquivo qcow2
+cp /backup/pfsense-backup.qcow2 /var/lib/libvirt/images/pfsense.qcow2
+# 4. Redefinir VM
+virsh define pfsense-backup.xml
+# 5. Iniciar VM
+virsh start pfsense
