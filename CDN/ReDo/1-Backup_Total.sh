@@ -12,6 +12,6 @@ virsh dumpxml pfsense > /mnt/disk01/pfsense-vm-$datetime.xml
 # 2. Parar a VM (recomendado para consistência)
 virsh shutdown pfsense
 # 3. Copiar o arquivo qcow2
-cp /var/lib/libvirt/images/pfsense.qcow2 /backup/pfsense-backup.qcow2
+sudo rsync -a /var/lib/libvirt/images/pfsense*.qcow2 /mnt/disk01/pfsense-backup.qcow2
 # 4. Religar a VM
 virsh start pfsense
