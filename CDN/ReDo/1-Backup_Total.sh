@@ -7,11 +7,11 @@ sudo tar -I 'lz4 -1 -c -' -cpf "$destiny"/etc-"$datetime".tar.lz4 \
     /etc/
 
 # 1. Exportar configuração da VM
-virsh dumpxml pfsense > pfsense-backup.xml
+datetime=$(date +%Y%m%d_%H%M%S)
+virsh dumpxml pfsense > /mnt/disk01/pfsense-vm-$datetime.xml
 # 2. Parar a VM (recomendado para consistência)
 virsh shutdown pfsense
 # 3. Copiar o arquivo qcow2
 cp /var/lib/libvirt/images/pfsense.qcow2 /backup/pfsense-backup.qcow2
 # 4. Religar a VM
 virsh start pfsense
-
