@@ -6,6 +6,12 @@ sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys
 
 pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
 
+docker network create -d macvlan \
+  --subnet=$(jq -r '.[0].IPAM.Config[0].Subnet' backup-macvlan.json) \
+  --gateway=$(jq -r '.[0].IPAM.Config[0].Gateway' backup-macvlan.json) \
+  -o parent=$(jq -r '.[0].Options.parent' backup-macvlan.json) \
+  $(jq -r '.[0].Name' backup-macvlan.json)
+
 if ! [ -f /srv/restored1.lock ]; then
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".Informacoes.Data_Restauracao = \"${datetime0}\"" /srv/system.yaml
