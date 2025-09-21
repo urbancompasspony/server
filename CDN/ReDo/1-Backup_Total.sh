@@ -6,6 +6,11 @@ sudo tar -I 'lz4 -1 -c -' -cpf "$destiny"/etc-"$datetime".tar.lz4 \
     --exclude='/etc/machine-id' \
     /etc/
 
+mkdir -p docker-network-backup
+for network in $(docker network ls --format "{{.Name}}" | grep -v "bridge\|host\|none"); do
+    docker network inspect $network > docker-network-backup/$network.json
+done
+
 # 1. Exportar configuração da VM
 datetime=$(date +%Y%m%d_%H%M%S)
 virsh dumpxml pfsense > /mnt/disk01/pfsense-vm-$datetime.xml
