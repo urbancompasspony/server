@@ -4,7 +4,7 @@ if ! [ -f /srv/restored4.lock ]; then
     echo "=== ETAPA 5: Restaurando containers automaticamente ==="
     
     # Base URL do seu repositório GitHub
-    BASE_URL="https://raw.githubusercontent.com/SEU_USER/SEU_REPO/main/containers"
+    BASE_URL="https://github.com/urbancompasspony/docker/blob/main"
     
     # Criar lockfile para execução automatizada
     sudo touch /srv/lockfile
