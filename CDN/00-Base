@@ -27,24 +27,28 @@ function restoreconfirm0 {
     var1=$(echo "$VALUE0" | sed -n 1p)
     [ "$var1" = "eu estou ciente dos riscos" ] && {
       clear
-      echo "O SERVIDOR SERÁ COMPLETAMENTE RESTAURADO!"
-      echo "NÃO DESLIGUE O SERVIDOR ATÉ O REINÍCIO AUTOMÁTICO."
-      echo "NÃO TENTE INTERAGIR COM O SISTEMA DURANTE A RESTAURAÇÃO COMPLETA."
       echo "5"
+      echo "O SERVIDOR SERÁ COMPLETAMENTE RESTAURADO BASEADO NO BACKUP ENCONTRADO!"
       sleep 1
       echo "4"
+      echo "NÃO TENTE INTERAGIR COM O SISTEMA DURANTE A RESTAURAÇÃO COMPLETA."
       sleep 1
       echo "3"
+      echo "SE POSSÍVEL DESCONECTE TECLADO E MOUSE, NÃO INTERAJA COM ABSOLUTAMENTE NADA ATÉ CONCLUIR!"
       sleep 1
       echo "2"
+      echo "SE QUISER DESISTIR AGORA PRESSIONE   CTRL + C"
       sleep 1
       echo "1"
+      echo "NÃO DESLIGUE O SERVIDOR ATÉ O MOMENTO DO REINÍCIO AUTOMÁTICO."
       sleep 1
       echo "Restauração Iniciada..."
-      curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/03-ReDo-SRV
-      sleep 3
+      echo "Tenha uma boa sorte!"
+      sleep 2
+      clear
+      curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/2-Restore_Total.sh | sudo bash
     } || {
-      clear; echo ""; echo "Repete a frase por favor! Saindo..."
+      clear; echo ""; echo "Repete a frase exatamente como estou pedindo, por favor! Saindo..."
       sleep 3
     }
 }
