@@ -118,15 +118,49 @@ if ! [ -f /srv/restored4.lock ]; then
     # Criar lockfile para execução automatizada
     sudo touch /srv/lockfile
     
-    # Mapear img_base para scripts no GitHub
-    declare -A script_map=(
-        ["pihole"]="01-pihole"
-        ["active-directory"]="02-domain" 
-        ["wan-speed-test"]="03-speedtest"
-        ["lan-speed-test"]="04-openspeed"
-        ["dwservice"]="05-dwservice"
-        # Adicione mais mapeamentos conforme necessário
-    )
+  declare -A script_map=(
+    ["pihole"]="01-pihole"
+    ["active-directory"]="02-domain"
+    ["unifi"]="03-unifi-net"
+    ["mysql"]="04-mysql"
+    ["oraclexe21c"]="05-oracle_xe"
+    ["nut"]="06-nut-gui"
+    ["swc"]="07-simple-web-chat"
+    ["honeygain"]="08-honeygain"
+    ["pentest"]="09-pentest"
+    ["cups"]="10-cups"
+    ["nobreak-sms"]="11-SMS-PV"
+    ["luanti"]="12-luanti-server"
+    ["tailscale"]="13-tailscale"
+    ["kasm"]="14-kasm"
+    ["kuma"]="15-kuma"
+    ["lan-speed-test"]="16-openspeedtest"
+    ["chromium-browser"]="17-Chromium"
+    ["jellyfin"]="19-jellyfin"
+    ["wan-speed-test"]="20-myspeed-tracker"
+    ["qbittorrent"]="21-qbittorrent"
+    ["aptcache"]="22-apt-cacher"
+    ["meshstatic"]="23-meshstatic-web"
+    ["plocate"]="24-plocate"
+    ["pihole dwservice etc"]="25-ferdium"
+    ["nextcloud"]="26-nextcloud"
+    ["openfire"]="27-openfire"
+    ["filebrowser"]="28-filebrowser"
+    ["mariadb"]="29-mariadb"
+    ["syslog"]="30-syslog-ng"
+    ["reverse-proxy"]="33-reverseproxy"
+    ["onlyoffice"]="34-onlyoffice"
+    ["apache2"]="36-generic_apache"
+    ["ftp"]="37-ftp-server"
+    ["dwservice"]="38-ssh-dw"
+    ["syncthing"]="42.0-syncthing"
+    ["xpra"]="45-xpra-virt-manager"
+    ["homarr-web-panel"]="60-homarr"
+    ["dashdot"]="61-dashdot"
+    ["qdir"]="74-qdirstat"
+    ["elasticsearch-db"]="78-elasticsearch"
+    ["elastic-search-gui"]="80-sist2"
+  )
     
     # Verificar se containers.yaml existe
     if [ -f /srv/containers.yaml ]; then
