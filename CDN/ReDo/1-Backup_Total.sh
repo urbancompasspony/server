@@ -3,6 +3,8 @@
 destiny=$(sed -n '2p' /srv/scripts/config/backupcont)
 datetime=$(date +"%d_%m_%y")
 
+# ETAPA 01
+##########################################################################################################################
 if [ -b "$(sudo blkid -L bkpsys 2>/dev/null)" ]; then
     :;
 else
@@ -11,6 +13,8 @@ else
   [[ -n "$device" ]] && sudo e2label "$device" "bkpsys" || echo "Erro: dispositivo não encontrado"
 fi
 
+# ETAPA 02
+##########################################################################################################################
 sudo tar -I 'lz4 -1 -c -' -cpf "$destiny"/etc-"$datetime".tar.lz4 \
     --exclude='/etc/machine-id' \
     --exclude='/etc/fstab' \
@@ -18,12 +22,16 @@ sudo tar -I 'lz4 -1 -c -' -cpf "$destiny"/etc-"$datetime".tar.lz4 \
 
 sudo cp /etc/fstab "$destiny"/fstab-"$datetime".backup
 
+# ETAPA 03
+##########################################################################################################################
 mkdir -p "$destiny"/docker-network-backup
 for network in $(docker network ls --format "{{.Name}}" | grep -v "bridge\|host\|none"); do
   docker network inspect $network > "$destiny"/docker-network-backup/$network.json
 done
 
-# Função para aguardar VM parar
+# ETAPA 04
+##########################################################################################################################
+# Função para aguardar VM pfSense existente parar
 wait_vm_shutdown() {
     local vm_name="$1"
     local timeout=180
