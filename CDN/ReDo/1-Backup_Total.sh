@@ -3,6 +3,14 @@
 destiny=$(sed -n '2p' /srv/scripts/config/backupcont)
 datetime=$(date +"%d_%m_%y")
 
+if [ -b "$(sudo blkid -L bkpsys 2>/dev/null)" ]; then
+    :;
+else
+  mount_point=$(sed -n '2p' /srv/scripts/config/backupcont)
+  device=$(df "$mount_point" | grep -v Filesystem | awk '{print $1}')
+  [[ -n "$device" ]] && sudo e2label "$device" "bkpsys" || echo "Erro: dispositivo não encontrado"
+fi
+
 sudo tar -I 'lz4 -1 -c -' -cpf "$destiny"/etc-"$datetime".tar.lz4 \
     --exclude='/etc/machine-id' \
     --exclude='/etc/fstab' \
