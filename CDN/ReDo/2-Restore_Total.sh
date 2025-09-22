@@ -19,6 +19,7 @@ if [ -f "$pathrestore/docker-network-backup/backup-macvlan.json" ]; then
 fi
 
 # ETAPA 1: Restaurar /etc
+##########################################################################################################################
 if ! [ -f /srv/restored0.lock ]; then
     echo "=== ETAPA 1: Restaurando /etc ==="
     
@@ -48,6 +49,7 @@ if ! [ -f /srv/restored0.lock ]; then
 fi
 
 # ETAPA 2: Restaurar containers e outros arquivos
+##########################################################################################################################
 if ! [ -f /srv/restored1.lock ]; then
     echo "=== ETAPA 2: Restaurando containers ==="
     
@@ -68,6 +70,7 @@ if ! [ -f /srv/restored1.lock ]; then
 fi
 
 # ETAPA 3: Restaurar VMs pfSense
+##########################################################################################################################
 if ! [ -f /srv/restored2.lock ]; then
     echo "=== ETAPA 3: Restaurando VMs pfSense ==="
     
@@ -91,4 +94,91 @@ if ! [ -f /srv/restored2.lock ]; then
     echo "✓ ETAPA 3 concluída"
 fi
 
+# ETAPA 4: Instalar dependências necessárias
+##########################################################################################################################
+if ! [ -f /srv/restored3.lock ]; then
+    echo "=== ETAPA 4: Instalando dependências ==="
+    
+    # Instalar dependências necessárias para os scripts
+    sudo apt update
+    sudo apt install -y dialog yq jq curl
+    
+    sudo touch /srv/restored3.lock
+    echo "✓ ETAPA 4 concluída"
+fi
+
+# ETAPA 5: Restaurar containers automaticamente
+##########################################################################################################################
+if ! [ -f /srv/restored4.lock ]; then
+    echo "=== ETAPA 5: Restaurando containers automaticamente ==="
+    
+    # Base URL do seu repositório GitHub
+    BASE_URL="https://raw.githubusercontent.com/SEU_USER/SEU_REPO/main/containers"
+    
+    # Criar lockfile para execução automatizada
+    sudo touch /srv/lockfile
+    
+    # Mapear img_base para scripts no GitHub
+    declare -A script_map=(
+        ["pihole"]="01-pihole"
+        ["active-directory"]="02-domain" 
+        ["wan-speed-test"]="03-speedtest"
+        ["lan-speed-test"]="04-openspeed"
+        ["dwservice"]="05-dwservice"
+        # Adicione mais mapeamentos conforme necessário
+    )
+    
+    # Verificar se containers.yaml existe
+    if [ -f /srv/containers.yaml ]; then
+        echo "Encontrado containers.yaml, processando containers..."
+        
+        # Criar diretório temporário para scripts
+        mkdir -p /tmp/container-scripts
+        
+        # Obter lista de containers e suas img_base
+        yq -r 'to_entries[] | "\(.key):\(.value.img_base)"' /srv/containers.yaml | while IFS=: read -r container_name img_base; do
+            if [[ -n "${script_map[$img_base]}" ]]; then
+                script_name="${script_map[$img_base]}"
+                script_url="${BASE_URL}/${script_name}"
+                script_path="/tmp/container-scripts/${script_name}"
+                
+                echo "Container: $container_name | Imagem: $img_base | Script: $script_name"
+                echo "Baixando de: $script_url"
+                
+                # Fazer download do script
+                if curl -sSL "$script_url" -o "$script_path"; then
+                    echo "✓ Script baixado com sucesso"
+                    chmod +x "$script_path"
+                    
+                    echo "Executando script para $container_name..."
+                    bash "$script_path"
+                    echo "✓ Container $container_name processado"
+                else
+                    echo "✗ Erro ao baixar script de $script_url"
+                fi
+            else
+                echo "⚠ Nenhum script mapeado para img_base: $img_base (container: $container_name)"
+            fi
+            
+            sleep 2  # Pausa entre containers
+        done
+        
+        # Limpar scripts temporários
+        rm -rf /tmp/container-scripts
+    else
+        echo "Arquivo containers.yaml não encontrado, pulando restauração de containers"
+    fi
+    
+    # Remover lockfile após processamento
+    sudo rm -f /srv/lockfile
+    
+    sudo touch /srv/restored4.lock
+    echo "✓ ETAPA 5 concluída"
+fi
+
 echo "=== RESTORE COMPLETO ==="
+echo "Sistema totalmente restaurado!"
+echo "- ✓ Configurações do sistema (/etc)"
+echo "- ✓ VMs pfSense"
+echo "- ✓ Containers Docker"
+echo "- ✓ Redes Docker"
