@@ -12,6 +12,11 @@ docker network create -d macvlan \
   -o parent=$(jq -r '.[0].Options.parent' backup-macvlan.json) \
   $(jq -r '.[0].Name' backup-macvlan.json)
 
+awk '
+FNR==NR { seen[$2]++; next }
+!seen[$2] { print }
+' /etc/fstab /caminho/backup/etc/fstab
+
 if ! [ -f /srv/restored1.lock ]; then
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".Informacoes.Data_Restauracao = \"${datetime0}\"" /srv/system.yaml
