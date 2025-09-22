@@ -1,4 +1,0 @@
-
-# Identificar disco alvo:
-sudo e2label /dev/xxx "bkpsys"
-
