@@ -12,10 +12,25 @@ docker network create -d macvlan \
   -o parent=$(jq -r '.[0].Options.parent' backup-macvlan.json) \
   $(jq -r '.[0].Name' backup-macvlan.json)
 
-awk '
+if ! [ -f /srv/restored0.lock ]; then
+  cp "$destiny"/fstab-"$datetime".backup /tmp/fstab.backup
+
+  file="$1"
+  echo "1. Restaurando /etc completo (exceto fstab)..."
+  sudo tar -I 'lz4 -d -c' -xpf "$file" --exclude='etc/fstab' -C /
+  echo "2. Aplicando merge do fstab..."
+  sudo cp /etc/fstab /etc/fstab.before_merge.$(date +%Y%m%d_%H%M%S)
+  sudo tar -I 'lz4 -d -c' -xpf "$file" etc/fstab -O > /tmp/fstab.backup
+  awk '
 FNR==NR { seen[$2]++; next }
 !seen[$2] { print }
-' /etc/fstab /caminho/backup/etc/fstab
+' /etc/fstab /tmp/fstab.backup | sudo tee -a /etc/fstab
+  echo "3. Testando configuração..."
+  sudo mount -a --fake && echo "✓ fstab válido" || echo "✗ Erro no fstab!"
+  rm /tmp/fstab.backup
+  echo "Restore completo!"
+  sudo touch /srv/restored0.lock  
+fi
 
 if ! [ -f /srv/restored1.lock ]; then
   datetime0=$(date +"%d/%m/%Y - %H:%M")
@@ -38,9 +53,22 @@ if ! [ -f /srv/restored1.lock ]; then
   find $pathrestore -type f -name "etc*.tar.lz4" -mtime -1 -print0 | \
   while IFS= read -r -d '' file; do
     echo "Restaurando ETC: $file"
-    sudo tar -I 'lz4 -d -c -' -xf "$file" -C /etc/
+    #sudo tar -I 'lz4 -d -c -' -xf "$file" --exclude='etc/fstab' -C /etc/
+    sudo tar -I 'lz4 -d -c' -xpf "$file" --exclude='etc/fstab' -C /
     echo "ETC concluído: $(basename "$file")"
   done
+
+# Extrair fstab do backup para um local temporário
+sudo tar -I 'lz4 -d -c' -xpf "$file" etc/fstab -O > /tmp/fstab.backup
+# Fazer backup do fstab atual por segurança
+sudo cp /etc/fstab /etc/fstab.before_merge.$(date +%Y%m%d_%H%M%S)
+# Aplicar o merge inteligente
+awk '
+FNR==NR { seen[$2]++; next }
+!seen[$2] { print }
+' /etc/fstab /tmp/fstab.backup | sudo tee -a /etc/fstab
+# Limpar arquivo temporário
+rm /tmp/fstab.backup
 
   sudo touch /srv/restored1.lock
   sudo reboot
