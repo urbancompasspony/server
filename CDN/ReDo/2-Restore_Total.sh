@@ -205,20 +205,25 @@ fi
 if ! [ -f /srv/restored4.lock ]; then
     echo "=== ETAPA 4: Restaurando containers via orchestration ==="
     
-    # URL base do orchestration
-    ORCHESTRATION_URL="https://raw.githubusercontent.com/urbancompasspony/docker/main/orchestration.sh"
+    # URL correta do orchestration
+    ORCHESTRATION_URL="https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/orchestration"
     
     # Verificar se containers.yaml existe
     if [ -f /srv/containers.yaml ]; then
         echo "Encontrado containers.yaml, processando containers por img_base..."
         
-        # Baixar orchestration uma única vez
-        echo "Baixando orchestration..."
-        if ! curl -sSL "$ORCHESTRATION_URL" -o /tmp/orchestration.sh; then
-            echo "❌ Erro ao baixar orchestration"
-            exit 1
+        # Baixar orchestration apenas se não existir
+        if [ ! -f /tmp/orchestration ]; then
+            echo "Baixando orchestration..."
+            if ! curl -sSL "$ORCHESTRATION_URL" -o /tmp/orchestration; then
+                echo "❌ Erro ao baixar orchestration"
+                exit 1
+            fi
+            chmod +x /tmp/orchestration
+            echo "✓ Orchestration baixado"
+        else
+            echo "✓ Aproveitando orchestration existente"
         fi
-        chmod +x /tmp/orchestration.sh
         
         # Mapeamento: img_base -> nome do script no GitHub
         declare -A script_map=(
@@ -291,7 +296,7 @@ if ! [ -f /srv/restored4.lock ]; then
                 echo "$script_name" > /srv/lockfile
                 
                 echo "Executando orchestration para $img_base..."
-                bash /tmp/orchestration.sh
+                bash /tmp/orchestration
                 
                 # Verificar se foi bem-sucedido
                 if [ $? -eq 0 ]; then
@@ -321,21 +326,7 @@ if ! [ -f /srv/restored4.lock ]; then
         total_containers=$(yq -r 'keys | length' /srv/containers.yaml)
         echo "Total de containers no YAML: $total_containers"
         
-        processed_images=$(echo "$unique_images" | while read -r img; do
-            [[ -n "${script_map[$img]}" ]] && echo "$img"
-        done | wc -l)
-        
-        skipped_images=$(echo "$unique_images" | while read -r img; do
-            [[ -z "${script_map[$img]}" ]] && echo "$img"
-        done)
-        
-        echo "Imagens processadas: $processed_images"
-        if [ -n "$skipped_images" ]; then
-            echo "Imagens não mapeadas:"
-            echo "$skipped_images" | while read -r img; do
-                echo "  ⚠ $img"
-            done
-        fi
+        echo "✓ Restauração automática concluída"
         
     else
         echo "⚠ Arquivo containers.yaml não encontrado, pulando restauração de containers"
