@@ -12,6 +12,16 @@ github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 common_functions_url="${github}X-COMMON-BASE.sh"
 
 function start {
+  if [ -f /srv/lockfile ]; then
+    local script_to_run=$(cat /srv/lockfile 2>/dev/null)
+    if [ -n "$script_to_run" ]; then
+      echo "Modo automatico detectado. Executando: $script_to_run"
+      wget "$github$script_to_run" -O "/tmp/$script_to_run"
+      sudo bash "/tmp/$script_to_run"
+      exit 0
+    fi
+  fi
+
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
   1 'Modelo & Ferramentas' \
   2 'Somente Contrato' \
