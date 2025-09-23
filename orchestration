@@ -9,7 +9,7 @@ mTITLE="Docker Orchestration"
 bkTTITLE="Sistema Automatizado de Orquestração de Containers"
 
 github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
-common_functions_url="${github}X-COMMON-BASE.sh
+common_functions_url="${github}X-COMMON-BASE.sh"
 
 function start {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
