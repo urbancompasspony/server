@@ -9,6 +9,7 @@ mTITLE="Docker Orchestration"
 bkTTITLE="Sistema Automatizado de Orquestração de Containers"
 
 github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
+common_functions_url="${github}X-COMMON-BASE.sh
 
 function start {
   if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
@@ -164,6 +165,18 @@ function personal {
   esac
 }
 
+function ensure_common {
+  if [ ! -f /tmp/common-functions.sh ]; then
+    echo "Baixando funções comuns..."
+    if ! curl -sSL "$common_functions_url" -o /tmp/common-functions.sh; then
+      echo "ERRO: Falha ao baixar common-functions.sh"
+      sleep 2
+      exit 1
+    fi
+    :;
+  fi
+}
+
 if ! command -v yq >/dev/null 2>&1; then
   clear; echo "yq não foi encontrado no sistema"; sleep 3
   return 1
@@ -174,4 +187,5 @@ if ! docker network inspect macvlan &>/dev/null; then
     return 1
 fi
 
+ensure_common
 start
