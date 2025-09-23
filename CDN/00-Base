@@ -50,9 +50,10 @@ PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZE
       echo "1"
       echo "NÃO DESLIGUE O SERVIDOR ATÉ O MOMENTO DO REINÍCIO AUTOMÁTICO."
       sleep 1
+      echo "0"
       echo "Restauração Iniciada..."
       echo "Tenha uma boa sorte!"
-      sleep 2
+      sleep 3
       clear
       curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/2-Restore_Total.sh | sudo bash
     } || {
