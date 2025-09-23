@@ -8,19 +8,19 @@ sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys
 # Encontrar caminho do backup
 pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
 
-# Restaurar rede Docker (se existir backup)
-if [ -f "$pathrestore/docker-network-backup/backup-macvlan.json" ]; then
+# Restaurar rede docker macvlan (se existir backup)
+if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
     cd "$pathrestore/docker-network-backup" || exit
     docker network create -d macvlan \
-      --subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' backup-macvlan.json)" \
-      --gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' backup-macvlan.json)" \
-      -o parent="$(jq -r '.[0].Options.parent' backup-macvlan.json)" \
-      "$(jq -r '.[0].Name' backup-macvlan.json)"
+      --subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' macvlan.json)" \
+      --gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' macvlan.json)" \
+      -o parent="$(jq -r '.[0].Options.parent' macvlan.json)" \
+      "$(jq -r '.[0].Name' macvlan.json)"
 fi
 
 # ETAPA 1: Restaurar /etc
 ##########################################################################################################################
-if ! [ -f /srv/restored0.lock ]; then
+if ! [ -f /srv/restored1.lock ]; then
     echo "=== ETAPA 1: Restaurando /etc ==="
     
     # Encontrar arquivo etc mais recente
@@ -28,89 +28,182 @@ if ! [ -f /srv/restored0.lock ]; then
     
     if [ -n "$etc_file" ]; then
         echo "1. Restaurando /etc completo (exceto fstab)..."
-        sudo tar -I 'lz4 -d -c' -xpf "$etc_file" --exclude='etc/fstab' -C /
+        sudo tar -I 'lz4 -d -c' -xpf "$etc_file" -C /
         
-        echo "2. Aplicando merge do fstab..."
-        sudo cp /etc/fstab "/etc/fstab.before_merge.$(date +%Y%m%d_%H%M%S)"
+        echo "2. Procurando backup do fstab..."
+        # Procurar arquivo fstab backup (formato: fstab-YYYYMMDD_HHMMSS.backup)
+        fstab_backup=$(find "$pathrestore" -name "fstab-*.backup" | sort | tail -1)
         
-        # Extrair fstab do backup (correção do sudo redirect)
-        sudo tar -I 'lz4 -d -c' -xpf "$etc_file" etc/fstab -O | sudo tee /tmp/fstab.backup > /dev/null
+        if [ -n "$fstab_backup" ]; then
+            echo "Encontrado: $(basename "$fstab_backup")"
+            echo "3. Fazendo backup do fstab atual..."
+            sudo cp /etc/fstab "/etc/fstab.bkp-preventivo.$(date +%Y%m%d_%H%M%S)"
+            
+            echo "4. Aplicando merge inteligente do fstab..."
+            # Merge: manter entradas atuais, adicionar só as que não existem do backup
+            awk 'FNR==NR { seen[$2]++; next } !seen[$2] { print }' /etc/fstab "$fstab_backup" | sudo tee -a /etc/fstab > /dev/null
+            
+            echo "5. Testando configuração..."
+            if sudo mount -a --fake; then
+                echo "✓ fstab válido"
+            else
+                echo "✗ Erro no fstab! Restaurando backup..."
+                sudo cp "/etc/fstab.before_restore.$(date +%Y%m%d)_"* /etc/fstab 2>/dev/null || true
+            fi
+        else
+            echo "⚠ Nenhum backup de fstab encontrado em $pathrestore"
+        fi
         
-        # Merge inteligente
-        awk 'FNR==NR { seen[$2]++; next } !seen[$2] { print }' /etc/fstab /tmp/fstab.backup | sudo tee -a /etc/fstab > /dev/null
-        
-        echo "3. Testando configuração..."
-        sudo mount -a --fake && echo "✓ fstab válido" || echo "✗ Erro no fstab!"
-        
-        rm -f /tmp/fstab.backup
         sudo touch /srv/restored0.lock
         echo "✓ ETAPA 1 concluída"
+    else
+        echo "❌ Nenhum arquivo etc-*.tar.lz4 encontrado em $pathrestore"
+        echo "Arquivos disponíveis:"
+        find "$pathrestore" -name "*.tar.lz4" 2>/dev/null || echo "Nenhum arquivo .tar.lz4 encontrado"
     fi
+else
+    echo "⏭ ETAPA 1 já executada (lock existe)"
 fi
 
 # ETAPA 2: Restaurar containers e outros arquivos
 ##########################################################################################################################
-if ! [ -f /srv/restored1.lock ]; then
-    echo "=== ETAPA 2: Restaurando containers ==="
+if ! [ -f /srv/restored2.lock ]; then
+    echo "=== ETAPA 2: Restaurando containers (automático 24h) ==="
     
-    # Restaurar arquivos de configuração se existirem
+    # Restaurar YAMLs
     [ -f "$pathrestore/system.yaml" ] && sudo rsync -va "$pathrestore/system.yaml" /srv/
     [ -f "$pathrestore/containers.yaml" ] && sudo rsync -va "$pathrestore/containers.yaml" /srv/
     
-    # Restaurar outros arquivos tar.lz4 (exceto etc)
-    find "$pathrestore" -type f -name "*.tar.lz4" -not -name "etc*.tar.lz4" -print0 | \
-    while IFS= read -r -d '' file; do
-        echo "Restaurando: $(basename "$file")"
-        sudo tar -I 'lz4 -d -c' -xf "$file" -C /srv/containers
-    done
+    echo "🕐 Buscando backups das últimas 24h entre ~320 arquivos..."
     
-    sudo touch /srv/restored1.lock
-    echo "✓ ETAPA 2 concluída - Reiniciando..."
-    sudo reboot
-fi
-
-# ETAPA 3: Restaurar VMs pfSense
-##########################################################################################################################
-if ! [ -f /srv/restored2.lock ]; then
-    echo "=== ETAPA 3: Restaurando VMs pfSense ==="
+    # Método mais eficiente para muitos arquivos
+    recent_container_file=$(find "$pathrestore" -type f -name "*.tar.lz4" -not -name "etc*.tar.lz4" -newermt "24 hours ago" -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2-)
     
-    # Restaurar discos pfSense
-    find "$pathrestore" -name "*pfsense*" -type f \( -name "*.qcow2" -o -name "*.img" \) | while read -r disk_file; do
-        echo "Restaurando disco: $(basename "$disk_file")"
-        sudo cp "$disk_file" /var/lib/libvirt/images/
-    done
-    
-    # Restaurar configurações XML das VMs
-    find "$pathrestore" -name "*pfsense*-vm-*.xml" | while read -r xml_file; do
-        echo "Definindo VM: $(basename "$xml_file")"
-        virsh define "$xml_file"
+    if [ -n "$recent_container_file" ]; then
+        echo "📦 Restaurando: $(basename "$recent_container_file")"
+        echo "📅 Data: $(stat -c '%y' "$recent_container_file" | cut -d'.' -f1)"
         
-        # Extrair nome da VM do arquivo XML
-        vm_name=$(basename "$xml_file" | sed 's/-vm-.*\.xml$//')
-        virsh start "$vm_name" 2>/dev/null || echo "Falha ao iniciar $vm_name"
-    done
+        sudo tar -I 'lz4 -d -c' -xf "$recent_container_file" -C /srv/containers
+        echo "✅ Containers restaurados das últimas 24h"
+        
+    else
+        echo "⚠ Nenhum backup das últimas 24h, usando o mais recente disponível"
+        fallback_file=$(find "$pathrestore" -type f -name "*.tar.lz4" -not -name "etc*.tar.lz4" -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2-)
+        
+        if [ -n "$fallback_file" ]; then
+            echo "📦 Fallback: $(basename "$fallback_file")"
+            echo "📅 Data: $(stat -c '%y' "$fallback_file" | cut -d'.' -f1)"
+            sudo tar -I 'lz4 -d -c' -xf "$fallback_file" -C /srv/containers
+            echo "✅ Containers restaurados (backup mais recente)"
+        else
+            echo "❌ Nenhum backup encontrado!"
+        fi
+    fi
     
     sudo touch /srv/restored2.lock
-    echo "✓ ETAPA 3 concluída"
+    echo "✓ ETAPA 2 concluída"
+else
+    echo "⏭ ETAPA 2 já executada (lock existe)"
 fi
 
-# ETAPA 4: Instalar dependências necessárias
+# ETAPA 3: Restaurar VMs pfSense (CORRIGIDA)
 ##########################################################################################################################
 if ! [ -f /srv/restored3.lock ]; then
-    echo "=== ETAPA 4: Instalando dependências ==="
+    echo "=== ETAPA 3: Restaurando VMs pfSense ==="
     
-    # Instalar dependências necessárias para os scripts
-    sudo apt update
-    sudo apt install -y dialog yq jq curl
+    # Restaurar discos pfSense (sempre 1 versão) - busca case-insensitive
+    echo "📦 Restaurando discos pfSense..."
+    find "$pathrestore" -iname "*pfsense*" -type f \( -name "*.qcow2" -o -name "*.img" \) | while read -r disk_file; do
+        echo "Restaurando disco: $(basename "$disk_file")"
+        sudo rsync -va "$disk_file" /var/lib/libvirt/images/
+    done
+    
+    # Procurar XMLs mais recentes para cada VM pfSense
+    echo ""
+    echo "🔧 Configurando VMs com XMLs mais recentes..."
+    
+    # Encontrar todos os XMLs únicos (por nome base da VM) - busca case-insensitive
+    vm_bases=$(find "$pathrestore" -iname "*pfsense*.xml" -exec basename {} \; | sed 's/-vm-.*\.xml$//' | sort -u)
+    
+    # Debug: mostrar o que foi encontrado
+    echo "🔍 Debug - XMLs encontrados:"
+    find "$pathrestore" -iname "*pfsense*.xml" | while read -r xml; do
+        echo "   Encontrado: $(basename "$xml")"
+    done
+    
+    echo "🔍 Debug - Nomes base extraídos:"
+    echo "$vm_bases" | while read -r base; do
+        echo "   Nome base: '$base'"
+    done
+    
+    if [ -n "$vm_bases" ]; then
+        echo "$vm_bases" | while read -r vm_base; do
+            echo "🔍 Processando VM base: '$vm_base'"
+            
+            # Para cada VM base, encontrar o XML mais recente (busca case-insensitive)
+            most_recent_xml=$(find "$pathrestore" -iname "${vm_base}-vm-*.xml" -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2-)
+            
+            if [ -n "$most_recent_xml" ]; then
+                echo "🖥️  VM: $vm_base"
+                echo "   XML mais recente: $(basename "$most_recent_xml")"
+                echo "   Caminho completo: $most_recent_xml"
+                echo "   Data: $(stat -c '%y' "$most_recent_xml" | cut -d'.' -f1)"
+                
+                # Verificar se o arquivo XML existe e é legível
+                if [ -r "$most_recent_xml" ]; then
+                    # Definir a VM
+                    echo "   🔧 Definindo VM..."
+                    if virsh define "$most_recent_xml"; then
+                        echo "   ✅ VM definida com sucesso"
+                        
+                        # Tentar iniciar a VM
+                        if virsh start "$vm_base" 2>/dev/null; then
+                            echo "   ✅ VM iniciada com sucesso"
+                        else
+                            echo "   ⚠️  Falha ao iniciar $vm_base (normal se já estiver rodando)"
+                        fi
+                    else
+                        echo "   ❌ Falha ao definir VM $vm_base"
+                        echo "   🔍 Verificando conteúdo do XML..."
+                        head -5 "$most_recent_xml"
+                    fi
+                else
+                    echo "   ❌ Arquivo XML não encontrado ou não legível: $most_recent_xml"
+                fi
+                
+                # Mostrar outros XMLs disponíveis para esta VM (informativo)
+                other_xmls=$(find "$pathrestore" -iname "${vm_base}-vm-*.xml" | wc -l)
+                if [ "$other_xmls" -gt 1 ]; then
+                    echo "   ℹ️  Outros $((other_xmls-1)) XML(s) disponível(is) mas não usado(s)"
+                fi
+                echo ""
+            else
+                echo "   ❌ Nenhum XML encontrado para VM base: $vm_base"
+            fi
+        done
+    else
+        echo "⚠️  Nenhum XML pfSense encontrado"
+        echo "XMLs disponíveis no diretório:"
+        find "$pathrestore" -name "*.xml" | head -10 | while read -r xml; do
+            echo "   - $(basename "$xml")"
+        done
+        echo ""
+        echo "🔍 Testando busca case-insensitive:"
+        find "$pathrestore" -iname "*pfsense*.xml" | while read -r xml; do
+            echo "   - $(basename "$xml")"
+        done
+    fi
     
     sudo touch /srv/restored3.lock
-    echo "✓ ETAPA 4 concluída"
+    echo "✅ ETAPA 3 concluída"
+else
+    echo "⏭ ETAPA 3 já executada (lock existe)"
 fi
 
-# ETAPA 5: Restaurar containers automaticamente (VERSÃO CORRIGIDA)
+# ETAPA 4: Restaurar containers automaticamente (VERSÃO CORRIGIDA)
 ##########################################################################################################################
 if ! [ -f /srv/restored4.lock ]; then
-    echo "=== ETAPA 5: Restaurando containers automaticamente ==="
+    echo "=== ETAPA 4: Restaurando containers automaticamente ==="
     
     # Base URL do seu repositório GitHub
     BASE_URL="https://github.com/urbancompasspony/docker/blob/main"
@@ -163,6 +256,7 @@ if ! [ -f /srv/restored4.lock ]; then
     )
     
     # Verificar se containers.yaml existe
+    sudo rsync -va 
     if [ -f /srv/containers.yaml ]; then
         echo "Encontrado containers.yaml, processando containers..."
         
@@ -235,12 +329,16 @@ if ! [ -f /srv/restored4.lock ]; then
     sudo rm -f /srv/lockfile
     
     sudo touch /srv/restored4.lock
-    echo "✓ ETAPA 5 concluída"
+    echo "✓ ETAPA 4 concluída"
+else
+    echo "⏭ ETAPA 4 já executada (lock existe)"
 fi
 
 echo "=== RESTORE COMPLETO ==="
-echo "Sistema totalmente restaurado!"
 echo "- ✓ Configurações do sistema (/etc)"
 echo "- ✓ VMs pfSense"
 echo "- ✓ Containers Docker"
 echo "- ✓ Redes Docker"
+echo "reiniciando..."
+sleep 5
+reboot
