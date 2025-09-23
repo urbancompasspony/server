@@ -200,133 +200,146 @@ else
     echo "⏭ ETAPA 3 já executada (lock existe)"
 fi
 
-# ETAPA 4: Restaurar containers automaticamente (VERSÃO CORRIGIDA)
+# ETAPA 4: Restaurar containers via orchestration + lockfile
 ##########################################################################################################################
 if ! [ -f /srv/restored4.lock ]; then
-    echo "=== ETAPA 4: Restaurando containers automaticamente ==="
+    echo "=== ETAPA 4: Restaurando containers via orchestration ==="
     
-    # Base URL do seu repositório GitHub
-    BASE_URL="https://github.com/urbancompasspony/docker/blob/main"
-    
-    # Criar lockfile para execução automatizada
-    sudo touch /srv/lockfile
-    
-    declare -A script_map=(
-        ["pihole"]="01-pihole"
-        ["active-directory"]="02-domain"
-        ["unifi"]="03-unifi-net"
-        ["mysql"]="04-mysql"
-        ["oraclexe21c"]="05-oracle_xe"
-        ["nut"]="06-nut-gui"
-        ["swc"]="07-simple-web-chat"
-        ["honeygain"]="08-honeygain"
-        ["pentest"]="09-pentest"
-        ["cups"]="10-cups"
-        ["nobreak-sms"]="11-SMS-PV"
-        ["luanti"]="12-luanti-server"
-        ["tailscale"]="13-tailscale"
-        ["kasm"]="14-kasm"
-        ["kuma"]="15-kuma"
-        ["lan-speed-test"]="16-openspeedtest"
-        ["chromium-browser"]="17-Chromium"
-        ["jellyfin"]="19-jellyfin"
-        ["wan-speed-test"]="20-myspeed-tracker"
-        ["qbittorrent"]="21-qbittorrent"
-        ["aptcache"]="22-apt-cacher"
-        ["meshstatic"]="23-meshstatic-web"
-        ["plocate"]="24-plocate"
-        ["pihole dwservice etc"]="25-ferdium"
-        ["nextcloud"]="26-nextcloud"
-        ["openfire"]="27-openfire"
-        ["filebrowser"]="28-filebrowser"
-        ["mariadb"]="29-mariadb"
-        ["syslog"]="30-syslog-ng"
-        ["reverse-proxy"]="33-reverseproxy"
-        ["onlyoffice"]="34-onlyoffice"
-        ["apache2"]="36-generic_apache"
-        ["ftp"]="37-ftp-server"
-        ["dwservice"]="38-ssh-dw"
-        ["syncthing"]="42.0-syncthing"
-        ["xpra"]="45-xpra-virt-manager"
-        ["homarr-web-panel"]="60-homarr"
-        ["dashdot"]="61-dashdot"
-        ["qdir"]="74-qdirstat"
-        ["elasticsearch-db"]="78-elasticsearch"
-        ["elastic-search-gui"]="80-sist2"
-    )
+    # URL base do orchestration
+    ORCHESTRATION_URL="https://raw.githubusercontent.com/urbancompasspony/docker/main/orchestration.sh"
     
     # Verificar se containers.yaml existe
-    sudo rsync -va 
     if [ -f /srv/containers.yaml ]; then
-        echo "Encontrado containers.yaml, processando containers..."
+        echo "Encontrado containers.yaml, processando containers por img_base..."
         
-        # Criar diretório temporário para scripts
-        mkdir -p /tmp/container-scripts
+        # Baixar orchestration uma única vez
+        echo "Baixando orchestration..."
+        if ! curl -sSL "$ORCHESTRATION_URL" -o /tmp/orchestration.sh; then
+            echo "❌ Erro ao baixar orchestration"
+            exit 1
+        fi
+        chmod +x /tmp/orchestration.sh
         
-        # CORREÇÃO: Processar cada container individualmente
-        yq -r 'keys[]' /srv/containers.yaml | while read -r container_name; do
-            echo "=== Processando container: $container_name ==="
-            
-            # Obter img_base para este container específico
-            img_base=$(yq -r ".\"$container_name\".img_base" /srv/containers.yaml)
-            
+        # Mapeamento: img_base -> nome do script no GitHub
+        declare -A script_map=(
+            ["pihole"]="01-pihole"
+            ["active-directory"]="02-domain"
+            ["unifi"]="03-unifi-net"
+            ["mysql"]="04-mysql"
+            ["oraclexe21c"]="05-oracle_xe"
+            ["nut"]="06-nut-gui"
+            ["swc"]="07-simple-web-chat"
+            ["honeygain"]="08-honeygain"
+            ["pentest"]="09-pentest"
+            ["cups"]="10-cups"
+            ["nobreak-sms"]="11-SMS-PV"
+            ["luanti"]="12-luanti-server"
+            ["tailscale"]="13-tailscale"
+            ["kuma"]="15-kuma"
+            ["lan-speed-test"]="16-openspeedtest"
+            ["chromium-browser"]="17-Chromium"
+            ["jellyfin"]="19-jellyfin"
+            ["wan-speed-test"]="20-myspeed-tracker"
+            ["qbittorrent"]="21-qbittorrent"
+            ["ferdium"]="25-ferdium"
+            ["nextcloud"]="26-nextcloud"
+            ["openfire"]="27-openfire"
+            ["filebrowser"]="28-filebrowser"
+            ["mariadb"]="29-mariadb"
+            ["ntfy"]="30-ntfy_server"
+            ["reverse-proxy"]="33-reverseproxy"
+            ["onlyoffice"]="34-onlyoffice"
+            ["apache2"]="36-generic_apache"
+            ["ftp"]="37-ftp-server"
+            ["dwservice"]="38-ssh-dw"
+            ["syncthing"]="42.0-syncthing"
+            ["xpra"]="45-xpra-virt-manager"
+            ["active-directory-beta"]="58-domain-test"
+            ["homarr-web-panel"]="60-homarr"
+            ["dashdot"]="61-dashdot"
+            ["qdir"]="74-qdirstat"
+            ["elasticsearch-db"]="78-elasticsearch"
+            ["elastic-search-gui"]="80-sist2"
+        )
+        
+        # Obter todas as img_base únicas do YAML
+        unique_images=$(yq -r '[.[] | .img_base] | unique | .[]' /srv/containers.yaml)
+        
+        echo "Imagens base encontradas:"
+        echo "$unique_images" | while read -r img; do
+            count=$(yq -r "[.[] | select(.img_base == \"$img\")] | length" /srv/containers.yaml)
+            echo "  • $img ($count container(s))"
+        done
+        echo ""
+        
+        # Para cada img_base única, processar via orchestration
+        echo "$unique_images" | while read -r img_base; do
             if [[ -n "${script_map[$img_base]}" ]]; then
                 script_name="${script_map[$img_base]}"
-                script_url="${BASE_URL}/${script_name}"
-                script_path="/tmp/container-scripts/${script_name}"
                 
-                echo "Container: $container_name"
-                echo "Imagem base: $img_base"
-                echo "Script: $script_name"
-                echo "URL: $script_url"
+                echo "=== Processando img_base: $img_base ==="
+                echo "Script correspondente: $script_name"
                 
-                # Fazer download do script (só uma vez por script único)
-                if [ ! -f "$script_path" ]; then
-                    echo "Baixando script..."
-                    if curl -sSL "$script_url" -o "$script_path"; then
-                        echo "✓ Script baixado com sucesso"
-                        chmod +x "$script_path"
-                    else
-                        echo "✗ Erro ao baixar script de $script_url"
-                        continue
-                    fi
+                # Containers que serão processados
+                containers=$(yq -r "to_entries[] | select(.value.img_base == \"$img_base\") | .key" /srv/containers.yaml)
+                echo "Containers que serão restaurados:"
+                echo "$containers" | while read -r cont; do
+                    echo "  • $cont"
+                done
+                
+                # Criar lockfile com nome do script
+                echo "$script_name" > /srv/lockfile
+                
+                echo "Executando orchestration para $img_base..."
+                bash /tmp/orchestration.sh
+                
+                # Verificar se foi bem-sucedido
+                if [ $? -eq 0 ]; then
+                    echo "✓ $img_base processado com sucesso"
                 else
-                    echo "✓ Script já existe em cache"
+                    echo "✗ Erro ao processar $img_base"
                 fi
                 
-                echo "Executando script para container $container_name..."
-                
-                # IMPORTANTE: O script vai usar o lockfile e buscar as configurações
-                # específicas deste container no containers.yaml através da função
-                # process_container que está nos scripts originais
-                bash "$script_path"
-                
-                echo "✓ Container $container_name processado"
                 echo "----------------------------------------"
+                sleep 3  # Pausa entre diferentes tipos de container
                 
             else
-                echo "⚠ Nenhum script mapeado para img_base: $img_base (container: $container_name)"
+                echo "⚠ Nenhum script mapeado para img_base: $img_base"
+                containers=$(yq -r "to_entries[] | select(.value.img_base == \"$img_base\") | .key" /srv/containers.yaml)
+                echo "Containers afetados:"
+                echo "$containers" | while read -r cont; do
+                    echo "  • $cont"
+                done
+                echo ""
             fi
-            
-            sleep 3  # Pausa entre containers para evitar conflitos
         done
         
-        # Limpar scripts temporários
-        rm -rf /tmp/container-scripts
+        # Limpar lockfile final
+        rm -f /srv/lockfile
         
-        echo "=== Resumo final ==="
-        echo "Containers processados:"
-        yq -r 'keys[]' /srv/containers.yaml | while read -r container; do
-            img_base=$(yq -r ".\"$container\".img_base" /srv/containers.yaml)
-            echo "  • $container ($img_base)"
-        done
+        echo "=== Resumo da restauração ==="
+        total_containers=$(yq -r 'keys | length' /srv/containers.yaml)
+        echo "Total de containers no YAML: $total_containers"
+        
+        processed_images=$(echo "$unique_images" | while read -r img; do
+            [[ -n "${script_map[$img]}" ]] && echo "$img"
+        done | wc -l)
+        
+        skipped_images=$(echo "$unique_images" | while read -r img; do
+            [[ -z "${script_map[$img]}" ]] && echo "$img"
+        done)
+        
+        echo "Imagens processadas: $processed_images"
+        if [ -n "$skipped_images" ]; then
+            echo "Imagens não mapeadas:"
+            echo "$skipped_images" | while read -r img; do
+                echo "  ⚠ $img"
+            done
+        fi
         
     else
-        echo "Arquivo containers.yaml não encontrado, pulando restauração de containers"
+        echo "⚠ Arquivo containers.yaml não encontrado, pulando restauração de containers"
     fi
-    
-    # Remover lockfile após processamento
-    sudo rm -f /srv/lockfile
     
     sudo touch /srv/restored4.lock
     echo "✓ ETAPA 4 concluída"
