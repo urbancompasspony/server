@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function urgencies0 {
-var0=$(dialog --title ' ' --backtitle "Restauracao de Containers" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
+var0=$(dialog --title 'Modelo CDN' --backtitle "Continuidade do Negocio" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
 1 'Restaurar Containers Localmente' \
 2 'Download Backups de Containers' \
 3 'Refazer Todo o Servidor!' \
