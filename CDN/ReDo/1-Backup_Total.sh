@@ -1,6 +1,10 @@
 #!/bin/bash
 destiny=$(sed -n '2p' /srv/scripts/config/backupcont)
 datetime=$(date +"%d_%m_%y")
+
+# ETAPA 00
+##########################################################################################################################
+sudo crontab -l | sudo tee "$destiny"/crontab-bkp > /dev/null
 # ETAPA 01
 ##########################################################################################################################
 if [ -b "$(sudo blkid -L bkpsys 2>/dev/null)" ]; then
