@@ -20,10 +20,10 @@ function start {
     return
   fi
   case "$var0" in
-  0) wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/search-tool.sh -O /tmp/search-tool.sh ; clear; sudo bash /tmp/search-tool.sh ; start ;;
+  0) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/search-tool.sh | tee /tmp/search-tool.sh> /dev/null ; clear; sudo bash /tmp/search-tool.sh ; start ;;
   1) dwservice0 ; start ;;
   2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/isoserver | sudo bash ; start ;;
-  3) clear; sudo wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso -O /var/lib/libvirt/images/virtio-win.iso ; start ;;
+  3) clear; curl -sSL https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso | sudo tee /var/lib/libvirt/images/virtio-win.iso> /dev/null ; start ;;
   4) clear ; sudo env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep ; start ;;
   5) clear ; satas ; start ;;
   6) clear ; dnstest ; start ;;
@@ -479,7 +479,7 @@ function iperfsrv {
 
 function dwservice0 {
   clear
-  wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
+  curl https://www.dwservice.net/download/dwagent_x86.sh | tee /home/administrador/dwagent_x86.sh
   chmod +x dwagent_x86.sh
   sudo bash dwagent_x86.sh
 }
