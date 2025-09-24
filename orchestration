@@ -16,7 +16,7 @@ function start {
     local script_to_run=$(cat /srv/lockfile 2>/dev/null)
     if [ -n "$script_to_run" ]; then
       echo "Modo automatico detectado. Executando: $script_to_run"
-      wget "$github$script_to_run" -O "/tmp/$script_to_run"
+      curl -sSL "$github$script_to_run" | tee "/tmp/$script_to_run"
       sudo bash "/tmp/$script_to_run"
       exit 0
     fi
@@ -63,20 +63,20 @@ function contratos0 {
   fi
 
   case "$var0" in
-  1) wget "$github"28-filebrowser -O /tmp/filebrowser; sudo bash /tmp/filebrowser ;;
-  2) wget "$github"60-homarr -O /tmp/homarr; sudo bash /tmp/homarr ;;
-  3) wget "$github"09-pentest -O /tmp/pentest; sudo bash /tmp/pentest ;;
-  4) wget "$github"03-unifi-net -O /tmp/unifi; sudo bash /tmp/unifi ;;
-  5) wget "$github"33-reverseproxy -O /tmp/apacherp; sudo bash /tmp/apacherp ;;
-  6) wget "$github"27-openfire -O /tmp/openfire; sudo bash /tmp/openfire ;;
-  7) wget "$github"34-onlyoffice -O /tmp/ooffice; sudo bash /tmp/ooffice ;;
-  8) wget "$github"13-tailscale -O /tmp/tailscale; sudo bash /tmp/tailscale ;;
-  9) wget "$github"74-qdirstat -O /tmp/qdirstat; sudo bash /tmp/qdirstat ;;
-  10) wget "$github"80-sist2 -O /tmp/sist2; sudo bash /tmp/sist2 ;;
-  11) wget "$github"06-nut-gui -O /tmp/nut-gui; sudo bash /tmp/nut-gui ;;
-  12) wget "$github"11-SMS-PV -O /tmp/SMS; sudo bash /tmp/SMS ;;
-  13) wget "$github"15-kuma -O /tmp/kuma; sudo bash /tmp/kuma ;;
-  14) wget "$github"24-plocate -O /tmp/plocate; sudo bash /tmp/plocate ;;
+  1) curl -sSL "$github"28-filebrowser | tee /tmp/filebrowser> /dev/null; sudo bash /tmp/filebrowser ;;
+  2) curl -sSL "$github"60-homarr | tee /tmp/homarr> /dev/null; sudo bash /tmp/homarr ;;
+  3) curl -sSL "$github"09-pentest | tee /tmp/pentest> /dev/null; sudo bash /tmp/pentest ;;
+  4) curl -sSL "$github"03-unifi-net | tee /tmp/unifi> /dev/null; sudo bash /tmp/unifi ;;
+  5) curl -sSL "$github"33-reverseproxy | tee /tmp/apacherp> /dev/null; sudo bash /tmp/apacherp ;;
+  6) curl -sSL "$github"27-openfire | tee /tmp/openfire> /dev/null; sudo bash /tmp/openfire ;;
+  7) curl -sSL "$github"34-onlyoffice | tee /tmp/ooffice> /dev/null; sudo bash /tmp/ooffice ;;
+  8) curl -sSL "$github"13-tailscale | tee /tmp/tailscale> /dev/null; sudo bash /tmp/tailscale ;;
+  9) curl -sSL "$github"74-qdirstat | tee /tmp/qdirstat> /dev/null; sudo bash /tmp/qdirstat ;;
+  10) curl -sSL "$github"80-sist2 | tee /tmp/sist2> /dev/null; sudo bash /tmp/sist2 ;;
+  11) curl -sSL "$github"06-nut-gui | tee /tmp/nut-gui> /dev/null; sudo bash /tmp/nut-gui ;;
+  12) curl -sSL "$github"11-SMS-PV | tee /tmp/SMS> /dev/null; sudo bash /tmp/SMS ;;
+  13) curl -sSL "$github"15-kuma | tee /tmp/kuma> /dev/null; sudo bash /tmp/kuma ;;
+  14) curl -sSL "$github"24-plocate | tee /tmp/plocate> /dev/null; sudo bash /tmp/plocate ;;
   X) return ;;
   esac
 }
@@ -94,12 +94,12 @@ function modelstools {
   fi
 
   case "$var0" in
-  1) wget "$github"61-dashdot -O /tmp/dashdot; sudo bash /tmp/dashdot ;;
-  2) wget "$github"02-domain -O /tmp/domain; sudo bash /tmp/domain ;;
-  3) wget "$github"20-myspeed-tracker -O /tmp/myspeed; sudo bash /tmp/myspeed ;;
-  4) wget "$github"16-openspeedtest -O /tmp/speedtest; sudo bash /tmp/speedtest ;;
-  5) wget "$github"01-pihole -O /tmp/pihole; sudo bash /tmp/pihole ;;
-  6) wget "$github"45-xpra-virt-manager -O /tmp/45-xpra-virt-manager; sudo bash /tmp/45-xpra-virt-manager ;;
+  1) curl -sSL "$github"61-dashdot | tee /tmp/dashdot> /dev/null; sudo bash /tmp/dashdot ;;
+  2) curl -sSL "$github"02-domain | tee /tmp/domain> /dev/null; sudo bash /tmp/domain ;;
+  3) curl -sSL "$github"20-myspeed-tracker | tee /tmp/myspeed> /dev/null; sudo bash /tmp/myspeed ;;
+  4) curl -sSL "$github"16| teepenspeedtest | tee /tmp/speedtest> /dev/null; sudo bash /tmp/speedtest ;;
+  5) curl -sSL "$github"01-pihole | tee /tmp/pihole> /dev/null; sudo bash /tmp/pihole ;;
+  6) curl -sSL "$github"45-xpra-virt-manager | tee /tmp/45-xpra-virt-manager> /dev/null; sudo bash /tmp/45-xpra-virt-manager ;;
   X) return ;;
   esac
 }
@@ -119,14 +119,14 @@ function general {
   fi
 
   case "$var0" in
-  1) wget "$github"25-ferdium -O /tmp/ferdium; sudo bash /tmp/ferdium ;;
-  2) wget "$github"26-nextcloud -O /tmp/nextcloud; sudo bash /tmp/nextcloud ;;
-  3) wget "$github"30-ntfy_server -O /tmp/ntfy_server; sudo bash /tmp/ntfy_server ;;
-  4) wget "$github"36-generic_apache -O /tmp/genericapache; sudo bash /tmp/genericapache ;;
-  5) wget "$github"10-cups -O /tmp/cups; sudo bash /tmp/cups ;;
-  6) wget "$github"37-ftp-server -O /tmp/ftp-server; sudo bash /tmp/ftp-server ;;
-  7) wget "$github"42.0-syncthing -O /tmp/syncthing; sudo bash /tmp/syncthing ;;
-  8) wget "$github"17-Chromium -O /tmp/Chromium; sudo bash /tmp/Chromium ;;
+  1) curl -sSL "$github"25-ferdium | tee /tmp/ferdium> /dev/null; sudo bash /tmp/ferdium ;;
+  2) curl -sSL "$github"26-nextcloud | tee /tmp/nextcloud> /dev/null; sudo bash /tmp/nextcloud ;;
+  3) curl -sSL "$github"30-ntfy_server | tee /tmp/ntfy_server> /dev/null; sudo bash /tmp/ntfy_server ;;
+  4) curl -sSL "$github"36-generic_apache | tee /tmp/genericapache> /dev/null; sudo bash /tmp/genericapache ;;
+  5) curl -sSL "$github"10-cups | tee /tmp/cups> /dev/null; sudo bash /tmp/cups ;;
+  6) curl -sSL "$github"37-ftp-server | tee /tmp/ftp-server> /dev/null; sudo bash /tmp/ftp-server ;;
+  7) curl -sSL "$github"42.0-syncthing | tee /tmp/syncthing> /dev/null; sudo bash /tmp/syncthing ;;
+  8) curl -sSL "$github"17-Chromium | tee /tmp/Chromium> /dev/null; sudo bash /tmp/Chromium ;;
   X) return ;;
   esac
 }
@@ -142,10 +142,10 @@ function database {
   fi
 
   case "$var0" in
-  1) wget "$github"04-mysql -O /tmp/mysql; sudo bash /tmp/mysql ;;
-  2) wget "$github"29-mariadb -O /tmp/mariadb; sudo bash /tmp/mariadb ;;
-  3) wget "$github"05-oracle_xe -O /tmp/oracle_xe; sudo bash /tmp/oracle_xe ;;
-  4) wget "$github"78-elasticsearch -O /tmp/elasticsearch; sudo bash /tmp/elasticsearch ;;
+  1) curl -sSL "$github"04-mysql | tee /tmp/mysql> /dev/null; sudo bash /tmp/mysql ;;
+  2) curl -sSL "$github"29-mariadb | tee /tmp/mariadb> /dev/null; sudo bash /tmp/mariadb ;;
+  3) curl -sSL "$github"05-oracle_xe | tee /tmp/oracle_xe> /dev/null; sudo bash /tmp/oracle_xe ;;
+  4) curl -sSL "$github"78-elasticsearch | tee /tmp/elasticsearch> /dev/null; sudo bash /tmp/elasticsearch ;;
   X) return ;;
   esac
 }
@@ -164,13 +164,13 @@ function personal {
   fi
 
   case "$var0" in
-  1) wget "$github"12-luanti-server -O /tmp/luanti; sudo bash /tmp/luanti ;;
-  2) wget "$github"38-ssh-dw -O /tmp/ssho; sudo bash /tmp/ssho ;;
-  3) wget "$github"19-jellyfin -O /tmp/jellyfin; sudo bash /tmp/jellyfin ;;
-  4) wget "$github"21-qbittorrent -O /tmp/qbittorrent; sudo bash /tmp/qbittorrent ;;
-  5) wget "$github"58-domain-test -O /tmp/dtest; sudo bash /tmp/dtest ;;
-  6) wget "$github"07-simple-web-chat -O /tmp/chatsimple; sudo bash /tmp/chatsimple ;;
-  7) wget "$github"08-honeygain -O /tmp/honeygain; sudo bash /tmp/honeygain ;;
+  1) curl -sSL "$github"12-luanti-server | tee /tmp/luanti> /dev/null; sudo bash /tmp/luanti ;;
+  2) curl -sSL "$github"38-ssh-dw | tee /tmp/ssho> /dev/null; sudo bash /tmp/ssho ;;
+  3) curl -sSL "$github"19-jellyfin | tee /tmp/jellyfin> /dev/null; sudo bash /tmp/jellyfin ;;
+  4) curl -sSL "$github"21-qbittorrent | tee /tmp/qbittorrent> /dev/null; sudo bash /tmp/qbittorrent ;;
+  5) curl -sSL "$github"58-domain-test | tee /tmp/dtest> /dev/null; sudo bash /tmp/dtest ;;
+  6) curl -sSL "$github"07-simple-web-chat | tee /tmp/chatsimple> /dev/null; sudo bash /tmp/chatsimple ;;
+  7) curl -sSL "$github"08-honeygain | tee /tmp/honeygain> /dev/null; sudo bash /tmp/honeygain ;;
   X) return ;;
   esac
 }
