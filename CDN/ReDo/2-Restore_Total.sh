@@ -18,6 +18,9 @@ if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
       "$(jq -r '.[0].Name' macvlan.json)"
 fi
 
+# ETAPA 00: Restaurar Crontabs
+##########################################################################################################################
+sudo crontab "$destiny"/crontab-bkp
 # ETAPA 1: Restaurar /etc
 ##########################################################################################################################
 if ! [ -f /srv/restored1.lock ]; then
