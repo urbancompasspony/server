@@ -673,7 +673,7 @@ function checkpathfolder {
 function force_msi_w10 {
   if dpkg --list | grep msitools; then
     if dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W10?' 0 0; then
-      wget -O w10admx.msi "$admxw10" && mkdir /msifiles && msiextract -C /msifiles/ w10admx.msi
+      curl -sSL "$admxw10" | tee w10admx.msi > /dev/null && mkdir /msifiles && msiextract -C /msifiles/ w10admx.msi
       rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions
       samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
       echo ""; read -r -p "As regras do Windows 10 foram carregadas. Ignore as mensagens de erro acima. Pressione Enter para continuar!"
@@ -686,7 +686,7 @@ function force_msi_w10 {
 function force_msi_w11 {
   if dpkg --list | grep msitools; then
     if dialog --title 'Confirmacao' --backtitle 'PODEM OCORRER IMPREVISTOS COM AS REGRAS DE GPO PREVIAMENTE DEFINIDAS!' --yesno 'Deseja mesmo trocar toda a estrutura ADMX para W11?' 0 0; then
-      wget -O w11admx.msi "$admxw11" && mkdir /msifiles && msiextract -C /msifiles/ w11admx.msi
+      curl -sSL "$admxw11" | tee w11admx.msi > /dev/null && mkdir /msifiles && msiextract -C /msifiles/ w11admx.msi
       rm -R /var/lib/samba/sysvol/"$DOMAIN"/Policies/PolicyDefinitions
       mv /msifiles/Program\ Files/Microsoft\ Group\ Policy/Windows\ 11\ September\ 2022\ Update\ \(22H2\)/PolicyDefinitions/ /msifiles/PolicyDefinitions/
       samba-tool gpo admxload -U Administrator --admx-dir="/msifiles/PolicyDefinitions/"
