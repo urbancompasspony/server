@@ -20,7 +20,13 @@ fi
 
 # ETAPA 00: Restaurar Crontabs
 ##########################################################################################################################
-sudo crontab "$destiny"/crontab-bkp
+if ! [ -f /srv/restored0.lock ]; then
+    sudo crontab "$destiny"/crontab-bkp
+    sudo touch /srv/restored0.lock
+    echo "✓ ETAPA 0 concluída"
+else
+    echo "⏭ ETAPA 0 já executada (lock existe)"
+fi
 # ETAPA 1: Restaurar /etc
 ##########################################################################################################################
 if ! [ -f /srv/restored1.lock ]; then
@@ -84,8 +90,6 @@ if ! [ -f /srv/restored2.lock ]; then
     
     if [ -n "$recent_container_file" ]; then
         echo "📦 Restaurando: $(basename "$recent_container_file")"
-        echo "📅 Data: $(stat -c '%y' "$recent_container_file" | cut -d'.' -f1)"
-        
         sudo tar -I 'lz4 -d -c' -xf "$recent_container_file" -C /srv/containers
         echo "✅ Containers restaurados das últimas 24h"
         
@@ -95,9 +99,8 @@ if ! [ -f /srv/restored2.lock ]; then
         
         if [ -n "$fallback_file" ]; then
             echo "📦 Fallback: $(basename "$fallback_file")"
-            echo "📅 Data: $(stat -c '%y' "$fallback_file" | cut -d'.' -f1)"
             sudo tar -I 'lz4 -d -c' -xf "$fallback_file" -C /srv/containers
-            echo "✅ Containers restaurados (backup mais recente)"
+            echo "✅ Containers restaurados (backup um pouco mais antigo)"
         else
             echo "❌ Nenhum backup encontrado!"
         fi
