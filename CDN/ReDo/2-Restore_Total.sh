@@ -125,8 +125,8 @@ if ! [ -f /srv/restored3.lock ]; then
     echo "=== ETAPA 2: Restaurando containers (mais recente de cada) ==="
     
     # Restaurar YAMLs
-    [ -f "$pathrestore/system.yaml" ] && sudo rsync -va "$pathrestore/system.yaml" /srv/
-    [ -f "$pathrestore/containers.yaml" ] && sudo rsync -va "$pathrestore/containers.yaml" /srv/
+    [ -f "$pathrestore/system.yaml" ] && sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/system.yaml" /srv/
+    [ -f "$pathrestore/containers.yaml" ] && sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/containers.yaml" /srv/
     
     echo "🔍 Analisando arquivos de container..."
     
@@ -190,7 +190,7 @@ if ! [ -f /srv/restored4.lock ]; then
       if echo "$file_type" | grep -qi "qemu\|disk\|image\|data"; then
         echo "Restaurando disco: $(basename "$disk_file")"
         echo "  Tipo: $file_type"
-        sudo rsync -va "$disk_file" /var/lib/libvirt/images/
+        sudo rsync -aHAXv --numeric-ids --sparse "$disk_file" /var/lib/libvirt/images/
       else
         echo "⏭ Ignorando $(basename "$disk_file") (não é disco virtual)"
         echo "  Tipo: $file_type"
