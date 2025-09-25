@@ -1,49 +1,64 @@
 #!/bin/bash
-
-# Setup inicial
-sudo mkdir -p /srv/containers
-sudo mkdir -p /mnt/bkpsys
-    
-if mountpoint -q /mnt/bkpsys; then
-    echo "✓ Backup já está montado"
-else
-    echo "Montando backup..."
-    if sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys; then
-        echo "✓ Backup montado com sucesso"
-    else
-        echo "✗ Não conseguimos encontrar o disco com backup!"
-        echo "Verifique os dispositivos de armazenamento."
-        echo "Saindo..."
-        sleep 5
-        exit 1
-    fi
-fi
-
-# Encontrar caminho do backup
-pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
-
-# Restaurar rede docker macvlan (se existir backup)
-if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
-    cd "$pathrestore/docker-network-backup" || exit
-    docker network create -d macvlan \
-      --subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' macvlan.json)" \
-      --gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' macvlan.json)" \
-      -o parent="$(jq -r '.[0].Options.parent' macvlan.json)" \
-      "$(jq -r '.[0].Name' macvlan.json)"
-fi
-
-# ETAPA 00: Restaurar Crontabs
+yamlbase="/srv/system.yaml"
+yamlextra="/srv/containers.yaml"
+export yamlbase
+export yamlextra
+# ETAPA 00
 ##########################################################################################################################
-if ! [ -f /srv/restored0.lock ]; then
-    sudo crontab "$destiny"/crontab-bkp
-    sudo touch /srv/restored0.lock
-    echo "✓ ETAPA 0 concluída"
+if [ "$(hostname)" = "ubuntu-server" ]; then
+  :;
 else
-    echo "⏭ ETAPA 0 já executada (lock existe)"
+  clear
+  echo ""; echo "ATENÇÃO:"
+  sleep 1
+  echo "Este sistema já está pré-definido com o hostname $(hostname)."
+  sleep 4
+  echo "Entendemos que você está tentando restaurar um backup do servidor sobre um servidor legítimo em execução."
+  sleep 5
+  echo "Se realmente quiser fazer isso, renomeie o hostname para ubuntu-server e reexecute este utilitario!"
+  sleep 5
+  exit 1
 fi
-# ETAPA 1: Restaurar /etc
+sudo mkdir -p /srv/containers; sudo mkdir -p /mnt/bkpsys
+if mountpoint -q /mnt/bkpsys; then
+  echo "✓ Backup já está montado"
+else
+  echo "Montando backup..."
+  if sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys; then
+    echo "✓ Backup montado com sucesso"
+    echo "✓ ETAPA 0 concluída"
+  else
+    clear
+    echo ""; echo "✗ Não conseguimos encontrar o dispositivo com backup do servidor!"
+    sleep 4
+    echo "Verifique os dispositivos de armazenamento."
+    sleep 3
+    echo "Saindo..."
+    sleep 2
+    exit 1
+  fi
+fi
+# ETAPA 01
 ##########################################################################################################################
 if ! [ -f /srv/restored1.lock ]; then
+  pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
+  export pathrestore
+  if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
+    cd "$pathrestore/docker-network-backup" || exit
+    docker network create -d macvlan \
+    --subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' macvlan.json)" \
+    --gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' macvlan.json)" \
+    -o parent="$(jq -r '.[0].Options.parent' macvlan.json)" \
+    "$(jq -r '.[0].Name' macvlan.json)"
+    sudo touch /srv/restored1.lock
+    echo "✓ ETAPA 1 concluída"
+  fi
+else
+  echo "⏭ ETAPA 1 já executada (lock existe)"
+fi
+# ETAPA 02
+##########################################################################################################################
+if ! [ -f /srv/restored2.lock ]; then
     echo "=== ETAPA 1: Restaurando /etc ==="
     
     # Encontrar arquivo etc mais recente
@@ -76,66 +91,97 @@ if ! [ -f /srv/restored1.lock ]; then
         else
             echo "⚠ Nenhum backup de fstab encontrado em $pathrestore"
         fi
-        
-        sudo touch /srv/restored0.lock
-        echo "✓ ETAPA 1 concluída"
+
+        # Limpeza total de dados inuteis para deixar o fstab conciso!
+        sudo sed -i '/^[[:space:]]*#/d; /^[[:space:]]*$/d; s/[[:space:]]*$//' /etc/fstab
+
+        sudo touch /srv/restored2.lock
+        echo "✓ ETAPA 2 concluída"
     else
         echo "❌ Nenhum arquivo etc-*.tar.lz4 encontrado em $pathrestore"
         echo "Arquivos disponíveis:"
         find "$pathrestore" -name "*.tar.lz4" 2>/dev/null || echo "Nenhum arquivo .tar.lz4 encontrado"
     fi
 else
-    echo "⏭ ETAPA 1 já executada (lock existe)"
+    echo "⏭ ETAPA 2 já executada (lock existe)"
 fi
 
-# ETAPA 2: Restaurar containers e outros arquivos
+# ETAPA 03
 ##########################################################################################################################
-if ! [ -f /srv/restored2.lock ]; then
-    echo "=== ETAPA 2: Restaurando containers (automático 24h) ==="
+if ! [ -f /srv/restored3.lock ]; then
+    echo "=== ETAPA 2: Restaurando containers (mais recente de cada) ==="
     
     # Restaurar YAMLs
     [ -f "$pathrestore/system.yaml" ] && sudo rsync -va "$pathrestore/system.yaml" /srv/
     [ -f "$pathrestore/containers.yaml" ] && sudo rsync -va "$pathrestore/containers.yaml" /srv/
     
-    echo "🕐 Buscando backups das últimas 24h entre ~320 arquivos..."
+    echo "🔍 Analisando arquivos de container..."
     
-    # Método mais eficiente para muitos arquivos
-    recent_container_file=$(find "$pathrestore" -type f -name "*.tar.lz4" -not -name "etc*.tar.lz4" -newermt "24 hours ago" -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2-)
+    # Criar diretório se não existir
+    sudo mkdir -p /srv/containers
     
-    if [ -n "$recent_container_file" ]; then
-        echo "📦 Restaurando: $(basename "$recent_container_file")"
-        sudo tar -I 'lz4 -d -c' -xf "$recent_container_file" -C /srv/containers
-        echo "✅ Containers restaurados das últimas 24h"
+    # Encontrar todos os arquivos .tar.lz4 (exceto etc)
+    temp_file="/tmp/container_analysis.$$"
+    find "$pathrestore" -name "*.tar.lz4" -not -name "etc*.tar.lz4" -printf '%T@ %p\n' | sort -k2 > "$temp_file"
+    
+    # Extrair nomes base únicos e pegar o mais recente de cada
+    declare -A latest_files
+    
+    while read -r timestamp filepath; do
+        filename=$(basename "$filepath")
+        # Extrair nome base (tudo antes da data)
+        # Ex: openspeedtest-24_09_25.tar.lz4 -> openspeedtest
+        basename_clean=$(echo "$filename" | sed 's/-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.tar\.lz4$//')
         
-    else
-        echo "⚠ Nenhum backup das últimas 24h, usando o mais recente disponível"
-        fallback_file=$(find "$pathrestore" -type f -name "*.tar.lz4" -not -name "etc*.tar.lz4" -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2-)
-        
-        if [ -n "$fallback_file" ]; then
-            echo "📦 Fallback: $(basename "$fallback_file")"
-            sudo tar -I 'lz4 -d -c' -xf "$fallback_file" -C /srv/containers
-            echo "✅ Containers restaurados (backup um pouco mais antigo)"
-        else
-            echo "❌ Nenhum backup encontrado!"
+        # Guardar o mais recente (maior timestamp) para cada nome base
+        if [[ -z "${latest_files[$basename_clean]}" ]] || (( $(echo "$timestamp > ${latest_files[$basename_clean]%% *}" | bc -l) )); then
+            latest_files[$basename_clean]="$timestamp $filepath"
         fi
+    done < "$temp_file"
+    
+    rm -f "$temp_file"
+    
+    # Restaurar os arquivos selecionados
+    if [ ${#latest_files[@]} -gt 0 ]; then
+        echo "📦 Encontrados $(echo ${#latest_files[@]}) containers únicos:"
+        
+        for basename_clean in "${!latest_files[@]}"; do
+            filepath=$(echo "${latest_files[$basename_clean]}" | cut -d' ' -f2-)
+            filename=$(basename "$filepath")
+            echo "  - $basename_clean: $filename"
+            
+            echo "    Extraindo: $filename"
+            sudo tar -I 'lz4 -d -c' -xf "$filepath" -C /srv/containers
+        done
+        
+        echo "✅ Containers restaurados (mais recente de cada tipo)"
+    else
+        echo "❌ Nenhum arquivo de container encontrado!"
     fi
     
-    sudo touch /srv/restored2.lock
-    echo "✓ ETAPA 2 concluída"
+    sudo touch /srv/restored3.lock
+    echo "✓ ETAPA 3 concluída"
 else
-    echo "⏭ ETAPA 2 já executada (lock existe)"
+    echo "⏭ ETAPA 3 já executada (lock existe)"
 fi
-
-# ETAPA 3: Restaurar VMs pfSense (CORRIGIDA)
+# ETAPA 04
 ##########################################################################################################################
-if ! [ -f /srv/restored3.lock ]; then
+if ! [ -f /srv/restored4.lock ]; then
     echo "=== ETAPA 3: Restaurando VMs pfSense ==="
     
     # Restaurar discos pfSense (sempre 1 versão) - busca case-insensitive
     echo "📦 Restaurando discos pfSense..."
-    find "$pathrestore" -iname "*pfsense*" -type f \( -name "*.qcow2" -o -name "*.img" \) | while read -r disk_file; do
+    find "$pathrestore" -iname "*pfsense*" -type f | while read -r disk_file; do
+      # Verificar se é um arquivo de disco virtual
+      file_type=$(file -b "$disk_file")
+      if echo "$file_type" | grep -qi "qemu\|disk\|image\|data"; then
         echo "Restaurando disco: $(basename "$disk_file")"
+        echo "  Tipo: $file_type"
         sudo rsync -va "$disk_file" /var/lib/libvirt/images/
+      else
+        echo "⏭ Ignorando $(basename "$disk_file") (não é disco virtual)"
+        echo "  Tipo: $file_type"
+      fi
     done
     
     # Procurar XMLs mais recentes para cada VM pfSense
@@ -214,15 +260,14 @@ if ! [ -f /srv/restored3.lock ]; then
         done
     fi
     
-    sudo touch /srv/restored3.lock
-    echo "✅ ETAPA 3 concluída"
+    sudo touch /srv/restored4.lock
+    echo "✅ ETAPA 4 concluída"
 else
-    echo "⏭ ETAPA 3 já executada (lock existe)"
+    echo "⏭ ETAPA 4 já executada (lock existe)"
 fi
-
-# ETAPA 4: Restaurar containers via orchestration + lockfile
+# ETAPA 05
 ##########################################################################################################################
-if ! [ -f /srv/restored4.lock ]; then
+if ! [ -f /srv/restored5.lock ]; then
     echo "=== ETAPA 4: Restaurando containers via orchestration ==="
     
     # URL correta do orchestration
@@ -352,17 +397,33 @@ if ! [ -f /srv/restored4.lock ]; then
         echo "⚠ Arquivo containers.yaml não encontrado, pulando restauração de containers"
     fi
     
-    sudo touch /srv/restored4.lock
-    echo "✓ ETAPA 4 concluída"
+    sudo touch /srv/restored5.lock
+    echo "✓ ETAPA 5 concluída"
 else
-    echo "⏭ ETAPA 4 já executada (lock existe)"
+    echo "⏭ ETAPA 5 já executada (lock existe)"
 fi
-
-echo "=== RESTORE COMPLETO ==="
-echo "- ✓ Configurações do sistema (/etc)"
-echo "- ✓ VMs pfSense"
-echo "- ✓ Containers Docker"
-echo "- ✓ Redes Docker"
-echo "reiniciando..."
-sleep 5
-reboot
+# ETAPA 06
+##########################################################################################################################
+if ! [ -f /srv/restored6.lock ]; then
+  sudo crontab "$pathrestore"/crontab-bkp
+  sudo touch /srv/restored2.lock
+  echo "✓ ETAPA 6 concluída"
+else
+  echo "⏭ ETAPA 6 já executada (lock existe)"
+fi
+# ETAPA 07
+##########################################################################################################################
+if ! [ -f /srv/restored7.lock ]; then
+  datetime0=$(date +"%d/%m/%Y - %H:%M")
+  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"${datetime0}\"" "$yamlbase"
+  echo "=== RESTORE COMPLETO ==="
+  sleep 3
+  echo "Reiniciando..."
+  sleep 3
+  reboot
+else
+  clear
+  echo ""
+  echo "⏭ ESTE SERVIDOR JÁ FOI RESTAURADO COMPLETAMENTE! (lock existe)"
+  sleep 3
+fi
