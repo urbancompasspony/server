@@ -3,7 +3,21 @@
 # Setup inicial
 sudo mkdir -p /srv/containers
 sudo mkdir -p /mnt/bkpsys
-sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys
+    
+if mountpoint -q /mnt/bkpsys; then
+    echo "✓ Backup já está montado"
+else
+    echo "Montando backup..."
+    if sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys; then
+        echo "✓ Backup montado com sucesso"
+    else
+        echo "✗ Não conseguimos encontrar o disco com backup!"
+        echo "Verifique os dispositivos de armazenamento."
+        echo "Saindo..."
+        sleep 5
+        exit 1
+    fi
+fi
 
 # Encontrar caminho do backup
 pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
