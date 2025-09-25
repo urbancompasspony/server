@@ -182,7 +182,7 @@ function wayland00 {
   sudo apt update
   sudo apt install openbox wayland-utils labwc obconf -y
   mkdir -p /home/administrador/.config/labwc
-  rsync -va /etc/xdg/openbox/ .config/labwc/
+  rsync -aHAXv --numeric-ids --sparse /etc/xdg/openbox/ .config/labwc/
   wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O .config/labwc/menu.xml
 }
 
