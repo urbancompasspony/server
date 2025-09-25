@@ -3,8 +3,19 @@ yamlbase="/srv/system.yaml"
 yamlextra="/srv/containers.yaml"
 export yamlbase
 export yamlextra
-# ETAPA 00
+# ETAPA X
 ##########################################################################################################################
+if [ -f /srv/restored8.lock ]; then
+  clear
+  echo ""
+  echo "⏭ ESTE SERVIDOR JÁ FOI RESTAURADO COMPLETAMENTE! (lock existe)"
+  sleep 2
+  echo "Se o sistema apresenta falhas nos serviços, recomendo que formate e refaça o sistema restaurando novamente."
+  sleep 4
+  echo "Saindo..."
+  sleep 2
+  exit 1
+fi
 if [ "$(hostname)" = "ubuntu-server" ]; then
   :;
 else
@@ -19,6 +30,8 @@ else
   sleep 5
   exit 1
 fi
+# ETAPA 00
+##########################################################################################################################
 sudo mkdir -p /srv/containers; sudo mkdir -p /mnt/bkpsys
 if mountpoint -q /mnt/bkpsys; then
   echo "✓ Backup já está montado"
@@ -406,7 +419,7 @@ fi
 ##########################################################################################################################
 if ! [ -f /srv/restored6.lock ]; then
   sudo crontab "$pathrestore"/crontab-bkp
-  sudo touch /srv/restored2.lock
+  sudo touch /srv/restored6.lock
   echo "✓ ETAPA 6 concluída"
 else
   echo "⏭ ETAPA 6 já executada (lock existe)"
@@ -414,16 +427,20 @@ fi
 # ETAPA 07
 ##########################################################################################################################
 if ! [ -f /srv/restored7.lock ]; then
-  datetime0=$(date +"%d/%m/%Y - %H:%M")
-  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"${datetime0}\"" "$yamlbase"
-  echo "=== RESTORE COMPLETO ==="
-  sleep 3
-  echo "Reiniciando..."
-  sleep 3
-  sudo reboot
+
+  sudo touch /srv/restored7.lock
+  echo "✓ ETAPA 7 concluída"
 else
-  clear
-  echo ""
-  echo "⏭ ESTE SERVIDOR JÁ FOI RESTAURADO COMPLETAMENTE! (lock existe)"
-  sleep 3
+  echo "⏭ ETAPA 7 já executada (lock existe)"
 fi
+# ETAPA 08
+##########################################################################################################################
+datetime0=$(date +"%d/%m/%Y - %H:%M")
+sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"${datetime0}\"" "$yamlbase"
+echo "=== RESTORE COMPLETO ==="
+sleep 3
+echo "Reiniciando..."
+sudo touch /srv/restored8.lock
+sleep 3
+sudo reboot
+exit 0
