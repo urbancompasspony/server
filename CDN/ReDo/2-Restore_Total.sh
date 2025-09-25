@@ -41,7 +41,7 @@ if ! [ -f /srv/restored1.lock ]; then
         
         echo "2. Procurando backup do fstab..."
         # Procurar arquivo fstab backup (formato: fstab-YYYYMMDD_HHMMSS.backup)
-        fstab_backup=$(find "$pathrestore" -name "fstab-*.backup" | sort | tail -1)
+        fstab_backup=$(find "$pathrestore" -name "fstab.backup" | sort | tail -1)
         
         if [ -n "$fstab_backup" ]; then
             echo "Encontrado: $(basename "$fstab_backup")"
