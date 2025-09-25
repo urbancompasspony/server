@@ -20,7 +20,7 @@ sudo tar -I 'lz4 -1 -c -' -cpf "$destiny"/etc-"$datetime".tar.lz4 \
     --exclude='/etc/machine-id' \
     --exclude='/etc/fstab' \
     /etc/
-sudo cp /etc/fstab "$destiny"/fstab-"$datetime".backup
+sudo cp /etc/fstab "$destiny"/fstab.backup
 # ETAPA 03
 ##########################################################################################################################
 sudo mkdir -p "$destiny"/docker-network-backup
