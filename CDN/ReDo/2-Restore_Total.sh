@@ -420,7 +420,7 @@ if ! [ -f /srv/restored7.lock ]; then
   sleep 3
   echo "Reiniciando..."
   sleep 3
-  reboot
+  sudo reboot
 else
   clear
   echo ""
