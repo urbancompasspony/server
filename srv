@@ -49,13 +49,12 @@ function start {
   1 'Docker Orchestration' \
   2 'Docker Maintenance' \
   3 'AutoConfig pfSense (VM)' \
-  4 'Set Wayland (labwc)' \
-  5 'Netplan Setup' \
-  6 'Install DWService' \
-  7 'Install Tailscale' \
-  8 'Install DiagnosticUI' \
-  9 'Install AD-DC-WebUI' \
-  10 'Install DWService ARM' \
+  4 'Netplan Setup' \
+  5 'Install DWService' \
+  6 'Install Tailscale' \
+  7 'Install DiagnosticUI' \
+  8 'Install AD-DC-WebUI' \
+  9 'Install DWService ARM' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -64,13 +63,12 @@ function start {
   1) clear ; echo "Por favor, insira a senha do usuário $USER!" ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/orchestration | sudo bash ; start ;;
   2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/docker-tools | bash ; start ;;
   3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; start ;;
-  4) wayland00 ; mkdir -p /home/administrador/.config/openbox ; wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O /home/administrador/.config/openbox ; start ;;
-  5) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
-  6) dwservice0 ; start ;;
-  7) [ $HOSTNAME = "ubuntu-server" ] && echo "TROQUE O HOSTNAME DESTE SERVIDOR!" || curl -fsSL https://tailscale.com/install.sh | sh ; tailscale up ; start ;;
-  8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
-  9) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash ; start ;;
-  10) dwgeneric0 ; start ;;
+  4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
+  5) dwservice0 ; start ;;
+  6) [ $HOSTNAME = "ubuntu-server" ] && echo "TROQUE O HOSTNAME DESTE SERVIDOR!" || curl -fsSL https://tailscale.com/install.sh | sh ; tailscale up ; start ;;
+  7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
+  8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash ; start ;;
+  9) dwgeneric0 ; start ;;
   X) exit ;;
   esac
 }
@@ -83,7 +81,7 @@ function managers {
   if ! var0=$(dialog --title 'Suporte ao Servidor' --backtitle "Bem-Vindo ao USM $version" --ok-label "Acessar" --cancel-label "Sair" --menu " " 0 0 0 \
   1 'Informacoes do Servidor' \
   2 'Iniciar Area de Trabalho (local apenas)' \
-  3 'Gerir o Active Directory (se existente)' \
+  3 'Gerir o Active Directory (se existir)' \
   4 'Ferramentas Diversas' \
   5 'Diagnóstico do Sistema' \
   6 'Continuidade do Negocio (CdN)' \
@@ -183,7 +181,7 @@ function wayland00 {
   sudo apt install openbox wayland-utils labwc obconf -y
   mkdir -p /home/administrador/.config/labwc
   rsync -aHAXv --numeric-ids --sparse /etc/xdg/openbox/ .config/labwc/
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O .config/labwc/menu.xml
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml | tee .config/labwc/menu.xml >/dev/null
 }
 
 function domain00 {
