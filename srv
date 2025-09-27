@@ -196,17 +196,11 @@ function domain00 {
 }
 
 function dwservice0 {
-  clear
-  wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
-  chmod +x dwagent_x86.sh
-  sudo bash dwagent_x86.sh
+  clear; curl -sSL https://www.dwservice.net/download/dwagent_x86.sh | tee /home/administrador/dwagent_x86.sh > /dev/null; chmod +x dwagent_x86.sh; sudo bash dwagent_x86.sh
 }
 
 function dwgeneric0 {
-  clear
-  wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh
-  chmod +x dwagent_generic.sh
-  sudo bash dwagent_generic.sh
+  clear; curl -sSL https://www.dwservice.net/download/dwagent_generic.sh | tee /home/administrador/dwagent_generic.sh > /dev/null; chmod +x dwagent_generic.sh; sudo bash dwagent_generic.sh
 }
 
 # ===================================================================================================================================== #
