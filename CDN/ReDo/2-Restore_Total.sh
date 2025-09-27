@@ -3,7 +3,7 @@ yamlbase="/srv/system.yaml"
 yamlextra="/srv/containers.yaml"
 export yamlbase
 export yamlextra
-# ETAPA X
+# ETAPA X - Montagem do disco de backup
 ##########################################################################################################################
 sudo mkdir -p /srv/containers; sudo mkdir -p /mnt/bkpsys
 if mountpoint -q /mnt/bkpsys; then
@@ -24,9 +24,8 @@ else
     exit 1
   fi
 fi
-# ETAPA 00
+# ETAPA 00 - Verificação Preventiva
 ##########################################################################################################################
-# Verificação de proteções
 if [ -f /mnt/bkpsys/system.yaml ]; then
   CURRENT_MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
   BACKUP_MACHINE_ID=$(yq -r '.Redes.macvlan.machine_id // empty' /mnt/bkpsys/system.yaml 2>/dev/null)
@@ -121,7 +120,7 @@ else
   sleep 5
   exit 1
 fi
-# ETAPA 01
+# ETAPA 01 - Montagem das redes
 ##########################################################################################################################
 if ! [ -f /srv/restored1.lock ]; then
   pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
@@ -160,10 +159,10 @@ if ! [ -f /srv/restored1.lock ]; then
 else
   echo "ETAPA 1 ja executada (lock existe)"
 fi
-# ETAPA 02
+# ETAPA 02 - Restaurando sistema operacional /etc/
 ##########################################################################################################################
 if ! [ -f /srv/restored2.lock ]; then
-    echo "=== ETAPA 1: Restaurando /etc ==="
+    echo "=== ETAPA 2: Restaurando /etc ==="
     
     # Encontrar arquivo etc mais recente
     etc_file=$(find "$pathrestore" -name "etc-*.tar.lz4" | sort | tail -1)
@@ -210,67 +209,9 @@ else
     echo "⏭ ETAPA 2 já executada (lock existe)"
 fi
 
-# ETAPA 03
+# ETAPA 03 - Restaurando VM pfSense
 ##########################################################################################################################
 if ! [ -f /srv/restored3.lock ]; then
-    echo "=== ETAPA 2: Restaurando containers (mais recente de cada) ==="
-    
-    # Restaurar YAMLs
-    [ -f "$pathrestore/system.yaml" ] && sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/system.yaml" /srv/
-    [ -f "$pathrestore/containers.yaml" ] && sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/containers.yaml" /srv/
-    
-    echo "🔍 Analisando arquivos de container..."
-    
-    # Criar diretório se não existir
-    sudo mkdir -p /srv/containers
-    
-    # Encontrar todos os arquivos .tar.lz4 (exceto etc)
-    temp_file="/tmp/container_analysis.$$"
-    find "$pathrestore" -name "*.tar.lz4" -not -name "etc*.tar.lz4" -printf '%T@ %p\n' | sort -k2 > "$temp_file"
-    
-    # Extrair nomes base únicos e pegar o mais recente de cada
-    declare -A latest_files
-    
-    while read -r timestamp filepath; do
-        filename=$(basename "$filepath")
-        # Extrair nome base (tudo antes da data)
-        # Ex: openspeedtest-24_09_25.tar.lz4 -> openspeedtest
-        basename_clean=$(echo "$filename" | sed 's/-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.tar\.lz4$//')
-        
-        # Guardar o mais recente (maior timestamp) para cada nome base
-        if [[ -z "${latest_files[$basename_clean]}" ]] || (( $(echo "$timestamp > ${latest_files[$basename_clean]%% *}" | bc -l) )); then
-            latest_files[$basename_clean]="$timestamp $filepath"
-        fi
-    done < "$temp_file"
-    
-    rm -f "$temp_file"
-    
-    # Restaurar os arquivos selecionados
-    if [ ${#latest_files[@]} -gt 0 ]; then
-        echo "📦 Encontrados $(echo ${#latest_files[@]}) containers únicos:"
-        
-        for basename_clean in "${!latest_files[@]}"; do
-            filepath=$(echo "${latest_files[$basename_clean]}" | cut -d' ' -f2-)
-            filename=$(basename "$filepath")
-            echo "  - $basename_clean: $filename"
-            
-            echo "    Extraindo: $filename"
-            sudo tar -I 'lz4 -d -c' -xf "$filepath" -C /srv/containers
-        done
-        
-        echo "✅ Containers restaurados (mais recente de cada tipo)"
-    else
-        echo "❌ Nenhum arquivo de container encontrado!"
-    fi
-    
-    sudo touch /srv/restored3.lock
-    echo "✓ ETAPA 3 concluída"
-else
-    echo "⏭ ETAPA 3 já executada (lock existe)"
-fi
-# ETAPA 04
-##########################################################################################################################
-if ! [ -f /srv/restored4.lock ]; then
     echo "=== ETAPA 3: Restaurando VMs pfSense ==="
     
     # Restaurar discos pfSense (sempre 1 versão) - busca case-insensitive
@@ -364,15 +305,73 @@ if ! [ -f /srv/restored4.lock ]; then
         done
     fi
     
+    sudo touch /srv/restored3.lock
+    echo "✅ ETAPA 3 concluída"
+else
+    echo "⏭ ETAPA 3 já executada (lock existe)"
+fi
+# ETAPA 04 - Restaurar cada container no seu devido lugar apenas
+##########################################################################################################################
+if ! [ -f /srv/restored4.lock ]; then
+    echo "=== ETAPA 4: Restaurando containers (mais recente de cada) ==="
+    
+    # Restaurar YAMLs
+    [ -f "$pathrestore/system.yaml" ] && sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/system.yaml" /srv/
+    [ -f "$pathrestore/containers.yaml" ] && sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/containers.yaml" /srv/
+    
+    echo "🔍 Analisando arquivos de container..."
+    
+    # Criar diretório se não existir
+    sudo mkdir -p /srv/containers
+    
+    # Encontrar todos os arquivos .tar.lz4 (exceto etc)
+    temp_file="/tmp/container_analysis.$$"
+    find "$pathrestore" -name "*.tar.lz4" -not -name "etc*.tar.lz4" -printf '%T@ %p\n' | sort -k2 > "$temp_file"
+    
+    # Extrair nomes base únicos e pegar o mais recente de cada
+    declare -A latest_files
+    
+    while read -r timestamp filepath; do
+        filename=$(basename "$filepath")
+        # Extrair nome base (tudo antes da data)
+        # Ex: openspeedtest-24_09_25.tar.lz4 -> openspeedtest
+        basename_clean=$(echo "$filename" | sed 's/-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.tar\.lz4$//')
+        
+        # Guardar o mais recente (maior timestamp) para cada nome base
+        if [[ -z "${latest_files[$basename_clean]}" ]] || (( $(echo "$timestamp > ${latest_files[$basename_clean]%% *}" | bc -l) )); then
+            latest_files[$basename_clean]="$timestamp $filepath"
+        fi
+    done < "$temp_file"
+    
+    rm -f "$temp_file"
+    
+    # Restaurar os arquivos selecionados
+    if [ ${#latest_files[@]} -gt 0 ]; then
+        echo "📦 Encontrados $(echo ${#latest_files[@]}) containers únicos:"
+        
+        for basename_clean in "${!latest_files[@]}"; do
+            filepath=$(echo "${latest_files[$basename_clean]}" | cut -d' ' -f2-)
+            filename=$(basename "$filepath")
+            echo "  - $basename_clean: $filename"
+            
+            echo "    Extraindo: $filename"
+            sudo tar -I 'lz4 -d -c' -xf "$filepath" -C /srv/containers
+        done
+        
+        echo "✅ Containers restaurados (mais recente de cada tipo)"
+    else
+        echo "❌ Nenhum arquivo de container encontrado!"
+    fi
+    
     sudo touch /srv/restored4.lock
-    echo "✅ ETAPA 4 concluída"
+    echo "✓ ETAPA 4 concluída"
 else
     echo "⏭ ETAPA 4 já executada (lock existe)"
 fi
-# ETAPA 05
+# ETAPA 05 - Inicializar os containers que foram restaurados da etapa anterior
 ##########################################################################################################################
 if ! [ -f /srv/restored5.lock ]; then
-    echo "=== ETAPA 4: Restaurando containers via orchestration ==="
+    echo "=== ETAPA 5: Restaurando containers via orchestration ==="
     
     # URL correta do orchestration
     ORCHESTRATION_URL="https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/orchestration"
@@ -506,7 +505,7 @@ if ! [ -f /srv/restored5.lock ]; then
 else
     echo "⏭ ETAPA 5 já executada (lock existe)"
 fi
-# ETAPA 06
+# ETAPA 06 - Restauração Crontab
 ##########################################################################################################################
 if ! [ -f /srv/restored6.lock ]; then
   sudo crontab "$pathrestore"/crontab-bkp
@@ -515,23 +514,14 @@ if ! [ -f /srv/restored6.lock ]; then
 else
   echo "⏭ ETAPA 6 já executada (lock existe)"
 fi
-# ETAPA 07
-##########################################################################################################################
-if ! [ -f /srv/restored7.lock ]; then
-
-  sudo touch /srv/restored7.lock
-  echo "✓ ETAPA 7 concluída"
-else
-  echo "⏭ ETAPA 7 já executada (lock existe)"
-fi
-# ETAPA 08
+# ETAPA 07 - Finalização
 ##########################################################################################################################
 datetime0=$(date +"%d/%m/%Y - %H:%M")
 sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"${datetime0}\"" "$yamlbase"
 echo "=== RESTORE COMPLETO ==="
 sleep 3
 echo "Reiniciando..."
-sudo touch /srv/restored8.lock
+sudo touch /srv/restored7.lock
 sleep 3
 sudo reboot
 exit 0
