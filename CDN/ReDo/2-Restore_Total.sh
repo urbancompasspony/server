@@ -5,6 +5,27 @@ export yamlbase
 export yamlextra
 # ETAPA X
 ##########################################################################################################################
+sudo mkdir -p /srv/containers; sudo mkdir -p /mnt/bkpsys
+if mountpoint -q /mnt/bkpsys; then
+  echo "✓ Backup já está montado"
+else
+  echo "Montando backup..."
+  if sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys; then
+    echo "✓ Backup montado com sucesso"
+    echo "✓ ETAPA 0 concluída"
+  else
+    clear
+    echo ""; echo "✗ Não conseguimos encontrar o dispositivo com backup do servidor!"
+    sleep 4
+    echo "Verifique os dispositivos de armazenamento."
+    sleep 3
+    echo "Saindo..."
+    sleep 2
+    exit 1
+  fi
+fi
+# ETAPA 00
+##########################################################################################################################
 # Verificação de proteções
 if [ -f /mnt/bkpsys/system.yaml ]; then
   CURRENT_MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
@@ -99,27 +120,6 @@ else
   echo "Se realmente quiser fazer isso, renomeie o hostname para ubuntu-server e reexecute este utilitario!"
   sleep 5
   exit 1
-fi
-# ETAPA 00
-##########################################################################################################################
-sudo mkdir -p /srv/containers; sudo mkdir -p /mnt/bkpsys
-if mountpoint -q /mnt/bkpsys; then
-  echo "✓ Backup já está montado"
-else
-  echo "Montando backup..."
-  if sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys; then
-    echo "✓ Backup montado com sucesso"
-    echo "✓ ETAPA 0 concluída"
-  else
-    clear
-    echo ""; echo "✗ Não conseguimos encontrar o dispositivo com backup do servidor!"
-    sleep 4
-    echo "Verifique os dispositivos de armazenamento."
-    sleep 3
-    echo "Saindo..."
-    sleep 2
-    exit 1
-  fi
 fi
 # ETAPA 01
 ##########################################################################################################################
