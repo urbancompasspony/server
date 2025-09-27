@@ -28,24 +28,22 @@ fi
 ##########################################################################################################################
 if [ -f /mnt/bkpsys/system.yaml ]; then
   CURRENT_MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
-  BACKUP_MACHINE_ID=$(yq -r '.Redes.macvlan.machine_id // empty' /mnt/bkpsys/system.yaml 2>/dev/null)
+  BACKUP_MACHINE_ID=$(yq -r '.Informacoes.machine_id' /mnt/bkpsys/system.yaml 2>/dev/null)
   
   # Verificar se machine-id do backup está vazio ou inválido
-  if [ -z "$BACKUP_MACHINE_ID" ] || [ "$BACKUP_MACHINE_ID" = "null" ] || [ "$BACKUP_MACHINE_ID" = "empty" ]; then
+  if [ -z "$BACKUP_MACHINE_ID" ] || [ "$BACKUP_MACHINE_ID" = "null" ]; then
     clear
     echo ""
     echo "ERRO DE VALIDACAO!"
     sleep 2
-    echo "O machine-id no backup esta vazio, nulo ou invalido."
-    sleep 3
+    echo "O machine-id no backup esta nulo ou invalido."
     echo "Backup: '$BACKUP_MACHINE_ID'"
     sleep 3
     echo "Isso indica um backup corrompido ou incompleto."
-    sleep 4
-    echo "Nao e possivel determinar com seguranca se este restore e valido."
-    sleep 4
-    echo "Verifique a integridade do backup ou use um backup mais recente."
     sleep 3
+    echo "Nao e possivel determinar com seguranca se este restore e valido."
+    echo "Verifique a integridade do backup ou use um backup mais recente."
+    sleep 5
     echo "Saindo por seguranca..."
     sleep 2
     exit 1
@@ -55,7 +53,7 @@ if [ -f /mnt/bkpsys/system.yaml ]; then
   if [ -z "$CURRENT_MACHINE_ID" ]; then
     clear
     echo ""
-    echo "ERRO: Nao foi possivel ler o machine-id do sistema atual!"
+    echo "ERRO CATASTRÓFICO: Nao foi possivel ler o machine-id do sistema atual!"
     sleep 3
     echo "Verifique o arquivo /etc/machine-id"
     sleep 2
@@ -67,17 +65,15 @@ if [ -f /mnt/bkpsys/system.yaml ]; then
     clear
     echo ""
     echo "BLOQUEIO DE SEGURANCA ATIVADO!"
-    sleep 2
+    sleep 1
     echo "O machine-id atual ($CURRENT_MACHINE_ID) e identico ao do backup."
-    sleep 3
-    echo "Isso indica que voce esta tentando restaurar um backup sobre o proprio sistema que o gerou."
-    sleep 4
-    echo "Esta operacao e PERIGOSA e pode causar perda de dados ou corrupcao do sistema!"
-    sleep 4
-    echo "Para restaurar, execute em um sistema diferente ou reformate este sistema."
-    sleep 3
-    echo "Saindo por seguranca..."
     sleep 2
+    echo "Isso indica que voce esta tentando restaurar um backup sobre o proprio sistema que o gerou."
+    echo "Esta operacao e PERIGOSA e pode causar perda de dados ou corrupcao do sistema!"
+    sleep 6
+    echo "Para restaurar, execute em um sistema diferente ou reformate este sistema."
+    echo "Saindo por seguranca..."
+    sleep 4
     exit 1
   fi
   
@@ -90,7 +86,7 @@ else
   sleep 3
   echo "Nao e possivel validar a seguranca do restore."
   echo "Saindo por seguranca..."
-  sleep 2
+  sleep 3
   exit 1
 fi
 
@@ -110,11 +106,11 @@ if [ "$(hostname)" = "ubuntu-server" ]; then
   :;
 else
   clear
-  echo ""; echo "ATENÇÃO:"
+  echo ""; echo "ATENCAO:"
   sleep 1
-  echo "Este sistema já está pré-definido com o hostname $(hostname)."
+  echo "Este sistema ja esta pre-definido com o hostname $(hostname)."
   sleep 4
-  echo "Entendemos que você está tentando restaurar um backup do servidor sobre um servidor legítimo em execução."
+  echo "Entendemos que você esta tentando restaurar um backup do servidor sobre um servidor legitimo em execucao."
   sleep 5
   echo "Se realmente quiser fazer isso, renomeie o hostname para ubuntu-server e reexecute este utilitario!"
   sleep 5
