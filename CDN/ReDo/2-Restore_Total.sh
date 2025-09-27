@@ -5,6 +5,75 @@ export yamlbase
 export yamlextra
 # ETAPA X
 ##########################################################################################################################
+# Verificação de proteções
+if [ -f /mnt/bkpsys/system.yaml ]; then
+  CURRENT_MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
+  BACKUP_MACHINE_ID=$(yq -r '.Redes.macvlan.machine_id // empty' /mnt/bkpsys/system.yaml 2>/dev/null)
+  
+  # Verificar se machine-id do backup está vazio ou inválido
+  if [ -z "$BACKUP_MACHINE_ID" ] || [ "$BACKUP_MACHINE_ID" = "null" ] || [ "$BACKUP_MACHINE_ID" = "empty" ]; then
+    clear
+    echo ""
+    echo "ERRO DE VALIDACAO!"
+    sleep 2
+    echo "O machine-id no backup esta vazio, nulo ou invalido."
+    sleep 3
+    echo "Backup: '$BACKUP_MACHINE_ID'"
+    sleep 3
+    echo "Isso indica um backup corrompido ou incompleto."
+    sleep 4
+    echo "Nao e possivel determinar com seguranca se este restore e valido."
+    sleep 4
+    echo "Verifique a integridade do backup ou use um backup mais recente."
+    sleep 3
+    echo "Saindo por seguranca..."
+    sleep 2
+    exit 1
+  fi
+  
+  # Verificar se machine-id atual está disponível
+  if [ -z "$CURRENT_MACHINE_ID" ]; then
+    clear
+    echo ""
+    echo "ERRO: Nao foi possivel ler o machine-id do sistema atual!"
+    sleep 3
+    echo "Verifique o arquivo /etc/machine-id"
+    sleep 2
+    exit 1
+  fi
+  
+  # Verificar se são idênticos (proteção anti-auto-restore)
+  if [ "$CURRENT_MACHINE_ID" = "$BACKUP_MACHINE_ID" ]; then
+    clear
+    echo ""
+    echo "BLOQUEIO DE SEGURANCA ATIVADO!"
+    sleep 2
+    echo "O machine-id atual ($CURRENT_MACHINE_ID) e identico ao do backup."
+    sleep 3
+    echo "Isso indica que voce esta tentando restaurar um backup sobre o proprio sistema que o gerou."
+    sleep 4
+    echo "Esta operacao e PERIGOSA e pode causar perda de dados ou corrupcao do sistema!"
+    sleep 4
+    echo "Para restaurar, execute em um sistema diferente ou reformate este sistema."
+    sleep 3
+    echo "Saindo por seguranca..."
+    sleep 2
+    exit 1
+  fi
+  
+  echo "Machine-id validado: sistema diferente do backup - prosseguindo..."
+  
+else
+  clear
+  echo ""
+  echo "AVISO: Arquivo system.yaml nao encontrado no backup!"
+  sleep 3
+  echo "Nao e possivel validar a seguranca do restore."
+  echo "Saindo por seguranca..."
+  sleep 2
+  exit 1
+fi
+
 if [ -f /srv/restored8.lock ]; then
   clear
   echo ""
@@ -16,6 +85,7 @@ if [ -f /srv/restored8.lock ]; then
   sleep 2
   exit 1
 fi
+
 if [ "$(hostname)" = "ubuntu-server" ]; then
   :;
 else
@@ -56,18 +126,39 @@ fi
 if ! [ -f /srv/restored1.lock ]; then
   pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
   export pathrestore
+  
   if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
     cd "$pathrestore/docker-network-backup" || exit
-    docker network create -d macvlan \
-    --subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' macvlan.json)" \
-    --gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' macvlan.json)" \
-    -o parent="$(jq -r '.[0].Options.parent' macvlan.json)" \
-    "$(jq -r '.[0].Name' macvlan.json)"
+    
+    # Pega a interface do backup
+    original_parent="$(jq -r '.[0].Options.parent' macvlan.json)"
+    
+    # Verifica se a interface original existe
+    if ip link show "$original_parent" >/dev/null 2>&1; then
+        echo "Interface original $original_parent encontrada - usando backup direto!"
+        
+        docker network create -d macvlan \
+        --subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' macvlan.json)" \
+        --gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' macvlan.json)" \
+        -o parent="$original_parent" \
+        "$(jq -r '.[0].Name' macvlan.json)"
+        
+    else
+        echo "Interface $original_parent nao encontrada - configuracao interativa necessaria"
+        
+        if curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/set | sudo bash; then
+            echo "Configuracao de rede concluida com sucesso"
+        else
+            echo "ERRO: Falha na configuracao de rede"
+            exit 1
+        fi
+    fi
+    
     sudo touch /srv/restored1.lock
-    echo "✓ ETAPA 1 concluída"
+    echo "ETAPA 1 concluida"
   fi
 else
-  echo "⏭ ETAPA 1 já executada (lock existe)"
+  echo "ETAPA 1 ja executada (lock existe)"
 fi
 # ETAPA 02
 ##########################################################################################################################
