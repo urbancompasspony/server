@@ -151,8 +151,8 @@ EOF
         echo "      dhcp4: true" | sudo tee -a "$NETPLAN_FILE" > /dev/null
     done
     
-      sudo netplan generate
-      sudo netplan apply
+    sudo netplan generate
+    sudo netplan apply
 }
 
 if ! [ -f /srv/restored1.lock ]; then  
@@ -161,7 +161,7 @@ if ! [ -f /srv/restored1.lock ]; then
     
     # Pega a interface do backup
     original_parent="$(jq -r '.[0].Options.parent' macvlan.json)"
-    
+    export original_parent
     # Verifica se a interface original existe
     if ip link show "$original_parent" >/dev/null 2>&1; then
         clear
@@ -178,8 +178,9 @@ if ! [ -f /srv/restored1.lock ]; then
         echo "Interface $original_parent nao encontrada - configuracao interativa necessaria"
         sleep 3
         auto_configure_netplan
+        sleep 3
         if curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/set | sudo bash; then
-            echo "Configuracao de rede concluida com sucesso"
+            :
         else
             echo "ERRO: Falha na configuracao de rede"
             exit 1
@@ -270,30 +271,16 @@ if ! [ -f /srv/restored3.lock ]; then
     # Encontrar todos os XMLs únicos (por nome base da VM) - busca case-insensitive
     vm_bases=$(find "$pathrestore" -iname "*pfsense*.xml" -exec basename {} \; | sed 's/-vm-.*\.xml$//' | sort -u)
     
-    # Debug: mostrar o que foi encontrado
-    echo "🔍 Debug - XMLs encontrados:"
-    find "$pathrestore" -iname "*pfsense*.xml" | while read -r xml; do
-        echo "   Encontrado: $(basename "$xml")"
-    done
-    
-    echo "🔍 Debug - Nomes base extraídos:"
-    echo "$vm_bases" | while read -r base; do
-        echo "   Nome base: '$base'"
-    done
-    
     if [ -n "$vm_bases" ]; then
         echo "$vm_bases" | while read -r vm_base; do
             echo "🔍 Processando VM base: '$vm_base'"
             
-            # Para cada VM base, encontrar o XML mais recente (busca case-insensitive)
             most_recent_xml=$(find "$pathrestore" -iname "${vm_base}-vm-*.xml" -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2-)
-            
-            if [ -n "$most_recent_xml" ]; then
-                echo "🖥️  VM: $vm_base"
-                echo "   XML mais recente: $(basename "$most_recent_xml")"
-                echo "   Caminho completo: $most_recent_xml"
-                echo "   Data: $(stat -c '%y' "$most_recent_xml" | cut -d'.' -f1)"
-                
+            actualinterface=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
+
+            sed -i "s/<source dev='$original_parent'/<source dev='$actualinterface'/g" $most_recent_xml.xml
+
+            if [ -n "$most_recent_xml" ]; then                
                 # Verificar se o arquivo XML existe e é legível
                 if [ -r "$most_recent_xml" ]; then
                     # Definir a VM
