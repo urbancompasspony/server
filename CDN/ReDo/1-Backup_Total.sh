@@ -26,6 +26,8 @@ fi
 # ETAPA 01
 ##########################################################################################################################
 sudo crontab -l | sudo tee "$destiny"/crontab-bkp > /dev/null
+sudo cp -r /srv/scripts "$destiny"
+sudo cp /srv/*.yaml "$destiny"
 # ETAPA 02
 ##########################################################################################################################
 sudo tar -I 'lz4 -1 -c -' -cpf "$destiny"/etc-"$datetime".tar.lz4 \
