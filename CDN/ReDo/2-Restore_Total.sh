@@ -5,20 +5,20 @@ export yamlbase
 export yamlextra
 # ETAPA X - Montagem do disco de backup
 ##########################################################################################################################
-function pathrestore0 {
+function restorefunc {
   pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
   export pathrestore
 }
 sudo mkdir -p /srv/containers; sudo mkdir -p /mnt/bkpsys
 if mountpoint -q /mnt/bkpsys; then
   echo "✓ Backup já está montado"
-  pathrestore0
+  restorefunc
 else
   echo "Montando backup..."
   if sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys; then
     echo "✓ Backup montado com sucesso"
     echo "✓ ETAPA 0 concluída"
-    pathrestore0
+    restorefunc
   else
     clear
     echo ""; echo "✗ Não conseguimos encontrar o dispositivo com backup do servidor!"
@@ -32,9 +32,9 @@ else
 fi
 # ETAPA 00 - Verificação Preventiva
 ##########################################################################################################################
-if [ -f "$pathrestore0"/system.yaml ]; then
+if [ -f "$pathrestore"/system.yaml ]; then
   CURRENT_MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
-  BACKUP_MACHINE_ID=$(yq -r '.Informacoes.machine_id' "$pathrestore0"/system.yaml 2>/dev/null)
+  BACKUP_MACHINE_ID=$(yq -r '.Informacoes.machine_id' "$pathrestore"/system.yaml 2>/dev/null)
   # Verificar se machine-id do backup está vazio ou inválido
   if [ -z "$BACKUP_MACHINE_ID" ] || [ "$BACKUP_MACHINE_ID" = "null" ]; then
     clear
