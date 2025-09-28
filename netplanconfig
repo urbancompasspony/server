@@ -1,0 +1,55 @@
+#!/bin/bash
+
+if [ -f /etc/netplan/00-installer-config.yaml ]; then
+  NETPLAN_FILE="/etc/netplan/00-installer-config.yaml"
+else
+  NETPLAN_FILE="/etc/netplan/50-cloud-init.yaml"
+fi
+
+function auto_configure_netplan {
+    backup_file="/srv/netplan_backup_$(date +%s).yaml"
+    sudo cp "$NETPLAN_FILE" "$backup_file" 2>/dev/null
+    up_interfaces=()
+    down_interfaces=()
+    
+    # Fixed: Use glob pattern instead of ls | grep
+    for interface in /sys/class/net/en*; do
+        # Check if the glob matched anything
+        [ -e "$interface" ] || continue
+        
+        # Extract just the interface name
+        interface_name=$(basename "$interface")
+        
+        status=$(cat "$interface/operstate" 2>/dev/null || echo "unknown")
+        if [ "$status" = "up" ]; then
+            up_interfaces+=("$interface_name")
+        elif [ "$status" = "down" ]; then
+            down_interfaces+=("$interface_name")
+        fi
+    done
+    
+    cat << EOF | sudo tee "$NETPLAN_FILE" > /dev/null
+network:
+  version: 2
+  ethernets:
+EOF
+    
+  for interface in "${up_interfaces[@]}"; do
+    echo "    $interface:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "      dhcp4: true" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "      nameservers:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "        addresses: [8.8.4.4, 1.0.0.1]" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+  done
+
+  for interface in "${down_interfaces[@]}"; do
+    echo "    $interface:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "      dhcp4: true" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "      nameservers:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "        addresses: [8.8.4.4, 1.0.0.1]" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+  done
+    
+    sudo netplan generate
+    sudo netplan apply
+}
+
+auto_configure_netplan
