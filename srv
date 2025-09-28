@@ -65,7 +65,7 @@ function start {
   3) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/auto_pfsense | sudo bash ; start ;;
   4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
   5) dwservice0 ; start ;;
-  6) [ $HOSTNAME = "ubuntu-server" ] && echo "TROQUE O HOSTNAME DESTE SERVIDOR!" || curl -fsSL https://tailscale.com/install.sh | sh ; tailscale up ; start ;;
+  6) tailscale0 ; start ;;
   7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash ; start ;;
   8) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash ; start ;;
   9) dwgeneric0 ; start ;;
@@ -193,12 +193,29 @@ function domain00 {
   fi
 }
 
+function tailscaled0 {
+  if [ $HOSTNAME = "ubuntu-server" ]; then
+    clear; echo "TROQUE O HOSTNAME DESTE SERVIDOR!"
+    sleep 3
+    return
+  else
+    curl -fsSL https://tailscale.com/install.sh | sh
+    sudo tailscale up
+  fi
+}
+
 function dwservice0 {
-  clear; curl -sSL https://www.dwservice.net/download/dwagent_x86.sh | tee /home/administrador/dwagent_x86.sh > /dev/null; chmod +x dwagent_x86.sh; sudo bash dwagent_x86.sh
+  clear
+  curl -sSL https://www.dwservice.net/download/dwagent_x86.sh | tee /home/administrador/dwagent_x86.sh >/dev/null
+  chmod +x /home/administrador/dwagent_x86.sh
+  sudo bash /home/administrador/dwagent_x86.sh
 }
 
 function dwgeneric0 {
-  clear; curl -sSL https://www.dwservice.net/download/dwagent_generic.sh | tee /home/administrador/dwagent_generic.sh > /dev/null; chmod +x dwagent_generic.sh; sudo bash dwagent_generic.sh
+  clear
+  curl -sSL https://www.dwservice.net/download/dwagent_generic.sh | tee /home/administrador/dwagent_generic.sh >/dev/null
+  chmod +x /home/administrador/dwagent_generic.sh
+  sudo bash /home/administrador/dwagent_generic.sh
 }
 
 # ===================================================================================================================================== #
