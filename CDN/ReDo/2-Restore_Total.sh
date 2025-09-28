@@ -151,12 +151,8 @@ EOF
         echo "      dhcp4: true" | sudo tee -a "$NETPLAN_FILE" > /dev/null
     done
     
-    if sudo netplan try --timeout=10; then
-        :
-    else
-        sudo cp "$backup_file" "$NETPLAN_FILE"
-        sudo netplan apply
-    fi
+      sudo netplan generate
+      sudo netplan apply
 }
 
 if ! [ -f /srv/restored1.lock ]; then  
