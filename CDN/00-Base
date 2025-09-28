@@ -4,7 +4,7 @@ function urgencies0 {
 var0=$(dialog --title 'Modelo CDN' --backtitle "Continuidade do Negocio" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
 1 'Restaurar Containers Localmente' \
 2 'Download Backups de Containers' \
-3 'Forçar um Backup Pontual' \
+3 'Forçar um Backup Pontual Imediato' \
 4 'Refazer Todo o Servidor!' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
