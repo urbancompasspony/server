@@ -49,7 +49,7 @@ function start {
   1 'Docker Orchestration' \
   2 'Docker Maintenance' \
   3 'AutoConfig pfSense (VM)' \
-  4 'Netplan Setup' \
+  4 'Netplan AutoSetup' \
   5 'Install DWService' \
   6 'Install Tailscale' \
   7 'Install DiagnosticUI' \
