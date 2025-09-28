@@ -89,7 +89,7 @@ fi
 # Nenhum erro??? Então vamos seguir!
   clear
   echo "ESTA TUDO CORRETO! TUDO FOI DEVIDAMENTE VALIDADO."
-  slee 1
+  sleep 1
   echo "5"
   echo "O SERVIDOR SERÁ COMPLETAMENTE RESTAURADO BASEADO NO BACKUP ENCONTRADO!"
   sleep 1
