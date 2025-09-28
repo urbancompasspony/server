@@ -68,7 +68,7 @@ done
 sudo find /var/lib/libvirt/images/ -iname "*pfsense*" -exec rsync -aHAXv --numeric-ids --sparse {} "$destiny"/ \;
 virsh list --all --name | grep -i pfsense | while read -r vm_name; do
   if [[ -n "$vm_name" ]]; then
-    virsh dumpxml "$vm_name" | sudo tee "$destiny"/"$vm_name"-vm-"$datetime".xml> /dev/null
+    virsh dumpxml "$vm_name" | sudo tee "$destiny"/"$vm_name"-vm.xml> /dev/null
     virsh start "$vm_name"
   fi
 done
