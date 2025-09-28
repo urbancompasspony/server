@@ -479,9 +479,9 @@ function iperfsrv {
 
 function dwservice0 {
   clear
-  curl https://www.dwservice.net/download/dwagent_x86.sh | tee /home/administrador/dwagent_x86.sh
-  chmod +x dwagent_x86.sh
-  sudo bash dwagent_x86.sh
+  curl -sSL https://www.dwservice.net/download/dwagent_x86.sh | tee /home/administrador/dwagent_x86.sh >/dev/null
+  chmod +x /home/administrador/dwagent_x86.sh
+  sudo bash /home/administrador/dwagent_x86.sh
 }
 
 function satas {
