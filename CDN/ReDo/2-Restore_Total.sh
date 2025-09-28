@@ -235,6 +235,10 @@ function etapa03 {
 
       if [ -n "$xml_file" ]; then
           echo "XML encontrado: $(basename "$xml_file")"
+          
+          # Interface do Docker para ser ignorada e não usada no pfSense
+          docker_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
+          original_parent="$docker_interface"
 
           # Função para mapear interfaces
           function map_xml_interfaces {
@@ -256,7 +260,7 @@ function etapa03 {
               echo "🔍 Interfaces disponíveis: ${available_interfaces[*]}"
 
               # Extrair interfaces do XML
-              xml_interfaces=($(grep -oP "dev='\K[^']*" "$xml_file"))
+              xml_interfaces=($(grep -oP "dev='\K[^']*" "$xml_file" | grep -v "^$original_parent$"))
 
               if [ ${#xml_interfaces[@]} -eq 0 ]; then
                   echo "⚠️  Nenhuma interface no XML"
@@ -354,14 +358,28 @@ function etapa04 {
   if ! [ -f /srv/restored4.lock ]; then
       echo "=== ETAPA 4: Restaurando containers (mais recente de cada) ==="
 
-      # Restaurar YAMLs
-      [ -f "$pathrestore/system.yaml" ] && sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/system.yaml" /srv/
-      [ -f "$pathrestore/containers.yaml" ] && sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/containers.yaml" /srv/
-
-      echo "🔍 Analisando arquivos de container..."
-
       # Criar diretório se não existir
       sudo mkdir -p /srv/containers
+
+      # Restaurar YAMLs
+      if [ -f "$pathrestore/system.yaml" ];then
+        sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/system.yaml" /srv/
+      else
+        clear; echo "ERROR: Nao encontrei o systemn.yaml. SAINDO..."
+        exit 1
+      fi
+
+      if [ -f "$pathrestore/containers.yaml" ]; then
+        sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/containers.yaml" /srv/
+      else
+        clear
+        echo "WARNING: Nao encontrei o containers.yaml. Vou criar um YAML vazio e prosseguir."
+        echo "Verifique se isso esta correto pois sem o YAML nenhum container ira inicializar."
+        sleep 5
+        sudo touch /srv/containers.yaml
+      fi
+
+      echo "🔍 Analisando arquivos de container..."
 
       # Encontrar todos os arquivos .tar.lz4 (exceto etc)
       temp_file="/tmp/container_analysis.$$"
@@ -397,7 +415,7 @@ function etapa04 {
               sudo tar -I 'lz4 -d -c' -xf "$filepath" -C /srv/containers
           done
 
-          echo "✅ Containers restaurados (mais recente de cada tipo)"
+          echo "✅ Containers restaurados (mais recente de cada)"
       else
           echo "❌ Nenhum arquivo de container encontrado!"
       fi
