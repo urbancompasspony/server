@@ -5,14 +5,21 @@ export yamlbase
 export yamlextra
 # ETAPA X - Montagem do disco de backup
 ##########################################################################################################################
+function pathrestore0 {
+  pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
+  export pathrestore
+}
+
 sudo mkdir -p /srv/containers; sudo mkdir -p /mnt/bkpsys
 if mountpoint -q /mnt/bkpsys; then
   echo "✓ Backup já está montado"
+  pathrestore0
 else
   echo "Montando backup..."
   if sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys; then
     echo "✓ Backup montado com sucesso"
     echo "✓ ETAPA 0 concluída"
+    pathrestore0
   else
     clear
     echo ""; echo "✗ Não conseguimos encontrar o dispositivo com backup do servidor!"
@@ -26,102 +33,67 @@ else
 fi
 # ETAPA 00 - Verificação Preventiva
 ##########################################################################################################################
-if [ -f /mnt/bkpsys/system.yaml ]; then
+if [ -f "$pathrestore0"/system.yaml ]; then
   CURRENT_MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
-  BACKUP_MACHINE_ID=$(yq -r '.Informacoes.machine_id' /mnt/bkpsys/system.yaml 2>/dev/null)
+  BACKUP_MACHINE_ID=$(yq -r '.Informacoes.machine_id' "$pathrestore0"/system.yaml 2>/dev/null)
   
   # Verificar se machine-id do backup está vazio ou inválido
   if [ -z "$BACKUP_MACHINE_ID" ] || [ "$BACKUP_MACHINE_ID" = "null" ]; then
     clear
     echo ""
-    echo "ERRO DE VALIDACAO!"
-    sleep 2
+    echo "ERRO 01: VALIDACAO!"
     echo "O machine-id no backup esta nulo ou invalido."
-    echo "Backup: '$BACKUP_MACHINE_ID'"
-    sleep 3
-    echo "Isso indica um backup corrompido ou incompleto."
-    sleep 3
-    echo "Nao e possivel determinar com seguranca se este restore e valido."
-    echo "Verifique a integridade do backup ou use um backup mais recente."
+    echo "Operacao cancelada. Saindo em 5 segundos..."
     sleep 5
-    echo "Saindo por seguranca..."
-    sleep 2
     exit 1
   fi
-  
-  # Verificar se machine-id atual está disponível
-  if [ -z "$CURRENT_MACHINE_ID" ]; then
-    clear
-    echo ""
-    echo "ERRO CATASTRÓFICO: Nao foi possivel ler o machine-id do sistema atual!"
-    sleep 3
-    echo "Verifique o arquivo /etc/machine-id"
-    sleep 2
-    exit 1
-  fi
-  
+   
   # Verificar se são idênticos (proteção anti-auto-restore)
   if [ "$CURRENT_MACHINE_ID" = "$BACKUP_MACHINE_ID" ]; then
     clear
     echo ""
-    echo "BLOQUEIO DE SEGURANCA ATIVADO!"
-    sleep 1
-    echo "O machine-id atual ($CURRENT_MACHINE_ID) e identico ao do backup."
-    sleep 2
-    echo "Isso indica que voce esta tentando restaurar um backup sobre o proprio sistema que o gerou."
-    echo "Esta operacao e PERIGOSA e pode causar perda de dados ou corrupcao do sistema!"
-    sleep 6
-    echo "Para restaurar, execute em um sistema diferente ou reformate este sistema."
-    echo "Saindo por seguranca..."
-    sleep 4
+    echo "ERRO 02: BLOQUEIO DE SEGURANCA!"
+    echo "Para restaurar, reexecute essa restauracao em outro sistema ou reformate este."
+    echo "Operacao cancelada. Saindo em 5 segundos..."
+    sleep 5
     exit 1
   fi
-  
-  echo "Machine-id validado: sistema diferente do backup - prosseguindo..."
-  
+
+  if [ -f /srv/restored8.lock ]; then
+    clear
+    echo ""
+    echo "ERRO 03: ⏭ ESTE SERVIDOR JÁ FOI RESTAURADO COMPLETAMENTE! (lock existe)"
+    echo "Se o sistema apresenta falhas nos serviços, recomendo que formate e refaça o sistema restaurando novamente."
+    echo "Operacao cancelada. Saindo em 5 segundos..."
+    sleep 5
+    exit 1
+  fi
+
+  if [ "$(hostname)" = "ubuntu-server" ]; then
+    :;
+  else
+    clear
+    echo ""; echo ""
+    echo "ERRO 04: Este sistema ja esta pre-definido com o hostname $(hostname)."
+    echo "Entendemos que você esta tentando restaurar um backup do servidor sobre um servidor legitimo em execucao."
+    echo "Se realmente quiser fazer isso, renomeie este sistema para o hostname 'ubuntu-server' e reexecute este utilitario!"
+    echo "Operacao cancelada. Saindo em 5 segundos..."
+    sleep 5
+    exit 1
+  fi
+ 
 else
   clear
   echo ""
-  echo "AVISO: Arquivo system.yaml nao encontrado no backup!"
-  sleep 3
-  echo "Nao e possivel validar a seguranca do restore."
-  echo "Saindo por seguranca..."
-  sleep 3
-  exit 1
-fi
-
-if [ -f /srv/restored8.lock ]; then
-  clear
-  echo ""
-  echo "⏭ ESTE SERVIDOR JÁ FOI RESTAURADO COMPLETAMENTE! (lock existe)"
-  sleep 2
-  echo "Se o sistema apresenta falhas nos serviços, recomendo que formate e refaça o sistema restaurando novamente."
-  sleep 4
-  echo "Saindo..."
-  sleep 2
-  exit 1
-fi
-
-if [ "$(hostname)" = "ubuntu-server" ]; then
-  :;
-else
-  clear
-  echo ""; echo "ATENCAO:"
-  sleep 1
-  echo "Este sistema ja esta pre-definido com o hostname $(hostname)."
-  sleep 4
-  echo "Entendemos que você esta tentando restaurar um backup do servidor sobre um servidor legitimo em execucao."
-  sleep 5
-  echo "Se realmente quiser fazer isso, renomeie o hostname para ubuntu-server e reexecute este utilitario!"
+  echo "ERRO 05: Arquivo system.yaml nao encontrado no backup!"
+  echo "Nao e possivel validar este backup encontrado."
+  echo "Operacao cancelada. Saindo em 5 segundos..."
   sleep 5
   exit 1
 fi
 # ETAPA 01 - Montagem das redes
 ##########################################################################################################################
-if ! [ -f /srv/restored1.lock ]; then
-  pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
-  export pathrestore
-  
+if ! [ -f /srv/restored1.lock ]; then  
   if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
     cd "$pathrestore/docker-network-backup" || exit
     
