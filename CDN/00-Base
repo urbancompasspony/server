@@ -4,14 +4,14 @@ function urgencies0 {
 var0=$(dialog --title 'Modelo CDN' --backtitle "Continuidade do Negocio" --ok-label "Acessar" --cancel-label "Voltar" --menu " " 0 0 0 \
 1 'Restaurar Containers Localmente' \
 2 'Download Backups de Containers' \
-3 'Refazer Todo o Servidor!' \
-4 'Forçar um Backup Pontual' \
+3 'Forçar um Backup Pontual' \
+4 'Refazer Todo o Servidor!' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/01-Restore_BKP | bash ; urgencies0 ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/02-Restore_Cloud | bash ; urgencies0 ;;
-3) clear ; restoreconfirm0 ; urgencies0 ;;
-4) clear ; sudo bash /srv/scripts/bkp-cdn.sh ; urgencies0 ;;
+3) clear ; sudo bash /srv/scripts/bkp-cdn.sh ; urgencies0 ;;
+4) clear ; restoreconfirm0 ; urgencies0 ;;
 X) echo "." >/dev/null ;;
 esac
 }
