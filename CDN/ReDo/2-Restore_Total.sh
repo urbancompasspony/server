@@ -141,15 +141,19 @@ network:
   ethernets:
 EOF
     
-    for interface in "${up_interfaces[@]}"; do
-        echo "    $interface:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
-        echo "      dhcp4: true" | sudo tee -a "$NETPLAN_FILE" > /dev/null
-    done
-    
-    for interface in "${down_interfaces[@]}"; do
-        echo "    $interface:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
-        echo "      dhcp4: true" | sudo tee -a "$NETPLAN_FILE" > /dev/null
-    done
+  for interface in "${up_interfaces[@]}"; do
+    echo "    $interface:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "      dhcp4: true" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "      nameservers:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "        addresses: [8.8.4.4, 1.0.0.1]" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+  done
+
+  for interface in "${down_interfaces[@]}"; do
+    echo "    $interface:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "      dhcp4: true" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "      nameservers:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    echo "        addresses: [8.8.4.4, 1.0.0.1]" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+  done
     
     sudo netplan generate
     sudo netplan apply
