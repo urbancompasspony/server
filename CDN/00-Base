@@ -28,7 +28,7 @@ function verifycontainers {
     exit 1
   fi
 
-  sudo bash /srv/scripts/bkp-cdn.sh
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh | sudo bash
 }
 
 function restoreconfirm0 {
