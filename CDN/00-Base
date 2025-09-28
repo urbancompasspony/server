@@ -10,10 +10,25 @@ X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/01-Restore_BKP | bash ; urgencies0 ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/02-Restore_Cloud | bash ; urgencies0 ;;
-3) clear ; sudo bash /srv/scripts/bkp-cdn.sh ; urgencies0 ;;
+3) clear ; verifycontainers ; urgencies0 ;;
 4) clear ; restoreconfirm0 ; urgencies0 ;;
 X) echo "." >/dev/null ;;
 esac
+}
+
+function verifycontainers {
+  if [ ! -d "/srv/containers" ]; then
+    echo "ERRO: A pasta /srv/containers não existe! Cancelando..."
+    exit 1
+  fi
+
+  # Verificar se a pasta /srv/containers está vazia
+  if [ -z "$(ls -A /srv/containers)" ]; then
+    echo "AVISO: A pasta /srv/containers existe mas está vazia. Cancelando execução."
+    exit 1
+  fi
+
+  sudo bash /srv/scripts/bkp-cdn.sh
 }
 
 function restoreconfirm0 {
