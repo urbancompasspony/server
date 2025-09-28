@@ -277,7 +277,9 @@ if ! [ -f /srv/restored3.lock ]; then
             
             most_recent_xml=$(find "$pathrestore" -iname "${vm_base}-vm-*.xml" -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2-)
             actualinterface=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
-
+            
+            cp "$most_recent_xml" "$most_recent_xml.bak"
+            sed -i "s/<source dev='$original_parent' mode='bridge'\/>/<source dev='$actualinterface' mode='bridge'\/>/g" "$most_recent_xml"
             sed -i "s/<source dev='$original_parent'/<source dev='$actualinterface'/g" $most_recent_xml.xml
 
             if [ -n "$most_recent_xml" ]; then                
