@@ -121,8 +121,9 @@ if ! [ -f /srv/restored1.lock ]; then
     
     # Verifica se a interface original existe
     if ip link show "$original_parent" >/dev/null 2>&1; then
+        clear
         echo "Interface original $original_parent encontrada - usando backup direto!"
-        
+        sleep 2
         docker network create -d macvlan \
         --subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' macvlan.json)" \
         --gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' macvlan.json)" \
@@ -130,8 +131,9 @@ if ! [ -f /srv/restored1.lock ]; then
         "$(jq -r '.[0].Name' macvlan.json)"
         
     else
+        clear
         echo "Interface $original_parent nao encontrada - configuracao interativa necessaria"
-        
+        sleep 3
         if curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/set | sudo bash; then
             echo "Configuracao de rede concluida com sucesso"
         else
@@ -172,6 +174,7 @@ if ! [ -f /srv/restored2.lock ]; then
             awk 'FNR==NR { seen[$2]++; next } !seen[$2] { print }' /etc/fstab "$fstab_backup" | sudo tee -a /etc/fstab > /dev/null
             
             echo "5. Testando configuração..."
+            sudo systemctl daemon-reload
             if sudo mount -a --fake; then
                 echo "✓ fstab válido"
             else
@@ -370,7 +373,7 @@ if ! [ -f /srv/restored5.lock ]; then
         # Baixar orchestration apenas se não existir
         if [ ! -f /tmp/orchestration ]; then
             echo "Baixando orchestration..."
-            if ! curl -sSL "$ORCHESTRATION_URL" -o /tmp/orchestration; then
+            if ! curl -sSL "$ORCHESTRATION_URL" | tee /tmp/orchestration>/dev/null; then
                 echo "❌ Erro ao baixar orchestration"
                 exit 1
             fi
