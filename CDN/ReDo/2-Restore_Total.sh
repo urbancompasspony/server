@@ -158,10 +158,9 @@ EOF
 if ! [ -f /srv/restored1.lock ]; then  
   if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
     cd "$pathrestore/docker-network-backup" || exit
-    
-    # Pega a interface do backup
     original_parent="$(jq -r '.[0].Options.parent' macvlan.json)"
     export original_parent
+    
     # Verifica se a interface original existe
     if ip link show "$original_parent" >/dev/null 2>&1; then
         clear
