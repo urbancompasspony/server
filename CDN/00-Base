@@ -45,10 +45,10 @@ PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZE
 "." 1 1 "$VALUE1" 1 1 45 0 3>&1 1>&2 2>&3 3>&- > /dev/tty)
     case $? in
       0) echo "." > /dev/null ;;
-      1) exit 0 ;;
+      1) clear; echo ""; echo "Repete a frase exatamente como estou pedindo, por favor! Saindo..." ;;
     esac
     var1=$(echo "$VALUE0" | sed -n 1p)
-    [ "$var1" = "eu estou ciente dos riscos" ] && {
+    if [ "$var1" = "eu estou ciente dos riscos" ]; then
       clear
       echo "5"
       echo "O SERVIDOR SERÁ COMPLETAMENTE RESTAURADO BASEADO NO BACKUP ENCONTRADO!"
@@ -71,10 +71,7 @@ PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZE
       sleep 3
       clear
       curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/2-Restore_Total.sh | sudo bash
-    } || {
-      clear; echo ""; echo "Repete a frase exatamente como estou pedindo, por favor! Saindo..."
-      sleep 3
-    }
+    fi
 }
 
 urgencies0
