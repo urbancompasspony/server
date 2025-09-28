@@ -57,3 +57,18 @@ virsh list --all --name | grep -i pfsense | while read -r vm_name; do
     virsh start "$vm_name"
   fi
 done
+# ETAPA 05
+##########################################################################################################################
+# Apenas uma revalidação por segurança. Isso deveria ocorrer no LINITE mas alguns servidores não tem esse dado
+# e ele não será coletado em sistemas virgens, a ausência de containers .tar.lz4 em /srv/containers vai impedir.
+yamlbase="/srv/system.yaml"
+CURRENT_MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
+BACKUP_MACHINE_ID=$(yq -r '.Informacoes.machine_id' "$yamlbase" 2>/dev/null)
+if [ "$CURRENT_MACHINE_ID" = "$BACKUP_MACHINE_ID" ]; then
+  :;
+else
+  if [ -z "$BACKUP_MACHINE_ID" ] || [ "$BACKUP_MACHINE_ID" = "null" ]; then
+    MACHINE_ID=$(cat /etc/machine-id)
+    sudo yq -i ".Informacoes.machine_id = \"${MACHINE_ID}\"" "$yamlbase"
+  fi
+fi
