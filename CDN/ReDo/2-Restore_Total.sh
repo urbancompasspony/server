@@ -249,83 +249,46 @@ fi
 if ! [ -f /srv/restored3.lock ]; then
     echo "=== ETAPA 3: Restaurando VMs pfSense ==="
     
-    # Restaurar discos pfSense (sempre 1 versão) - busca case-insensitive
+    # Restaurar discos pfSense
     echo "📦 Restaurando discos pfSense..."
     find "$pathrestore" -iname "*pfsense*" -type f | while read -r disk_file; do
-      # Verificar se é um arquivo de disco virtual
       file_type=$(file -b "$disk_file")
       if echo "$file_type" | grep -qi "qemu\|disk\|image\|data"; then
         echo "Restaurando disco: $(basename "$disk_file")"
-        echo "  Tipo: $file_type"
         sudo rsync -aHAXv --numeric-ids --sparse "$disk_file" /var/lib/libvirt/images/
-      else
-        echo "⏭ Ignorando $(basename "$disk_file") (não é disco virtual)"
-        echo "  Tipo: $file_type"
       fi
     done
     
-    # Procurar XMLs mais recentes para cada VM pfSense
-    echo ""
-    echo "🔧 Configurando VMs com XMLs mais recentes..."
+    # Configurar VM pfSense
+    echo "🔧 Configurando VM pfSense..."
     
-    # Encontrar todos os XMLs únicos (por nome base da VM) - busca case-insensitive
-    vm_bases=$(find "$pathrestore" -iname "*pfsense*.xml" -exec basename {} \; | sed 's/-vm-.*\.xml$//' | sort -u)
+    # Procurar XML pfSense (qualquer variação)
+    xml_file=$(find "$pathrestore" -iname "pf*.xml" | head -1)
     
-    if [ -n "$vm_bases" ]; then
-        echo "$vm_bases" | while read -r vm_base; do
-            echo "🔍 Processando VM base: '$vm_base'"
-            
-            most_recent_xml=$(find "$pathrestore" -iname "${vm_base}-vm-*.xml" -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2-)
-            actualinterface=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
-            
-            cp "$most_recent_xml" "$most_recent_xml.bak"
-            sed -i "s/<source dev='$original_parent' mode='bridge'\/>/<source dev='$actualinterface' mode='bridge'\/>/g" "$most_recent_xml"
-            sed -i "s/<source dev='$original_parent'/<source dev='$actualinterface'/g" $most_recent_xml.xml
-
-            if [ -n "$most_recent_xml" ]; then                
-                # Verificar se o arquivo XML existe e é legível
-                if [ -r "$most_recent_xml" ]; then
-                    # Definir a VM
-                    echo "   🔧 Definindo VM..."
-                    if virsh define "$most_recent_xml"; then
-                        echo "   ✅ VM definida com sucesso"
-                        
-                        # Tentar iniciar a VM
-                        if virsh start "$vm_base" 2>/dev/null; then
-                            echo "   ✅ VM iniciada com sucesso"
-                        else
-                            echo "   ⚠️  Falha ao iniciar $vm_base (normal se já estiver rodando)"
-                        fi
-                    else
-                        echo "   ❌ Falha ao definir VM $vm_base"
-                        echo "   🔍 Verificando conteúdo do XML..."
-                        head -5 "$most_recent_xml"
-                    fi
-                else
-                    echo "   ❌ Arquivo XML não encontrado ou não legível: $most_recent_xml"
-                fi
-                
-                # Mostrar outros XMLs disponíveis para esta VM (informativo)
-                other_xmls=$(find "$pathrestore" -iname "${vm_base}-vm-*.xml" | wc -l)
-                if [ "$other_xmls" -gt 1 ]; then
-                    echo "   ℹ️  Outros $((other_xmls-1)) XML(s) disponível(is) mas não usado(s)"
-                fi
-                echo ""
+    if [ -n "$xml_file" ]; then
+        echo "XML encontrado: $(basename "$xml_file")"
+        
+        # Obter interface atual
+        actualinterface=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
+        
+        # Fazer backup e alterar interface
+        cp "$xml_file" "$xml_file.bak"
+        sed -i "s/<source dev='$original_parent'/<source dev='$actualinterface'/g" "$xml_file"
+        
+        # Definir e iniciar VM
+        if virsh define "$xml_file"; then
+            echo "✅ VM definida com sucesso"
+            vm_name=$(basename "$xml_file" .xml | sed 's/-vm$//')
+            if virsh start "$vm_name" 2>/dev/null; then
+                echo "✅ VM iniciada com sucesso"
             else
-                echo "   ❌ Nenhum XML encontrado para VM base: $vm_base"
+                echo "⚠️  VM já estava rodando ou falha ao iniciar"
             fi
-        done
+        else
+            echo "❌ Falha ao definir VM"
+        fi
     else
-        echo "⚠️  Nenhum XML pfSense encontrado"
-        echo "XMLs disponíveis no diretório:"
-        find "$pathrestore" -name "*.xml" | head -10 | while read -r xml; do
-            echo "   - $(basename "$xml")"
-        done
-        echo ""
-        echo "🔍 Testando busca case-insensitive:"
-        find "$pathrestore" -iname "*pfsense*.xml" | while read -r xml; do
-            echo "   - $(basename "$xml")"
-        done
+        echo "❌ XML pfSense não encontrado em $pathrestore"
     fi
     
     sudo touch /srv/restored3.lock
@@ -397,7 +360,7 @@ if ! [ -f /srv/restored5.lock ]; then
     echo "=== ETAPA 5: Restaurando containers via orchestration ==="
     
     # URL correta do orchestration
-    ORCHESTRATION_URL="https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/orchestration"
+    ORCHESTRATION_URL="https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/orchestration"
     
     # Verificar se containers.yaml existe
     if [ -f /srv/containers.yaml ]; then
@@ -406,7 +369,7 @@ if ! [ -f /srv/restored5.lock ]; then
         # Baixar orchestration apenas se não existir
         if [ ! -f /tmp/orchestration ]; then
             echo "Baixando orchestration..."
-            if ! curl -sSL "$ORCHESTRATION_URL" | tee /tmp/orchestration>/dev/null; then
+            if ! curl -sSL "$ORCHESTRATION_URL" | tee /tmp/orchestration; then
                 echo "❌ Erro ao baixar orchestration"
                 exit 1
             fi
