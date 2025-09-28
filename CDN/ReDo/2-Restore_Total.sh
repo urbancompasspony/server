@@ -271,21 +271,105 @@ if ! [ -f /srv/restored3.lock ]; then
     if [ -n "$xml_file" ]; then
         echo "XML encontrado: $(basename "$xml_file")"
         
-        # Obter interface atual
-        actualinterface=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
+        # Função para mapear interfaces
+        function map_xml_interfaces {
+            local xml_file="$1"
+            
+            # Detectar interfaces disponíveis no sistema
+            available_interfaces=()
+            for interface in /sys/class/net/en*; do
+                [ -e "$interface" ] || continue
+                interface_name=$(basename "$interface")
+                available_interfaces+=("$interface_name")
+            done
+            
+            if [ ${#available_interfaces[@]} -eq 0 ]; then
+                echo "❌ Nenhuma interface ethernet encontrada"
+                return 1
+            fi
+            
+            echo "🔍 Interfaces disponíveis: ${available_interfaces[*]}"
+            
+            # Extrair interfaces do XML
+            xml_interfaces=($(grep -oP "dev='\K[^']*" "$xml_file"))
+            
+            if [ ${#xml_interfaces[@]} -eq 0 ]; then
+                echo "⚠️  Nenhuma interface no XML"
+                return 0
+            fi
+            
+            echo "🔍 Interfaces no XML: ${xml_interfaces[*]}"
+            
+            # Verificar se todas existem
+            all_exist=true
+            for xml_int in "${xml_interfaces[@]}"; do
+                if ! printf '%s\n' "${available_interfaces[@]}" | grep -q "^$xml_int$"; then
+                    all_exist=false
+                    break
+                fi
+            done
+            
+            if [ "$all_exist" = true ]; then
+                echo "✅ Todas as interfaces existem - mantendo XML original"
+                return 0
+            fi
+            
+            echo "🔄 Mapeando interfaces..."
+            cp "$xml_file" "$xml_file.bak"
+            
+            available_index=0
+            for xml_int in "${xml_interfaces[@]}"; do
+                # Se existe, manter
+                if printf '%s\n' "${available_interfaces[@]}" | grep -q "^$xml_int$"; then
+                    echo "  ✓ $xml_int -> $xml_int (mantida)"
+                    continue
+                fi
+                
+                # Mapear para próxima disponível
+                if [ $available_index -lt ${#available_interfaces[@]} ]; then
+                    new_interface="${available_interfaces[$available_index]}"
+                    
+                    # Pular se já usada no XML
+                    while printf '%s\n' "${xml_interfaces[@]}" | grep -q "^$new_interface$"; do
+                        ((available_index++))
+                        if [ $available_index -ge ${#available_interfaces[@]} ]; then
+                            break
+                        fi
+                        new_interface="${available_interfaces[$available_index]}"
+                    done
+                    
+                    if [ $available_index -lt ${#available_interfaces[@]} ]; then
+                        echo "  🔄 $xml_int -> $new_interface"
+                        sed -i "0,/dev='$xml_int'/s//dev='$new_interface'/" "$xml_file"
+                        ((available_index++))
+                    fi
+                fi
+            done
+            
+            echo "✅ Mapeamento concluído"
+        }
         
-        # Fazer backup e alterar interface
-        cp "$xml_file" "$xml_file.bak"
-        sed -i "s/<source dev='$original_parent'/<source dev='$actualinterface'/g" "$xml_file"
+        # Executar mapeamento de interfaces
+        map_xml_interfaces "$xml_file"
         
         # Definir e iniciar VM
         if virsh define "$xml_file"; then
             echo "✅ VM definida com sucesso"
-            vm_name=$(basename "$xml_file" .xml | sed 's/-vm$//')
+            
+            # Extrair nome real da VM do XML
+            vm_name=$(grep -oP '<name>\K[^<]+' "$xml_file")
+            echo "Nome da VM: $vm_name"
+            
             if virsh start "$vm_name" 2>/dev/null; then
                 echo "✅ VM iniciada com sucesso"
             else
-                echo "⚠️  VM já estava rodando ou falha ao iniciar"
+                echo "⚠️  Tentando forçar inicialização..."
+                virsh start "$vm_name" --force-boot 2>&1 | tee /tmp/vm_start_error.log
+                if [ ${PIPESTATUS[0]} -eq 0 ]; then
+                    echo "✅ VM iniciada com sucesso (forçada)"
+                else
+                    echo "❌ Falha ao iniciar VM. Log salvo em /tmp/vm_start_error.log"
+                fi
             fi
         else
             echo "❌ Falha ao definir VM"
