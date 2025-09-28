@@ -112,6 +112,53 @@ fi
   clear
 # ETAPA 01 - Montagem das redes
 ##########################################################################################################################
+NETPLAN_FILE="/etc/netplan/50-cloud-init.yaml"
+function auto_configure_netplan {
+    backup_file="/tmp/netplan_backup_$(date +%s).yaml"
+    sudo cp "$NETPLAN_FILE" "$backup_file" 2>/dev/null
+    up_interfaces=()
+    down_interfaces=()
+    
+    # Fixed: Use glob pattern instead of ls | grep
+    for interface in /sys/class/net/en*; do
+        # Check if the glob matched anything
+        [ -e "$interface" ] || continue
+        
+        # Extract just the interface name
+        interface_name=$(basename "$interface")
+        
+        status=$(cat "$interface/operstate" 2>/dev/null || echo "unknown")
+        if [ "$status" = "up" ]; then
+            up_interfaces+=("$interface_name")
+        elif [ "$status" = "down" ]; then
+            down_interfaces+=("$interface_name")
+        fi
+    done
+    
+    cat << EOF | sudo tee "$NETPLAN_FILE" > /dev/null
+network:
+  version: 2
+  ethernets:
+EOF
+    
+    for interface in "${up_interfaces[@]}"; do
+        echo "    $interface:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+        echo "      dhcp4: true" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    done
+    
+    for interface in "${down_interfaces[@]}"; do
+        echo "    $interface:" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+        echo "      dhcp4: true" | sudo tee -a "$NETPLAN_FILE" > /dev/null
+    done
+    
+    if sudo netplan try --timeout=10; then
+        :
+    else
+        sudo cp "$backup_file" "$NETPLAN_FILE"
+        sudo netplan apply
+    fi
+}
+
 if ! [ -f /srv/restored1.lock ]; then  
   if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
     cd "$pathrestore/docker-network-backup" || exit
@@ -134,6 +181,7 @@ if ! [ -f /srv/restored1.lock ]; then
         clear
         echo "Interface $original_parent nao encontrada - configuracao interativa necessaria"
         sleep 3
+        auto_configure_netplan
         if curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/set | sudo bash; then
             echo "Configuracao de rede concluida com sucesso"
         else
@@ -159,7 +207,7 @@ if ! [ -f /srv/restored2.lock ]; then
     if [ -n "$etc_file" ]; then
         echo "1. Restaurando /etc completo (exceto fstab)..."
         sudo tar -I 'lz4 -d -c' -xpf "$etc_file" -C /
-        
+
         echo "2. Procurando backup do fstab..."
         # Procurar arquivo fstab backup (formato: fstab-YYYYMMDD_HHMMSS.backup)
         fstab_backup=$(find "$pathrestore" -name "fstab.backup" | sort | tail -1)
