@@ -9,7 +9,6 @@ function pathrestore0 {
   pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
   export pathrestore
 }
-
 sudo mkdir -p /srv/containers; sudo mkdir -p /mnt/bkpsys
 if mountpoint -q /mnt/bkpsys; then
   echo "✓ Backup já está montado"
@@ -36,7 +35,6 @@ fi
 if [ -f "$pathrestore0"/system.yaml ]; then
   CURRENT_MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
   BACKUP_MACHINE_ID=$(yq -r '.Informacoes.machine_id' "$pathrestore0"/system.yaml 2>/dev/null)
-  
   # Verificar se machine-id do backup está vazio ou inválido
   if [ -z "$BACKUP_MACHINE_ID" ] || [ "$BACKUP_MACHINE_ID" = "null" ]; then
     clear
@@ -47,7 +45,6 @@ if [ -f "$pathrestore0"/system.yaml ]; then
     sleep 5
     exit 1
   fi
-   
   # Verificar se são idênticos (proteção anti-auto-restore)
   if [ "$CURRENT_MACHINE_ID" = "$BACKUP_MACHINE_ID" ]; then
     clear
@@ -58,7 +55,6 @@ if [ -f "$pathrestore0"/system.yaml ]; then
     sleep 5
     exit 1
   fi
-
   if [ -f /srv/restored8.lock ]; then
     clear
     echo ""
@@ -68,7 +64,6 @@ if [ -f "$pathrestore0"/system.yaml ]; then
     sleep 5
     exit 1
   fi
-
   if [ "$(hostname)" = "ubuntu-server" ]; then
     :;
   else
@@ -81,7 +76,6 @@ if [ -f "$pathrestore0"/system.yaml ]; then
     sleep 5
     exit 1
   fi
- 
 else
   clear
   echo ""
@@ -91,6 +85,31 @@ else
   sleep 5
   exit 1
 fi
+
+# Nenhum erro??? Então vamos seguir!
+  clear
+  echo "ESTA TUDO CORRETO! TUDO FOI DEVIDAMENTE VALIDADO."
+  slee 1
+  echo "5"
+  echo "O SERVIDOR SERÁ COMPLETAMENTE RESTAURADO BASEADO NO BACKUP ENCONTRADO!"
+  sleep 1
+  echo "4"
+  echo "NÃO TENTE INTERAGIR COM O SISTEMA DURANTE A RESTAURAÇÃO COMPLETA."
+  sleep 1
+  echo "3"
+  echo "SE POSSÍVEL DESCONECTE TECLADO E MOUSE, NÃO INTERAJA COM ABSOLUTAMENTE NADA ATÉ CONCLUIR!"
+  sleep 1
+  echo "2"
+  echo "SE QUISER DESISTIR AGORA PRESSIONE   CTRL + C"
+  sleep 1
+  echo "1"
+  echo "NÃO DESLIGUE O SERVIDOR ATÉ O MOMENTO DO REINÍCIO AUTOMÁTICO."
+  sleep 1
+  echo "0"
+  echo "Restauração Iniciada..."
+  echo "Tenha uma boa sorte!"
+  sleep 3
+  clear
 # ETAPA 01 - Montagem das redes
 ##########################################################################################################################
 if ! [ -f /srv/restored1.lock ]; then  
