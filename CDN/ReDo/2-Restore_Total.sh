@@ -496,8 +496,13 @@ function map_xml_interfaces {
         return 1
     fi
 
-    # Extrair interfaces do XML, exceto aquela do Docker!
-    xml_interfaces=($(grep -oP "dev='\K[^']*" "$xml_file" | grep -v "^$original_parent$"))
+    # Extrair interfaces APENAS de blocos <interface type='direct'>
+    # Procura por <source dev='...' mode='bridge'/> dentro de <interface type='direct'>
+    xml_interfaces=($(grep -Pzo "(?s)<interface type='direct'>.*?</interface>" "$xml_file" | \
+                  grep -Po "dev='\K[^']*" | \
+                  grep -v "^$original_parent$" | \
+                  sort -u))
+    
     if [ ${#xml_interfaces[@]} -eq 0 ]; then
         echo "⚠️  Nenhuma interface no XML"
         return 0
