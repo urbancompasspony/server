@@ -30,6 +30,47 @@ function etapa-mount {
   fi
 }
 
+function etapa00-github {
+  echo "=== Validando conectividade com GitHub ==="
+  
+  ORCHESTRATION_URL="https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/orchestration"
+  
+  echo "🌐 Testando acesso ao GitHub..."
+  
+  # Tenta fazer um HEAD request para verificar se o arquivo existe
+  if curl -sSf --head --max-time 10 "$ORCHESTRATION_URL" >/dev/null 2>&1; then
+    echo "✅ GitHub acessível - orchestration disponível"
+    return 0
+  else
+    clear
+    echo ""
+    echo "❌ ERRO 07: GITHUB INACESSÍVEL!"
+    echo ""
+    echo "Não foi possível acessar o GitHub para baixar o orchestration."
+    echo ""
+    echo "URL testada:"
+    echo "$ORCHESTRATION_URL"
+    echo ""
+    echo "POSSÍVEIS CAUSAS:"
+    echo "1. Servidor sem conexão com a internet"
+    echo "2. GitHub fora do ar"
+    echo "3. Firewall bloqueando acesso"
+    echo "4. DNS não está resolvendo corretamente"
+    echo ""
+    echo "SOLUÇÃO:"
+    echo "- Verifique a conexão de internet: ping 8.8.8.8"
+    echo "- Teste o DNS: nslookup raw.githubusercontent.com"
+    echo "- Verifique firewall/proxy"
+    echo "- Aguarde se GitHub estiver indisponível"
+    echo ""
+    echo "O restore NÃO pode continuar sem acesso ao orchestration!"
+    echo ""
+    echo "Operação cancelada. Saindo em 10 segundos..."
+    sleep 10
+    exit 1
+  fi
+}
+
 function restorefunc {
   pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
   if [ -z "$pathrestore" ]; then
@@ -736,6 +777,7 @@ function etapa07 {
 }
 
 etapa-mount
+etapa00-github
 etapa00-restored
 etapa00-machineid
 etapa00-hostname
