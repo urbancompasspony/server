@@ -515,15 +515,16 @@ function etapa02 {
   fi
 }
 
-# ============================================
-# FUNÇÃO AUXILIAR PARA MAPEAMENTO DE INTERFACES
-# Deve estar FORA de etapa03 para evitar problemas de escopo
-# ============================================
 function map_xml_interfaces {
     local xml_file="$1"
     local original_parent="$2"
     
-    # Detectar interfaces disponíveis no sistema (excluindo loopback e docker)
+    echo "=== Mapeamento de Interfaces da VM ==="
+    echo "Arquivo XML: $xml_file"
+    echo "Interface Docker (ignorada): $original_parent"
+    echo ""
+    
+    # Detectar interfaces disponíveis no sistema
     available_interfaces=()
     for interface in /sys/class/net/*; do
         [ -e "$interface" ] || continue
@@ -534,6 +535,8 @@ function map_xml_interfaces {
         [[ "$interface_name" == docker* ]] && continue
         [[ "$interface_name" == br-* ]] && continue
         [[ "$interface_name" == veth* ]] && continue
+        [[ "$interface_name" == virbr* ]] && continue
+        [[ "$interface_name" == tap* ]] && continue
 
         # Aceitar apenas interfaces físicas ethernet
         if [[ "$interface_name" =~ ^(en|em|eth|eno|enp|ens) ]]; then
@@ -542,73 +545,111 @@ function map_xml_interfaces {
     done
 
     if [ ${#available_interfaces[@]} -eq 0 ]; then
-        echo "❌ Nenhuma interface ethernet encontrada"
+        echo "❌ Nenhuma interface ethernet encontrada no sistema"
         return 1
     fi
 
+    echo "🌐 Interfaces ethernet disponíveis no sistema:"
+    printf '   • %s\n' "${available_interfaces[@]}"
+    echo ""
+
     # Extrair interfaces APENAS de blocos <interface type='direct'>
-    # Procura por <source dev='...' mode='bridge'/> dentro de <interface type='direct'>
     xml_interfaces=($(grep -Pzo "(?s)<interface type='direct'>.*?</interface>" "$xml_file" | \
-                  grep -Po "dev='\K[^']*" | \
-                  grep -v "^$original_parent$" | \
-                  sort -u))
+                      grep -Po "dev='\K[^']*" | \
+                      grep -v "^$original_parent$" | \
+                      sort -u))
     
     if [ ${#xml_interfaces[@]} -eq 0 ]; then
-        echo "⚠️  Nenhuma interface no XML"
+        echo "⚠️  Nenhuma interface de rede no XML (apenas Docker)"
         return 0
     fi
 
-    # Se XML tem mais interfaces que o sistema
+    echo "📋 Interfaces no XML do backup:"
+    printf '   • %s\n' "${xml_interfaces[@]}"
+    echo ""
+
+    # VALIDAÇÃO: Verificar quantidade
     if [ ${#xml_interfaces[@]} -gt ${#available_interfaces[@]} ]; then
-        echo "⚠️  XML requer ${#xml_interfaces[@]} interfaces, mas sistema só tem ${#available_interfaces[@]}"
-        echo "⏭  Pulando mapeamento e inicialização da VM - interfaces insuficientes"
+        echo "❌ XML requer ${#xml_interfaces[@]} interface(s), sistema tem ${#available_interfaces[@]}"
+        echo "⏭  VM será definida mas NÃO iniciada"
         return 2
     fi
 
-    # Verificar se todas existem
-    all_exist=true
+    # Verificar quais interfaces do XML existem no sistema
+    missing_interfaces=()
+    existing_interfaces=()
+    
     for xml_int in "${xml_interfaces[@]}"; do
-        if ! printf '%s\n' "${available_interfaces[@]}" | grep -q "^$xml_int$"; then
-            all_exist=false
-            break
+        if printf '%s\n' "${available_interfaces[@]}" | grep -q "^$xml_int$"; then
+            existing_interfaces+=("$xml_int")
+        else
+            missing_interfaces+=("$xml_int")
         fi
     done
 
-    if [ "$all_exist" = true ]; then
-        echo "✅ Todas as interfaces existem - mantendo XML original"
+    # SE TODAS EXISTEM: não precisa mapear
+    if [ ${#missing_interfaces[@]} -eq 0 ]; then
+        echo "✅ Todas as interfaces do XML existem no sistema"
+        printf '   ✓ %s\n' "${existing_interfaces[@]}"
+        echo "📝 Nenhuma modificação necessária - usando XML original"
         return 0
     fi
 
-    cp "$xml_file" "$xml_file.bak"
+    # PRECISA MAPEAR
+    echo "⚠️  Interfaces que NÃO existem no sistema:"
+    printf '   ✗ %s\n' "${missing_interfaces[@]}"
+    echo ""
+    echo "🔧 Iniciando mapeamento automático..."
+    echo ""
 
-    available_index=0
+    # Backup do XML original
+    if [ ! -f "$xml_file.original" ]; then
+        cp "$xml_file" "$xml_file.original"
+        echo "💾 Backup: $xml_file.original"
+    fi
+
+    # Interfaces disponíveis para mapeamento (não usadas no XML)
+    available_for_mapping=()
+    for avail_int in "${available_interfaces[@]}"; do
+        if ! printf '%s\n' "${existing_interfaces[@]}" | grep -q "^$avail_int$"; then
+            available_for_mapping+=("$avail_int")
+        fi
+    done
+
+    echo "🎯 Interfaces livres para mapeamento:"
+    printf '   • %s\n' "${available_for_mapping[@]}"
+    echo ""
+    echo "--- Mapeamento realizado ---"
+
+    # MAPEAR CADA INTERFACE
+    mapping_index=0
     for xml_int in "${xml_interfaces[@]}"; do
         # Se existe, manter
-        if printf '%s\n' "${available_interfaces[@]}" | grep -q "^$xml_int$"; then
-            echo "  ✓ $xml_int -> $xml_int (mantida)"
+        if printf '%s\n' "${existing_interfaces[@]}" | grep -q "^$xml_int$"; then
+            echo "  ✓ $xml_int → $xml_int (mantida)"
             continue
         fi
 
-        # Mapear para próxima disponível
-        if [ $available_index -lt ${#available_interfaces[@]} ]; then
-            new_interface="${available_interfaces[$available_index]}"
-
-            # Pular se já usada no XML
-            while printf '%s\n' "${xml_interfaces[@]}" | grep -q "^$new_interface$"; do
-                ((available_index++))
-                if [ $available_index -ge ${#available_interfaces[@]} ]; then
-                    break
-                fi
-                new_interface="${available_interfaces[$available_index]}"
-            done
-
-            if [ $available_index -lt ${#available_interfaces[@]} ]; then
-                echo "  🔄 $xml_int -> $new_interface"
-                sed -i "0,/dev='$xml_int'/s//dev='$new_interface'/" "$xml_file"
-                ((available_index++))
-            fi
+        # Não existe - mapear
+        if [ $mapping_index -lt ${#available_for_mapping[@]} ]; then
+            new_interface="${available_for_mapping[$mapping_index]}"
+            echo "  🔄 $xml_int → $new_interface (remapeada)"
+            
+            # Substituir no XML
+            sed -i "0,/dev='$xml_int'/s//dev='$new_interface'/" "$xml_file"
+            
+            ((mapping_index++))
+        else
+            echo "  ❌ $xml_int → FALHA (sem interfaces livres)"
         fi
     done
+
+    echo "----------------------------"
+    echo ""
+    echo "✅ XML modificado com sucesso!"
+    echo "📄 Usando: $xml_file"
+    
+    return 0
 }
 
 function etapa03 {
@@ -624,50 +665,53 @@ function etapa03 {
         fi
       done
 
-      # Procurar XML pfSense (qualquer variação)
-      xml_file=$(find "$pathrestore" -iname "pf*.xml" | head -1)
+      # Procurar XML no backup
+      xml_file_backup=$(find "$pathrestore" -iname "pf*.xml" | head -1)
 
-      if [ -n "$xml_file" ]; then
-          echo "XML encontrado: $(basename "$xml_file")"
+      if [ -n "$xml_file_backup" ]; then
+          echo "📄 XML no backup: $(basename "$xml_file_backup")"
           
-          # Interface do Docker para ser ignorada e não usada no pfSense
+          # Copiar para área de trabalho
+          xml_file_work="/tmp/pfsense-restore.xml"
+          cp "$xml_file_backup" "$xml_file_work"
+          echo "✓ Copiado para: $xml_file_work"
+          echo ""
+          
+          # Detectar interface Docker
           docker_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
           original_parent="$docker_interface"
 
           if [ -z "$original_parent" ] || [ "$original_parent" = "null" ]; then
-            echo "ERRO: Rede macvlan não encontrada. Execute etapa01 primeiro ou crie a rede manualmente."
-            sleep 3
+            echo "❌ Rede macvlan não encontrada - execute etapa01 primeiro"
             return 1
           fi
 
-          # Executar mapeamento de interfaces (agora passando parâmetros explicitamente)
-          map_xml_interfaces "$xml_file" "$original_parent"
+          # MAPEAR INTERFACES
+          map_xml_interfaces "$xml_file_work" "$original_parent"
           mapping_result=$?
 
-          # Só definir e iniciar VM se o mapeamento foi bem-sucedido
-          if [ $mapping_result -eq 2 ]; then
-              echo "⏭  VM não será iniciada devido à falta de interfaces"
-          elif virsh define "$xml_file"; then
-              # Extrair nome real da VM do XML
-              vm_name=$(grep -oP '<name>\K[^<]+' "$xml_file")
-              
-              if [ -z "$vm_name" ]; then
-                  echo "❌ Não foi possível extrair o nome da VM do XML"
-              else
-                  echo "Nome da VM: $vm_name"
+          echo ""
+          
+          # Definir VM
+          if virsh define "$xml_file_work"; then
+              vm_name=$(grep -oP '<name>\K[^<]+' "$xml_file_work")
+              echo "✅ VM definida: $vm_name"
 
+              # Iniciar apenas se mapeamento OK
+              if [ $mapping_result -eq 2 ]; then
+                  echo "⏭  VM NÃO iniciada (interfaces insuficientes)"
+              else
+                  echo "🚀 Iniciando VM..."
                   if virsh start "$vm_name" 2>/dev/null; then
-                      echo "✅ VM iniciada com sucesso"
+                      echo "✅ VM iniciada com sucesso!"
                   else
-                      echo "⚠️  Tentando forçar inicialização..."
                       virsh start "$vm_name" --force-boot 2>&1 | tee /tmp/vm_start_error.log
-                      if [ ${PIPESTATUS[0]} -eq 0 ]; then
-                          echo "✅ VM iniciada com sucesso (forçada)"
-                      else
-                          echo "❌ Falha ao iniciar VM. Log salvo em /tmp/vm_start_error.log"
-                      fi
+                      [ ${PIPESTATUS[0]} -eq 0 ] && echo "✅ VM iniciada (forçada)" || echo "❌ Falha - veja /tmp/vm_start_error.log"
                   fi
               fi
+              
+              # Salvar XML final
+              sudo cp "$xml_file_work" "/var/lib/libvirt/qemu/$vm_name.xml"
           else
               echo "❌ Falha ao definir VM"
           fi
@@ -676,7 +720,7 @@ function etapa03 {
       sudo touch /srv/restored3.lock
       echo "✅ ETAPA 3 concluída"
   else
-      echo "⏭ ETAPA 3 já executada (lock existe)"
+      echo "⏭ ETAPA 3 já executada"
   fi
 }
 
