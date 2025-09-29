@@ -28,7 +28,7 @@ function verifycontainers {
   fi
 
   if dialog --title 'Backup Imediato' --backtitle "BACKUP" --yesno 'Deseja fazer um backup deste sistema? \nTodos os servicos serao pausados.' 0 0; then
-    clear; echo "Aguarde..."
+    clear; echo "Digite sua senha a seguir..."
     curl -sSL "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" | sudo tee /srv/scripts/backupcont.sh> /dev/null
     sudo chmod +x /srv/scripts/backupcont.sh; sudo bash /srv/scripts/backupcont.sh
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh | sudo tee /srv/scripts/bkp-cdn.sh >/dev/null
