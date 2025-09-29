@@ -6,23 +6,21 @@ yamlbase="/srv/system.yaml"
 CURRENT_MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
 BACKUP_MACHINE_ID=$(yq -r '.Informacoes.machine_id' "$yamlbase" 2>/dev/null)
 
-function etapaX {
+function etapa00 {
   if [ "$(hostname)" = "ubuntu-server" ]; then
     clear
     echo "Tentativa de criar um backup a partir de um sistema limpo."
     echo "Saindo..."
     sleep 3
     exit 1
-  fi
-}
-
-function etapa00 {
-  if [ "$CURRENT_MACHINE_ID" = "$BACKUP_MACHINE_ID" ]; then
-    :;
   else
-    if [ -z "$BACKUP_MACHINE_ID" ] || [ "$BACKUP_MACHINE_ID" = "null" ]; then
-      MACHINE_ID=$(cat /etc/machine-id)
-      sudo yq -i ".Informacoes.machine_id = \"${MACHINE_ID}\"" "$yamlbase"
+    if [ "$CURRENT_MACHINE_ID" = "$BACKUP_MACHINE_ID" ]; then
+      :;
+    else
+      if [ -z "$BACKUP_MACHINE_ID" ] || [ "$BACKUP_MACHINE_ID" = "null" ]; then
+        MACHINE_ID=$(cat /etc/machine-id)
+        sudo yq -i ".Informacoes.machine_id = \"${MACHINE_ID}\"" "$yamlbase"
+      fi
     fi
   fi
 }
@@ -90,7 +88,6 @@ function wait_vm_shutdown {
   echo "VM $vm_name parada"
 }
 
-etapaX
 etapa00
 etapa01
 etapa02
