@@ -216,7 +216,6 @@ function etapa03 {
       echo "=== ETAPA 3: Restaurando VMs pfSense ==="
 
       # Restaurar discos pfSense
-      echo "📦 Restaurando discos pfSense..."
       find "$pathrestore" -iname "*pfsense*" -type f | while read -r disk_file; do
         file_type=$(file -b "$disk_file")
         if echo "$file_type" | grep -qi "qemu\|disk\|image\|data"; then
@@ -224,9 +223,6 @@ function etapa03 {
           sudo rsync -aHAXv --numeric-ids --sparse "$disk_file" /var/lib/libvirt/images/
         fi
       done
-
-      # Configurar VM pfSense
-      echo "🔧 Configurando VM pfSense..."
 
       # Procurar XML pfSense (qualquer variação)
       xml_file=$(find "$pathrestore" -iname "pf*.xml" | head -1)
@@ -255,17 +251,13 @@ function etapa03 {
                   return 1
               fi
 
-              echo "🔍 Interfaces disponíveis: ${available_interfaces[*]}"
-
-              # Extrair interfaces do XML
+              # Extrair interfaces do XML, exceto aquela do Docker!
               xml_interfaces=($(grep -oP "dev='\K[^']*" "$xml_file" | grep -v "^$original_parent$"))
 
               if [ ${#xml_interfaces[@]} -eq 0 ]; then
                   echo "⚠️  Nenhuma interface no XML"
                   return 0
               fi
-
-              echo "🔍 Interfaces no XML: ${xml_interfaces[*]}"
 
               # Verificar se todas existem
               all_exist=true
@@ -281,7 +273,6 @@ function etapa03 {
                   return 0
               fi
 
-              echo "🔄 Mapeando interfaces..."
               cp "$xml_file" "$xml_file.bak"
 
               available_index=0
@@ -312,8 +303,6 @@ function etapa03 {
                       fi
                   fi
               done
-
-              echo "✅ Mapeamento concluído"
           }
 
           # Executar mapeamento de interfaces
@@ -321,8 +310,6 @@ function etapa03 {
 
           # Definir e iniciar VM
           if virsh define "$xml_file"; then
-              echo "✅ VM definida com sucesso"
-
               # Extrair nome real da VM do XML
               vm_name=$(grep -oP '<name>\K[^<]+' "$xml_file")
               echo "Nome da VM: $vm_name"
