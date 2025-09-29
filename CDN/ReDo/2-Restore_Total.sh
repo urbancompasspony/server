@@ -263,10 +263,16 @@ function etapa03 {
 
               # Extrair interfaces do XML, exceto aquela do Docker!
               xml_interfaces=($(grep -oP "dev='\K[^']*" "$xml_file" | grep -v "^$original_parent$"))
-
               if [ ${#xml_interfaces[@]} -eq 0 ]; then
                   echo "⚠️  Nenhuma interface no XML"
                   return 0
+              fi
+
+              # Se XML tem mais interfaces que o sistema
+              if [ ${#xml_interfaces[@]} -gt ${#available_interfaces[@]} ]; then
+                  echo "⚠️  XML requer ${#xml_interfaces[@]} interfaces, mas sistema só tem ${#available_interfaces[@]}"
+                  echo "⏭  Pulando mapeamento e inicialização da VM - interfaces insuficientes"
+                  return 2
               fi
 
               # Verificar se todas existem
@@ -317,9 +323,12 @@ function etapa03 {
 
           # Executar mapeamento de interfaces
           map_xml_interfaces "$xml_file"
+          mapping_result=$?
 
-          # Definir e iniciar VM
-          if virsh define "$xml_file"; then
+          # Só definir e iniciar VM se o mapeamento foi bem-sucedido
+          if [ $mapping_result -eq 2 ]; then
+              echo "⏭  VM não será iniciada devido à falta de interfaces"
+          elif virsh define "$xml_file"; then
               # Extrair nome real da VM do XML
               vm_name=$(grep -oP '<name>\K[^<]+' "$xml_file")
               echo "Nome da VM: $vm_name"
@@ -338,9 +347,6 @@ function etapa03 {
           else
               echo "❌ Falha ao definir VM"
           fi
-      else
-          echo "❌ XML pfSense não encontrado em $pathrestore"
-      fi
 
       sudo touch /srv/restored3.lock
       echo "✅ ETAPA 3 concluída"
