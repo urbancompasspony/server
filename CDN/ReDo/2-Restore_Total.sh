@@ -100,6 +100,141 @@ function etapa00-hostname {
   fi
 }
 
+function etapa00-interfaces {
+  echo "=== Validando interfaces de rede para pfSense ==="
+  
+  # Procurar XML do pfSense no backup
+  xml_file=$(find "$pathrestore" -iname "pf*.xml" 2>/dev/null | head -1)
+  
+  if [ -z "$xml_file" ]; then
+    echo "⚠️  Nenhum XML de pfSense encontrado no backup"
+    echo "✓ Validação de interfaces: PULADA (sem VM para restaurar)"
+    return 0
+  fi
+  
+  echo "📄 XML encontrado: $(basename "$xml_file")"
+  
+  # Detectar interface do Docker (será ignorada)
+  docker_interface=$(yq -r '.[0].Options.parent' "$pathrestore"/docker-network-backup/macvlan.json 2>/dev/null)
+  
+  if [ -z "$docker_interface" ] || [ "$docker_interface" = "null" ]; then
+    echo "⚠️  Não foi possível detectar interface Docker do backup"
+    echo "   Assumindo que será criada durante restore"
+    docker_interface="NONE"
+  else
+    echo "🐳 Interface Docker no backup: $docker_interface (será ignorada)"
+  fi
+  
+  # Extrair interfaces do XML, excluindo a do Docker
+  mapfile -t xml_interfaces < <(grep -oP "dev='\K[^']*" "$xml_file" | grep -v "^$docker_interface$" | sort -u)
+  
+  if [ ${#xml_interfaces[@]} -eq 0 ]; then
+    echo "✓ Validação de interfaces: OK (nenhuma interface no XML)"
+    return 0
+  fi
+  
+  echo "🔍 Interfaces necessárias no XML (exceto Docker):"
+  printf '   • %s\n' "${xml_interfaces[@]}"
+  echo "   Total: ${#xml_interfaces[@]} interface(s)"
+  echo ""
+  
+  # Detectar interfaces físicas disponíveis no sistema atual
+  available_interfaces=()
+  for interface in /sys/class/net/*; do
+    [ -e "$interface" ] || continue
+    interface_name=$(basename "$interface")
+    
+    # Pular loopback, docker e interfaces virtuais
+    [[ "$interface_name" == "lo" ]] && continue
+    [[ "$interface_name" == docker* ]] && continue
+    [[ "$interface_name" == br-* ]] && continue
+    [[ "$interface_name" == veth* ]] && continue
+    [[ "$interface_name" == virbr* ]] && continue
+    [[ "$interface_name" == tap* ]] && continue
+    
+    # Aceitar apenas interfaces físicas ethernet
+    if [[ "$interface_name" =~ ^(en|em|eth|eno|enp|ens) ]]; then
+      # Verificar se está UP ou pode ser ativada
+      if ip link show "$interface_name" >/dev/null 2>&1; then
+        available_interfaces+=("$interface_name")
+      fi
+    fi
+  done
+  
+  if [ ${#available_interfaces[@]} -eq 0 ]; then
+    clear
+    echo ""
+    echo "❌ ERRO 06: INTERFACES INSUFICIENTES!"
+    echo ""
+    echo "O backup contém uma VM pfSense que requer ${#xml_interfaces[@]} interface(s) ethernet:"
+    printf '   • %s\n' "${xml_interfaces[@]}"
+    echo ""
+    echo "Porém, este sistema NÃO possui nenhuma interface ethernet física disponível!"
+    echo ""
+    echo "Interfaces detectadas no sistema:"
+    for iface in /sys/class/net/*; do
+      [ -e "$iface" ] && echo "   • $(basename "$iface")"
+    done
+    echo ""
+    echo "SOLUÇÃO:"
+    echo "1. Adicione placas de rede físicas ao servidor"
+    echo "2. Ou remova a VM pfSense do backup antes de restaurar"
+    echo ""
+    echo "Operação cancelada. Saindo em 10 segundos..."
+    sleep 10
+    exit 1
+  fi
+  
+  echo "🌐 Interfaces ethernet disponíveis neste sistema:"
+  printf '   • %s\n' "${available_interfaces[@]}"
+  echo "   Total: ${#available_interfaces[@]} interface(s)"
+  echo ""
+  
+  # VERIFICAÇÃO CRÍTICA: Comparar quantidade
+  if [ ${#xml_interfaces[@]} -gt ${#available_interfaces[@]} ]; then
+    clear
+    echo ""
+    echo "❌ ERRO 06: INTERFACES INSUFICIENTES!"
+    echo ""
+    echo "┌─────────────────────────────────────────────────┐"
+    echo "│  O backup requer:  ${#xml_interfaces[@]} interface(s) ethernet      │"
+    echo "│  Sistema possui:   ${#available_interfaces[@]} interface(s) disponível(is) │"
+    echo "└─────────────────────────────────────────────────┘"
+    echo ""
+    echo "Interfaces necessárias (do backup):"
+    printf '   • %s\n' "${xml_interfaces[@]}"
+    echo ""
+    echo "Interfaces disponíveis (neste sistema):"
+    printf '   • %s\n' "${available_interfaces[@]}"
+    echo ""
+    echo "A VM pfSense NÃO poderá ser restaurada corretamente!"
+    echo ""
+    echo "SOLUÇÕES POSSÍVEIS:"
+    echo "1. Adicione mais $(( ${#xml_interfaces[@]} - ${#available_interfaces[@]} )) placa(s) de rede física ao servidor"
+    echo "2. Edite o XML do pfSense no backup para usar menos interfaces"
+    echo "3. Continue o restore, mas a VM pfSense ficará inoperante"
+    echo ""
+    echo "Deseja continuar mesmo assim? A VM NÃO será iniciada."
+    read -p "Digite 'sim' para continuar ou pressione ENTER para cancelar: " resposta
+    
+    if [ "$resposta" = "sim" ]; then
+      echo ""
+      echo "⚠️  Continuando restore... VM pfSense será definida mas NÃO iniciada"
+      sleep 3
+      return 0
+    else
+      echo ""
+      echo "Operação cancelada pelo usuário. Saindo em 5 segundos..."
+      sleep 5
+      exit 1
+    fi
+  fi
+  
+  echo "✅ Validação de interfaces: OK"
+  echo "   Sistema possui interfaces suficientes para restaurar pfSense"
+  sleep 2
+}
+
 function etapa00-ok {
   clear
   echo "ESTA TUDO CORRETO! TUDO FOI DEVIDAMENTE VALIDADO."
@@ -376,7 +511,7 @@ function etapa04 {
       if [ -f "$pathrestore/system.yaml" ];then
         sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/system.yaml" /srv/
       else
-        clear; echo "ERROR: Nao encontrei o systemn.yaml. SAINDO..."
+        clear; echo "ERROR: Nao encontrei o system.yaml. SAINDO..."
         exit 1
       fi
 
@@ -393,37 +528,40 @@ function etapa04 {
       echo "🔍 Analisando arquivos de container..."
 
       # Encontrar todos os arquivos .tar.lz4 (exceto etc)
+      # Usar sort -V para ordenação natural de versão
       temp_file="/tmp/container_analysis.$$"
-      find "$pathrestore" -name "*.tar.lz4" -not -name "etc*.tar.lz4" -printf '%T@ %p\n' | sort -k2 > "$temp_file"
+      find "$pathrestore" -name "*.tar.lz4" -not -name "etc*.tar.lz4" -printf '%f\n' | sort -V > "$temp_file"
 
       # Extrair nomes base únicos e pegar o mais recente de cada
       declare -A latest_files
 
-      while read -r timestamp filepath; do
-          filename=$(basename "$filepath")
+      while read -r filename; do
           # Extrair nome base (tudo antes da data)
-          # Ex: openspeedtest-24_09_25.tar.lz4 -> openspeedtest
+          # Ex: openspeedtest-29_09_25.tar.lz4 -> openspeedtest
           basename_clean=$(echo "$filename" | sed 's/-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.tar\.lz4$//')
 
-          # Guardar o mais recente (maior timestamp) para cada nome base
-          if [[ -z "${latest_files[$basename_clean]}" ]] || (( $(echo "$timestamp > ${latest_files[$basename_clean]%% *}" | bc -l) )); then
-              latest_files[$basename_clean]="$timestamp $filepath"
-          fi
+          # Como está ordenado por sort -V, sempre substitui com o mais recente
+          latest_files[$basename_clean]="$filename"
       done < "$temp_file"
 
       rm -f "$temp_file"
 
       # Restaurar os arquivos selecionados
       if [ ${#latest_files[@]} -gt 0 ]; then
-          echo "📦 Encontrados $(echo ${#latest_files[@]}) containers únicos:"
+          echo "📦 Encontrados ${#latest_files[@]} containers únicos:"
 
           for basename_clean in "${!latest_files[@]}"; do
-              filepath=$(echo "${latest_files[$basename_clean]}" | cut -d' ' -f2-)
-              filename=$(basename "$filepath")
+              filename="${latest_files[$basename_clean]}"
+              filepath="$pathrestore/$filename"
+              
               echo "  - $basename_clean: $filename"
 
-              echo "    Extraindo: $filename"
-              sudo tar -I 'lz4 -d -c' -xf "$filepath" -C /srv/containers
+              if [ -f "$filepath" ]; then
+                  echo "    Extraindo: $filename"
+                  sudo tar -I 'lz4 -d -c' -xf "$filepath" -C /srv/containers
+              else
+                  echo "    ⚠️  Arquivo não encontrado: $filepath"
+              fi
           done
 
           echo "✅ Containers restaurados (mais recente de cada)"
@@ -601,6 +739,7 @@ etapa-mount
 etapa00-restored
 etapa00-machineid
 etapa00-hostname
+etapa00-interfaces
 etapa00-ok
 
 etapa01
