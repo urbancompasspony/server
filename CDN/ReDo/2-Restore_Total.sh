@@ -384,36 +384,83 @@ function etapa01 {
     if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
       cd "$pathrestore/docker-network-backup" || exit
       original_parent="$(jq -r '.[0].Options.parent' macvlan.json)"
-      export original_parent
+      
+      echo "=== ETAPA 1: Configurando rede Docker macvlan ==="
+      echo "Interface no backup: $original_parent"
 
       # Verifica se a interface original existe
       if ip link show "$original_parent" >/dev/null 2>&1; then
           clear
-          echo "Interface original $original_parent encontrada - usando backup direto!"
+          echo "✅ Interface original $original_parent encontrada - usando backup direto!"
           sleep 2
-          docker network create -d macvlan \
-          --subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' macvlan.json)" \
-          --gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' macvlan.json)" \
-          -o parent="$original_parent" \
-          "$(jq -r '.[0].Name' macvlan.json)"
+          
+          if docker network create -d macvlan \
+            --subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' macvlan.json)" \
+            --gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' macvlan.json)" \
+            -o parent="$original_parent" \
+            "$(jq -r '.[0].Name' macvlan.json)"; then
+            
+            echo "✅ Rede macvlan criada com sucesso!"
+            export original_parent
+            
+          else
+            echo "❌ ERRO ao criar rede macvlan"
+            echo "Possíveis causas:"
+            echo "  - Rede já existe"
+            echo "  - Conflito de subnet"
+            echo "  - Interface em uso"
+            exit 1
+          fi
 
       else
           clear
-          echo "Interface $original_parent nao encontrada - configuracao interativa necessaria"
+          echo "⚠️ Interface $original_parent não encontrada!"
+          echo "Será necessário configurar manualmente..."
           sleep 3
+          
+          # Chamar script de configuração interativa
           if curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/set | sudo bash; then
-              :
+              echo ""
+              echo "✅ Rede configurada com sucesso!"
+              sleep 2
+              
+              # CRÍTICO: Atualizar a variável com a interface REAL que foi configurada
+              new_parent=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
+              
+              if [ -n "$new_parent" ] && [ "$new_parent" != "null" ]; then
+                  echo "📝 Nova interface detectada: $new_parent"
+                  original_parent="$new_parent"
+                  export original_parent
+              else
+                  echo "❌ ERRO: Não foi possível detectar a interface configurada!"
+                  echo "Inspecionando rede macvlan:"
+                  docker network inspect macvlan
+                  exit 1
+              fi
+              
           else
-              echo "ERRO: Falha na configuracao de rede"
+              echo "❌ ERRO: Falha na configuração de rede"
               exit 1
           fi
       fi
 
+      # Salvar configuração final no system.yaml
+      if [ -f /srv/system.yaml ]; then
+          echo "💾 Salvando configuração da interface no system.yaml..."
+          sudo yq -i ".Rede.interface_docker = \"$original_parent\"" /srv/system.yaml
+          echo "✓ Interface $original_parent salva no YAML"
+      else
+          echo "⚠️ system.yaml ainda não existe - será salvo na etapa04"
+      fi
+
       sudo touch /srv/restored1.lock
-      echo "ETAPA 1 concluida"
+      echo "✅ ETAPA 1 concluída"
+      
+    else
+      echo "⚠️ Arquivo macvlan.json não encontrado - pulando configuração de rede"
     fi
   else
-    echo "ETAPA 1 ja executada (lock existe)"
+    echo "⏭ ETAPA 1 já executada (lock existe)"
   fi
 }
 
