@@ -144,8 +144,6 @@ function etapa01 {
           clear
           echo "Interface $original_parent nao encontrada - configuracao interativa necessaria"
           sleep 3
-          auto_configure_netplan
-          sleep 3
           if curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/set | sudo bash; then
               :
           else
