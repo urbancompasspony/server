@@ -417,7 +417,9 @@ function etapa01 {
           echo "⚠️ Interface $original_parent não encontrada!"
           echo "Será necessário configurar manualmente..."
           sleep 3
-          
+          echo ""
+          echo "LEMBRE-SE DE MAPEAR A SUBNET, O GATEWAY E A PLACA DE REDE ESPECIFICAMENTE PARA APONTAR OS CONTAINERS NA LAN DO PFSENSE!"
+          sleep 5
           # Chamar script de configuração interativa
           if curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/set | sudo bash; then
               echo ""
