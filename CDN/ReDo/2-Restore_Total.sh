@@ -238,12 +238,22 @@ function etapa03 {
           function map_xml_interfaces {
               local xml_file="$1"
 
-              # Detectar interfaces disponíveis no sistema
+              # Detectar interfaces disponíveis no sistema (excluindo loopback e docker)
               available_interfaces=()
-              for interface in /sys/class/net/en*; do
+              for interface in /sys/class/net/*; do
                   [ -e "$interface" ] || continue
                   interface_name=$(basename "$interface")
-                  available_interfaces+=("$interface_name")
+    
+                  # Pular loopback, docker e interfaces virtuais
+                  [[ "$interface_name" == "lo" ]] && continue
+                  [[ "$interface_name" == docker* ]] && continue
+                  [[ "$interface_name" == br-* ]] && continue
+                  [[ "$interface_name" == veth* ]] && continue
+    
+                  # Aceitar apenas interfaces físicas ethernet
+                  if [[ "$interface_name" =~ ^(en|em|eth|eno|enp|ens) ]]; then
+                      available_interfaces+=("$interface_name")
+                  fi
               done
 
               if [ ${#available_interfaces[@]} -eq 0 ]; then
