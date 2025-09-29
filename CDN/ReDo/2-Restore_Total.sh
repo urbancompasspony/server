@@ -240,8 +240,11 @@ function etapa00-interfaces {
   fi
   
   # Extrair interfaces do XML, excluindo a do Docker
-  mapfile -t xml_interfaces < <(grep -oP "dev='\K[^']*" "$xml_file" | grep -v "^$docker_interface$" | sort -u)
-  
+  mapfile -t xml_interfaces < <(grep -Pzo "(?s)<interface type='direct'>.*?</interface>" "$xml_file" | \
+                              grep -Po "dev='\K[^']*" | \
+                              grep -v "^$docker_interface$" | \
+                              sort -u)
+                              
   if [ ${#xml_interfaces[@]} -eq 0 ]; then
     echo "✓ Validação de interfaces: OK (nenhuma interface no XML)"
     return 0
