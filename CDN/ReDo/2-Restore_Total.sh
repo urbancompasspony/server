@@ -6,6 +6,13 @@ yamlextra="/srv/containers.yaml"
 export yamlbase
 export yamlextra
 
+LOG_FILE="/var/log/restore-$(date +%Y%m%d_%H%M%S).log"
+exec 1> >(tee -a "$LOG_FILE")
+exec 2>&1
+
+echo "=== Restore iniciado em $(date) ==="
+echo "Log salvo em: $LOG_FILE"
+
 function etapa-mount {
   sudo mkdir -p /srv/containers; sudo mkdir -p /mnt/bkpsys
   if mountpoint -q /mnt/bkpsys; then
@@ -28,6 +35,72 @@ function etapa-mount {
       exit 1
     fi
   fi
+}
+
+function etapa00-dependencies {
+  echo "=== Validando dependências ==="
+  
+  missing_deps=()
+  
+  for cmd in yq lz4 jq docker virsh rsync curl; do
+    if ! command -v "$cmd" &> /dev/null; then
+      missing_deps+=("$cmd")
+    fi
+  done
+  
+  if [ ${#missing_deps[@]} -gt 0 ]; then
+    clear
+    echo ""
+    echo "❌ ERRO 08: DEPENDÊNCIAS FALTANDO!"
+    echo ""
+    echo "Os seguintes pacotes são necessários mas não foram encontrados:"
+    printf '   • %s\n' "${missing_deps[@]}"
+    echo ""
+    echo "Instale-os com:"
+    echo "sudo apt install yq liblz4-tool jq docker.io libvirt-clients rsync curl"
+    echo ""
+    echo "Operação cancelada. Saindo em 10 segundos..."
+    sleep 10
+    exit 1
+  fi
+  
+  echo "✅ Todas as dependências encontradas"
+}
+
+function etapa00-diskspace {
+  echo "=== Validando espaço em disco ==="
+  
+  # Estimar tamanho total dos backups
+  backup_size=$(du -sb "$pathrestore" | cut -f1)
+  backup_size_gb=$((backup_size / 1024 / 1024 / 1024))
+  
+  # Espaço disponível em /srv
+  available_space=$(df /srv | tail -1 | awk '{print $4}')
+  available_gb=$((available_space / 1024 / 1024))
+  
+  echo "Tamanho do backup: ~${backup_size_gb}GB"
+  echo "Espaço disponível: ~${available_gb}GB"
+  
+  # Precisa de pelo menos 2x o tamanho (descompactação + original)
+  required_space=$((backup_size_gb * 2))
+  
+  if [ $available_gb -lt $required_space ]; then
+    clear
+    echo ""
+    echo "❌ ERRO 09: ESPAÇO INSUFICIENTE!"
+    echo ""
+    echo "Necessário: ~${required_space}GB"
+    echo "Disponível: ~${available_gb}GB"
+    echo "Faltam: ~$((required_space - available_gb))GB"
+    echo ""
+    echo "Libere espaço em /srv antes de continuar."
+    echo ""
+    echo "Operação cancelada. Saindo em 10 segundos..."
+    sleep 10
+    exit 1
+  fi
+  
+  echo "✅ Espaço em disco suficiente"
 }
 
 function etapa00-github {
@@ -256,8 +329,9 @@ function etapa00-interfaces {
     echo "3. Continue o restore, mas a VM pfSense ficará inoperante"
     echo ""
     echo "Deseja continuar mesmo assim? A VM NÃO será iniciada."
-    read -p "Digite 'sim' para continuar ou pressione ENTER para cancelar: " resposta
     
+    read -p "Digite 'sim' para continuar ou pressione ENTER para cancelar: " resposta
+    resposta=$(echo "$resposta" | tr '[:upper:]' '[:lower:]' | xargs)
     if [ "$resposta" = "sim" ]; then
       echo ""
       echo "⚠️  Continuando restore... VM pfSense será definida mas NÃO iniciada"
@@ -391,6 +465,97 @@ function etapa02 {
   fi
 }
 
+# ============================================
+# FUNÇÃO AUXILIAR PARA MAPEAMENTO DE INTERFACES
+# Deve estar FORA de etapa03 para evitar problemas de escopo
+# ============================================
+function map_xml_interfaces {
+    local xml_file="$1"
+    local original_parent="$2"
+    
+    # Detectar interfaces disponíveis no sistema (excluindo loopback e docker)
+    available_interfaces=()
+    for interface in /sys/class/net/*; do
+        [ -e "$interface" ] || continue
+        interface_name=$(basename "$interface")
+
+        # Pular loopback, docker e interfaces virtuais
+        [[ "$interface_name" == "lo" ]] && continue
+        [[ "$interface_name" == docker* ]] && continue
+        [[ "$interface_name" == br-* ]] && continue
+        [[ "$interface_name" == veth* ]] && continue
+
+        # Aceitar apenas interfaces físicas ethernet
+        if [[ "$interface_name" =~ ^(en|em|eth|eno|enp|ens) ]]; then
+            available_interfaces+=("$interface_name")
+        fi
+    done
+
+    if [ ${#available_interfaces[@]} -eq 0 ]; then
+        echo "❌ Nenhuma interface ethernet encontrada"
+        return 1
+    fi
+
+    # Extrair interfaces do XML, exceto aquela do Docker!
+    xml_interfaces=($(grep -oP "dev='\K[^']*" "$xml_file" | grep -v "^$original_parent$"))
+    if [ ${#xml_interfaces[@]} -eq 0 ]; then
+        echo "⚠️  Nenhuma interface no XML"
+        return 0
+    fi
+
+    # Se XML tem mais interfaces que o sistema
+    if [ ${#xml_interfaces[@]} -gt ${#available_interfaces[@]} ]; then
+        echo "⚠️  XML requer ${#xml_interfaces[@]} interfaces, mas sistema só tem ${#available_interfaces[@]}"
+        echo "⏭  Pulando mapeamento e inicialização da VM - interfaces insuficientes"
+        return 2
+    fi
+
+    # Verificar se todas existem
+    all_exist=true
+    for xml_int in "${xml_interfaces[@]}"; do
+        if ! printf '%s\n' "${available_interfaces[@]}" | grep -q "^$xml_int$"; then
+            all_exist=false
+            break
+        fi
+    done
+
+    if [ "$all_exist" = true ]; then
+        echo "✅ Todas as interfaces existem - mantendo XML original"
+        return 0
+    fi
+
+    cp "$xml_file" "$xml_file.bak"
+
+    available_index=0
+    for xml_int in "${xml_interfaces[@]}"; do
+        # Se existe, manter
+        if printf '%s\n' "${available_interfaces[@]}" | grep -q "^$xml_int$"; then
+            echo "  ✓ $xml_int -> $xml_int (mantida)"
+            continue
+        fi
+
+        # Mapear para próxima disponível
+        if [ $available_index -lt ${#available_interfaces[@]} ]; then
+            new_interface="${available_interfaces[$available_index]}"
+
+            # Pular se já usada no XML
+            while printf '%s\n' "${xml_interfaces[@]}" | grep -q "^$new_interface$"; do
+                ((available_index++))
+                if [ $available_index -ge ${#available_interfaces[@]} ]; then
+                    break
+                fi
+                new_interface="${available_interfaces[$available_index]}"
+            done
+
+            if [ $available_index -lt ${#available_interfaces[@]} ]; then
+                echo "  🔄 $xml_int -> $new_interface"
+                sed -i "0,/dev='$xml_int'/s//dev='$new_interface'/" "$xml_file"
+                ((available_index++))
+            fi
+        fi
+    done
+}
+
 function etapa03 {
   if ! [ -f /srv/restored3.lock ]; then
       echo "=== ETAPA 3: Restaurando VMs pfSense ==="
@@ -420,95 +585,8 @@ function etapa03 {
             return 1
           fi
 
-          # Função para mapear interfaces
-          function map_xml_interfaces {
-              local xml_file="$1"
-
-              # Detectar interfaces disponíveis no sistema (excluindo loopback e docker)
-              available_interfaces=()
-              for interface in /sys/class/net/*; do
-                  [ -e "$interface" ] || continue
-                  interface_name=$(basename "$interface")
-    
-                  # Pular loopback, docker e interfaces virtuais
-                  [[ "$interface_name" == "lo" ]] && continue
-                  [[ "$interface_name" == docker* ]] && continue
-                  [[ "$interface_name" == br-* ]] && continue
-                  [[ "$interface_name" == veth* ]] && continue
-    
-                  # Aceitar apenas interfaces físicas ethernet
-                  if [[ "$interface_name" =~ ^(en|em|eth|eno|enp|ens) ]]; then
-                      available_interfaces+=("$interface_name")
-                  fi
-              done
-
-              if [ ${#available_interfaces[@]} -eq 0 ]; then
-                  echo "❌ Nenhuma interface ethernet encontrada"
-                  return 1
-              fi
-
-              # Extrair interfaces do XML, exceto aquela do Docker!
-              xml_interfaces=($(grep -oP "dev='\K[^']*" "$xml_file" | grep -v "^$original_parent$"))
-              if [ ${#xml_interfaces[@]} -eq 0 ]; then
-                  echo "⚠️  Nenhuma interface no XML"
-                  return 0
-              fi
-
-              # Se XML tem mais interfaces que o sistema
-              if [ ${#xml_interfaces[@]} -gt ${#available_interfaces[@]} ]; then
-                  echo "⚠️  XML requer ${#xml_interfaces[@]} interfaces, mas sistema só tem ${#available_interfaces[@]}"
-                  echo "⏭  Pulando mapeamento e inicialização da VM - interfaces insuficientes"
-                  return 2
-              fi
-
-              # Verificar se todas existem
-              all_exist=true
-              for xml_int in "${xml_interfaces[@]}"; do
-                  if ! printf '%s\n' "${available_interfaces[@]}" | grep -q "^$xml_int$"; then
-                      all_exist=false
-                      break
-                  fi
-              done
-
-              if [ "$all_exist" = true ]; then
-                  echo "✅ Todas as interfaces existem - mantendo XML original"
-                  return 0
-              fi
-
-              cp "$xml_file" "$xml_file.bak"
-
-              available_index=0
-              for xml_int in "${xml_interfaces[@]}"; do
-                  # Se existe, manter
-                  if printf '%s\n' "${available_interfaces[@]}" | grep -q "^$xml_int$"; then
-                      echo "  ✓ $xml_int -> $xml_int (mantida)"
-                      continue
-                  fi
-
-                  # Mapear para próxima disponível
-                  if [ $available_index -lt ${#available_interfaces[@]} ]; then
-                      new_interface="${available_interfaces[$available_index]}"
-
-                      # Pular se já usada no XML
-                      while printf '%s\n' "${xml_interfaces[@]}" | grep -q "^$new_interface$"; do
-                          ((available_index++))
-                          if [ $available_index -ge ${#available_interfaces[@]} ]; then
-                              break
-                          fi
-                          new_interface="${available_interfaces[$available_index]}"
-                      done
-
-                      if [ $available_index -lt ${#available_interfaces[@]} ]; then
-                          echo "  🔄 $xml_int -> $new_interface"
-                          sed -i "0,/dev='$xml_int'/s//dev='$new_interface'/" "$xml_file"
-                          ((available_index++))
-                      fi
-                  fi
-              done
-          }
-
-          # Executar mapeamento de interfaces
-          map_xml_interfaces "$xml_file"
+          # Executar mapeamento de interfaces (agora passando parâmetros explicitamente)
+          map_xml_interfaces "$xml_file" "$original_parent"
           mapping_result=$?
 
           # Só definir e iniciar VM se o mapeamento foi bem-sucedido
@@ -517,22 +595,28 @@ function etapa03 {
           elif virsh define "$xml_file"; then
               # Extrair nome real da VM do XML
               vm_name=$(grep -oP '<name>\K[^<]+' "$xml_file")
-              echo "Nome da VM: $vm_name"
-
-              if virsh start "$vm_name" 2>/dev/null; then
-                  echo "✅ VM iniciada com sucesso"
+              
+              if [ -z "$vm_name" ]; then
+                  echo "❌ Não foi possível extrair o nome da VM do XML"
               else
-                  echo "⚠️  Tentando forçar inicialização..."
-                  virsh start "$vm_name" --force-boot 2>&1 | tee /tmp/vm_start_error.log
-                  if [ ${PIPESTATUS[0]} -eq 0 ]; then
-                      echo "✅ VM iniciada com sucesso (forçada)"
+                  echo "Nome da VM: $vm_name"
+
+                  if virsh start "$vm_name" 2>/dev/null; then
+                      echo "✅ VM iniciada com sucesso"
                   else
-                      echo "❌ Falha ao iniciar VM. Log salvo em /tmp/vm_start_error.log"
+                      echo "⚠️  Tentando forçar inicialização..."
+                      virsh start "$vm_name" --force-boot 2>&1 | tee /tmp/vm_start_error.log
+                      if [ ${PIPESTATUS[0]} -eq 0 ]; then
+                          echo "✅ VM iniciada com sucesso (forçada)"
+                      else
+                          echo "❌ Falha ao iniciar VM. Log salvo em /tmp/vm_start_error.log"
+                      fi
                   fi
               fi
           else
               echo "❌ Falha ao definir VM"
           fi
+      fi
 
       sudo touch /srv/restored3.lock
       echo "✅ ETAPA 3 concluída"
@@ -599,7 +683,12 @@ function etapa04 {
 
               if [ -f "$filepath" ]; then
                   echo "    Extraindo: $filename"
-                  sudo tar -I 'lz4 -d -c' -xf "$filepath" -C /srv/containers
+                  if sudo tar -I 'lz4 -d -c' -xf "$filepath" -C /srv/containers 2>/dev/null; then
+                      echo "    ✅ Extraído com sucesso"
+                  else
+                      echo "    ❌ ERRO ao extrair - arquivo pode estar corrompido!"
+                      continue
+                  fi
               else
                   echo "    ⚠️  Arquivo não encontrado: $filepath"
               fi
@@ -694,6 +783,8 @@ function etapa05 {
           echo ""
 
           # Para cada img_base única, processar via orchestration
+          rm -f /srv/lockfile
+          
           echo "$unique_images" | while read -r img_base; do
               if [[ -n "${script_map[$img_base]}" ]]; then
                   script_name="${script_map[$img_base]}"
@@ -713,7 +804,8 @@ function etapa05 {
 
                   echo "Executando orchestration para $img_base..."
                   bash /tmp/orchestration
-
+                  rm -f /srv/lockfile
+                  
                   # Verificar se foi bem-sucedido
                   if [ $? -eq 0 ]; then
                       echo "✓ $img_base processado com sucesso"
@@ -777,6 +869,8 @@ function etapa07 {
 }
 
 etapa-mount
+etapa00-dependencies
+etapa00-diskspace
 etapa00-github
 etapa00-restored
 etapa00-machineid
