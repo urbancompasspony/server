@@ -32,6 +32,10 @@ function etapa-mount {
 
 function restorefunc {
   pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
+  if [ -z "$pathrestore" ]; then
+    echo "ERRO: Nenhum backup encontrado em /mnt/bkpsys"
+    exit 1
+  fi
   export pathrestore
 }
 
@@ -233,6 +237,12 @@ function etapa03 {
           # Interface do Docker para ser ignorada e não usada no pfSense
           docker_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
           original_parent="$docker_interface"
+
+          if [ -z "$original_parent" ] || [ "$original_parent" = "null" ]; then
+            echo "ERRO: Rede macvlan não encontrada. Execute etapa01 primeiro ou crie a rede manualmente."
+            sleep 3
+            return 1
+          fi
 
           # Função para mapear interfaces
           function map_xml_interfaces {
