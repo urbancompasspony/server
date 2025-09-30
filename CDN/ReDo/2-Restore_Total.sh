@@ -382,83 +382,172 @@ function etapa01 {
   if ! [ -f /srv/restored1.lock ]; then
     if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
       cd "$pathrestore/docker-network-backup" || exit
+      
+      # Ler configurações do backup
       original_parent="$(jq -r '.[0].Options.parent' macvlan.json)"
+      network_name="$(jq -r '.[0].Name' macvlan.json)"
+      subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' macvlan.json)"
+      gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' macvlan.json)"
       
       echo "=== ETAPA 1: Configurando rede Docker macvlan ==="
-      echo "Interface no backup: $original_parent"
-
-      # Verifica se a interface original existe
+      echo "Configurações do backup:"
+      echo "  Nome: $network_name"
+      echo "  Subnet: $subnet"
+      echo "  Gateway: $gateway"
+      echo "  Interface original: $original_parent"
+      echo ""
+      
+      # Verificar se a interface original existe
       if ip link show "$original_parent" >/dev/null 2>&1; then
           clear
-          echo "✅ Interface original $original_parent encontrada - usando backup direto!"
+          echo "✅ Interface original $original_parent encontrada!"
+          echo ""
+          echo "Criando rede macvlan com configurações do backup..."
           sleep 2
           
           if docker network create -d macvlan \
-            --subnet="$(jq -r '.[0].IPAM.Config[0].Subnet' macvlan.json)" \
-            --gateway="$(jq -r '.[0].IPAM.Config[0].Gateway' macvlan.json)" \
+            --subnet="$subnet" \
+            --gateway="$gateway" \
             -o parent="$original_parent" \
-            "$(jq -r '.[0].Name' macvlan.json)"; then
+            "$network_name"; then
             
             echo "✅ Rede macvlan criada com sucesso!"
             export original_parent
             
           else
             echo "❌ ERRO ao criar rede macvlan"
+            echo ""
             echo "Possíveis causas:"
-            echo "  - Rede já existe"
+            echo "  - Rede já existe (verificar: docker network ls)"
             echo "  - Conflito de subnet"
             echo "  - Interface em uso"
+            echo ""
+            sleep 5
             exit 1
           fi
-
+          
       else
           clear
-          echo "⚠️ Interface $original_parent não encontrada!"
-          echo "Será necessário configurar manualmente..."
-          sleep 3
+          echo "⚠️ Interface $original_parent não encontrada no sistema!"
           echo ""
-          echo "LEMBRE-SE DE MAPEAR A SUBNET, O GATEWAY E A PLACA DE REDE ESPECIFICAMENTE PARA APONTAR OS CONTAINERS NA LAN DO PFSENSE!"
-          sleep 5
-          # Chamar script de configuração interativa
-          if curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/set | sudo bash; then
-              echo ""
-              echo "✅ Rede configurada com sucesso!"
-              sleep 2
-              
-              # CRÍTICO: Atualizar a variável com a interface REAL que foi configurada
-              new_parent=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
-              
-              if [ -n "$new_parent" ] && [ "$new_parent" != "null" ]; then
-                  echo "📝 Nova interface detectada: $new_parent"
-                  original_parent="$new_parent"
-                  export original_parent
+          echo "📋 Interfaces ethernet disponíveis:"
+          echo ""
+          
+          # Listar interfaces disponíveis
+          for interface in /sys/class/net/*; do
+            [ -e "$interface" ] || continue
+            interface_name=$(basename "$interface")
+            
+            # Mostrar apenas interfaces físicas ethernet
+            if [[ "$interface_name" =~ ^(en|em|eth|eno|enp|ens) ]]; then
+              # Pegar IP se tiver
+              ip_addr=$(ip -4 addr show "$interface_name" 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+              if [ -n "$ip_addr" ]; then
+                echo "  • $interface_name (IP: $ip_addr)"
               else
-                  echo "❌ ERRO: Não foi possível detectar a interface configurada!"
-                  echo "Inspecionando rede macvlan:"
-                  docker network inspect macvlan
-                  exit 1
+                echo "  • $interface_name (sem IP)"
               fi
-              
+            fi
+          done
+          
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "⚠️  ATENÇÃO: Configuração de Rede Docker"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "A rede será criada com as seguintes configurações do backup:"
+          echo ""
+          echo "  Nome da rede: $network_name"
+          echo "  Subnet:       $subnet"
+          echo "  Gateway:      $gateway"
+          echo ""
+          echo "⚠️  IMPORTANTE: Escolha a interface que está conectada"
+          echo "    na mesma LAN do pfSense para os containers!"
+          echo ""
+          
+          # Dialog interativo
+          new_parent=$(dialog --stdout \
+            --title "Interface de Rede para Docker" \
+            --backtitle "Restauração - Etapa 1" \
+            --inputbox "\nDigite o nome da interface ethernet que será usada\npara a rede macvlan dos containers Docker.\n\nEsta interface deve estar na mesma LAN do pfSense!\n\nExemplos: enp5s0, enp6s0, eno1, eth0\n\nInterface:" \
+            18 65)
+          
+          # Verificar se usuário cancelou
+          if [ $? -ne 0 ] || [ -z "$new_parent" ]; then
+            clear
+            echo "❌ Operação cancelada pelo usuário"
+            echo "Não é possível continuar sem configurar a rede Docker"
+            exit 1
+          fi
+          
+          # Validar se a interface existe
+          if ! ip link show "$new_parent" >/dev/null 2>&1; then
+            clear
+            echo "❌ ERRO: Interface '$new_parent' não existe no sistema!"
+            echo ""
+            echo "Interfaces disponíveis:"
+            ip -o link show | awk -F': ' '{print "  • " $2}'
+            echo ""
+            echo "Execute o restore novamente e escolha uma interface válida."
+            sleep 5
+            exit 1
+          fi
+          
+          clear
+          echo "✅ Interface selecionada: $new_parent"
+          echo ""
+          echo "Criando rede macvlan com configurações do backup..."
+          echo "  Nome: $network_name"
+          echo "  Subnet: $subnet"
+          echo "  Gateway: $gateway"
+          echo "  Interface: $new_parent"
+          echo ""
+          sleep 2
+          
+          # Criar rede com a nova interface
+          if docker network create -d macvlan \
+            --subnet="$subnet" \
+            --gateway="$gateway" \
+            -o parent="$new_parent" \
+            "$network_name"; then
+            
+            echo "✅ Rede macvlan criada com sucesso!"
+            original_parent="$new_parent"
+            export original_parent
+            
           else
-              echo "❌ ERRO: Falha na configuração de rede"
-              exit 1
+            echo "❌ ERRO ao criar rede macvlan"
+            echo ""
+            echo "Possíveis causas:"
+            echo "  - Rede já existe"
+            echo "  - Conflito de subnet com a rede atual"
+            echo "  - Interface em uso por outra aplicação"
+            echo ""
+            sleep 5
+            exit 1
           fi
       fi
-
+      
       # Salvar configuração final no system.yaml
       if [ -f /srv/system.yaml ]; then
-          echo "💾 Salvando configuração da interface no system.yaml..."
+          echo ""
+          echo "💾 Salvando configuração no system.yaml..."
           sudo yq -i ".Rede.interface_docker = \"$original_parent\"" /srv/system.yaml
-          echo "✓ Interface $original_parent salva no YAML"
+          sudo yq -i ".Rede.subnet = \"$subnet\"" /srv/system.yaml
+          sudo yq -i ".Rede.gateway = \"$gateway\"" /srv/system.yaml
+          echo "✓ Configuração salva"
       else
           echo "⚠️ system.yaml ainda não existe - será salvo na etapa04"
       fi
-
+      
       sudo touch /srv/restored1.lock
+      echo ""
       echo "✅ ETAPA 1 concluída"
+      sleep 2
       
     else
-      echo "⚠️ Arquivo macvlan.json não encontrado - pulando configuração de rede"
+      echo "⚠️ Arquivo macvlan.json não encontrado no backup"
+      echo "Pulando configuração de rede Docker"
     fi
   else
     echo "⏭ ETAPA 1 já executada (lock existe)"
