@@ -465,12 +465,29 @@ function etapa01 {
           echo "    na mesma LAN do pfSense para os containers!"
           echo ""
           
-          # Dialog interativo
+          interface_list=""
+          for interface in /sys/class/net/*; do
+            [ -e "$interface" ] || continue
+            interface_name=$(basename "$interface")
+  
+            # Mostrar apenas interfaces físicas ethernet
+            if [[ "$interface_name" =~ ^(en|em|eth|eno|enp|ens) ]]; then
+              # Pegar IP se tiver
+              ip_addr=$(ip -4 addr show "$interface_name" 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+             if [ -n "$ip_addr" ]; then
+                interface_list+="  • $interface_name (IP: $ip_addr)\n"
+              else
+                interface_list+="  • $interface_name (sem IP)\n"
+              fi
+            fi
+          done
+
+          # Dialog interativo com lista dinâmica
           new_parent=$(dialog --stdout \
-            --title "Interface de Rede para Docker" \
+            --title "Interface de Rede para os Containers" \
             --backtitle "Restauração - Etapa 1" \
-            --inputbox "\nDigite o nome da interface ethernet que será usada\npara a rede macvlan dos containers Docker.\n\nEsta interface deve estar na mesma LAN do pfSense!\n\nExemplos: enp5s0, enp6s0, eno1, eth0\n\nInterface:" \
-            18 65)
+            --inputbox "\nDigite o nome da interface ethernet que será usada\npara a rede macvlan dos containers.\n\nEsta interface será a mesma LAN do Host Linux (não a LAN do pfSense)!\n\nInterfaces disponíveis:\n\n${interface_list}\nInterface:" \
+            22 70)
           
           # Verificar se usuário cancelou
           if [ $? -ne 0 ] || [ -z "$new_parent" ]; then
