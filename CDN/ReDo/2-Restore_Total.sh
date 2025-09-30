@@ -580,7 +580,9 @@ function etapa02 {
 
       if [ -n "$etc_file" ]; then
           echo "1. Restaurando /etc completo (exceto fstab)..."
-          sudo tar -I 'lz4 -d -c' -xpf "$etc_file" -C / --exclude='etc/netplan'
+          sudo tar -I 'lz4 -d -c' -xpf "$etc_file" -C / \
+            --exclude='etc/netplan' \
+            --exclude='etc/apt'
 
           echo "2. Procurando backup do fstab..."
           # Procurar arquivo fstab backup (formato: fstab-YYYYMMDD_HHMMSS.backup)
