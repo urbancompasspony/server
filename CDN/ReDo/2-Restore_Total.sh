@@ -720,10 +720,50 @@ function map_xml_interfaces {
     # Interfaces disponíveis para mapeamento (não usadas no XML)
     available_for_mapping=()
     for avail_int in "${available_interfaces[@]}"; do
+        # Pular se for a interface do Docker
+        if [ "$avail_int" = "$original_parent" ]; then
+            continue
+        fi
+        # Pular se já está sendo usada no XML
         if ! printf '%s\n' "${existing_interfaces[@]}" | grep -q "^$avail_int$"; then
             available_for_mapping+=("$avail_int")
         fi
     done
+
+    # VALIDAÇÃO: Verifica se há interfaces disponíveis
+    if [ ${#available_for_mapping[@]} -eq 0 ]; then
+        clear
+        echo ""
+        echo "⚠️  AVISO: Mapeamento de Interfaces Impossível"
+        echo ""
+        echo "╔════════════════════════════════════════════════════╗"
+        echo "║  A interface do Docker é a única disponível!      ║"
+        echo "║  O pfSense NÃO poderá ser iniciado automaticamente║"
+        echo "╚════════════════════════════════════════════════════╝"
+        echo ""
+        echo "Interfaces necessárias pelo pfSense:"
+        printf '   • %s\n' "${xml_interfaces[@]}"
+        echo ""
+        echo "Interface reservada para Docker:"
+        echo "   • $original_parent (BLOQUEADA)"
+        echo ""
+        echo "O QUE VAI ACONTECER:"
+        echo "  ✓ VM será definida no libvirt"
+        echo "  ✗ VM NÃO será iniciada (faltam interfaces)"
+        echo "  ✓ XML ficará preparado em /tmp/pfsense-restore.xml"
+        echo ""
+        echo "INTERVENÇÃO MANUAL NECESSÁRIA:"
+        echo "  1. Adicione mais placa(s) de rede física"
+        echo "  2. Edite o XML: virsh edit pfsense"
+        echo "  3. Mapeie as interfaces manualmente"
+        echo "  4. Inicie a VM: virsh start pfsense"
+        echo ""
+        echo "Continuando a restauração em 10 segundos..."
+        sleep 10
+        
+        # Define VM mas não inicia (retorna código 2)
+        return 2
+    fi
 
     echo "🎯 Interfaces livres para mapeamento:"
     printf '   • %s\n' "${available_for_mapping[@]}"
@@ -764,7 +804,7 @@ function map_xml_interfaces {
 function etapa03 {
   if ! [ -f /srv/restored3.lock ]; then
       echo "=== ETAPA 3: Restaurando VMs pfSense ==="
-
+      
       # Restaurar discos pfSense
       find "$pathrestore" -iname "*pfsense*" -type f | while read -r disk_file; do
         file_type=$(file -b "$disk_file")
@@ -773,10 +813,10 @@ function etapa03 {
           sudo rsync -aHAXv --numeric-ids --sparse "$disk_file" /var/lib/libvirt/images/
         fi
       done
-
+      
       # Procurar XML no backup
       xml_file_backup=$(find "$pathrestore" -iname "pf*.xml" | head -1)
-
+      
       if [ -n "$xml_file_backup" ]; then
           echo "📄 XML no backup: $(basename "$xml_file_backup")"
           
@@ -789,43 +829,56 @@ function etapa03 {
           # Detectar interface Docker
           docker_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
           original_parent="$docker_interface"
-
+          
           if [ -z "$original_parent" ] || [ "$original_parent" = "null" ]; then
             echo "❌ Rede macvlan não encontrada - execute etapa01 primeiro"
             return 1
           fi
-
+          
           # MAPEAR INTERFACES
           map_xml_interfaces "$xml_file_work" "$original_parent"
           mapping_result=$?
-
+          
           echo ""
           
           # Definir VM
           if virsh define "$xml_file_work"; then
               vm_name=$(grep -oP '<name>\K[^<]+' "$xml_file_work")
               echo "✅ VM definida: $vm_name"
-
-              # Iniciar apenas se mapeamento OK
+              
+              # Iniciar apenas se mapeamento foi bem-sucedido
               if [ $mapping_result -eq 2 ]; then
-                  echo "⏭  VM NÃO iniciada (interfaces insuficientes)"
+                  echo ""
+                  echo "⏭  VM NÃO iniciada (interfaces insuficientes ou bloqueadas)"
+                  echo "📝 XML salvo em: /tmp/pfsense-restore.xml"
+                  echo "📝 Configuração manual necessária após conclusão do restore"
+                  echo ""
               else
+                  echo ""
                   echo "🚀 Iniciando VM..."
                   if virsh start "$vm_name" 2>/dev/null; then
                       echo "✅ VM iniciada com sucesso!"
                   else
+                      echo "⚠️  Tentando iniciar com --force-boot..."
                       virsh start "$vm_name" --force-boot 2>&1 | tee /tmp/vm_start_error.log
-                      [ ${PIPESTATUS[0]} -eq 0 ] && echo "✅ VM iniciada (forçada)" || echo "❌ Falha - veja /tmp/vm_start_error.log"
+                      if [ ${PIPESTATUS[0]} -eq 0 ]; then
+                          echo "✅ VM iniciada (forçada)"
+                      else
+                          echo "❌ Falha ao iniciar VM"
+                          echo "📝 Log salvo em: /tmp/vm_start_error.log"
+                      fi
                   fi
               fi
               
               # Salvar XML final
               sudo cp "$xml_file_work" "/var/lib/libvirt/qemu/$vm_name.xml"
+              echo "✓ XML definitivo salvo em: /var/lib/libvirt/qemu/$vm_name.xml"
+              
           else
               echo "❌ Falha ao definir VM"
           fi
       fi
-
+      
       sudo touch /srv/restored3.lock
       echo "✅ ETAPA 3 concluída"
   else
