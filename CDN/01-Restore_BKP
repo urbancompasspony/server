@@ -3,6 +3,13 @@ datetime=$(date +"%d_%m_%y_%H_%M")
 source=$(sed -n '1p' /srv/scripts/config/backupcont)
 destiny=$(sed -n '2p' /srv/scripts/config/backupcont)
 
+if ! [ -d "$destiny" ]; then
+  clear
+  echo "Nenhum backup encontrado ainda. Saindo..."
+  sleep 3
+  exit 1
+fi
+
 function start {
   files=()
   temp_files=()
