@@ -7,7 +7,7 @@ export yamlbase
 export yamlextra
 
 LOG_FILE="/var/log/restore-$(date +%Y%m%d_%H%M%S).log"
-exec 1> >(tee -a "$LOG_FILE")
+exec 1> >(sudo tee -a "$LOG_FILE")
 exec 2>&1
 
 echo "=== Restore iniciado em $(date) ==="
@@ -35,6 +35,15 @@ function etapa-mount {
       exit 1
     fi
   fi
+}
+
+function restorefunc {
+  pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
+  if [ -z "$pathrestore" ]; then
+    echo "ERRO: Nenhum backup encontrado em /mnt/bkpsys"
+    exit 1
+  fi
+  export pathrestore
 }
 
 function etapa00-dependencies {
@@ -142,15 +151,6 @@ function etapa00-github {
     sleep 10
     exit 1
   fi
-}
-
-function restorefunc {
-  pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
-  if [ -z "$pathrestore" ]; then
-    echo "ERRO: Nenhum backup encontrado em /mnt/bkpsys"
-    exit 1
-  fi
-  export pathrestore
 }
 
 function etapa00-restored {
