@@ -11,7 +11,7 @@ case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/01-Restore_BKP | bash ; urgencies0 ;;
 2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/02-Restore_Cloud | bash ; urgencies0 ;;
 3) clear ; verifycontainers ; urgencies0 ;;
-4) clear ; restoreconfirm0 ; urgencies0 ;;
+4) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/2-Restore_Total.sh | sudo bash ; urgencies0 ;;
 X) echo "." >/dev/null ;;
 esac
 }
@@ -41,31 +41,6 @@ function verifycontainers {
     clear; echo "Backup concluido!"
     sleep 2
   fi
-}
-
-function restoreconfirm0 {
-if sudo blkid | grep -q bkpsys; then
-  :;
-else
-  echo "Disco bkpsys NÃO encontrado, não há backup configurado ainda."
-  sleep 2
-  exit 1
-fi
-
-  VALUE0=$(dialog --ok-label "Restaurar" --title "Restauracao Total" --form "\nPOR FAVOR CONFIRME QUE VOCE ESTA DE ACORDO \nCOM OS RISCOS INERENTES A ESTA RESTAURACAO! \n\n
-PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZER ESTA OPERAÇÃO DESNECESSSARIAMENTE.\n\nRepita no campo abaixo: \neu estou ciente dos riscos" 0 0 0 \
-"." 1 1 "$VALUE1" 1 1 45 0 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-    case $? in
-      0) : ;;
-      1) return ;;
-    esac
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    if [ "$var1" = "eu estou ciente dos riscos" ]; then
-      curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/2-Restore_Total.sh | sudo bash
-    else
-      clear; echo ""; echo "Repete a frase exatamente como estou pedindo, por favor! Saindo..."
-      return
-    fi
 }
 
 urgencies0
