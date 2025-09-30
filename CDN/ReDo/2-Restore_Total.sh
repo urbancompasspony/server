@@ -240,10 +240,10 @@ function etapa00-interfaces {
   fi
   
   # Extrair interfaces do XML, excluindo a do Docker
-  mapfile -t xml_interfaces < <(grep -Pzo "(?s)<interface type='direct'>.*?</interface>" "$xml_file" | \
-                              grep -Po "dev='\K[^']*" | \
-                              grep -v "^$docker_interface$" | \
-                              sort -u)
+  mapfile -t xml_interfaces < <(awk '/<interface type=.direct.>/,/<\/interface>/ {if ($0 ~ /dev=/) print}' "$xml_file" | \
+    grep -oP "dev='\K[^']*" | \
+    grep -v "^$docker_interface$" | \
+    sort -u)
                               
   if [ ${#xml_interfaces[@]} -eq 0 ]; then
     echo "✓ Validação de interfaces: OK (nenhuma interface no XML)"
@@ -643,11 +643,11 @@ function map_xml_interfaces {
     printf '   • %s\n' "${available_interfaces[@]}"
     echo ""
 
-    # Extrair interfaces APENAS de blocos <interface type='direct'>
-    xml_interfaces=($(grep -Pzo "(?s)<interface type='direct'>.*?</interface>" "$xml_file" | \
-                      grep -Po "dev='\K[^']*" | \
-                      grep -v "^$original_parent$" | \
-                      sort -u))
+    # Extrair TODAS as linhas que contêm dev='' dentro de interface type='direct'
+    xml_interfaces=($(awk '/<interface type=.direct.>/,/<\/interface>/ {if ($0 ~ /dev=/) print}' "$xml_file" | \
+      grep -oP "dev='\K[^']*" | \
+      grep -v "^$original_parent$" | \
+      sort -u))
     
     if [ ${#xml_interfaces[@]} -eq 0 ]; then
         echo "⚠️  Nenhuma interface de rede no XML (apenas Docker)"
