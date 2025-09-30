@@ -854,6 +854,9 @@ function etapa03 {
                   echo "📝 Configuração manual necessária após conclusão do restore"
                   echo ""
               else
+                  if virsh autostart "$vm_name" 2>/dev/null; then
+                    echo "✅ Autostart configurado - VM iniciará com o host"
+                  fi
                   echo ""
                   echo "🚀 Iniciando VM..."
                   if virsh start "$vm_name" 2>/dev/null; then
@@ -866,6 +869,12 @@ function etapa03 {
                       else
                           echo "❌ Falha ao iniciar VM"
                           echo "📝 Log salvo em: /tmp/vm_start_error.log"
+                          echo "🔧 Desativando autostart devido à falha..."
+                          if virsh autostart --disable "$vm_name" 2>/dev/null; then
+                              echo "✅ Autostart desativado - VM não iniciará automaticamente"
+                          else
+                              echo "⚠️  Não foi possível desativar autostart"
+                          fi
                       fi
                   fi
               fi
