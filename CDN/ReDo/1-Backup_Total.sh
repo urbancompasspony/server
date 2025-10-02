@@ -77,16 +77,29 @@ function wait_vm_shutdown {
   local vm_name="$1"
   local timeout=180
   local count=0
+  
   while virsh list --state-running --name | grep -q "^$vm_name$"; do
       if [ $count -ge $timeout ]; then
+          echo "⚠️ Timeout atingido - forçando desligamento de $vm_name"
           virsh destroy "$vm_name"
-          sleep 2
+          sleep 10  # Aguardar estabilização após destroy forçado
           break
       fi
+      
+      # Feedback visual a cada 30s
+      if [ $((count % 30)) -eq 0 ] && [ $count -gt 0 ]; then
+          echo "Aguardando shutdown de $vm_name... (${count}s/${timeout}s)"
+      fi
+      
       sleep 2
       ((count+=2))
   done
-  echo "VM $vm_name parada"
+  
+  # Garantir flush dos buffers do kernel
+  sync
+  sleep 3
+  
+  echo "✅ VM $vm_name parada com segurança"
 }
 
 etapa00
