@@ -45,7 +45,8 @@ function backup_vm {
   # Backup dos discos
   virsh list --all --name | grep -v -i pfsense | grep -v '^$' | while read -r vm_name; do
     if [[ -n "$vm_name" ]]; then
-      virsh domblklist "$vm_name" --details | awk '/^file.*disk/ {print $4}' | while read -r disk_path; do
+      #virsh domblklist "$vm_name" --details | awk '/file.*disk/ {print $4}'
+      virsh domblklist "$vm_name" --details | awk '$1=="file" && $2=="disk" {print $4}' | while read -r disk_path; do
         if [[ -n "$disk_path" && -f "$disk_path" ]]; then
           sudo rsync -aHAX --numeric-ids --sparse "$disk_path" "$destiny"/ 2>&1 | grep -E "^(ERRO|ERROR|failed)"
         fi
