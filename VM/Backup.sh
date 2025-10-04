@@ -1,6 +1,10 @@
 #!/bin/bash
 destiny=$(sed -n '1p' /srv/scripts/config/backupvm)
 
+if [ -z "$destiny" ]; then
+  echo "ERRO: Caminho de destino vazio" >&2; exit 1
+fi
+
 function check_destination {
   # Extrai o ponto de montagem real do caminho
   mount_point=$(df "$destiny" 2>/dev/null | awk 'NR==2 {print $6}')
