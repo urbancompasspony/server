@@ -1,0 +1,20 @@
+Via Virt-Manager:
+
+ADD HARDWARE CHANNEL
+Name: org.qemu.guest_agent.0
+Device type: UNIX socket (unix)
+AUTO
+
+Via CLI:
+
+virsh shutdown VMNAME
+virsh edit VMNAME
+
+Adicione dentro de <devices>:
+
+<channel type='unix'>
+  <source mode='bind'/>
+  <target type='virtio' name='org.qemu.guest_agent.0'/>
+</channel>
+
+virsh start VMNAME
