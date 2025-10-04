@@ -2,8 +2,16 @@
 destiny=$(sed -n '1p' /srv/scripts/config/backupvm)
 
 function check_destination {
-  if ! mountpoint -q "$destiny"; then
-    echo "ERRO: $destiny não está montado" >&2
+  # Extrai o ponto de montagem real do caminho
+  mount_point=$(df "$destiny" 2>/dev/null | awk 'NR==2 {print $6}')
+  
+  if [[ -z "$mount_point" ]]; then
+    echo "ERRO: Não foi possível determinar o ponto de montagem de $destiny" >&2
+    return 1
+  fi
+  
+  if ! mountpoint -q "$mount_point"; then
+    echo "ERRO: $mount_point não está montado" >&2
     return 1
   fi
   
