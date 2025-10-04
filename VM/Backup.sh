@@ -36,8 +36,9 @@ function backup_vm {
   # Desliga VMs em execução (exceto pfsense)
   virsh list --all --name | grep -v -i pfsense | grep -v '^$' | while read -r vm_name; do
     if [[ -n "$vm_name" ]] && virsh list --state-running --name | grep -q "^$vm_name$"; then
-        virsh shutdown "$vm_name" --mode agent 2>/dev/null
-        wait_vm_shutdown "$vm_name"
+    # Tenta agent, se falhar tenta acpi, se falhar tenta padrão
+    virsh shutdown "$vm_name" --mode agent 2>/dev/null || virsh shutdown "$vm_name" --mode acpi 2>/dev/null || virsh shutdown "$vm_name" 2>/dev/null
+    wait_vm_shutdown "$vm_name"
     fi
   done
   
