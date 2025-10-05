@@ -4,12 +4,16 @@
 backup_dir=$(sed -n '1p' /srv/scripts/config/backupvm)
 
 if [ -z "$backup_dir" ]; then
-  echo "ERRO: Caminho de backup vazio em /srv/scripts/config/backupvm" >&2
+  clear
+  echo "ERRO: Caminho de backup vazio em /srv/scripts/config/backupvm"
+  sleep 3
   exit 1
 fi
 
 if [ ! -d "$backup_dir" ]; then
-  echo "ERRO: Diretório de backup não existe: $backup_dir" >&2
+  clear
+  echo "ERRO: Diretório de backup não existe: $backup_dir"
+  sleep 3
   exit 1
 fi
 
@@ -17,7 +21,9 @@ fi
 xml_files=$(find "$backup_dir" -maxdepth 1 -type f -name "*-vm.xml")
 
 if [ -z "$xml_files" ]; then
-  echo "ERRO: Nenhum XML de VM encontrado em $backup_dir" >&2
+  clear
+  echo "ERRO: Nenhum XML de VM encontrado em $backup_dir"
+  sleep 3
   exit 1
 fi
 
@@ -44,7 +50,9 @@ echo "$xml_files" | while read -r xml_file; do
     backup_disk=$(find "$backup_dir" -maxdepth 1 -type f -name "$disk_name" | head -n1)
     
     if [ -z "$backup_disk" ] || [ ! -f "$backup_disk" ]; then
-      echo "ERRO: Disco de backup não encontrado: $disk_name" >&2
+      clear
+      echo "ERRO: Disco de backup não encontrado: $disk_name"
+      sleep 3
       exit 1
     fi
     
@@ -80,7 +88,9 @@ echo "$xml_files" | while read -r xml_file; do
   
   # Inicia a VM
   if ! virsh start "$vm_name" >/dev/null 2>&1; then
-    echo "ERRO: Falha ao iniciar a VM $vm_name" >&2
+    clear
+    echo "ERRO: Falha ao iniciar a VM $vm_name"
+    sleep 3
     continue
   fi
   
@@ -88,4 +98,5 @@ echo "$xml_files" | while read -r xml_file; do
 done
 
 echo "Processo de restauração concluído"
+sleep 1
 exit 0
