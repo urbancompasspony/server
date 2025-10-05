@@ -2,7 +2,10 @@
 destiny=$(sed -n '1p' /srv/scripts/config/backupvm)
 
 if [ -z "$destiny" ]; then
-  echo "ERRO: Caminho de destino vazio" >&2; exit 1
+  clear
+  echo "ERRO: Caminho de destino vazio"
+  sleep 3
+  exit 1
 fi
 
 function check_destination {
