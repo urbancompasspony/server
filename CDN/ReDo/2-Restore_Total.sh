@@ -1134,8 +1134,6 @@ function etapa07 {
   sleep 3
   echo "Reiniciando..."
   sudo touch /srv/restored7.lock
-  sleep 3
-  sudo reboot
 }
 
 etapa-mount
@@ -1155,5 +1153,7 @@ etapa04
 etapa05
 etapa06
 etapa07
+
+sudo reboot
 
 exit 0
