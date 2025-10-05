@@ -5,9 +5,9 @@ var0=$(dialog --title 'Modelo CDN' --backtitle "Continuidade do Negocio" --ok-la
 1 'Restaurar Containers Localmente' \
 2 'Download Backups de Containers da Nuvem' \
 3 'Backup A: Imediato do Sistema (+ Firewall)' \
-4 'Backup B: Outras VMs (- Firewall)'
+4 'Backup B: Outras VMs (- Firewall)' \
 5 'Refazer A: Base do Servidor (+ Firewall)' \
-6 'Refazer B: Outras VMs (- Firewall)'
+6 'Refazer B: Outras VMs (- Firewall)' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/01-Restore_BKP | bash ; urgencies0 ;;
