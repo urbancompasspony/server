@@ -901,9 +901,19 @@ function etapa04 {
 
       # Criar diretório se não existir
       sudo mkdir -p /srv/containers
+      sudo mkdir -p /srv/scripts
 
+      # Restaurar scripts
+      if [ -d "$pathrestore/scripts" ]; then
+        echo "📁 Restaurando /srv/scripts..."
+        sudo rsync -aHAXv --numeric-ids --delete "$pathrestore/scripts/" /srv/scripts/
+        echo "✅ Scripts restaurados"
+      else
+        echo "⚠️  Diretório scripts não encontrado no backup"
+      fi
+      
       # Restaurar YAMLs
-      if [ -f "$pathrestore/system.yaml" ];then
+      if [ -f "$pathrestore/system.yaml" ]; then
         sudo rsync -aHAXv --numeric-ids --sparse "$pathrestore/system.yaml" /srv/
       else
         clear; echo "ERROR: Nao encontrei o system.yaml. SAINDO..."
