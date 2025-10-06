@@ -585,7 +585,6 @@ function etapa02 {
             --exclude='etc/apt'
 
           echo "2. Procurando backup do fstab..."
-          # Procurar arquivo fstab backup (formato: fstab-YYYYMMDD_HHMMSS.backup)
           fstab_backup=$(find "$pathrestore" -name "fstab.backup" | sort | tail -1)
 
           if [ -n "$fstab_backup" ]; then
@@ -593,9 +592,100 @@ function etapa02 {
               echo "3. Fazendo backup do fstab atual..."
               sudo cp /etc/fstab "/etc/fstab.bkp-preventivo.$(date +%Y%m%d_%H%M%S)"
 
-              echo "4. Aplicando merge inteligente do fstab..."
-              # Merge: manter entradas atuais, adicionar só as que não existem do backup
-              awk 'FNR==NR { seen[$2]++; next } !seen[$2] { print }' /etc/fstab "$fstab_backup" | sudo tee -a /etc/fstab > /dev/null
+              echo "4. Aplicando merge inteligente do fstab com validação..."
+              
+              # Criar arquivo temporário para processar
+              temp_fstab="/tmp/fstab.merge.$$"
+              
+              # Processar cada linha do backup
+              while IFS= read -r line; do
+                  # Pular comentários e linhas vazias
+                  if [[ "$line" =~ ^[[:space:]]*# ]] || [[ -z "$line" ]]; then
+                      continue
+                  fi
+                  
+                  # Extrair o device/UUID (primeiro campo)
+                  device=$(echo "$line" | awk '{print $1}')
+                  mountpoint=$(echo "$line" | awk '{print $2}')
+                  
+                  # Pular se já existe no fstab atual
+                  if grep -q "^[^#]*[[:space:]]${mountpoint}[[:space:]]" /etc/fstab; then
+                      echo "  ⏭ Pulando $mountpoint (já existe no fstab atual)"
+                      continue
+                  fi
+                  
+                  # Verificar se é UUID ou device path
+                  device_exists=false
+                  
+                  if [[ "$device" =~ ^UUID= ]]; then
+                      # Extrair UUID
+                      uuid="${device#UUID=}"
+                      
+                      # Verificar se o UUID existe
+                      if blkid | grep -qi "$uuid"; then
+                          device_exists=true
+                          echo "  ✓ UUID encontrado: $uuid -> $mountpoint"
+                      else
+                          echo "  ✗ UUID não encontrado: $uuid -> $mountpoint"
+                      fi
+                      
+                  elif [[ "$device" =~ ^LABEL= ]]; then
+                      # Extrair LABEL
+                      label="${device#LABEL=}"
+                      
+                      # Verificar se o LABEL existe
+                      if blkid | grep -qi "LABEL=\"$label\""; then
+                          device_exists=true
+                          echo "  ✓ LABEL encontrado: $label -> $mountpoint"
+                      else
+                          echo "  ✗ LABEL não encontrado: $label -> $mountpoint"
+                      fi
+                      
+                  elif [[ "$device" =~ ^/dev/ ]]; then
+                      # Device path direto
+                      if [ -b "$device" ]; then
+                          device_exists=true
+                          echo "  ✓ Device encontrado: $device -> $mountpoint"
+                      else
+                          echo "  ✗ Device não encontrado: $device -> $mountpoint"
+                      fi
+                  else
+                      # Outros tipos (nfs, tmpfs, etc) - assume que existem
+                      device_exists=true
+                      echo "  ℹ Tipo especial: $device -> $mountpoint"
+                  fi
+                  
+                  # Adicionar nofail se device não existe
+                  if [ "$device_exists" = false ]; then
+                      # Verificar se já tem nofail
+                      if [[ "$line" =~ nofail ]]; then
+                          echo "$line" >> "$temp_fstab"
+                          echo "    → Adicionando com nofail (já presente)"
+                      else
+                          # Adicionar nofail na coluna de opções (4ª coluna)
+                          modified_line=$(echo "$line" | awk '{
+                              if (NF >= 4) {
+                                  $4 = $4 ",nofail"
+                              } else {
+                                  $4 = "defaults,nofail"
+                              }
+                              print $0
+                          }')
+                          echo "$modified_line" >> "$temp_fstab"
+                          echo "    → Adicionando com nofail (ADICIONADO)"
+                      fi
+                  else
+                      echo "$line" >> "$temp_fstab"
+                      echo "    → Adicionando normalmente"
+                  fi
+                  
+              done < "$fstab_backup"
+              
+              # Adicionar linhas validadas ao fstab atual
+              if [ -f "$temp_fstab" ]; then
+                  sudo tee -a /etc/fstab < "$temp_fstab" > /dev/null
+                  rm -f "$temp_fstab"
+              fi
 
               echo "5. Testando configuração..."
               sudo systemctl daemon-reload
@@ -603,21 +693,19 @@ function etapa02 {
                   echo "✓ fstab válido"
               else
                   echo "✗ Erro no fstab! Restaurando backup..."
-                  sudo cp "/etc/fstab.before_restore.$(date +%Y%m%d)_"* /etc/fstab 2>/dev/null || true
+                  sudo cp "/etc/fstab.bkp-preventivo."* /etc/fstab 2>/dev/null || true
               fi
           else
               echo "⚠ Nenhum backup de fstab encontrado em $pathrestore"
           fi
 
-          # Limpeza total de dados inuteis para deixar o fstab conciso!
+          # Limpeza de comentários e linhas vazias
           sudo sed -i '/^[[:space:]]*#/d; /^[[:space:]]*$/d; s/[[:space:]]*$//' /etc/fstab
 
           sudo touch /srv/restored2.lock
           echo "✓ ETAPA 2 concluída"
       else
           echo "❌ Nenhum arquivo etc-*.tar.lz4 encontrado em $pathrestore"
-          echo "Arquivos disponíveis:"
-          find "$pathrestore" -name "*.tar.lz4" 2>/dev/null || echo "Nenhum arquivo .tar.lz4 encontrado"
       fi
   else
       echo "⏭ ETAPA 2 já executada (lock existe)"
