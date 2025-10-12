@@ -584,11 +584,13 @@ function etapa02 {
             --exclude='etc/netplan' \
             --exclude='etc/apt'
 
-          # Após restaurar /etc
           echo "1.1 Atualizando configuração do GRUB..."
           if [ -f /etc/default/grub ]; then
-              sudo update-grub2
-              echo "✓ GRUB atualizado"
+              if sudo update-grub2 2>/dev/null; then
+                  echo "✓ GRUB2 atualizado"
+              else
+                  echo "⚠️ Erro ao atualizar GRUB2 (pode não estar instalado)"
+              fi
           else
               echo "⚠️ /etc/default/grub não encontrado"
           fi
