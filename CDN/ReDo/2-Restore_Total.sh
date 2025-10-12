@@ -1150,6 +1150,10 @@ function etapa05 {
           done
           echo ""
 
+          # Arrays para tracking de sucessos e falhas
+          declare -a successful_images
+          declare -a failed_images
+          
           # Para cada img_base única, processar via orchestration
           rm -f /srv/lockfile
           
@@ -1170,48 +1174,153 @@ function etapa05 {
                   # Criar lockfile com nome do script
                   echo "$script_name" > /srv/lockfile
 
-                  echo "Executando orchestration para $img_base..."
-                  bash /tmp/orchestration
+                  # Sistema de retry: máximo 3 tentativas
+                  MAX_RETRIES=3
+                  attempt=1
+                  success=false
+
+                  while [ $attempt -le $MAX_RETRIES ]; do
+                      echo ""
+                      echo "🔄 Tentativa $attempt de $MAX_RETRIES para $img_base..."
+                      
+                      # Executar orchestration
+                      bash /tmp/orchestration
+                      orch_exit=$?
+                      
+                      # Aguardar containers iniciarem
+                      sleep 5
+                      
+                      # Verificar status de TODOS os containers desta img_base
+                      all_running=true
+                      
+                      echo "Verificando status dos containers:"
+                      while IFS= read -r container_name; do
+                          if [ -n "$container_name" ]; then
+                              status=$(docker inspect --format='{{.State.Status}}' "$container_name" 2>/dev/null)
+                              
+                              if [ "$status" = "running" ]; then
+                                  echo "  ✅ $container_name: running"
+                              else
+                                  echo "  ❌ $container_name: $status (esperado: running)"
+                                  all_running=false
+                              fi
+                          fi
+                      done <<< "$containers"
+                      
+                      # Se todos estão running, sucesso!
+                      if [ "$all_running" = true ]; then
+                          echo "✅ Todos os containers de $img_base estão rodando!"
+                          success=true
+                          successful_images+=("$img_base")
+                          break
+                      else
+                          echo "⚠️  Nem todos os containers subiram corretamente"
+                          
+                          if [ $attempt -lt $MAX_RETRIES ]; then
+                              echo "🔄 Tentando novamente em 10 segundos..."
+                              sleep 10
+                              
+                              # Limpar containers com problema antes de retry
+                              echo "🧹 Removendo containers com falha para retry..."
+                              while IFS= read -r container_name; do
+                                  if [ -n "$container_name" ]; then
+                                      docker rm -f "$container_name" 2>/dev/null && echo "  • $container_name removido"
+                                  fi
+                              done <<< "$containers"
+                          fi
+                      fi
+                      
+                      ((attempt++))
+                  done
+                  
                   rm -f /srv/lockfile
                   
-                  # Verificar se foi bem-sucedido
-                  if [ $? -eq 0 ]; then
-                      echo "✓ $img_base processado com sucesso"
-                  else
-                      echo "✗ Erro ao processar $img_base"
+                  # Se após 3 tentativas não funcionou
+                  if [ "$success" = false ]; then
+                      echo ""
+                      echo "❌ FALHA DEFINITIVA: $img_base não subiu após $MAX_RETRIES tentativas"
+                      echo "📝 Containers afetados:"
+                      echo "$containers" | while read -r cont; do
+                          echo "  • $cont"
+                      done
+                      echo "⏭️  Pulando para próximo img_base..."
+                      echo ""
+                      failed_images+=("$img_base")
+                      
+                      # Log detalhado no arquivo principal
+                      {
+                          echo ""
+                          echo "========================================="
+                          echo "ERRO: img_base $img_base FALHOU"
+                          echo "Data: $(date)"
+                          echo "Tentativas: $MAX_RETRIES"
+                          echo "Containers afetados:"
+                          echo "$containers"
+                          echo "========================================="
+                          echo ""
+                      } | sudo tee -a "$LOG_FILE" > /dev/null
                   fi
 
                   echo "----------------------------------------"
                   sleep 3  # Pausa entre diferentes tipos de container
 
               else
-                  echo "⚠ Nenhum script mapeado para img_base: $img_base"
+                  echo "⚠️  Nenhum script mapeado para img_base: $img_base"
                   containers=$(yq -r "to_entries[] | select(.value.img_base == \"$img_base\") | .key" /srv/containers.yaml)
                   echo "Containers afetados:"
                   echo "$containers" | while read -r cont; do
                       echo "  • $cont"
                   done
                   echo ""
+                  failed_images+=("$img_base (sem script mapeado)")
               fi
           done
 
           # Limpar lockfile final
           rm -f /srv/lockfile
 
-          echo "=== Resumo da restauração ==="
+          echo ""
+          echo "========================================="
+          echo "=== RESUMO DA RESTAURAÇÃO DE CONTAINERS ==="
+          echo "========================================="
+          
           total_containers=$(yq -r 'keys | length' /srv/containers.yaml)
+          total_images=$(echo "$unique_images" | wc -l)
+          
+          echo "Total de img_base processadas: $total_images"
           echo "Total de containers no YAML: $total_containers"
-
+          echo ""
+          
+          if [ ${#successful_images[@]} -gt 0 ]; then
+              echo "✅ IMG_BASE COM SUCESSO (${#successful_images[@]}):"
+              printf '  ✓ %s\n' "${successful_images[@]}"
+              echo ""
+          fi
+          
+          if [ ${#failed_images[@]} -gt 0 ]; then
+              echo "❌ IMG_BASE COM FALHA (${#failed_images[@]}):"
+              printf '  ✗ %s\n' "${failed_images[@]}"
+              echo ""
+              echo "⚠️  ATENÇÃO: Alguns containers NÃO foram restaurados!"
+              echo "   Verifique o log em: $LOG_FILE"
+              echo "   Será necessária intervenção manual após o restore."
+              echo ""
+          else
+              echo "🎉 Todos os containers foram restaurados com sucesso!"
+              echo ""
+          fi
+          
           echo "✓ Restauração automática concluída"
+          echo "========================================="
 
       else
-          echo "⚠ Arquivo containers.yaml não encontrado, pulando restauração de containers"
+          echo "⚠️  Arquivo containers.yaml não encontrado, pulando restauração de containers"
       fi
 
       sudo touch /srv/restored5.lock
       echo "✓ ETAPA 5 concluída"
   else
-      echo "⏭ ETAPA 5 já executada (lock existe)"
+      echo "⏭️  ETAPA 5 já executada (lock existe)"
   fi
 }
 
