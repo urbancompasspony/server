@@ -584,6 +584,15 @@ function etapa02 {
             --exclude='etc/netplan' \
             --exclude='etc/apt'
 
+          # Após restaurar /etc
+          echo "1.1 Atualizando configuração do GRUB..."
+          if [ -f /etc/default/grub ]; then
+              sudo update-grub2
+              echo "✓ GRUB atualizado"
+          else
+              echo "⚠️ /etc/default/grub não encontrado"
+          fi
+
           echo "2. Procurando backup do fstab..."
           fstab_backup=$(find "$pathrestore" -name "fstab.backup" | sort | tail -1)
 
