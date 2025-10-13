@@ -157,7 +157,7 @@ function etapa00-github {
 }
 
 function etapa00-restored {
-  if [ -f /srv/restored8.lock ]; then
+  if [ -f /srv/restored7.lock ]; then
     clear
     echo ""
     echo "ERRO 01: ⏭ ESTE SERVIDOR JÁ FOI RESTAURADO COMPLETAMENTE! (lock existe)"
@@ -1632,6 +1632,7 @@ function etapa06 {
 function etapa07 {
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"${datetime0}\"" "$yamlbase"
+  sudo rm /srv/restored*
   echo "=== RESTORE COMPLETO ==="
   sleep 3
   echo "Reiniciando..."
