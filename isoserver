@@ -52,8 +52,8 @@ function init {
     echo ""
     echo "Nenhuma .iso e/ou .img localizada. Fazendo download..."
     echo ""
-    curl -sSL --user "$usern4me:$passw0rd" "$webadress/${options[choice - 1]}" | sudo tee "$destpath/${options[choice - 1]}" > /dev/null
-    #wget --user $usern4me --password $passw0rd $webadress/${options[choice - 1]} -O $destpath/${options[choice - 1]}
+    #curl -sSL --user "$usern4me:$passw0rd" "$webadress/${options[choice - 1]}" | sudo tee "$destpath/${options[choice - 1]}" > /dev/null
+    curl -#L --user "$usern4me:$passw0rd" "$webadress/${options[choice - 1]}" -o "$destpath/${options[choice - 1]}"
     sudo chmod 777 -R "$destpath"
   fi
 }
