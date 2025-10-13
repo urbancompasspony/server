@@ -6,6 +6,9 @@ yamlextra="/srv/containers.yaml"
 export yamlbase
 export yamlextra
 
+rede00="1"
+export rede00
+
 LOG_FILE="/var/log/restore-$(date +%Y%m%d_%H%M%S).log"
 exec 1> >(sudo tee -a "$LOG_FILE")
 exec 2>&1
@@ -389,6 +392,9 @@ function etapa00-ok {
             echo "✅ Rede macvlan criada com sucesso!"
             export original_parent
             
+            rede00="0"
+            export rede00
+            
           else
             echo "❌ ERRO ao criar rede macvlan"
             echo ""
@@ -554,11 +560,10 @@ PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZE
     if [ "$var1" = "eu estou ciente dos riscos" ]; then
       clear; echo "ESTA TUDO CORRETO! TUDO FOI DEVIDAMENTE VALIDADO."; sleep 1
       echo "5"; echo "O SERVIDOR SERÁ COMPLETAMENTE RESTAURADO BASEADO NO BACKUP ENCONTRADO!"; sleep 1
-      echo "4"; echo "NÃO TENTE INTERAGIR COM O SISTEMA DURANTE A RESTAURAÇÃO COMPLETA."; sleep 1
-      echo "3"; echo "SE POSSÍVEL DESCONECTE TECLADO E MOUSE, NÃO INTERAJA COM ABSOLUTAMENTE NADA ATÉ CONCLUIR!"; sleep 1
-      echo "2"; echo "SE QUISER DESISTIR AGORA, PRESSIONE   CTRL + C"; sleep 1
-      echo "1"; echo "NÃO DESLIGUE O SERVIDOR ATÉ O MOMENTO DO REINÍCIO AUTOMÁTICO."; sleep 1
-      echo "0"; echo "Que a boa sorte lhe acompanhe nesta restauração!"
+      echo "4"; echo "NÃO INTERAJA COM ABSOLUTAMENTE NADA, A MENOS QUE DEVIDAMENTE SOLICITADO!"; sleep 1
+      echo "3"; echo "SE QUISER DESISTIR AGORA, PRESSIONE: CTRL + C"; sleep 1
+      echo "2"; echo "NÃO DESLIGUE O SERVIDOR DA TOMADA ATÉ O MOMENTO DO REINÍCIO AUTOMÁTICO."; sleep 1
+      echo "1"; echo "Que a boa sorte lhe acompanhe nesta restauração!"
       sleep 3
       clear
     else
@@ -1039,7 +1044,11 @@ function etapa031 {
       echo "🎯 IP do pfSense: $pfsense_ip"
       echo ""
       echo "⏳ Aguardando pfSense responder (timeout: 3 minutos)..."
-      echo "   Isso é normal - VM precisa bootar e pfSense precisa carregar"
+      echo "   Isso é normal - VM precisa bootar e pfSense precisa carregar para continuarmos."
+      if [ "$rede00" = "1" ]; then
+        echo "   Rede Customizada: Se demorar demais para pingar, ou este menu fechar sem concluir ou reiniciar,"
+        echo "tecle CTRL+ALT+F2, faça login, digite startx e pelo Virt-Manager confira se o pfSense está solicitando ajuste manual das placas de rede!"
+      fi
       echo ""
       
       # Configurações de timeout
@@ -1099,9 +1108,8 @@ function etapa031 {
       echo "  • Firewall bloqueando ICMP"
       echo ""
       echo "DIAGNÓSTICO:"
-      echo "  • Status da VM: $(virsh domstate "$vm_name" 2>/dev/null || echo "desconhecido")"
-      echo "  • Console: virsh console $vm_name"
-      echo "  • Logs: journalctl -u libvirtd -n 50"
+      echo "Tecle CTRL+ALT+F2, faça login, digite startx e pelo Virt-Manager confira se o pfSense está solicitando ajuste manual das placas de rede!"
+      echo "Você pode sair desde CDN Restore A, ajustar o pfSense e depois reexecuta-lo. O script continuará de onde parou."
       echo ""
       
       read -r -p "Deseja continuar mesmo assim? (S/n): " resposta
