@@ -1124,6 +1124,155 @@ function etapa031 {
   fi
 }
 
+function etapa031b {
+  if ! [ -f /srv/restored031b.lock ]; then
+      echo "=== ETAPA 031b: Renovando configuração de rede ==="
+      
+      # Detectar interface principal (a mesma do macvlan/docker)
+      network_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
+      
+      if [ -z "$network_interface" ] || [ "$network_interface" = "null" ]; then
+          # Fallback: pegar interface padrão
+          network_interface=$(ip route | grep "default" | awk '{print $5}' | head -1)
+      fi
+      
+      if [ -z "$network_interface" ]; then
+          echo "⚠️  Não foi possível detectar interface de rede"
+          echo "   Pulando renovação automática"
+          sudo touch /srv/restored031b.lock
+          return 0
+      fi
+      
+      echo "📡 Interface detectada: $network_interface"
+      echo "🔧 Renovando configuração de rede via Netplan..."
+      echo ""
+      
+      # ================================================
+      # MÉTODO 1: Netplan apply (forçar reconfiguração)
+      # ================================================
+      if command -v netplan &>/dev/null; then
+          echo "1️⃣  Aplicando Netplan..."
+          
+          if sudo netplan apply 2>&1 | tee /tmp/netplan-apply.log; then
+              echo "   ✅ Netplan aplicado"
+              sleep 3
+          else
+              echo "   ⚠️  Netplan apply teve avisos (verificar log)"
+          fi
+      else
+          echo "   ❌ Netplan não encontrado!"
+          sudo touch /srv/restored031b.lock
+          return 1
+      fi
+      
+      # ================================================
+      # MÉTODO 2: Forçar renovação via systemd-networkd
+      # ================================================
+      echo ""
+      echo "2️⃣  Forçando renovação DHCP via systemd-networkd..."
+      
+      # Restart do networkd para forçar renovação
+      if sudo systemctl restart systemd-networkd 2>/dev/null; then
+          echo "   ✅ systemd-networkd reiniciado"
+          sleep 3
+      else
+          echo "   ⚠️  Falha ao reiniciar systemd-networkd"
+      fi
+      
+      # ================================================
+      # MÉTODO 3: Forçar interface down/up (último recurso)
+      # ================================================
+      echo ""
+      echo "3️⃣  Ciclando interface $network_interface..."
+      
+      # Down
+      if sudo ip link set "$network_interface" down 2>/dev/null; then
+          echo "   → Interface desativada"
+          sleep 2
+          
+          # Up
+          if sudo ip link set "$network_interface" up 2>/dev/null; then
+              echo "   → Interface ativada"
+              sleep 3
+          else
+              echo "   ❌ Falha ao ativar interface"
+          fi
+      else
+          echo "   ⚠️  Não foi possível ciclar interface (pode estar em uso)"
+      fi
+      
+      # ================================================
+      # MÉTODO 4: Networkctl reconfigure (Ubuntu 24.04)
+      # ================================================
+      if command -v networkctl &>/dev/null; then
+          echo ""
+          echo "4️⃣  Reconfigurando interface via networkctl..."
+          
+          if sudo networkctl reconfigure "$network_interface" 2>/dev/null; then
+              echo "   ✅ Interface reconfigurada"
+              sleep 3
+          else
+              echo "   ⚠️  networkctl reconfigure falhou"
+          fi
+      fi
+      
+      # ================================================
+      # VERIFICAÇÃO FINAL
+      # ================================================
+      echo ""
+      echo "🔍 Verificando novo IP..."
+      sleep 2
+      
+      new_ip=$(ip -4 addr show "$network_interface" 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
+      gateway=$(ip route | grep default | awk '{print $3}' | head -1)
+      
+      if [ -n "$new_ip" ]; then
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ CONFIGURAÇÃO DE REDE ATUALIZADA"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Interface: $network_interface"
+          echo "Novo IP:   $new_ip"
+          echo "Gateway:   $gateway"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          
+          # Testar conectividade com o gateway (pfSense)
+          if ping -c 2 -W 2 "$gateway" &>/dev/null; then
+              echo "✅ Conectividade com pfSense ($gateway) confirmada!"
+          else
+              echo "⚠️  Aviso: Não foi possível pingar o gateway"
+          fi
+          
+      else
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "⚠️  ATENÇÃO: IP NÃO DETECTADO"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Interface: $network_interface"
+          echo ""
+          echo "POSSÍVEIS CAUSAS:"
+          echo "  • Netplan configurado com IP estático"
+          echo "  • DHCP do pfSense ainda não respondeu"
+          echo "  • Interface em estado inconsistente"
+          echo ""
+          echo "SOLUÇÃO:"
+          echo "  • Verifique manualmente: ip addr show $network_interface"
+          echo "  • Force renovação: sudo netplan apply"
+          echo "  • Ou reinicie após restore: sudo reboot"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+      fi
+      
+      sudo touch /srv/restored031b.lock
+      echo "✓ ETAPA 031b concluída"
+      sleep 3
+      
+  else
+      echo "⏭️  ETAPA 031b já executada"
+  fi
+}
+
 function etapa04 {
   if ! [ -f /srv/restored4.lock ]; then
       echo "=== ETAPA 4: Restaurando containers (mais recente de cada) ==="
@@ -1498,6 +1647,7 @@ etapa01
 etapa02
 etapa03
 etapa031
+etapa031b
 etapa04
 etapa05
 etapa06
