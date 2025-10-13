@@ -994,6 +994,136 @@ function etapa03 {
   fi
 }
 
+function etapa031 {
+  if ! [ -f /srv/restored031-wait.lock ]; then
+      echo "=== ETAPA 031: Aguardando pfSense ficar online ==="
+      
+      # Verificar se VM pfSense existe
+      vm_name=$(virsh list --all | grep -i pfsense | awk '{print $2}')
+      
+      if [ -z "$vm_name" ]; then
+          echo "⚠️  Nenhuma VM pfSense encontrada - pulando verificação"
+          sudo touch /srv/restored031-wait.lock
+          return 0
+      fi
+      
+      # Verificar se VM está rodando
+      vm_state=$(virsh list --state-running | grep -i "$vm_name")
+      if [ -z "$vm_state" ]; then
+          echo "⚠️  VM pfSense não está rodando - pulando verificação"
+          sudo touch /srv/restored031-wait.lock
+          return 0
+      fi
+      
+      echo "🔍 VM pfSense detectada: $vm_name"
+      echo "📡 Tentando detectar IP do pfSense..."
+      
+      # Tentar obter IP do pfSense do YAML
+      pfsense_ip=$(yq -r '.Rede.gateway' /srv/system.yaml 2>/dev/null)
+      
+      if [ -z "$pfsense_ip" ] || [ "$pfsense_ip" = "null" ]; then
+          echo "⚠️  IP do pfSense não encontrado no system.yaml"
+          echo "💡 Tentando detectar via ARP/network scan..."
+          
+          # Tentar detectar via subnet
+          subnet=$(yq -r '.Rede.subnet' /srv/system.yaml 2>/dev/null)
+          if [ -n "$subnet" ] && [ "$subnet" != "null" ]; then
+              # Extrair primeiro IP do range (geralmente o gateway)
+              pfsense_ip=$(echo "$subnet" | sed 's|/.*||' | awk -F. '{print $1"."$2"."$3".1"}')
+              echo "🎯 IP estimado: $pfsense_ip"
+          else
+              echo "❌ Não foi possível determinar IP do pfSense"
+              echo "⏭️  Continuando sem verificação (pode causar problemas nos containers)"
+              sudo touch /srv/restored031-wait.lock
+              return 0
+          fi
+      fi
+      
+      echo "🎯 IP do pfSense: $pfsense_ip"
+      echo ""
+      echo "⏳ Aguardando pfSense responder (timeout: 3 minutos)..."
+      echo "   Isso é normal - VM precisa bootar e pfSense precisa carregar"
+      echo ""
+      
+      # Configurações de timeout
+      MAX_WAIT=180  # 3 minutos
+      INTERVAL=5    # 5 segundos entre tentativas
+      elapsed=0
+      
+      # Barra de progresso
+      while [ $elapsed -lt $MAX_WAIT ]; do
+          # Tentar ping
+          if ping -c 1 -W 2 "$pfsense_ip" &>/dev/null; then
+              echo ""
+              echo "✅ pfSense respondeu ao ping!"
+              echo "⏱️  Tempo decorrido: ${elapsed}s"
+              
+              # Esperar mais 10s para garantir que serviços estejam prontos
+              echo "⏳ Aguardando mais 10s para estabilização dos serviços..."
+              sleep 10
+              
+              echo "✅ pfSense está pronto!"
+              sudo touch /srv/restored031-wait.lock
+              return 0
+          fi
+          
+          # Atualizar progresso
+          printf "\r⏳ Aguardando... %ds/%ds " "$elapsed" "$MAX_WAIT"
+          
+          sleep $INTERVAL
+          elapsed=$((elapsed + INTERVAL))
+          
+          # Verificar se VM ainda está rodando a cada 30s
+          if [ $((elapsed % 30)) -eq 0 ]; then
+              if ! virsh list --state-running | grep -q "$vm_name"; then
+                  echo ""
+                  echo "❌ VM pfSense parou de responder durante a espera!"
+                  echo "🔧 Tentando reiniciar VM..."
+                  
+                  if virsh start "$vm_name" 2>/dev/null; then
+                      echo "✅ VM reiniciada - resetando timer"
+                      elapsed=0
+                  else
+                      echo "❌ Falha ao reiniciar VM"
+                      break
+                  fi
+              fi
+          fi
+      done
+      
+      # Timeout atingido
+      echo ""
+      echo "⚠️  TIMEOUT: pfSense não respondeu após 3 minutos"
+      echo ""
+      echo "POSSÍVEIS CAUSAS:"
+      echo "  • IP do pfSense está incorreto"
+      echo "  • VM está com problema de boot"
+      echo "  • Interfaces de rede mal configuradas"
+      echo "  • Firewall bloqueando ICMP"
+      echo ""
+      echo "DIAGNÓSTICO:"
+      echo "  • Status da VM: $(virsh domstate "$vm_name" 2>/dev/null || echo "desconhecido")"
+      echo "  • Console: virsh console $vm_name"
+      echo "  • Logs: journalctl -u libvirtd -n 50"
+      echo ""
+      
+      read -p "Deseja continuar mesmo assim? (S/n): " resposta
+      resposta=$(echo "$resposta" | tr '[:upper:]' '[:lower:]')
+      
+      if [[ "$resposta" =~ ^(s|sim|y|yes|)$ ]]; then
+          echo "⚠️  Continuando restore (containers podem falhar)"
+          sudo touch /srv/restored031-wait.lock
+          return 0
+      else
+          echo "❌ Restore cancelado pelo usuário"
+          exit 1
+      fi
+      
+  else
+      echo "⏭️  ETAPA 031 já executada (lock existe)"
+  fi
+}
+
 function etapa04 {
   if ! [ -f /srv/restored4.lock ]; then
       echo "=== ETAPA 4: Restaurando containers (mais recente de cada) ==="
@@ -1367,6 +1497,7 @@ etapa00-ok
 etapa01
 etapa02
 etapa03
+etapa031
 etapa04
 etapa05
 etapa06
