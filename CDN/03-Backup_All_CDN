@@ -1,0 +1,32 @@
+#!/bin/bash
+
+function verifycontainers {
+  if [ ! -d "/srv/containers" ]; then
+    echo "ERRO: A pasta /srv/containers não existe! Cancelando..."
+    exit 1
+  else
+    if [ -z "$(ls -A /srv/containers)" ]; then
+      echo "AVISO: A pasta /srv/containers existe mas está vazia. Cancelando..."
+      exit 1
+    fi
+  fi
+
+  if dialog --title 'Backup Imediato' --backtitle "BACKUP" --yesno 'Deseja fazer um backup deste sistema? \nTodos os servicos serao pausados.' 0 0; then
+    clear
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh | sudo tee /srv/scripts/bkp-cdn.sh >/dev/null
+    sudo chmod +x /srv/scripts/bkp-cdn.sh; sudo bash /srv/scripts/bkp-cdn.sh
+
+    clear
+    echo "Aguardando 30s para a VM pfSense iniciar antes de fazer backup dos containers."
+    sleep 30
+
+    curl -sSL "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" | sudo tee /srv/scripts/backupcont.sh> /dev/null
+    sudo chmod +x /srv/scripts/backupcont.sh; sudo bash /srv/scripts/backupcont.sh
+    clear; echo "Backup concluido!"
+    sleep 2
+  fi
+}
+
+verifycontainers
+
+exit 0
