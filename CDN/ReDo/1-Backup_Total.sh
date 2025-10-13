@@ -73,7 +73,7 @@ function etapa05 {
     if [[ -n "$vm_name" ]]; then
       echo "📦 Processando VM: $vm_name"
       # Pega apenas os discos reais (type=disk, device=file)
-      virsh domblklist "$vm_name" --details | awk '/^file.*disk/ {print $4}' | while read -r disk_path; do
+      virsh domblklist "$vm_name" --details | awk '/file.*disk/ {print $NF}' | while read -r disk_path; do
         if [[ -n "$disk_path" && -f "$disk_path" ]]; then
           echo "  └─ Copiando: $(basename "$disk_path")"
           sudo rsync -aHAXv --numeric-ids --sparse "$disk_path" "$destiny"/
