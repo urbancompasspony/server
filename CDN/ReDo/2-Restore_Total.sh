@@ -333,7 +333,7 @@ function etapa00-interfaces {
     echo ""
     echo "Deseja continuar mesmo assim? A VM NÃO será iniciada."
     
-    read -p "Digite 'sim' para continuar ou pressione ENTER para cancelar: " resposta
+    read -r -p "Digite 'sim' para continuar ou pressione ENTER para cancelar: " resposta
     resposta=$(echo "$resposta" | tr '[:upper:]' '[:lower:]' | xargs)
     if [ "$resposta" = "sim" ]; then
       echo ""
@@ -356,7 +356,7 @@ function etapa00-interfaces {
 function etapa00-ok {
   VALUE0=$(dialog --ok-label "Restaurar?" --title "Prepare-se" --backtitle "Este Sistema Passou em Todos os Testes Iniciais - Backup encontrado e condições satisfeitas." --form "\nPOR FAVOR CONFIRME QUE VOCE ESTA DE ACORDO \nCOM OS RISCOS INERENTES A ESTA RESTAURACAO! \n\n
 PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZER ESTA OPERAÇÃO DESNECESSSARIAMENTE.\n\nRepita no campo abaixo: \neu estou ciente dos riscos" 0 0 0 \
-"." 1 1 "$VALUE1" 1 1 45 0 3>&1 1>&2 2>&3 3>&- > /dev/tty)
+"." 1 1 "" 1 1 45 0 3>&1 1>&2 2>&3 3>&- > /dev/tty)
     case $? in
       0) : ;;
       1) return ;;
@@ -483,14 +483,9 @@ function etapa01 {
           done
 
           # Dialog interativo com lista dinâmica
-          new_parent=$(dialog --stdout \
-            --title "Interface de Rede para os Containers" \
+          if ! new_parent=$(dialog --stdout --title "Interface de Rede para os Containers" \
             --backtitle "Restauração - Etapa 1" \
-            --inputbox "\nDigite o nome da interface ethernet que será usada\npara a rede macvlan dos containers.\n\nEsta interface será a mesma LAN do Host Linux (não a LAN do pfSense)!\n\nInterfaces disponíveis:\n\n${interface_list}\nInterface:" \
-            22 70)
-          
-          # Verificar se usuário cancelou
-          if [ $? -ne 0 ] || [ -z "$new_parent" ]; then
+            --inputbox "..." 22 70) || [ -z "$new_parent" ]; then
             clear
             echo "❌ Operação cancelada pelo usuário"
             echo "Não é possível continuar sem configurar a rede Docker"
@@ -694,7 +689,8 @@ function etapa02 {
               
               # Adicionar linhas validadas ao fstab atual
               if [ -f "$temp_fstab" ]; then
-                  sudo tee -a /etc/fstab < "$temp_fstab" > /dev/null
+                  #sudo tee -a /etc/fstab < "$temp_fstab" > /dev/null
+                  cat "$temp_fstab" | sudo tee -a /etc/fstab > /dev/null
                   rm -f "$temp_fstab"
               fi
 
@@ -762,10 +758,10 @@ function map_xml_interfaces {
     echo ""
 
     # Extrair TODAS as linhas que contêm dev='' dentro de interface type='direct'
-    xml_interfaces=($(awk '/<interface type=.direct.>/,/<\/interface>/ {if ($0 ~ /dev=/) print}' "$xml_file" | \
+    mapfile -t xml_interfaces < <(awk '/<interface type=.direct.>/,/<\/interface>/ {if ($0 ~ /dev=/) print}' "$xml_file" | \
       grep -oP "dev='\K[^']*" | \
       grep -v "^$original_parent$" | \
-      sort -u))
+      sort -u)
     
     if [ ${#xml_interfaces[@]} -eq 0 ]; then
         echo "⚠️  Nenhuma interface de rede no XML (apenas Docker)"
@@ -963,7 +959,7 @@ function etapa03 {
                   else
                       echo "⚠️  Tentando iniciar com --force-boot..."
                       virsh start "$vm_name" --force-boot 2>&1 | tee /tmp/vm_start_error.log
-                      if [ ${PIPESTATUS[0]} -eq 0 ]; then
+                      if [ "${PIPESTATUS[0]}" -eq 0 ]; then
                           echo "✅ VM iniciada (forçada)"
                       else
                           echo "❌ Falha ao iniciar VM"
@@ -1107,7 +1103,7 @@ function etapa031 {
       echo "  • Logs: journalctl -u libvirtd -n 50"
       echo ""
       
-      read -p "Deseja continuar mesmo assim? (S/n): " resposta
+      read -r -p "Deseja continuar mesmo assim? (S/n): " resposta
       resposta=$(echo "$resposta" | tr '[:upper:]' '[:lower:]')
       
       if [[ "$resposta" =~ ^(s|sim|y|yes|)$ ]]; then
@@ -1321,7 +1317,8 @@ function etapa04 {
       while read -r filename; do
           # Extrair nome base (tudo antes da data)
           # Ex: openspeedtest-29_09_25.tar.lz4 -> openspeedtest
-          basename_clean=$(echo "$filename" | sed 's/-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.tar\.lz4$//')
+          #basename_clean=$(echo "$filename" | sed 's/-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.tar\.lz4$//')
+          basename_clean="${filename%-[0-9][0-9]_[0-9][0-9]_[0-9][0-9].tar.lz4}"
 
           # Como está ordenado por sort -V, sempre substitui com o mais recente
           latest_files[$basename_clean]="$filename"
@@ -1430,11 +1427,11 @@ function etapa05 {
               ["elastic-search-gui"]="80-sist2"
           )
 
-          # Obter todas as img_base únicas do YAML
-          unique_images=$(yq -r '[.[] | .img_base] | unique | .[]' /srv/containers.yaml)
+          # Obter todas as img_base únicas do YAML e popular array
+          mapfile -t unique_images < <(yq -r '[.[] | .img_base] | unique | .[]' /srv/containers.yaml)
 
           echo "Imagens base encontradas:"
-          echo "$unique_images" | while read -r img; do
+          for img in "${unique_images[@]}"; do
               count=$(yq -r "[.[] | select(.img_base == \"$img\")] | length" /srv/containers.yaml)
               echo "  • $img ($count container(s))"
           done
@@ -1447,7 +1444,7 @@ function etapa05 {
           # Para cada img_base única, processar via orchestration
           rm -f /srv/lockfile
           
-          echo "$unique_images" | while read -r img_base; do
+          for img_base in "${unique_images[@]}"; do
               if [[ -n "${script_map[$img_base]}" ]]; then
                   script_name="${script_map[$img_base]}"
 
@@ -1475,7 +1472,6 @@ function etapa05 {
                       
                       # Executar orchestration
                       bash /tmp/orchestration
-                      orch_exit=$?
                       
                       # Aguardar containers iniciarem
                       sleep 5
@@ -1575,7 +1571,7 @@ function etapa05 {
           echo "========================================="
           
           total_containers=$(yq -r 'keys | length' /srv/containers.yaml)
-          total_images=$(echo "$unique_images" | wc -l)
+          total_images=${#unique_images[@]}
           
           echo "Total de img_base processadas: $total_images"
           echo "Total de containers no YAML: $total_containers"
