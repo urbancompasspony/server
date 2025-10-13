@@ -354,31 +354,6 @@ function etapa00-interfaces {
 }
 
 function etapa00-ok {
-  VALUE0=$(dialog --ok-label "Restaurar?" --title "Prepare-se" --backtitle "Este Sistema Passou em Todos os Testes Iniciais - Backup encontrado e condições satisfeitas." --form "\nPOR FAVOR CONFIRME QUE VOCE ESTA DE ACORDO \nCOM OS RISCOS INERENTES A ESTA RESTAURACAO! \n\n
-PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZER ESTA OPERAÇÃO DESNECESSSARIAMENTE.\n\nRepita no campo abaixo: \neu estou ciente dos riscos" 0 0 0 \
-"." 1 1 "" 1 1 45 0 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-    case $? in
-      0) : ;;
-      1) return ;;
-    esac
-    var1=$(echo "$VALUE0" | sed -n 1p)
-    if [ "$var1" = "eu estou ciente dos riscos" ]; then
-      clear; echo "ESTA TUDO CORRETO! TUDO FOI DEVIDAMENTE VALIDADO."; sleep 1
-      echo "5"; echo "O SERVIDOR SERÁ COMPLETAMENTE RESTAURADO BASEADO NO BACKUP ENCONTRADO!"; sleep 1
-      echo "4"; echo "NÃO TENTE INTERAGIR COM O SISTEMA DURANTE A RESTAURAÇÃO COMPLETA."; sleep 1
-      echo "3"; echo "SE POSSÍVEL DESCONECTE TECLADO E MOUSE, NÃO INTERAJA COM ABSOLUTAMENTE NADA ATÉ CONCLUIR!"; sleep 1
-      echo "2"; echo "SE QUISER DESISTIR AGORA, PRESSIONE   CTRL + C"; sleep 1
-      echo "1"; echo "NÃO DESLIGUE O SERVIDOR ATÉ O MOMENTO DO REINÍCIO AUTOMÁTICO."; sleep 1
-      echo "0"; echo "Que a boa sorte lhe acompanhe nesta restauração!"
-      sleep 3
-      clear
-    else
-      clear; echo ""; echo "Por favor repita a frase exatamente como pedi! Saindo..."
-      exit 1
-    fi
-}
-
-function etapa01 {
   if ! [ -f /srv/restored1.lock ]; then
     if [ -f "$pathrestore/docker-network-backup/macvlan.json" ]; then
       cd "$pathrestore/docker-network-backup" || exit
@@ -564,6 +539,31 @@ function etapa01 {
   else
     echo "⏭ ETAPA 1 já executada (lock existe)"
   fi
+}
+
+function etapa01 {
+  VALUE0=$(dialog --ok-label "Restaurar?" --title "Prepare-se" --backtitle "Este Sistema Passou em Todos os Testes Iniciais - Backup encontrado e condições satisfeitas." --form "\nPOR FAVOR CONFIRME QUE VOCE ESTA DE ACORDO \nCOM OS RISCOS INERENTES A ESTA RESTAURACAO! \n\n
+PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZER ESTA OPERAÇÃO DESNECESSSARIAMENTE.\n\nRepita no campo abaixo: \neu estou ciente dos riscos" 0 0 0 \
+"." 1 1 "$VALUE1" 1 1 45 0 3>&1 1>&2 2>&3 3>&- > /dev/tty)
+    case $? in
+      0) : ;;
+      1) return ;;
+    esac
+    var1=$(echo "$VALUE0" | sed -n 1p)
+    if [ "$var1" = "eu estou ciente dos riscos" ]; then
+      clear; echo "ESTA TUDO CORRETO! TUDO FOI DEVIDAMENTE VALIDADO."; sleep 1
+      echo "5"; echo "O SERVIDOR SERÁ COMPLETAMENTE RESTAURADO BASEADO NO BACKUP ENCONTRADO!"; sleep 1
+      echo "4"; echo "NÃO TENTE INTERAGIR COM O SISTEMA DURANTE A RESTAURAÇÃO COMPLETA."; sleep 1
+      echo "3"; echo "SE POSSÍVEL DESCONECTE TECLADO E MOUSE, NÃO INTERAJA COM ABSOLUTAMENTE NADA ATÉ CONCLUIR!"; sleep 1
+      echo "2"; echo "SE QUISER DESISTIR AGORA, PRESSIONE   CTRL + C"; sleep 1
+      echo "1"; echo "NÃO DESLIGUE O SERVIDOR ATÉ O MOMENTO DO REINÍCIO AUTOMÁTICO."; sleep 1
+      echo "0"; echo "Que a boa sorte lhe acompanhe nesta restauração!"
+      sleep 3
+      clear
+    else
+      clear; echo ""; echo "Por favor repita a frase exatamente como pedi! Saindo..."
+      exit 1
+    fi
 }
 
 function etapa02 {
