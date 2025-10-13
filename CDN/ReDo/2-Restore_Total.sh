@@ -460,7 +460,8 @@ function etapa00-ok {
           # Dialog interativo com lista dinâmica
           if ! new_parent=$(dialog --stdout --title "Interface de Rede para os Containers" \
             --backtitle "Restauração - Etapa 1" \
-            --inputbox "..." 22 70) || [ -z "$new_parent" ]; then
+            --inputbox "\nDigite o nome da interface ethernet que será usada\npara a rede macvlan dos containers.\n\nEsta interface será a mesma LAN do Host Linux (não a LAN do pfSense)!\n\nInterfaces disponíveis:\n\n${interface_list}\nInterface:" \
+            22 70) || [ -z "$new_parent" ]; then
             clear
             echo "❌ Operação cancelada pelo usuário"
             echo "Não é possível continuar sem configurar a rede Docker"
