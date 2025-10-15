@@ -94,12 +94,23 @@ function managers {
   2) desktop00 ; managers ;;
   3) domain00 ; managers ;;
   4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | tee /home/administrador/.t00lz >/dev/null ; chmod +x /home/administrador/.t00lz ; clear ; bash /home/administrador/.t00lz ; managers ;;
-  5) clear ; sudo bash /usr/local/bin/diagnostic-system.sh ; managers ;;
+  5) check_diag_con ; managers ;;
   6) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/00-Base | tee /home/administrador/.base >/dev/null ; chmod +x /home/administrador/.base ; clear ; bash /home/administrador/.base ; managers ;;
   7) reb00t ; managers ;;
   8) shutd0 ; managers ;;
   X) exit ;;
   esac
+}
+
+function check_diag_con {
+  clear
+
+  if [ -z "$DIAG_UPDATE_CHECKED" ]; then
+    export DIAG_UPDATE_CHECKED=1
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
+  fi
+
+  sudo bash /usr/local/bin/diagnostic-system.sh
 }
 
 function allinfoz0 {
@@ -223,6 +234,7 @@ if ! [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+# Atualiza o bashrc só se tiver internet e verifica 1x a cada sessão!
 if [ -z "$BASHRC_UPDATE_CHECKED" ]; then
   export BASHRC_UPDATE_CHECKED=1
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
