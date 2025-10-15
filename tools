@@ -16,6 +16,7 @@ function start {
   8 'Teste de Placa de Rede' \
   9 'Ajustar Modo Kiosk' \
   10 'Alterar Hostname do Servidor' \
+  11 'Erros das Placas de Rede' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -31,8 +32,40 @@ function start {
   8) iperftest ; start ;;
   9) kiosk0 ; start ;;
   10) hostname_menu_with_yaml ; start ;;
+  11) check_network_drops ; start ;;
   X) echo "." >/dev/null ;;
   esac
+}
+
+check_network_drops() {
+    echo "=== Verificando perdas de pacotes nas interfaces ==="
+    echo ""
+    
+    # Pegar interfaces do netplan (exceto lo, docker, veth, virbr)
+    interfaces=$(ip -o link show | awk -F': ' '{print $2}' | grep -E '^(en|eth|wlan)' | grep -v '@')
+    
+    for iface in $interfaces; do
+        echo "=== Interface: $iface ==="
+        ip -s link show "$iface"
+        echo ""
+        
+        # Extrair valores de RX e TX dropped
+        rx_dropped=$(ip -s link show "$iface" | grep -A1 "RX:" | tail -1 | awk '{print $4}')
+        tx_dropped=$(ip -s link show "$iface" | grep -A1 "TX:" | tail -1 | awk '{print $4}')
+        
+        # Verificar se há drops
+        if [ "$rx_dropped" -gt 0 ] 2>/dev/null || [ "$tx_dropped" -gt 0 ] 2>/dev/null; then
+            echo "⚠️  ERROR: TEMOS PERDAS DE PACOTES"
+            [ "$rx_dropped" -gt 0 ] 2>/dev/null && echo "    RX DROPPED: $rx_dropped"
+            [ "$tx_dropped" -gt 0 ] 2>/dev/null && echo "    TX DROPPED: $tx_dropped"
+        else
+            echo "✓ Sem perdas de pacotes"
+        fi
+        
+        echo ""
+        echo "---"
+        echo ""
+    done
 }
 
 # Função para salvar hostname no system.yaml
