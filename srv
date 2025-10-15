@@ -52,8 +52,7 @@ function start {
   4 'Netplan AutoSetup' \
   5 'Install DWService' \
   6 'Install Tailscale' \
-  7 'Install AD-DC-WebUI' \
-  8 'Install DWService ARM' \
+  7 'Install DWService ARM' \
   X 'Sair' 2>&1 > /dev/tty ); then
     exit
   fi
@@ -65,8 +64,7 @@ function start {
   4) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash ; start ;;
   5) dwservice0 ; start ;;
   6) tailscaled0 ; start ;;
-  7) curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash ; start ;;
-  8) dwgeneric0 ; start ;;
+  7) dwgeneric0 ; start ;;
   X) exit ;;
   esac
 }
@@ -195,6 +193,10 @@ function wayland00 {
 
 function domain00 {
   if docker ps -a | grep dominio 1>&2 >/dev/null; then
+    if [ -z "$DOM_UPDATE_CHECKED" ]; then
+      export DOM_UPDATE_CHECKED=1
+      curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash
+    fi
     docker exec -it dominio /root/.init
     return
   else
