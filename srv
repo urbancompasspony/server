@@ -101,13 +101,17 @@ function managers {
 }
 
 function check_diag_con {
+  URLAQUI="https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh"
+    if ! curl -fsSL --connect-timeout 5 "$URLAQUI" -o "$TMP_BASHRC"; then
+      echo "Erro: Sem conexão com a internet ou URL inacessível."
+      rm -f "$TMP_BASHRC"
+    else
+      if [ -z "$DIAG_UPDATE_CHECKED" ]; then
+        export DIAG_UPDATE_CHECKED=1
+        curl -sSL $URLAQUI | sudo bash
+      fi
+    fi
   clear
-
-  if [ -z "$DIAG_UPDATE_CHECKED" ]; then
-    export DIAG_UPDATE_CHECKED=1
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
-  fi
-
   sudo bash /usr/local/bin/diagnostic-system.sh
 }
 
@@ -205,6 +209,7 @@ function domain00 {
       fi
     fi
 
+    clear
     docker exec -it dominio /root/.init
     return
   else
