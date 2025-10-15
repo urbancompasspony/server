@@ -102,9 +102,9 @@ function managers {
 
 function check_diag_con {
   URLAQUI="https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh"
-    if ! curl -fsSL --connect-timeout 5 "$URLAQUI" -o "$TMP_BASHRC"; then
+    if ! curl -fsSL --connect-timeout 5 $URLAQUI -o "/tmp/TMP_BASHRC"; then
       echo "Erro: Sem conexão com a internet ou URL inacessível."
-      rm -f "$TMP_BASHRC"
+      rm -f "/tmp/TMP_BASHRC"
     else
       if [ -z "$DIAG_UPDATE_CHECKED" ]; then
         export DIAG_UPDATE_CHECKED=1
@@ -113,6 +113,27 @@ function check_diag_con {
     fi
   clear
   sudo bash /usr/local/bin/diagnostic-system.sh
+}
+
+function domain00 {
+  if docker ps -a | grep dominio 1>&2 >/dev/null; then
+    URLAQUI="https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh"
+    if ! curl -fsSL --connect-timeout 5 $URLAQUI -o "/tmp/TMP_BASHRC"; then
+      echo "Erro: Sem conexão com a internet ou URL inacessível."
+      rm -f "$TMP_BASHRC"
+    else
+      if [ -z "$DOM_UPDATE_CHECKED" ]; then
+        export DOM_UPDATE_CHECKED=1
+        curl -sSL $URLAQUI | sudo bash
+      fi
+    fi
+
+    clear
+    docker exec -it dominio /root/.init
+    return
+  else
+    clear; echo ""; echo "Nenhum Controlador de Dominio encontrado neste sistema!"; echo ""; sleep 3
+  fi
 }
 
 function allinfoz0 {
@@ -193,28 +214,6 @@ function wayland00 {
   mkdir -p /home/administrador/.config/labwc
   rsync -aHAXv --numeric-ids --sparse /etc/xdg/openbox/ .config/labwc/
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml | tee .config/labwc/menu.xml >/dev/null
-}
-
-function domain00 {
-  if docker ps -a | grep dominio 1>&2 >/dev/null; then
-
-  URLAQUI="https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh"
-    if ! curl -fsSL --connect-timeout 5 "$URLAQUI" -o "$TMP_BASHRC"; then
-      echo "Erro: Sem conexão com a internet ou URL inacessível."
-      rm -f "$TMP_BASHRC"
-    else
-      if [ -z "$DOM_UPDATE_CHECKED" ]; then
-        export DOM_UPDATE_CHECKED=1
-        curl -sSL $URLAQUI | sudo bash
-      fi
-    fi
-
-    clear
-    docker exec -it dominio /root/.init
-    return
-  else
-    clear; echo ""; echo "Nenhum Controlador de Dominio encontrado neste sistema!"; echo ""; sleep 3
-  fi
 }
 
 function tailscaled0 {
