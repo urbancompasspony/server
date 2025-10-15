@@ -193,10 +193,18 @@ function wayland00 {
 
 function domain00 {
   if docker ps -a | grep dominio 1>&2 >/dev/null; then
-    if [ -z "$DOM_UPDATE_CHECKED" ]; then
-      export DOM_UPDATE_CHECKED=1
-      curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash
+
+  URLAQUI="https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh"
+    if ! curl -fsSL --connect-timeout 5 "$URLAQUI" -o "$TMP_BASHRC"; then
+      echo "Erro: Sem conexão com a internet ou URL inacessível."
+      rm -f "$TMP_BASHRC"
+    else
+      if [ -z "$DOM_UPDATE_CHECKED" ]; then
+        export DOM_UPDATE_CHECKED=1
+        curl -sSL $URLAQUI | sudo bash
+      fi
     fi
+
     docker exec -it dominio /root/.init
     return
   else
