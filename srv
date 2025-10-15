@@ -120,7 +120,7 @@ function domain00 {
     URLAQUI="https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh"
     if ! curl -fsSL --connect-timeout 5 $URLAQUI -o "/tmp/TMP_BASHRC"; then
       echo "Erro: Sem conexão com a internet ou URL inacessível."
-      rm -f "$TMP_BASHRC"
+      rm -f "/tmp/TMP_BASHRC"
     else
       if [ -z "$DOM_UPDATE_CHECKED" ]; then
         export DOM_UPDATE_CHECKED=1
