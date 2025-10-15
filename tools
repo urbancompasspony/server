@@ -13,10 +13,10 @@ function start {
   5 'Sync SATAs' \
   6 'Ping DNS (para pfSense)' \
   7 'SpeedTest by Ookla' \
-  8 'Teste de Placa de Rede' \
+  8 'Teste iperf de Velocidade LAN' \
   9 'Ajustar Modo Kiosk' \
   10 'Alterar Hostname do Servidor' \
-  11 'Erros das Placas de Rede' \
+  11 'Ver Erros das Placas de Rede' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -66,6 +66,8 @@ check_network_drops() {
         echo "---"
         echo ""
     done
+
+    sleep 5
 }
 
 # Função para salvar hostname no system.yaml
