@@ -473,6 +473,40 @@ test_network() {
     echo ""
     sleep 3
 
+    # Verificar perdas de pacotes nas interfaces de rede
+    log_message "Verificando perdas de pacotes nas interfaces de rede..."
+    
+    # Pegar interfaces ativas (exceto lo, docker, veth, virbr)
+    interfaces=$(ip -o link show | awk -F': ' '{print $2}' | grep -E '^(en|eth|wlan)' | grep -v '@')
+    
+    network_issues_found=false
+    
+    for iface in $interfaces; do
+        # Extrair valores de RX e TX dropped
+        rx_dropped=$(ip -s link show "$iface" | grep -A1 "RX:" | tail -1 | awk '{print $4}')
+        tx_dropped=$(ip -s link show "$iface" | grep -A1 "TX:" | tail -1 | awk '{print $4}')
+        
+        # Verificar se há drops
+        if [ "$rx_dropped" -gt 0 ] 2>/dev/null || [ "$tx_dropped" -gt 0 ] 2>/dev/null; then
+            if [ "$network_issues_found" = false ]; then
+                echo -e "⚠️  AVISO: Perdas de pacotes detectadas nas interfaces:"
+                network_issues_found=true
+            fi
+            
+            echo "  Interface $iface:"
+            [ "$rx_dropped" -gt 0 ] 2>/dev/null && echo "    RX DROPPED: $rx_dropped pacotes"
+            [ "$tx_dropped" -gt 0 ] 2>/dev/null && echo "    TX DROPPED: $tx_dropped pacotes"
+            add_warning
+        fi
+    done
+    
+    if [ "$network_issues_found" = false ]; then
+        echo -e "✅ OK: Nenhuma perda de pacotes detectada nas interfaces de rede"
+    fi
+
+    echo ""
+    sleep 3
+
     # Verifica interfaces de rede - CORRIGIDO para filtrar interfaces ignoráveis
     log_message "Verificando interfaces de rede..."
     
