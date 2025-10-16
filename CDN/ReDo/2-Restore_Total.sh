@@ -336,7 +336,8 @@ function etapa00-interfaces {
     echo ""
     echo "Deseja continuar mesmo assim? A VM NÃO será iniciada."
     
-    read -r -p "Digite 'sim' para continuar ou pressione ENTER para cancelar: " resposta
+    read -r -t 60 -p "Digite 'sim' para continuar ou pressione ENTER para cancelar: " resposta || resposta="sim"
+    
     resposta=$(echo "$resposta" | tr '[:upper:]' '[:lower:]' | xargs)
     if [ "$resposta" = "sim" ]; then
       echo ""
