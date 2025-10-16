@@ -65,6 +65,7 @@ function user_tools {
   Q 'Forcar a troca de senha imediata!' \
   R 'Mover usuario para OU' \
   S 'Cuidado: Excluir um usuario' \
+  T 'CUIDADO: Remocao de Usuario do Banco' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -89,6 +90,7 @@ function user_tools {
   Q) expiracy_now ; user_tools ;;
   R) mv_user_ou ; user_tools ;;
   S) rm_user ; user_tools ;;
+  T) rm_user_db ; user_tools ;;
   X) echo "." >/dev/null ;;
   esac
 }
@@ -971,6 +973,60 @@ function rm_user {
     else
       dialog --title "ERROR" --msgbox "Usuario invalido!" 7 25
     fi
+  fi
+}
+
+function rm_user_db {
+  if ! cnname=$(dialog --title "$ttitle" --backtitle "Excluir Usuario" --inputbox "Digite parte ou o nome completo do usuario (CN):" 0 0 2>&1 > /dev/tty); then
+    return
+  fi
+
+  if [ -z "$cnname" ]; then
+    dialog --title "Erro" --msgbox "Nenhum nome foi inserido." 6 40
+    return
+  fi
+
+  # Busca todos os DNs que correspondem ao CN parcial
+  mapfile -t dns < <(ldbsearch -H /var/lib/samba/private/sam.ldb "(cn=*$cnname*)" dn | grep "^dn:" | cut -d' ' -f2-)
+
+  count=${#dns[@]}
+
+  if [ "$count" -eq 0 ]; then
+    dialog --title "Nao encontrado" --msgbox "Nenhum usuario com '$cnname' foi localizado." 6 50
+    return
+  fi
+
+  if [ "$count" -eq 1 ]; then
+    selected_dn="${dns[0]}"
+  else
+    # Monta lista segura para dialog --menu
+    temp_list=""
+    for i in "${!dns[@]}"; do
+      label="Usuario_$((i+1))"
+      dn_escaped=$(echo "${dns[$i]}" | sed 's/"/\\"/g')
+      temp_list+=" \"$label\" \"$dn_escaped\""
+    done
+
+    # Executa menu de seleção
+    selected_label=$(eval dialog --title \"Multiplos encontrados\" --menu \"Selecione o usuario para excluir:\" 0 0 0 $temp_list 2>&1 > /dev/tty)
+
+    if [ -z "$selected_label" ]; then
+      dialog --msgbox "Operacao cancelada." 6 40
+      return
+    fi
+
+    # Recupera o DN real com base no label
+    index=$(( ${selected_label#Usuario_} - 1 ))
+    selected_dn="${dns[$index]}"
+  fi
+
+  # Confirma exclusao
+  dialog --yesno "Deseja realmente excluir:\n\n$selected_dn ?" 10 60
+  if [ $? -eq 0 ]; then
+    ldbdel -H /var/lib/samba/private/sam.ldb "$selected_dn"
+    dialog --title "Sucesso" --msgbox "O usuario foi removido com sucesso!" 6 50
+  else
+    dialog --title "Cancelado" --msgbox "Remocao cancelada." 6 40
   fi
 }
 
