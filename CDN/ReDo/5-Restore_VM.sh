@@ -132,6 +132,12 @@ echo "$xml_files" | while read -r xml_file; do
       sleep 3
       exit 1
     fi
+
+    if [ -e "$original_path" ]; then
+      echo "  ⚠️  AVISO: O disco $disk_name já existe no destino."
+      echo "  ⏭️  Pulando restauração deste disco para evitar sobrescrita!"
+      continue
+    fi
     
     # Cria o diretório de destino se não existir
     sudo mkdir -p "$(dirname "$original_path")"
