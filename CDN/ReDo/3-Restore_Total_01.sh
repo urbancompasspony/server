@@ -1153,4 +1153,6 @@ etapa02
 etapa03
 etapa031
 
+sudo reboot
+
 exit 0
