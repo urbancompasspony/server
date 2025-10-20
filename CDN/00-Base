@@ -10,8 +10,8 @@ var0=$(dialog --title 'Modelo CDN' --backtitle "Continuidade do Negocio" --ok-la
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
 1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/01-Restore_BKP | bash ; urgencies0 ;;
-2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/03-Backup_All_CDN | bash ; urgencies0 ;;
-3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/2-Restore_Total.sh | sudo bash ; urgencies0 ;;
+2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/02-Backup_All_CDN | bash ; urgencies0 ;;
+3) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/3-Restore_Total_01.sh | sudo bash ; urgencies0 ;;
 4) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/4-Restore_Total_02.sh | sudo bash ; urgencies0 ;;
 5) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/5-Restore_VM.sh | sudo bash ; urgencies0 ;;
 X) echo "." >/dev/null ;;
