@@ -16,7 +16,7 @@ exec 2>&1
 echo "=== Restore iniciado em $(date) ==="
 echo "Log salvo em: $LOG_FILE"
 
-function etapa-mount {
+function etapa00-mount {
   sudo mkdir -p /srv/containers; sudo mkdir -p /mnt/bkpsys
   if mountpoint -q /mnt/bkpsys; then
     echo "✓ Backup já está montado"
@@ -549,7 +549,7 @@ function etapa00-ok {
   fi
 }
 
-function etapa01 {
+function etapa01-start {
   VALUE0=$(dialog --ok-label "Restaurar?" --title "Prepare-se" --backtitle "Este Sistema Passou em Todos os Testes Iniciais - Backup encontrado e condições satisfeitas." --form "\nPOR FAVOR CONFIRME QUE VOCE ESTA DE ACORDO \nCOM OS RISCOS INERENTES A ESTA RESTAURACAO! \n\n
 PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZER ESTA OPERAÇÃO DESNECESSSARIAMENTE.\n\nRepita no campo abaixo: \neu estou ciente dos riscos" 0 0 0 \
 "." 1 1 "$VALUE1" 1 1 45 0 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -573,156 +573,100 @@ PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZE
     fi
 }
 
-function etapa02 {
-  if ! [ -f /srv/restored2.lock ]; then
-      echo "=== ETAPA 2: Restaurando /etc ==="
+function etapa02-pfsense {
+  if ! [ -f /srv/restored3.lock ]; then
+      echo "=== ETAPA 3: Restaurando VMs pfSense ==="
+      
+      find "$pathrestore" -type f -iname "*pfsense*" | while IFS= read -r disk_file; do
+        file_type=$(file -b "$disk_file")
 
-      # Encontrar arquivo etc mais recente
-      etc_file=$(find "$pathrestore" -name "etc-*.tar.lz4" | sort | tail -1)
+        # Ignora arquivos XML ou texto
+        if echo "$file_type" | grep -Eqi "XML|ASCII text|UTF-8 text"; then
+          echo "Ignorado (não é disco): $(basename "$disk_file") → Tipo: $file_type"
+          continue
+        fi
 
-      if [ -n "$etc_file" ]; then
-          echo "1. Restaurando /etc completo (exceto fstab)..."
-          sudo tar -I 'lz4 -d -c' -xpf "$etc_file" -C / \
-            --exclude='etc/netplan' \
-            --exclude='etc/apt'
-
-          echo "1.1 Atualizando configuração do GRUB..."
-          if [ -f /etc/default/grub ]; then
-              if sudo update-grub2 2>/dev/null; then
-                  echo "✓ GRUB2 atualizado"
-              else
-                  echo "⚠️ Erro ao atualizar GRUB2 (pode não estar instalado)"
-              fi
-          else
-              echo "⚠️ /etc/default/grub não encontrado"
+        # Aceita arquivos que parecem ser discos
+        if echo "$file_type" | grep -Eqi "qemu|qcow|virtual|boot sector|disk image|DOS/MBR|data"; then
+          echo "Restaurando disco: $(basename "$disk_file")"
+          sudo rsync -aHAXv --numeric-ids --sparse "$disk_file" /var/lib/libvirt/images/
+        else
+         echo "Ignorado (tipo desconhecido): $(basename "$disk_file") → Tipo: $file_type"
+        fi
+      done
+      
+      # Procurar XML no backup
+      xml_file_backup=$(find "$pathrestore" -iname "pf*.xml" | head -1)
+      
+      if [ -n "$xml_file_backup" ]; then
+          echo "📄 XML no backup: $(basename "$xml_file_backup")"
+          
+          # Copiar para área de trabalho
+          xml_file_work="/tmp/pfsense-restore.xml"
+          cp "$xml_file_backup" "$xml_file_work"
+          echo "✓ Copiado para: $xml_file_work"
+          echo ""
+          
+          # Detectar interface Docker
+          docker_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
+          original_parent="$docker_interface"
+          
+          if [ -z "$original_parent" ] || [ "$original_parent" = "null" ]; then
+            echo "❌ Rede macvlan não encontrada - execute etapa01 primeiro"
+            return 1
           fi
-
-          echo "2. Procurando backup do fstab..."
-          fstab_backup=$(find "$pathrestore" -name "fstab.backup" | sort | tail -1)
-
-          if [ -n "$fstab_backup" ]; then
-              echo "Encontrado: $(basename "$fstab_backup")"
-              echo "3. Fazendo backup do fstab atual..."
-              sudo cp /etc/fstab "/etc/fstab.bkp-preventivo.$(date +%Y%m%d_%H%M%S)"
-
-              echo "4. Aplicando merge inteligente do fstab com validação..."
+          
+          # MAPEAR INTERFACES
+          map_xml_interfaces "$xml_file_work" "$original_parent"
+          mapping_result=$?
+          
+          echo ""
+          
+          # Definir VM
+          if virsh define "$xml_file_work"; then
+              vm_name=$(grep -oP '<name>\K[^<]+' "$xml_file_work")
+              echo "✅ VM definida: $vm_name"
               
-              # Criar arquivo temporário para processar
-              temp_fstab="/tmp/fstab.merge.$$"
-              
-              # Processar cada linha do backup
-              while IFS= read -r line; do
-                  # Pular comentários e linhas vazias
-                  if [[ "$line" =~ ^[[:space:]]*# ]] || [[ -z "$line" ]]; then
-                      continue
-                  fi
-                  
-                  # Extrair o device/UUID (primeiro campo)
-                  device=$(echo "$line" | awk '{print $1}')
-                  mountpoint=$(echo "$line" | awk '{print $2}')
-                  
-                  # Pular se já existe no fstab atual
-                  if grep -q "^[^#]*[[:space:]]${mountpoint}[[:space:]]" /etc/fstab; then
-                      echo "  ⏭ Pulando $mountpoint (já existe no fstab atual)"
-                      continue
-                  fi
-                  
-                  # Verificar se é UUID ou device path
-                  device_exists=false
-                  
-                  if [[ "$device" =~ ^UUID= ]]; then
-                      # Extrair UUID
-                      uuid="${device#UUID=}"
-                      
-                      # Verificar se o UUID existe
-                      if blkid | grep -qi "$uuid"; then
-                          device_exists=true
-                          echo "  ✓ UUID encontrado: $uuid -> $mountpoint"
-                      else
-                          echo "  ✗ UUID não encontrado: $uuid -> $mountpoint"
-                      fi
-                      
-                  elif [[ "$device" =~ ^LABEL= ]]; then
-                      # Extrair LABEL
-                      label="${device#LABEL=}"
-                      
-                      # Verificar se o LABEL existe
-                      if blkid | grep -qi "LABEL=\"$label\""; then
-                          device_exists=true
-                          echo "  ✓ LABEL encontrado: $label -> $mountpoint"
-                      else
-                          echo "  ✗ LABEL não encontrado: $label -> $mountpoint"
-                      fi
-                      
-                  elif [[ "$device" =~ ^/dev/ ]]; then
-                      # Device path direto
-                      if [ -b "$device" ]; then
-                          device_exists=true
-                          echo "  ✓ Device encontrado: $device -> $mountpoint"
-                      else
-                          echo "  ✗ Device não encontrado: $device -> $mountpoint"
-                      fi
-                  else
-                      # Outros tipos (nfs, tmpfs, etc) - assume que existem
-                      device_exists=true
-                      echo "  ℹ Tipo especial: $device -> $mountpoint"
-                  fi
-                  
-                  # Adicionar nofail se device não existe
-                  if [ "$device_exists" = false ]; then
-                      # Verificar se já tem nofail
-                      if [[ "$line" =~ nofail ]]; then
-                          echo "$line" >> "$temp_fstab"
-                          echo "    → Adicionando com nofail (já presente)"
-                      else
-                          # Adicionar nofail na coluna de opções (4ª coluna)
-                          modified_line=$(echo "$line" | awk '{
-                              if (NF >= 4) {
-                                  $4 = $4 ",nofail"
-                              } else {
-                                  $4 = "defaults,nofail"
-                              }
-                              print $0
-                          }')
-                          echo "$modified_line" >> "$temp_fstab"
-                          echo "    → Adicionando com nofail (ADICIONADO)"
-                      fi
-                  else
-                      echo "$line" >> "$temp_fstab"
-                      echo "    → Adicionando normalmente"
-                  fi
-                  
-              done < "$fstab_backup"
-              
-              # Adicionar linhas validadas ao fstab atual
-              if [ -f "$temp_fstab" ]; then
-                  #sudo tee -a /etc/fstab < "$temp_fstab" > /dev/null
-                  cat "$temp_fstab" | sudo tee -a /etc/fstab > /dev/null
-                  rm -f "$temp_fstab"
-              fi
-
-              echo "5. Testando configuração..."
-              sudo systemctl daemon-reload
-              if sudo mount -a --fake; then
-                  echo "✓ fstab válido"
+              # Iniciar apenas se mapeamento foi bem-sucedido
+              if [ $mapping_result -eq 2 ]; then
+                  echo ""
+                  echo "⏭  VM NÃO iniciada (interfaces insuficientes ou bloqueadas)"
+                  echo "📝 XML salvo em: /tmp/pfsense-restore.xml"
+                  echo "📝 Configuração manual necessária após conclusão do restore"
+                  echo ""
               else
-                  echo "✗ Erro no fstab! Restaurando backup..."
-                  sudo cp "/etc/fstab.bkp-preventivo."* /etc/fstab 2>/dev/null || true
+                  if virsh autostart "$vm_name" 2>/dev/null; then
+                    echo "✅ Autostart configurado - VM iniciará com o host"
+                  fi
+                  echo ""
+                  echo "🚀 Iniciando VM..."
+                  if virsh start "$vm_name" 2>/dev/null; then
+                      echo "✅ VM iniciada com sucesso!"
+                  else
+                      echo "⚠️  Tentando iniciar com --force-boot..."
+                      virsh start "$vm_name" --force-boot 2>&1 | tee /tmp/vm_start_error.log
+                      if [ "${PIPESTATUS[0]}" -eq 0 ]; then
+                          echo "✅ VM iniciada (forçada)"
+                      else
+                          echo "❌ Falha ao iniciar VM"
+                          echo "📝 Log salvo em: /tmp/vm_start_error.log"
+                      fi
+                  fi
               fi
+              
+              # Salvar XML final
+              sudo cp "$xml_file_work" "/var/lib/libvirt/qemu/$vm_name.xml"
+              echo "✓ XML definitivo salvo em: /var/lib/libvirt/qemu/$vm_name.xml"
+              
           else
-              echo "⚠ Nenhum backup de fstab encontrado em $pathrestore"
+              echo "❌ Falha ao definir VM"
           fi
-
-          # Limpeza de comentários e linhas vazias
-          sudo sed -i '/^[[:space:]]*#/d; /^[[:space:]]*$/d; s/[[:space:]]*$//' /etc/fstab
-
-          sudo touch /srv/restored2.lock
-          echo "✓ ETAPA 2 concluída"
-      else
-          echo "❌ Nenhum arquivo etc-*.tar.lz4 encontrado em $pathrestore"
       fi
+      
+      sudo touch /srv/restored3.lock
+      echo "✅ ETAPA 3 concluída"
   else
-      echo "⏭ ETAPA 2 já executada (lock existe)"
+      echo "⏭ ETAPA 3 já executada"
   fi
 }
 
@@ -903,242 +847,160 @@ function map_xml_interfaces {
     return 0
 }
 
-function etapa03 {
-  if ! [ -f /srv/restored3.lock ]; then
-      echo "=== ETAPA 3: Restaurando VMs pfSense ==="
-      
-      find "$pathrestore" -type f -iname "*pfsense*" | while IFS= read -r disk_file; do
-        file_type=$(file -b "$disk_file")
+function etapa03-etc {
+  if ! [ -f /srv/restored2.lock ]; then
+      echo "=== ETAPA 2: Restaurando /etc ==="
 
-        # Ignora arquivos XML ou texto
-        if echo "$file_type" | grep -Eqi "XML|ASCII text|UTF-8 text"; then
-          echo "Ignorado (não é disco): $(basename "$disk_file") → Tipo: $file_type"
-          continue
-        fi
+      # Encontrar arquivo etc mais recente
+      etc_file=$(find "$pathrestore" -name "etc-*.tar.lz4" | sort | tail -1)
 
-        # Aceita arquivos que parecem ser discos
-        if echo "$file_type" | grep -Eqi "qemu|qcow|virtual|boot sector|disk image|DOS/MBR|data"; then
-          echo "Restaurando disco: $(basename "$disk_file")"
-          sudo rsync -aHAXv --numeric-ids --sparse "$disk_file" /var/lib/libvirt/images/
-        else
-         echo "Ignorado (tipo desconhecido): $(basename "$disk_file") → Tipo: $file_type"
-        fi
-      done
-      
-      # Procurar XML no backup
-      xml_file_backup=$(find "$pathrestore" -iname "pf*.xml" | head -1)
-      
-      if [ -n "$xml_file_backup" ]; then
-          echo "📄 XML no backup: $(basename "$xml_file_backup")"
-          
-          # Copiar para área de trabalho
-          xml_file_work="/tmp/pfsense-restore.xml"
-          cp "$xml_file_backup" "$xml_file_work"
-          echo "✓ Copiado para: $xml_file_work"
-          echo ""
-          
-          # Detectar interface Docker
-          docker_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
-          original_parent="$docker_interface"
-          
-          if [ -z "$original_parent" ] || [ "$original_parent" = "null" ]; then
-            echo "❌ Rede macvlan não encontrada - execute etapa01 primeiro"
-            return 1
-          fi
-          
-          # MAPEAR INTERFACES
-          map_xml_interfaces "$xml_file_work" "$original_parent"
-          mapping_result=$?
-          
-          echo ""
-          
-          # Definir VM
-          if virsh define "$xml_file_work"; then
-              vm_name=$(grep -oP '<name>\K[^<]+' "$xml_file_work")
-              echo "✅ VM definida: $vm_name"
-              
-              # Iniciar apenas se mapeamento foi bem-sucedido
-              if [ $mapping_result -eq 2 ]; then
-                  echo ""
-                  echo "⏭  VM NÃO iniciada (interfaces insuficientes ou bloqueadas)"
-                  echo "📝 XML salvo em: /tmp/pfsense-restore.xml"
-                  echo "📝 Configuração manual necessária após conclusão do restore"
-                  echo ""
+      if [ -n "$etc_file" ]; then
+          echo "1. Restaurando /etc completo (exceto fstab)..."
+          sudo tar -I 'lz4 -d -c' -xpf "$etc_file" -C / \
+            --exclude='etc/netplan' \
+            --exclude='etc/apt'
+
+          echo "1.1 Atualizando configuração do GRUB..."
+          if [ -f /etc/default/grub ]; then
+              if sudo update-grub2 2>/dev/null; then
+                  echo "✓ GRUB2 atualizado"
               else
-                  if virsh autostart "$vm_name" 2>/dev/null; then
-                    echo "✅ Autostart configurado - VM iniciará com o host"
-                  fi
-                  echo ""
-                  echo "🚀 Iniciando VM..."
-                  if virsh start "$vm_name" 2>/dev/null; then
-                      echo "✅ VM iniciada com sucesso!"
-                  else
-                      echo "⚠️  Tentando iniciar com --force-boot..."
-                      virsh start "$vm_name" --force-boot 2>&1 | tee /tmp/vm_start_error.log
-                      if [ "${PIPESTATUS[0]}" -eq 0 ]; then
-                          echo "✅ VM iniciada (forçada)"
-                      else
-                          echo "❌ Falha ao iniciar VM"
-                          echo "📝 Log salvo em: /tmp/vm_start_error.log"
-                          echo "🔧 Desativando autostart devido à falha..."
-                          if virsh autostart --disable "$vm_name" 2>/dev/null; then
-                              echo "✅ Autostart desativado - VM não iniciará automaticamente"
-                          else
-                              echo "⚠️  Não foi possível desativar autostart"
-                          fi
-                      fi
-                  fi
+                  echo "⚠️ Erro ao atualizar GRUB2 (pode não estar instalado)"
               fi
-              
-              # Salvar XML final
-              sudo cp "$xml_file_work" "/var/lib/libvirt/qemu/$vm_name.xml"
-              echo "✓ XML definitivo salvo em: /var/lib/libvirt/qemu/$vm_name.xml"
-              
           else
-              echo "❌ Falha ao definir VM"
+              echo "⚠️ /etc/default/grub não encontrado"
           fi
-      fi
-      
-      sudo touch /srv/restored3.lock
-      echo "✅ ETAPA 3 concluída"
-  else
-      echo "⏭ ETAPA 3 já executada"
-  fi
-}
 
-function etapa031 {
-  if ! [ -f /srv/restored031-wait.lock ]; then
-      echo "=== ETAPA 031: Aguardando pfSense ficar online ==="
-      
-      # Verificar se VM pfSense existe
-      vm_name=$(virsh list --all | grep -i pfsense | awk '{print $2}')
-      
-      if [ -z "$vm_name" ]; then
-          echo "⚠️  Nenhuma VM pfSense encontrada - pulando verificação"
-          sudo touch /srv/restored031-wait.lock
-          return 0
-      fi
-      
-      # Verificar se VM está rodando
-      vm_state=$(virsh list --state-running | grep -i "$vm_name")
-      if [ -z "$vm_state" ]; then
-          echo "⚠️  VM pfSense não está rodando - pulando verificação"
-          sudo touch /srv/restored031-wait.lock
-          return 0
-      fi
-      
-      echo "🔍 VM pfSense detectada: $vm_name"
-      echo "📡 Tentando detectar IP do pfSense..."
-      
-      # Tentar obter IP do pfSense do YAML
-      pfsense_ip=$(yq -r '.Rede.gateway' /srv/system.yaml 2>/dev/null)
-      
-      if [ -z "$pfsense_ip" ] || [ "$pfsense_ip" = "null" ]; then
-          echo "⚠️  IP do pfSense não encontrado no system.yaml"
-          echo "💡 Tentando detectar via ARP/network scan..."
-          
-          # Tentar detectar via subnet
-          subnet=$(yq -r '.Rede.subnet' /srv/system.yaml 2>/dev/null)
-          if [ -n "$subnet" ] && [ "$subnet" != "null" ]; then
-              # Extrair primeiro IP do range (geralmente o gateway)
-              pfsense_ip=$(echo "$subnet" | sed 's|/.*||' | awk -F. '{print $1"."$2"."$3".1"}')
-              echo "🎯 IP estimado: $pfsense_ip"
-          else
-              echo "❌ Não foi possível determinar IP do pfSense"
-              echo "⏭️  Continuando sem verificação (pode causar problemas nos containers)"
-              sudo touch /srv/restored031-wait.lock
-              return 0
-          fi
-      fi
-      
-      echo "🎯 IP do pfSense: $pfsense_ip"
-      echo ""
-      echo "⏳ Aguardando pfSense responder (timeout: 3 minutos)..."
-      echo "   Isso é normal - VM precisa bootar e pfSense precisa carregar para continuarmos."
-      if [ "$rede00" = "1" ]; then
-        echo "   Rede Customizada: Se demorar demais para pingar, ou este menu fechar sem concluir ou reiniciar,"
-        echo "tecle CTRL+ALT+F2, faça login, digite startx e pelo Virt-Manager confira se o pfSense está solicitando ajuste manual das placas de rede!"
-      fi
-      echo ""
-      
-      # Configurações de timeout
-      MAX_WAIT=180  # 3 minutos
-      INTERVAL=5    # 5 segundos entre tentativas
-      elapsed=0
-      
-      # Barra de progresso
-      while [ $elapsed -lt $MAX_WAIT ]; do
-          # Tentar ping
-          if ping -c 1 -W 2 "$pfsense_ip" &>/dev/null; then
-              echo ""
-              echo "✅ pfSense respondeu ao ping!"
-              echo "⏱️  Tempo decorrido: ${elapsed}s"
+          echo "2. Procurando backup do fstab..."
+          fstab_backup=$(find "$pathrestore" -name "fstab.backup" | sort | tail -1)
+
+          if [ -n "$fstab_backup" ]; then
+              echo "Encontrado: $(basename "$fstab_backup")"
+              echo "3. Fazendo backup do fstab atual..."
+              sudo cp /etc/fstab "/etc/fstab.bkp-preventivo.$(date +%Y%m%d_%H%M%S)"
+
+              echo "4. Aplicando merge inteligente do fstab com validação..."
               
-              # Esperar mais 10s para garantir que serviços estejam prontos
-              echo "⏳ Aguardando mais 10s para estabilização dos serviços..."
-              sleep 10
+              # Criar arquivo temporário para processar
+              temp_fstab="/tmp/fstab.merge.$$"
               
-              echo "✅ pfSense está pronto!"
-              sudo touch /srv/restored031-wait.lock
-              return 0
-          fi
-          
-          # Atualizar progresso
-          printf "\r⏳ Aguardando... %ds/%ds " "$elapsed" "$MAX_WAIT"
-          
-          sleep $INTERVAL
-          elapsed=$((elapsed + INTERVAL))
-          
-          # Verificar se VM ainda está rodando a cada 30s
-          if [ $((elapsed % 30)) -eq 0 ]; then
-              if ! virsh list --state-running | grep -q "$vm_name"; then
-                  echo ""
-                  echo "❌ VM pfSense parou de responder durante a espera!"
-                  echo "🔧 Tentando reiniciar VM..."
+              # Processar cada linha do backup
+              while IFS= read -r line; do
+                  # Pular comentários e linhas vazias
+                  if [[ "$line" =~ ^[[:space:]]*# ]] || [[ -z "$line" ]]; then
+                      continue
+                  fi
                   
-                  if virsh start "$vm_name" 2>/dev/null; then
-                      echo "✅ VM reiniciada - resetando timer"
-                      elapsed=0
-                  else
-                      echo "❌ Falha ao reiniciar VM"
-                      break
+                  # Extrair o device/UUID (primeiro campo)
+                  device=$(echo "$line" | awk '{print $1}')
+                  mountpoint=$(echo "$line" | awk '{print $2}')
+                  
+                  # Pular se já existe no fstab atual
+                  if grep -q "^[^#]*[[:space:]]${mountpoint}[[:space:]]" /etc/fstab; then
+                      echo "  ⏭ Pulando $mountpoint (já existe no fstab atual)"
+                      continue
                   fi
+                  
+                  # Verificar se é UUID ou device path
+                  device_exists=false
+                  
+                  if [[ "$device" =~ ^UUID= ]]; then
+                      # Extrair UUID
+                      uuid="${device#UUID=}"
+                      
+                      # Verificar se o UUID existe
+                      if blkid | grep -qi "$uuid"; then
+                          device_exists=true
+                          echo "  ✓ UUID encontrado: $uuid -> $mountpoint"
+                      else
+                          echo "  ✗ UUID não encontrado: $uuid -> $mountpoint"
+                      fi
+                      
+                  elif [[ "$device" =~ ^LABEL= ]]; then
+                      # Extrair LABEL
+                      label="${device#LABEL=}"
+                      
+                      # Verificar se o LABEL existe
+                      if blkid | grep -qi "LABEL=\"$label\""; then
+                          device_exists=true
+                          echo "  ✓ LABEL encontrado: $label -> $mountpoint"
+                      else
+                          echo "  ✗ LABEL não encontrado: $label -> $mountpoint"
+                      fi
+                      
+                  elif [[ "$device" =~ ^/dev/ ]]; then
+                      # Device path direto
+                      if [ -b "$device" ]; then
+                          device_exists=true
+                          echo "  ✓ Device encontrado: $device -> $mountpoint"
+                      else
+                          echo "  ✗ Device não encontrado: $device -> $mountpoint"
+                      fi
+                  else
+                      # Outros tipos (nfs, tmpfs, etc) - assume que existem
+                      device_exists=true
+                      echo "  ℹ Tipo especial: $device -> $mountpoint"
+                  fi
+                  
+                  # Adicionar nofail se device não existe
+                  if [ "$device_exists" = false ]; then
+                      # Verificar se já tem nofail
+                      if [[ "$line" =~ nofail ]]; then
+                          echo "$line" >> "$temp_fstab"
+                          echo "    → Adicionando com nofail (já presente)"
+                      else
+                          # Adicionar nofail na coluna de opções (4ª coluna)
+                          modified_line=$(echo "$line" | awk '{
+                              if (NF >= 4) {
+                                  $4 = $4 ",nofail"
+                              } else {
+                                  $4 = "defaults,nofail"
+                              }
+                              print $0
+                          }')
+                          echo "$modified_line" >> "$temp_fstab"
+                          echo "    → Adicionando com nofail (ADICIONADO)"
+                      fi
+                  else
+                      echo "$line" >> "$temp_fstab"
+                      echo "    → Adicionando normalmente"
+                  fi
+                  
+              done < "$fstab_backup"
+              
+              # Adicionar linhas validadas ao fstab atual
+              if [ -f "$temp_fstab" ]; then
+                  #sudo tee -a /etc/fstab < "$temp_fstab" > /dev/null
+                  cat "$temp_fstab" | sudo tee -a /etc/fstab > /dev/null
+                  rm -f "$temp_fstab"
               fi
+
+              echo "5. Testando configuração..."
+              sudo systemctl daemon-reload
+              if sudo mount -a --fake; then
+                  echo "✓ fstab válido"
+              else
+                  echo "✗ Erro no fstab! Restaurando backup..."
+                  sudo cp "/etc/fstab.bkp-preventivo."* /etc/fstab 2>/dev/null || true
+              fi
+          else
+              echo "⚠ Nenhum backup de fstab encontrado em $pathrestore"
           fi
-      done
-      
-      # Timeout atingido
-      echo ""
-      echo "⚠️  TIMEOUT: pfSense não respondeu após 3 minutos"
-      echo ""
-      echo "POSSÍVEIS CAUSAS:"
-      echo "  • IP do pfSense está incorreto"
-      echo "  • VM está com problema de boot"
-      echo "  • Interfaces de rede mal configuradas"
-      echo "  • Firewall bloqueando ICMP"
-      echo ""
-      echo "DIAGNÓSTICO:"
-      echo "Tecle CTRL+ALT+F2, faça login, digite startx e pelo Virt-Manager confira se o pfSense está solicitando ajuste manual das placas de rede!"
-      echo ""
-      
-      read -r -p "Deseja continuar mesmo assim? (S/n): " resposta
-      resposta=$(echo "$resposta" | tr '[:upper:]' '[:lower:]')
-      
-      if [[ "$resposta" =~ ^(s|sim|y|yes|)$ ]]; then
-          echo "⚠️  Continuando restore (containers podem falhar)"
-          sudo touch /srv/restored031-wait.lock
-          return 0
+
+          # Limpeza de comentários e linhas vazias
+          sudo sed -i '/^[[:space:]]*#/d; /^[[:space:]]*$/d; s/[[:space:]]*$//' /etc/fstab
+
+          sudo touch /srv/restored2.lock
+          echo "✓ ETAPA 2 concluída"
       else
-          echo "❌ Restore cancelado pelo usuário"
-          exit 1
+          echo "❌ Nenhum arquivo etc-*.tar.lz4 encontrado em $pathrestore"
       fi
-      
   else
-      echo "⏭️  ETAPA 031 já executada (lock existe)"
+      echo "⏭ ETAPA 2 já executada (lock existe)"
   fi
 }
 
-etapa-mount
+etapa00-mount
 etapa00-dependencies
 etapa00-diskspace
 etapa00-github
@@ -1148,10 +1010,9 @@ etapa00-hostname
 etapa00-interfaces
 etapa00-ok
 
-etapa01
-etapa02
-etapa03
-etapa031
+etapa01-start
+etapa02-pfsense
+etapa03-etc
 
 clear
 echo ""
@@ -1159,7 +1020,7 @@ echo "O SISTEMA SERA REINICIADO."
 sleep 1
 echo "CERTIFIQUE-SE QUE A REDE ACESSA O PFSENSE E QUE A INTERNET ESTEJA OK!"
 sleep 2
-echo "ESTIVER TUDO OK, CONTINUE PELO MENU SRV -> CONTINUIDADE DO NEGOCIO -> Refazer B: Servicos e Containers"
+echo "SE ESTIVER TUDO OK, CONTINUE PELO MENU SRV -> CONTINUIDADE DO NEGOCIO -> Refazer B: Servicos e Containers"
 sleep 3
 sudo reboot
 
