@@ -9,7 +9,7 @@ export yamlextra
 rede00="1"
 export rede00
 
-LOG_FILE="/var/log/restore-$(date +%Y%m%d_%H%M%S).log"
+LOG_FILE="/var/log/restore-total-1-$(date +%Y%m%d_%H%M%S).log"
 exec 1> >(sudo tee -a "$LOG_FILE")
 exec 2>&1
 
