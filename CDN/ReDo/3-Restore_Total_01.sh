@@ -574,7 +574,7 @@ PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZE
 }
 
 function etapa02-pfsense {
-  if ! [ -f /srv/restored3.lock ]; then
+  if ! [ -f /srv/restored2.lock ]; then
       echo "=== ETAPA 3: Restaurando VMs pfSense ==="
       
       find "$pathrestore" -type f -iname "*pfsense*" | while IFS= read -r disk_file; do
@@ -663,10 +663,10 @@ function etapa02-pfsense {
           fi
       fi
       
-      sudo touch /srv/restored3.lock
-      echo "✅ ETAPA 3 concluída"
+      sudo touch /srv/restored2.lock
+      echo "✅ ETAPA 2 concluída"
   else
-      echo "⏭ ETAPA 3 já executada"
+      echo "⏭ ETAPA 2 já executada"
   fi
 }
 
@@ -847,8 +847,99 @@ function map_xml_interfaces {
     return 0
 }
 
-function etapa03-etc {
-  if ! [ -f /srv/restored2.lock ]; then
+function etapa03-netplan {
+  if ! [ -f /srv/restored3.lock ]; then
+      echo "=== ETAPA 3: Renovando configuração de rede ==="
+      
+      # Detectar interface principal (a mesma do macvlan/docker)
+      network_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
+      
+      if [ -z "$network_interface" ] || [ "$network_interface" = "null" ]; then
+          # Fallback: pegar interface padrão
+          network_interface=$(ip route | grep "default" | awk '{print $5}' | head -1)
+      fi
+      
+      if [ -z "$network_interface" ]; then
+          echo "⚠️  Não foi possível detectar interface de rede"
+          echo "   Pulando renovação automática"
+          sudo touch /srv/restored031b.lock
+          return 0
+      fi
+      
+      echo "📡 Interface detectada: $network_interface"
+      echo "🔧 Renovando configuração de rede via Netplan..."
+      echo ""
+      
+      if command -v netplan &>/dev/null; then
+          echo "1️⃣  Aplicando Netplan..."
+          
+          if sudo netplan apply 2>&1 | tee /tmp/netplan-apply.log; then
+              echo "   ✅ Netplan aplicado"
+              sleep 3
+          else
+              echo "   ⚠️  Netplan apply teve avisos (verificar log)"
+          fi
+      else
+          echo "   ❌ Netplan não encontrado!"
+          sudo touch /srv/restored031b.lock
+          return 1
+      fi     
+
+      echo ""
+      echo "🔍 Verificando novo IP..."
+      sleep 2
+      
+      new_ip=$(ip -4 addr show "$network_interface" 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
+      gateway=$(ip route | grep default | awk '{print $3}' | head -1)
+      
+      if [ -n "$new_ip" ]; then
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ CONFIGURAÇÃO DE REDE ATUALIZADA"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Interface: $network_interface"
+          echo "Novo IP:   $new_ip"
+          echo "Gateway:   $gateway"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          
+          # Testar conectividade com o gateway (pfSense)
+          if ping -c 2 -W 2 "$gateway" &>/dev/null; then
+              echo "✅ Conectividade com pfSense ($gateway) confirmada!"
+          else
+              echo "⚠️  Aviso: Não foi possível pingar o gateway"
+          fi
+          
+      else
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "⚠️  ATENÇÃO: IP NÃO DETECTADO"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Interface: $network_interface"
+          echo ""
+          echo "POSSÍVEIS CAUSAS:"
+          echo "  • Netplan configurado com IP estático"
+          echo "  • DHCP do pfSense ainda não respondeu"
+          echo "  • Interface em estado inconsistente"
+          echo ""
+          echo "SOLUÇÃO:"
+          echo "  • Verifique manualmente: ip addr show $network_interface"
+          echo "  • Force renovação: sudo netplan apply"
+          echo "  • Ou reinicie após restore: sudo reboot"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+      fi
+      
+      sudo touch /srv/restored3.lock; echo "✓ ETAPA 3 concluída"
+      sleep 3
+      
+  else
+      echo "⏭️  ETAPA 3 já executada"
+  fi
+}
+
+function etapa04-etc {
+  if ! [ -f /srv/restored4.lock ]; then
       echo "=== ETAPA 2: Restaurando /etc ==="
 
       # Encontrar arquivo etc mais recente
@@ -989,14 +1080,12 @@ function etapa03-etc {
 
           # Limpeza de comentários e linhas vazias
           sudo sed -i '/^[[:space:]]*#/d; /^[[:space:]]*$/d; s/[[:space:]]*$//' /etc/fstab
-
-          sudo touch /srv/restored2.lock
-          echo "✓ ETAPA 2 concluída"
+          sudo touch /srv/restored4.lock; echo "✓ ETAPA 4 concluída"
       else
           echo "❌ Nenhum arquivo etc-*.tar.lz4 encontrado em $pathrestore"
       fi
   else
-      echo "⏭ ETAPA 2 já executada (lock existe)"
+      echo "⏭ ETAPA 4 já executada (lock existe)"
   fi
 }
 
@@ -1012,7 +1101,8 @@ etapa00-ok
 
 etapa01-start
 etapa02-pfsense
-etapa03-etc
+etapa03-netplan
+etapa04-etc
 
 clear
 echo ""
