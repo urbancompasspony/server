@@ -13,13 +13,20 @@ function verifycontainers {
 
   if dialog --title 'Backup Imediato' --backtitle "BACKUP" --yesno 'Deseja fazer um backup deste sistema? \nTodos os servicos serao pausados.' 0 0; then
     clear
+
+    # Backup all machine
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh | sudo tee /srv/scripts/bkp-cdn.sh >/dev/null
     sudo chmod +x /srv/scripts/bkp-cdn.sh; sudo bash /srv/scripts/bkp-cdn.sh
+
+    # Backup all VMs
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/2-Backup_VM.sh | sudo tee /srv/scripts/backupvm.sh> /dev/null
+    sudo chmod +x /srv/scripts/backupvm.sh; sudo bash /srv/scripts/backupvm.sh
 
     clear
     echo "Aguardando 30s para a VM pfSense iniciar antes de fazer backup dos containers."
     sleep 30
 
+    # Backup all containers
     curl -sSL "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" | sudo tee /srv/scripts/backupcont.sh> /dev/null
     sudo chmod +x /srv/scripts/backupcont.sh; sudo bash /srv/scripts/backupcont.sh
     clear; echo "Backup concluido!"
