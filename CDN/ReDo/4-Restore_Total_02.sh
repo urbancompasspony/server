@@ -549,6 +549,7 @@ function etapa07 {
   sudo touch /srv/restored7.lock
 }
 
+# Checa se 3-Restore_Total_01.sh ja executou antes.
 if [ -f /srv/restored031-wait.lock ]; then
   etapa00-restored
   etapa00-github
