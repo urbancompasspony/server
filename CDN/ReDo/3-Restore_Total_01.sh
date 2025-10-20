@@ -1153,6 +1153,14 @@ etapa02
 etapa03
 etapa031
 
+clear
+echo ""
+echo "O SISTEMA SERA REINICIADO."
+sleep 1
+echo "CERTIFIQUE-SE QUE A REDE ACESSA O PFSENSE E QUE A INTERNET ESTEJA OK!"
+sleep 2
+echo "ESTIVER TUDO OK, CONTINUE PELO MENU SRV -> CONTINUIDADE DO NEGOCIO -> Refazer B: Servicos e Containers"
+sleep 3
 sudo reboot
 
 exit 0
