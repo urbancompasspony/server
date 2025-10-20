@@ -919,7 +919,7 @@ function etapa03 {
         # Aceita arquivos que parecem ser discos
         if echo "$file_type" | grep -Eqi "qemu|qcow|virtual|boot sector|disk image|DOS/MBR|data"; then
           echo "Restaurando disco: $(basename "$disk_file")"
-          sudo rsync -aHAXv --numeric-ids --sparse "$disk_file" "$dest/"
+          sudo rsync -aHAXv --numeric-ids --sparse "$disk_file" /var/lib/libvirt/images/
         else
          echo "Ignorado (tipo desconhecido): $(basename "$disk_file") → Tipo: $file_type"
         fi
