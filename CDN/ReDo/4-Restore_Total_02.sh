@@ -1,5 +1,94 @@
 #!/bin/bash
 
+yamlbase="/srv/system.yaml"
+yamlextra="/srv/containers.yaml"
+
+export yamlbase
+export yamlextra
+
+LOG_FILE="/var/log/restore-total-2-$(date +%Y%m%d_%H%M%S).log"
+exec 1> >(sudo tee -a "$LOG_FILE")
+exec 2>&1
+
+echo "=== Restore iniciado em $(date) ==="
+echo "Log salvo em: $LOG_FILE"
+
+function etapa-continue {
+  if mountpoint -q /mnt/bkpsys; then
+    echo "✓ Backup já está montado"
+    pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
+  else
+    echo "Montando backup..."
+    if sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys; then
+      echo "✓ Backup montado com sucesso"
+      echo "✓ ETAPA 0 concluída"
+      pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
+    else
+      clear
+      echo ""; echo "✗ Não conseguimos encontrar o dispositivo com backup do servidor!"
+      sleep 4
+      echo "Verifique os dispositivos de armazenamento."
+      sleep 3
+      echo "Saindo..."
+      sleep 2
+      exit 1
+    fi
+  fi
+}
+
+function etapa00-github {
+  echo "=== Validando conectividade com GitHub ==="
+  
+  ORCHESTRATION_URL="https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/orchestration"
+  
+  echo "🌐 Testando acesso ao GitHub..."
+  
+  # Tenta fazer um HEAD request para verificar se o arquivo existe
+  if curl -sSf --head --max-time 10 "$ORCHESTRATION_URL" >/dev/null 2>&1; then
+    echo "✅ GitHub acessível - orchestration disponível"
+    return 0
+  else
+    clear
+    echo ""
+    echo "❌ ERRO 07: GITHUB INACESSÍVEL!"
+    echo ""
+    echo "Não foi possível acessar o GitHub para baixar o orchestration."
+    echo ""
+    echo "URL testada:"
+    echo "$ORCHESTRATION_URL"
+    echo ""
+    echo "POSSÍVEIS CAUSAS:"
+    echo "1. Servidor sem conexão com a internet"
+    echo "2. GitHub fora do ar"
+    echo "3. Firewall bloqueando acesso"
+    echo "4. DNS não está resolvendo corretamente"
+    echo ""
+    echo "SOLUÇÃO:"
+    echo "- Verifique a conexão de internet: ping 8.8.8.8"
+    echo "- Teste o DNS: nslookup raw.githubusercontent.com"
+    echo "- Verifique firewall/proxy"
+    echo "- Aguarde se GitHub estiver indisponível"
+    echo ""
+    echo "O restore NÃO pode continuar sem acesso ao orchestration!"
+    echo ""
+    echo "Operação cancelada. Saindo em 10 segundos..."
+    sleep 10
+    exit 1
+  fi
+}
+
+function etapa00-restored {
+  if [ -f /srv/restored7.lock ]; then
+    clear
+    echo ""
+    echo "ERRO 01: ⏭ ESTE SERVIDOR JÁ FOI RESTAURADO COMPLETAMENTE! (lock existe)"
+    echo "Se o sistema apresenta falhas nos serviços, recomendo que formate e refaça o sistema restaurando novamente."
+    echo "Operacao cancelada. Saindo em 5 segundos..."
+    sleep 5
+    exit 1
+  fi
+}
+
 function etapa04 {
   if ! [ -f /srv/restored4.lock ]; then
       echo "=== ETAPA 4: Restaurando containers (mais recente de cada) ==="
@@ -461,6 +550,11 @@ function etapa07 {
 }
 
 if [ -f /srv/restored031-wait.lock ]; then
+  etapa00-restored
+  etapa00-github
+
+  etapa-continue
+  
   etapa04
   etapa05
   etapa031b
