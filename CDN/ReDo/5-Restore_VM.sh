@@ -176,17 +176,13 @@ echo "$xml_files" | while read -r xml_file; do
     virsh undefine "$vm_name" >/dev/null 2>&1
   fi
   
-  # Define a VM usando o XML modificado
-  echo "  📝 Definindo VM..."
-  if ! virsh define "$xml_work" >/dev/null 2>&1; then
-    echo "  ❌ ERRO: Falha ao definir a VM $vm_name"
-    continue
-  fi
+# Verifica se o XML da VM já existe no destino
+if [ -e "/var/lib/libvirt/qemu/$vm_name.xml" ]; then
+  echo "  ⚠️  AVISO: O XML da VM $vm_name já existe no destino."
+  echo "  ⏭️  Pulando definição desta VM para evitar sobrescrita."
   
-  echo "  ✅ VM definida com sucesso"
-  
-  # Inicia a VM
-  echo "  🚀 Iniciando VM..."
+  # Inicia a VM existente
+  echo "  🚀 Iniciando VM existente..."
   if virsh start "$vm_name" >/dev/null 2>&1; then
     echo "  ✅ VM $vm_name iniciada com sucesso"
   else
@@ -199,8 +195,34 @@ echo "$xml_files" | while read -r xml_file; do
     fi
   fi
   
-  # Salva XML final
-  sudo cp "$xml_work" "/var/lib/libvirt/qemu/$vm_name.xml" 2>/dev/null
+  continue
+fi
+
+# Define a VM usando o XML modificado
+echo "  📝 Definindo VM..."
+if ! virsh define "$xml_work" >/dev/null 2>&1; then
+  echo "  ❌ ERRO: Falha ao definir a VM $vm_name"
+  continue
+fi
+
+echo "  ✅ VM definida com sucesso"
+
+# Inicia a VM
+echo "  🚀 Iniciando VM..."
+if virsh start "$vm_name" >/dev/null 2>&1; then
+  echo "  ✅ VM $vm_name iniciada com sucesso"
+else
+  echo "  ⚠️  Tentando iniciar com --force-boot..."
+  if virsh start "$vm_name" --force-boot >/dev/null 2>&1; then
+    echo "  ✅ VM iniciada (forçada)"
+  else
+    echo "  ❌ ERRO: Falha ao iniciar a VM $vm_name"
+    echo "  📝 Verifique: virsh dominfo $vm_name"
+  fi
+fi
+
+# Salva XML final
+sudo cp "$xml_work" "/var/lib/libvirt/qemu/$vm_name.xml" 2>/dev/null
   
   sleep 2
 done
