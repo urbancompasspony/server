@@ -907,12 +907,21 @@ function etapa03 {
   if ! [ -f /srv/restored3.lock ]; then
       echo "=== ETAPA 3: Restaurando VMs pfSense ==="
       
-      # Restaurar discos pfSense
-      find "$pathrestore" -iname "*pfsense*" -type f | while read -r disk_file; do
+      find "$pathrestore" -type f -iname "*pfsense*" | while IFS= read -r disk_file; do
         file_type=$(file -b "$disk_file")
-        if echo "$file_type" | grep -qi "qemu\|disk\|image\|data"; then
+
+        # Ignora arquivos XML ou texto
+        if echo "$file_type" | grep -Eqi "XML|ASCII text|UTF-8 text"; then
+          echo "Ignorado (não é disco): $(basename "$disk_file") → Tipo: $file_type"
+          continue
+        fi
+
+        # Aceita arquivos que parecem ser discos
+        if echo "$file_type" | grep -Eqi "qemu|qcow|virtual|boot sector|disk image|DOS/MBR|data"; then
           echo "Restaurando disco: $(basename "$disk_file")"
-          sudo rsync -aHAXv --numeric-ids --sparse "$disk_file" /var/lib/libvirt/images/
+          sudo rsync -aHAXv --numeric-ids --sparse "$disk_file" "$dest/"
+        else
+         echo "Ignorado (tipo desconhecido): $(basename "$disk_file") → Tipo: $file_type"
         fi
       done
       
