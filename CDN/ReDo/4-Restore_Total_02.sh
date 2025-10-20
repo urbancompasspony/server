@@ -89,7 +89,7 @@ function etapa00-restored {
   fi
 }
 
-function etapa04 {
+function etapa04-restore-bkpcont {
   if ! [ -f /srv/restored4.lock ]; then
       echo "=== ETAPA 4: Restaurando containers (mais recente de cada) ==="
 
@@ -181,7 +181,7 @@ function etapa04 {
   fi
 }
 
-function etapa05 {
+function etapa05-start-containers {
   if ! [ -f /srv/restored5.lock ]; then
       echo "=== ETAPA 5: Restaurando containers via orchestration ==="
 
@@ -437,99 +437,7 @@ function etapa05 {
   fi
 }
 
-function etapa031b {
-  if ! [ -f /srv/restored031b.lock ]; then
-      echo "=== ETAPA 031b: Renovando configuração de rede ==="
-      
-      # Detectar interface principal (a mesma do macvlan/docker)
-      network_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
-      
-      if [ -z "$network_interface" ] || [ "$network_interface" = "null" ]; then
-          # Fallback: pegar interface padrão
-          network_interface=$(ip route | grep "default" | awk '{print $5}' | head -1)
-      fi
-      
-      if [ -z "$network_interface" ]; then
-          echo "⚠️  Não foi possível detectar interface de rede"
-          echo "   Pulando renovação automática"
-          sudo touch /srv/restored031b.lock
-          return 0
-      fi
-      
-      echo "📡 Interface detectada: $network_interface"
-      echo "🔧 Renovando configuração de rede via Netplan..."
-      echo ""
-      
-      if command -v netplan &>/dev/null; then
-          echo "1️⃣  Aplicando Netplan..."
-          
-          if sudo netplan apply 2>&1 | tee /tmp/netplan-apply.log; then
-              echo "   ✅ Netplan aplicado"
-              sleep 3
-          else
-              echo "   ⚠️  Netplan apply teve avisos (verificar log)"
-          fi
-      else
-          echo "   ❌ Netplan não encontrado!"
-          sudo touch /srv/restored031b.lock
-          return 1
-      fi     
-
-      echo ""
-      echo "🔍 Verificando novo IP..."
-      sleep 2
-      
-      new_ip=$(ip -4 addr show "$network_interface" 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
-      gateway=$(ip route | grep default | awk '{print $3}' | head -1)
-      
-      if [ -n "$new_ip" ]; then
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "✅ CONFIGURAÇÃO DE REDE ATUALIZADA"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "Interface: $network_interface"
-          echo "Novo IP:   $new_ip"
-          echo "Gateway:   $gateway"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo ""
-          
-          # Testar conectividade com o gateway (pfSense)
-          if ping -c 2 -W 2 "$gateway" &>/dev/null; then
-              echo "✅ Conectividade com pfSense ($gateway) confirmada!"
-          else
-              echo "⚠️  Aviso: Não foi possível pingar o gateway"
-          fi
-          
-      else
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "⚠️  ATENÇÃO: IP NÃO DETECTADO"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "Interface: $network_interface"
-          echo ""
-          echo "POSSÍVEIS CAUSAS:"
-          echo "  • Netplan configurado com IP estático"
-          echo "  • DHCP do pfSense ainda não respondeu"
-          echo "  • Interface em estado inconsistente"
-          echo ""
-          echo "SOLUÇÃO:"
-          echo "  • Verifique manualmente: ip addr show $network_interface"
-          echo "  • Force renovação: sudo netplan apply"
-          echo "  • Ou reinicie após restore: sudo reboot"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo ""
-      fi
-      
-      sudo touch /srv/restored031b.lock
-      echo "✓ ETAPA 031b concluída"
-      sleep 3
-      
-  else
-      echo "⏭️  ETAPA 031b já executada"
-  fi
-}
-
-function etapa06 {
+function etapa06-cron {
   if ! [ -f /srv/restored6.lock ]; then
     sudo crontab "$pathrestore"/crontab-bkp
     sudo touch /srv/restored6.lock
@@ -539,7 +447,7 @@ function etapa06 {
   fi
 }
 
-function etapa07 {
+function etapa07-end {
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"${datetime0}\"" "$yamlbase"
   sudo rm /srv/restored*
@@ -549,18 +457,18 @@ function etapa07 {
   sudo touch /srv/restored7.lock
 }
 
-# Checa se 3-Restore_Total_01.sh ja executou antes.
-if [ -f /srv/restored031-wait.lock ]; then
+# Checa se 3-Restore_Total_01.sh ja executou antes e o arquivo restored3.lock existe..
+if [ -f /srv/restored3.lock ]; then
   etapa00-restored
   etapa00-github
 
   etapa-continue
   
-  etapa04
-  etapa05
-  etapa031b
-  etapa06
-  etapa07
+  etapa04-restore-bkpcont
+  etapa05-start-containers
+  etapa06-cron
+  etapa07-end
+  
   sudo reboot
 else
   clear
