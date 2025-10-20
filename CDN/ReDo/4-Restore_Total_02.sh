@@ -13,26 +13,15 @@ exec 2>&1
 echo "=== Restore iniciado em $(date) ==="
 echo "Log salvo em: $LOG_FILE"
 
-function etapa-continue {
-  if mountpoint -q /mnt/bkpsys; then
-    echo "✓ Backup já está montado"
-    pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
-  else
-    echo "Montando backup..."
-    if sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys; then
-      echo "✓ Backup montado com sucesso"
-      echo "✓ ETAPA 0 concluída"
-      pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
-    else
-      clear
-      echo ""; echo "✗ Não conseguimos encontrar o dispositivo com backup do servidor!"
-      sleep 4
-      echo "Verifique os dispositivos de armazenamento."
-      sleep 3
-      echo "Saindo..."
-      sleep 2
-      exit 1
-    fi
+function etapa00-restored {
+  if [ -f /srv/restored.lock ]; then
+    clear
+    echo ""
+    echo "ERRO 01: ⏭ ESTE SERVIDOR JÁ FOI RESTAURADO COMPLETAMENTE ANTERIORMENTE! (lock existe)"
+    echo "Se o sistema apresenta falhas nos serviços, recomendo que formate e refaça o sistema restaurando novamente."
+    echo "Operacao cancelada. Saindo em 5 segundos..."
+    sleep 5
+    exit 1
   fi
 }
 
@@ -77,21 +66,32 @@ function etapa00-github {
   fi
 }
 
-function etapa00-restored {
-  if [ -f /srv/restored7.lock ]; then
-    clear
-    echo ""
-    echo "ERRO 01: ⏭ ESTE SERVIDOR JÁ FOI RESTAURADO COMPLETAMENTE! (lock existe)"
-    echo "Se o sistema apresenta falhas nos serviços, recomendo que formate e refaça o sistema restaurando novamente."
-    echo "Operacao cancelada. Saindo em 5 segundos..."
-    sleep 5
-    exit 1
+function etapa00-continue {
+  if mountpoint -q /mnt/bkpsys; then
+    echo "✓ Backup já está montado"
+    pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
+  else
+    echo "Montando backup..."
+    if sudo mount -t ext4 LABEL=bkpsys /mnt/bkpsys; then
+      echo "✓ Backup montado com sucesso"
+      echo "✓ ETAPA 0 concluída"
+      pathrestore=$(find /mnt/bkpsys -name "*.tar.lz4" 2>/dev/null | head -1 | xargs dirname)
+    else
+      clear
+      echo ""; echo "✗ Não conseguimos encontrar o dispositivo com backup do servidor!"
+      sleep 4
+      echo "Verifique os dispositivos de armazenamento."
+      sleep 3
+      echo "Saindo..."
+      sleep 2
+      exit 1
+    fi
   fi
 }
 
-function etapa04-restore-bkpcont {
-  if ! [ -f /srv/restored4.lock ]; then
-      echo "=== ETAPA 4: Restaurando containers (mais recente de cada) ==="
+function etapa05-restore-bkpcont {
+  if ! [ -f /srv/restored5.lock ]; then
+      echo "=== ETAPA 5: Restaurando containers (mais recente de cada) ==="
 
       # Criar diretório se não existir
       sudo mkdir -p /srv/containers
@@ -174,16 +174,15 @@ function etapa04-restore-bkpcont {
           echo "❌ Nenhum arquivo de container encontrado!"
       fi
 
-      sudo touch /srv/restored4.lock
-      echo "✓ ETAPA 4 concluída"
+      sudo touch /srv/restored5.lock; echo "✓ ETAPA 5 concluída"
   else
-      echo "⏭ ETAPA 4 já executada (lock existe)"
+      echo "⏭ ETAPA 5 já executada (lock existe)"
   fi
 }
 
-function etapa05-start-containers {
-  if ! [ -f /srv/restored5.lock ]; then
-      echo "=== ETAPA 5: Restaurando containers via orchestration ==="
+function etapa06-start-containers {
+  if ! [ -f /srv/restored6.lock ]; then
+      echo "=== ETAPA 6: Restaurando containers via orchestration ==="
 
       # URL correta do orchestration
       ORCHESTRATION_URL="https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/orchestration"
@@ -430,45 +429,41 @@ function etapa05-start-containers {
           echo "⚠️  Arquivo containers.yaml não encontrado, pulando restauração de containers"
       fi
 
-      sudo touch /srv/restored5.lock
-      echo "✓ ETAPA 5 concluída"
+      sudo touch /srv/restored6.lock; echo "✓ ETAPA 6 concluída"
   else
-      echo "⏭️  ETAPA 5 já executada (lock existe)"
+      echo "⏭️  ETAPA 6 já executada (lock existe)"
   fi
 }
 
-function etapa06-cron {
-  if ! [ -f /srv/restored6.lock ]; then
+function etapa07-cron {
+  if ! [ -f /srv/restored7.lock ]; then
     sudo crontab "$pathrestore"/crontab-bkp
-    sudo touch /srv/restored6.lock
-    echo "✓ ETAPA 6 concluída"
+    sudo touch /srv/restored7.lock; echo "✓ ETAPA 7 concluída"
   else
-    echo "⏭ ETAPA 6 já executada (lock existe)"
+    echo "⏭ ETAPA 7 já executada (lock existe)"
   fi
 }
 
-function etapa07-end {
+function etapa08-end {
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"${datetime0}\"" "$yamlbase"
   sudo rm /srv/restored*
   echo "=== RESTORE COMPLETO ==="
   sleep 3
   echo "Reiniciando..."
-  sudo touch /srv/restored7.lock
+  sudo touch /srv/restored.lock
 }
 
-# Checa se 3-Restore_Total_01.sh ja executou antes e o arquivo restored3.lock existe..
-if [ -f /srv/restored3.lock ]; then
+if [ -f /srv/restored4.lock ]; then
   etapa00-restored
   etapa00-github
+  etapa00-continue
 
-  etapa-continue
-  
-  etapa04-restore-bkpcont
-  etapa05-start-containers
-  etapa06-cron
-  etapa07-end
-  
+  etapa05-restore-bkpcont
+  etapa06-start-containers
+  etapa07-cron
+  etapa08-end
+
   sudo reboot
 else
   clear
