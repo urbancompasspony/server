@@ -17,6 +17,16 @@ if [ ! -d "$backup_dir" ]; then
   exit 1
 fi
 
+# Checa se 3-Restore_Total_01.sh ja executou antes.
+if ! [ -f /srv/restored031-wait.lock ]; then
+  clear
+  echo "Nao identifiquei uma restauracao previamente iniciada."; sleep 2
+  echo "A restauração de uma VM em um sistema conforme nao pode ser realizada neste menu."; sleep 1
+  echo "Se estiver refazendo um servidor do zero, volte ao menu anterior e execute a partir de 'Refazer A: Base e Firewall'"; sleep 3
+  echo "Saindo..."; sleep 1
+  exit 1
+fi  
+
 # Detecta interface Docker (será a interface padrão para as VMs)
 docker_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
 
