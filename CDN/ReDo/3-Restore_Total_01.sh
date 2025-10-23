@@ -573,7 +573,249 @@ PODEM HAVER PERDA DE DADOS SENSIVEIS \nOU DANOS AO SISTEMA OPERACIONAL \nSE FIZE
     fi
 }
 
-function etapa02-pfsense {
+function etapa02-etc {
+  if ! [ -f /srv/restored4.lock ]; then
+      echo "=== ETAPA 2: Restaurando /etc ==="
+
+      # Encontrar arquivo etc mais recente
+      etc_file=$(find "$pathrestore" -name "etc-*.tar.lz4" | sort | tail -1)
+
+      if [ -n "$etc_file" ]; then
+          echo "1. Restaurando /etc completo (exceto fstab)..."
+          sudo tar -I 'lz4 -d -c' -xpf "$etc_file" -C / \
+            --exclude='etc/netplan' \
+            --exclude='etc/apt'
+
+          echo "1.1 Atualizando configuração do GRUB..."
+          if [ -f /etc/default/grub ]; then
+              if sudo update-grub2 2>/dev/null; then
+                  echo "✓ GRUB2 atualizado"
+              else
+                  echo "⚠️ Erro ao atualizar GRUB2 (pode não estar instalado)"
+              fi
+          else
+              echo "⚠️ /etc/default/grub não encontrado"
+          fi
+
+          echo "2. Procurando backup do fstab..."
+          fstab_backup=$(find "$pathrestore" -name "fstab.backup" | sort | tail -1)
+
+          if [ -n "$fstab_backup" ]; then
+              echo "Encontrado: $(basename "$fstab_backup")"
+              echo "3. Fazendo backup do fstab atual..."
+              sudo cp /etc/fstab "/etc/fstab.bkp-preventivo.$(date +%Y%m%d_%H%M%S)"
+
+              echo "4. Aplicando merge inteligente do fstab com validação..."
+              
+              # Criar arquivo temporário para processar
+              temp_fstab="/tmp/fstab.merge.$$"
+              
+              # Processar cada linha do backup
+              while IFS= read -r line; do
+                  # Pular comentários e linhas vazias
+                  if [[ "$line" =~ ^[[:space:]]*# ]] || [[ -z "$line" ]]; then
+                      continue
+                  fi
+                  
+                  # Extrair o device/UUID (primeiro campo)
+                  device=$(echo "$line" | awk '{print $1}')
+                  mountpoint=$(echo "$line" | awk '{print $2}')
+                  
+                  # Pular se já existe no fstab atual
+                  if grep -q "^[^#]*[[:space:]]${mountpoint}[[:space:]]" /etc/fstab; then
+                      echo "  ⏭ Pulando $mountpoint (já existe no fstab atual)"
+                      continue
+                  fi
+                  
+                  # Verificar se é UUID ou device path
+                  device_exists=false
+                  
+                  if [[ "$device" =~ ^UUID= ]]; then
+                      # Extrair UUID
+                      uuid="${device#UUID=}"
+                      
+                      # Verificar se o UUID existe
+                      if blkid | grep -qi "$uuid"; then
+                          device_exists=true
+                          echo "  ✓ UUID encontrado: $uuid -> $mountpoint"
+                      else
+                          echo "  ✗ UUID não encontrado: $uuid -> $mountpoint"
+                      fi
+                      
+                  elif [[ "$device" =~ ^LABEL= ]]; then
+                      # Extrair LABEL
+                      label="${device#LABEL=}"
+                      
+                      # Verificar se o LABEL existe
+                      if blkid | grep -qi "LABEL=\"$label\""; then
+                          device_exists=true
+                          echo "  ✓ LABEL encontrado: $label -> $mountpoint"
+                      else
+                          echo "  ✗ LABEL não encontrado: $label -> $mountpoint"
+                      fi
+                      
+                  elif [[ "$device" =~ ^/dev/ ]]; then
+                      # Device path direto
+                      if [ -b "$device" ]; then
+                          device_exists=true
+                          echo "  ✓ Device encontrado: $device -> $mountpoint"
+                      else
+                          echo "  ✗ Device não encontrado: $device -> $mountpoint"
+                      fi
+                  else
+                      # Outros tipos (nfs, tmpfs, etc) - assume que existem
+                      device_exists=true
+                      echo "  ℹ Tipo especial: $device -> $mountpoint"
+                  fi
+                  
+                  # Adicionar nofail se device não existe
+                  if [ "$device_exists" = false ]; then
+                      # Verificar se já tem nofail
+                      if [[ "$line" =~ nofail ]]; then
+                          echo "$line" >> "$temp_fstab"
+                          echo "    → Adicionando com nofail (já presente)"
+                      else
+                          # Adicionar nofail na coluna de opções (4ª coluna)
+                          modified_line=$(echo "$line" | awk '{
+                              if (NF >= 4) {
+                                  $4 = $4 ",nofail"
+                              } else {
+                                  $4 = "defaults,nofail"
+                              }
+                              print $0
+                          }')
+                          echo "$modified_line" >> "$temp_fstab"
+                          echo "    → Adicionando com nofail (ADICIONADO)"
+                      fi
+                  else
+                      echo "$line" >> "$temp_fstab"
+                      echo "    → Adicionando normalmente"
+                  fi
+                  
+              done < "$fstab_backup"
+              
+              # Adicionar linhas validadas ao fstab atual
+              if [ -f "$temp_fstab" ]; then
+                  #sudo tee -a /etc/fstab < "$temp_fstab" > /dev/null
+                  cat "$temp_fstab" | sudo tee -a /etc/fstab > /dev/null
+                  rm -f "$temp_fstab"
+              fi
+
+              echo "5. Testando configuração..."
+              sudo systemctl daemon-reload
+              if sudo mount -a --fake; then
+                  echo "✓ fstab válido"
+              else
+                  echo "✗ Erro no fstab! Restaurando backup..."
+                  sudo cp "/etc/fstab.bkp-preventivo."* /etc/fstab 2>/dev/null || true
+              fi
+          else
+              echo "⚠ Nenhum backup de fstab encontrado em $pathrestore"
+          fi
+
+          # Limpeza de comentários e linhas vazias
+          sudo sed -i '/^[[:space:]]*#/d; /^[[:space:]]*$/d; s/[[:space:]]*$//' /etc/fstab
+          sudo touch /srv/restored4.lock; echo "✓ ETAPA 4 concluída"
+      else
+          echo "❌ Nenhum arquivo etc-*.tar.lz4 encontrado em $pathrestore"
+      fi
+  else
+      echo "⏭ ETAPA 4 já executada (lock existe)"
+  fi
+}
+
+function etapa03-netplan {
+  if ! [ -f /srv/restored3.lock ]; then
+      echo "=== ETAPA 3: Renovando configuração de rede ==="
+      
+      # Detectar interface principal (a mesma do macvlan/docker)
+      network_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
+      
+      if [ -z "$network_interface" ] || [ "$network_interface" = "null" ]; then
+          # Fallback: pegar interface padrão
+          network_interface=$(ip route | grep "default" | awk '{print $5}' | head -1)
+      fi
+      
+      if [ -z "$network_interface" ]; then
+          echo "⚠️  Não foi possível detectar interface de rede"
+          echo "   Pulando renovação automática"
+          sudo touch /srv/restored031b.lock
+          return 0
+      fi
+      
+      echo "📡 Interface detectada: $network_interface"
+      echo "🔧 Renovando configuração de rede via Netplan..."
+      echo ""
+      
+      if command -v netplan &>/dev/null; then
+          echo "1️⃣  Aplicando Netplan..."
+          
+          if sudo netplan apply 2>&1 | tee /tmp/netplan-apply.log; then
+              echo "   ✅ Netplan aplicado"
+              sleep 3
+          else
+              echo "   ⚠️  Netplan apply teve avisos (verificar log)"
+          fi
+      else
+          echo "   ❌ Netplan não encontrado!"
+          sudo touch /srv/restored031b.lock
+          return 1
+      fi     
+
+      echo ""
+      echo "🔍 Verificando novo IP..."
+      sleep 2
+      
+      new_ip=$(ip -4 addr show "$network_interface" 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
+      gateway=$(ip route | grep default | awk '{print $3}' | head -1)
+      
+      if [ -n "$new_ip" ]; then
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ CONFIGURAÇÃO DE REDE ATUALIZADA"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Interface: $network_interface"
+          echo "Novo IP:   $new_ip"
+          echo "Gateway:   $gateway"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          
+          # Testar conectividade com o gateway (pfSense)
+          if ping -c 2 -W 2 "$gateway" &>/dev/null; then
+              echo "✅ Conectividade com pfSense ($gateway) confirmada!"
+          else
+              echo "⚠️  Aviso: Não foi possível pingar o gateway"
+          fi
+          
+      else
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "⚠️  ATENÇÃO: IP NÃO DETECTADO"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Interface: $network_interface"
+          echo ""
+          echo "POSSÍVEIS CAUSAS:"
+          echo "  • Netplan configurado com IP estático"
+          echo "  • DHCP do pfSense ainda não respondeu"
+          echo "  • Interface em estado inconsistente"
+          echo ""
+          echo "SOLUÇÃO:"
+          echo "  • Verifique manualmente: ip addr show $network_interface"
+          echo "  • Force renovação: sudo netplan apply"
+          echo "  • Ou reinicie após restore: sudo reboot"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+      fi
+      
+      sudo touch /srv/restored3.lock; echo "✓ ETAPA 3 concluída"
+      sleep 3
+      
+  else
+      echo "⏭️  ETAPA 3 já executada"
+  fi
+}
+
+function etapa04-pfsense {
   if ! [ -f /srv/restored2.lock ]; then
       echo "=== ETAPA 3: Restaurando VMs pfSense ==="
       
@@ -847,248 +1089,6 @@ function map_xml_interfaces {
     return 0
 }
 
-function etapa03-netplan {
-  if ! [ -f /srv/restored3.lock ]; then
-      echo "=== ETAPA 3: Renovando configuração de rede ==="
-      
-      # Detectar interface principal (a mesma do macvlan/docker)
-      network_interface=$(docker network inspect macvlan 2>/dev/null | jq -r '.[0].Options.parent' 2>/dev/null)
-      
-      if [ -z "$network_interface" ] || [ "$network_interface" = "null" ]; then
-          # Fallback: pegar interface padrão
-          network_interface=$(ip route | grep "default" | awk '{print $5}' | head -1)
-      fi
-      
-      if [ -z "$network_interface" ]; then
-          echo "⚠️  Não foi possível detectar interface de rede"
-          echo "   Pulando renovação automática"
-          sudo touch /srv/restored031b.lock
-          return 0
-      fi
-      
-      echo "📡 Interface detectada: $network_interface"
-      echo "🔧 Renovando configuração de rede via Netplan..."
-      echo ""
-      
-      if command -v netplan &>/dev/null; then
-          echo "1️⃣  Aplicando Netplan..."
-          
-          if sudo netplan apply 2>&1 | tee /tmp/netplan-apply.log; then
-              echo "   ✅ Netplan aplicado"
-              sleep 3
-          else
-              echo "   ⚠️  Netplan apply teve avisos (verificar log)"
-          fi
-      else
-          echo "   ❌ Netplan não encontrado!"
-          sudo touch /srv/restored031b.lock
-          return 1
-      fi     
-
-      echo ""
-      echo "🔍 Verificando novo IP..."
-      sleep 2
-      
-      new_ip=$(ip -4 addr show "$network_interface" 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
-      gateway=$(ip route | grep default | awk '{print $3}' | head -1)
-      
-      if [ -n "$new_ip" ]; then
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "✅ CONFIGURAÇÃO DE REDE ATUALIZADA"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "Interface: $network_interface"
-          echo "Novo IP:   $new_ip"
-          echo "Gateway:   $gateway"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo ""
-          
-          # Testar conectividade com o gateway (pfSense)
-          if ping -c 2 -W 2 "$gateway" &>/dev/null; then
-              echo "✅ Conectividade com pfSense ($gateway) confirmada!"
-          else
-              echo "⚠️  Aviso: Não foi possível pingar o gateway"
-          fi
-          
-      else
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "⚠️  ATENÇÃO: IP NÃO DETECTADO"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "Interface: $network_interface"
-          echo ""
-          echo "POSSÍVEIS CAUSAS:"
-          echo "  • Netplan configurado com IP estático"
-          echo "  • DHCP do pfSense ainda não respondeu"
-          echo "  • Interface em estado inconsistente"
-          echo ""
-          echo "SOLUÇÃO:"
-          echo "  • Verifique manualmente: ip addr show $network_interface"
-          echo "  • Force renovação: sudo netplan apply"
-          echo "  • Ou reinicie após restore: sudo reboot"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo ""
-      fi
-      
-      sudo touch /srv/restored3.lock; echo "✓ ETAPA 3 concluída"
-      sleep 3
-      
-  else
-      echo "⏭️  ETAPA 3 já executada"
-  fi
-}
-
-function etapa04-etc {
-  if ! [ -f /srv/restored4.lock ]; then
-      echo "=== ETAPA 2: Restaurando /etc ==="
-
-      # Encontrar arquivo etc mais recente
-      etc_file=$(find "$pathrestore" -name "etc-*.tar.lz4" | sort | tail -1)
-
-      if [ -n "$etc_file" ]; then
-          echo "1. Restaurando /etc completo (exceto fstab)..."
-          sudo tar -I 'lz4 -d -c' -xpf "$etc_file" -C / \
-            --exclude='etc/netplan' \
-            --exclude='etc/apt'
-
-          echo "1.1 Atualizando configuração do GRUB..."
-          if [ -f /etc/default/grub ]; then
-              if sudo update-grub2 2>/dev/null; then
-                  echo "✓ GRUB2 atualizado"
-              else
-                  echo "⚠️ Erro ao atualizar GRUB2 (pode não estar instalado)"
-              fi
-          else
-              echo "⚠️ /etc/default/grub não encontrado"
-          fi
-
-          echo "2. Procurando backup do fstab..."
-          fstab_backup=$(find "$pathrestore" -name "fstab.backup" | sort | tail -1)
-
-          if [ -n "$fstab_backup" ]; then
-              echo "Encontrado: $(basename "$fstab_backup")"
-              echo "3. Fazendo backup do fstab atual..."
-              sudo cp /etc/fstab "/etc/fstab.bkp-preventivo.$(date +%Y%m%d_%H%M%S)"
-
-              echo "4. Aplicando merge inteligente do fstab com validação..."
-              
-              # Criar arquivo temporário para processar
-              temp_fstab="/tmp/fstab.merge.$$"
-              
-              # Processar cada linha do backup
-              while IFS= read -r line; do
-                  # Pular comentários e linhas vazias
-                  if [[ "$line" =~ ^[[:space:]]*# ]] || [[ -z "$line" ]]; then
-                      continue
-                  fi
-                  
-                  # Extrair o device/UUID (primeiro campo)
-                  device=$(echo "$line" | awk '{print $1}')
-                  mountpoint=$(echo "$line" | awk '{print $2}')
-                  
-                  # Pular se já existe no fstab atual
-                  if grep -q "^[^#]*[[:space:]]${mountpoint}[[:space:]]" /etc/fstab; then
-                      echo "  ⏭ Pulando $mountpoint (já existe no fstab atual)"
-                      continue
-                  fi
-                  
-                  # Verificar se é UUID ou device path
-                  device_exists=false
-                  
-                  if [[ "$device" =~ ^UUID= ]]; then
-                      # Extrair UUID
-                      uuid="${device#UUID=}"
-                      
-                      # Verificar se o UUID existe
-                      if blkid | grep -qi "$uuid"; then
-                          device_exists=true
-                          echo "  ✓ UUID encontrado: $uuid -> $mountpoint"
-                      else
-                          echo "  ✗ UUID não encontrado: $uuid -> $mountpoint"
-                      fi
-                      
-                  elif [[ "$device" =~ ^LABEL= ]]; then
-                      # Extrair LABEL
-                      label="${device#LABEL=}"
-                      
-                      # Verificar se o LABEL existe
-                      if blkid | grep -qi "LABEL=\"$label\""; then
-                          device_exists=true
-                          echo "  ✓ LABEL encontrado: $label -> $mountpoint"
-                      else
-                          echo "  ✗ LABEL não encontrado: $label -> $mountpoint"
-                      fi
-                      
-                  elif [[ "$device" =~ ^/dev/ ]]; then
-                      # Device path direto
-                      if [ -b "$device" ]; then
-                          device_exists=true
-                          echo "  ✓ Device encontrado: $device -> $mountpoint"
-                      else
-                          echo "  ✗ Device não encontrado: $device -> $mountpoint"
-                      fi
-                  else
-                      # Outros tipos (nfs, tmpfs, etc) - assume que existem
-                      device_exists=true
-                      echo "  ℹ Tipo especial: $device -> $mountpoint"
-                  fi
-                  
-                  # Adicionar nofail se device não existe
-                  if [ "$device_exists" = false ]; then
-                      # Verificar se já tem nofail
-                      if [[ "$line" =~ nofail ]]; then
-                          echo "$line" >> "$temp_fstab"
-                          echo "    → Adicionando com nofail (já presente)"
-                      else
-                          # Adicionar nofail na coluna de opções (4ª coluna)
-                          modified_line=$(echo "$line" | awk '{
-                              if (NF >= 4) {
-                                  $4 = $4 ",nofail"
-                              } else {
-                                  $4 = "defaults,nofail"
-                              }
-                              print $0
-                          }')
-                          echo "$modified_line" >> "$temp_fstab"
-                          echo "    → Adicionando com nofail (ADICIONADO)"
-                      fi
-                  else
-                      echo "$line" >> "$temp_fstab"
-                      echo "    → Adicionando normalmente"
-                  fi
-                  
-              done < "$fstab_backup"
-              
-              # Adicionar linhas validadas ao fstab atual
-              if [ -f "$temp_fstab" ]; then
-                  #sudo tee -a /etc/fstab < "$temp_fstab" > /dev/null
-                  cat "$temp_fstab" | sudo tee -a /etc/fstab > /dev/null
-                  rm -f "$temp_fstab"
-              fi
-
-              echo "5. Testando configuração..."
-              sudo systemctl daemon-reload
-              if sudo mount -a --fake; then
-                  echo "✓ fstab válido"
-              else
-                  echo "✗ Erro no fstab! Restaurando backup..."
-                  sudo cp "/etc/fstab.bkp-preventivo."* /etc/fstab 2>/dev/null || true
-              fi
-          else
-              echo "⚠ Nenhum backup de fstab encontrado em $pathrestore"
-          fi
-
-          # Limpeza de comentários e linhas vazias
-          sudo sed -i '/^[[:space:]]*#/d; /^[[:space:]]*$/d; s/[[:space:]]*$//' /etc/fstab
-          sudo touch /srv/restored4.lock; echo "✓ ETAPA 4 concluída"
-      else
-          echo "❌ Nenhum arquivo etc-*.tar.lz4 encontrado em $pathrestore"
-      fi
-  else
-      echo "⏭ ETAPA 4 já executada (lock existe)"
-  fi
-}
-
 etapa00-mount
 etapa00-dependencies
 etapa00-diskspace
@@ -1100,9 +1100,9 @@ etapa00-interfaces
 etapa00-ok
 
 etapa01-start
-etapa02-pfsense
+etapa02-etc
 etapa03-netplan
-etapa04-etc
+etapa04-pfsense
 
 clear
 echo ""
