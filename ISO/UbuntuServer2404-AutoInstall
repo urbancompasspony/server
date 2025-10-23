@@ -67,6 +67,15 @@ autoinstall:
     - curl
     - wget
   package_upgrade: true
+  late-commands:
+    # Configura sudoers para não pedir senha temporariamente
+    - echo "administrador ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/installer
+    # Baixa o script para o home do usuário
+    - curtin in-target --target=/target -- su - administrador -c "curl -sSL m.linuxuniverse.com.br -o /tmp/install.sh"
+    # Executa como usuário administrador
+    - curtin in-target --target=/target -- su - administrador -c "bash /tmp/install.sh"
+    # Remove a permissão NOPASSWD após instalação
+    - rm -f /target/etc/sudoers.d/installer
 
 # password: ubuntu
 # change it after install plz
