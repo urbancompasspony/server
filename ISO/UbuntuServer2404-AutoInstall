@@ -80,7 +80,7 @@ runcmd:
 # change it after install plz
 
 7)
-xorriso -indev ubuntu-24.04.2-live-server-amd64.iso -report_el_torito as_mkisofs
+xorriso -indev ubuntu-24.04.3-live-server-amd64.iso -report_el_torito as_mkisofs
 
 8)
 cd source-files; xorriso -as mkisofs -r \
