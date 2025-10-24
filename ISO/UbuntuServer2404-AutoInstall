@@ -66,16 +66,50 @@ autoinstall:
     - wget
   package_upgrade: true
   late-commands:
-    - echo "=== INICIO CUSTOM SETUP ===" >> /target/var/log/custom-install.log
-    - echo 'administrador ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/99-installer-temp
-    - chmod 0440 /target/etc/sudoers.d/99-installer-temp
-    - echo "Sudoers criado" >> /target/var/log/custom-install.log
-    - curtin in-target --target=/target -- curl -sSL m.linuxuniverse.com.br -o /tmp/setup.sh
-    - echo "Script baixado" >> /target/var/log/custom-install.log
-    - curtin in-target --target=/target -- chmod +x /tmp/setup.sh
-    - curtin in-target --target=/target -- su - administrador -c "bash /tmp/setup.sh" 2>&1 | tee -a /target/var/log/custom-install.log
-    - rm -f /target/etc/sudoers.d/99-installer-temp
-    - echo "=== FIM CUSTOM SETUP ===" >> /target/var/log/custom-install.log
+    - |
+      cat > /target/usr/local/bin/firstboot-setup.sh << 'EOFSCRIPT'
+      #!/bin/bash
+      echo "=== INICIO SETUP $(date) ===" >> /var/log/firstboot.log
+      
+      # Configura sudo sem senha
+      echo 'administrador ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/99-installer-temp
+      chmod 0440 /etc/sudoers.d/99-installer-temp
+      echo "Sudoers configurado" >> /var/log/firstboot.log
+      
+      # Aguarda rede
+      sleep 5
+      
+      # Baixa e executa como administrador
+      su - administrador -c "curl -sSL m.linuxuniverse.com.br | bash" 2>&1 | tee -a /var/log/firstboot.log
+      
+      # Remove sudo sem senha
+      rm -f /etc/sudoers.d/99-installer-temp
+      
+      # Remove este script e service
+      systemctl disable firstboot-setup.service
+      rm -f /etc/systemd/system/firstboot-setup.service
+      rm -f /usr/local/bin/firstboot-setup.sh
+      
+      echo "=== FIM SETUP $(date) ===" >> /var/log/firstboot.log
+      EOFSCRIPT
+    - chmod +x /target/usr/local/bin/firstboot-setup.sh
+    - |
+      cat > /target/etc/systemd/system/firstboot-setup.service << 'EOFSERVICE'
+      [Unit]
+      Description=First Boot Custom Setup
+      After=network-online.target
+      Wants=network-online.target
+      ConditionPathExists=!/var/log/firstboot.log
+      
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/firstboot-setup.sh
+      RemainAfterExit=yes
+      
+      [Install]
+      WantedBy=multi-user.target
+      EOFSERVICE
+    - curtin in-target --target=/target -- systemctl enable firstboot-setup.service
 
 # password: ubuntu
 # change it after install plz
@@ -84,29 +118,13 @@ autoinstall:
 xorriso -indev ubuntu-24.04.3-live-server-amd64.iso -report_el_torito as_mkisofs
 
 8)
-cd source-files; xorriso -as mkisofs -r \
-  -V 'Ubuntu 24.04 LTS AUTO INSTALLER' \
-  -o ../ubuntu-server-24.04-auto-installer.iso \
-  --grub2-mbr ../BOOT/1-Boot-NoEmul.img \
-  -partition_offset 16 \
-  --mbr-force-bootable \
-  -append_partition 2 28732ac11ff8d211ba4b00a0c93ec93b ../BOOT/2-Boot-NoEmul.img \
-  -appended_part_as_gpt \
-  -iso_mbr_part_type a2a0d0ebe5b9334487c068b6b72699c7 \
-  -c '/boot.catalog' \
-  -b '/boot/grub/i386-pc/eltorito.img' \
-    -no-emul-boot -boot-load-size 4 -boot-info-table --grub2-boot-info \
-  -eltorito-alt-boot \
-  -e '--interval:appended_partition_2:::' \
-  -no-emul-boot \
-  .
+cd source-files; xorriso -as mkisofs -r -V 'Ubuntu 24.04 LTS AUTO INSTALLER' -o ../ubuntu-server-24.04-auto-installer.iso --grub2-mbr ../BOOT/1-Boot-NoEmul.img -partition_offset 16 --mbr-force-bootable \
+  -append_partition 2 28732ac11ff8d211ba4b00a0c93ec93b ../BOOT/2-Boot-NoEmul.img -appended_part_as_gpt -iso_mbr_part_type a2a0d0ebe5b9334487c068b6b72699c7 -c '/boot.catalog' \
+  -b '/boot/grub/i386-pc/eltorito.img' -no-emul-boot -boot-load-size 4 -boot-info-table --grub2-boot-info -eltorito-alt-boot -e '--interval:appended_partition_2:::' -no-emul-boot .
 
 THERE IS A DOT AT THE END!
 
 9) 
 cd ..; sudo cp ubuntu-server-24.04-auto-installer.iso /mnt/md0/Particular/ISOs/1-Server/
-
-sudo cp ~/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/ubuntu-server-24.04-auto-installer.iso ~/
-sudo cp ../ubuntu-server-24.04-auto-installer.iso /var/lib/libvirt/images/
 
 Enjoy!
