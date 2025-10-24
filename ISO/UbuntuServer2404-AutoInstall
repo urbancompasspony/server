@@ -2,10 +2,10 @@
 sudo apt install p7zip-full p7zip 7zip wget xorriso
 
 2)
-mkdir u2404-autoinstall-ISO; cd u2404-autoinstall-ISO; wget https://releases.ubuntu.com/24.04/ubuntu-24.04.2-live-server-amd64.iso
+mkdir u2404-autoinstall-ISO; cd u2404-autoinstall-ISO; wget https://releases.ubuntu.com/24.04/ubuntu-24.04.3-live-server-amd64.iso
 
 3)
-7z -y x ubuntu-24.04.2-live-server-amd64.iso -osource-files
+7z -y x ubuntu-24.04.3-live-server-amd64.iso -osource-files
 
 4)
 cd source-files; mv  '[BOOT]' ../BOOT
@@ -22,13 +22,11 @@ menuentry "Instalar automaticamente o Ubuntu Server 24.04 LTS" {
     linux   /casper/vmlinuz autoinstall ds=nocloud\;s=/cdrom/server/  ---
     initrd  /casper/initrd
 }
-menuentry " " {set gfxpayload=keep}
 menuentry "Teste ou instale manualmente o Ubuntu Server 24.04 LTS" {
         set gfxpayload=keep
         linux   /casper/vmlinuz  ---
         initrd  /casper/initrd
 }
-menuentry " " {set gfxpayload=keep}
 menuentry "Reiniciar sistema" {reboot}
 menuentry "Desligar sistema" {halt}
 grub_platform
@@ -85,8 +83,8 @@ xorriso -indev ubuntu-24.04.2-live-server-amd64.iso -report_el_torito as_mkisofs
 
 8)
 cd source-files; xorriso -as mkisofs -r \
-  -V 'Ubuntu 24.04 LTS AUTO' \
-  -o ../ubuntuserver-24.04-autoinstall.iso \
+  -V 'Ubuntu 24.04 LTS AUTO INSTALLER' \
+  -o ../ubuntu-server-24.04-auto-installer.iso \
   --grub2-mbr ../BOOT/1-Boot-NoEmul.img \
   -partition_offset 16 \
   --mbr-force-bootable \
@@ -104,6 +102,8 @@ cd source-files; xorriso -as mkisofs -r \
 THERE IS A DOT AT THE END!
 
 9) 
-sudo cp ../ubuntu-24.04-autoinstall.iso /var/lib/libvirt/images/
+sudo cp ../ubuntu-server-24.04-auto-installer.iso /var/lib/libvirt/images/
+sudo cp ~/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/ubuntu-server-24.04-auto-installer.iso ~/
+sudo chmod 777 -R ~/ubuntu-server-24.04-auto-installer.iso
 
 Enjoy!
