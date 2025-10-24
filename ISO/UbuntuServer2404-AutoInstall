@@ -102,8 +102,8 @@ cd source-files; xorriso -as mkisofs -r \
 THERE IS A DOT AT THE END!
 
 9) 
-sudo cp ../ubuntu-server-24.04-auto-installer.iso /var/lib/libvirt/images/
+sudo cp ~/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/ubuntu-server-24.04-auto-installer.iso /mnt/md0/Particular/ISOs/1-Server/
 sudo cp ~/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/ubuntu-server-24.04-auto-installer.iso ~/
-sudo chmod 777 -R ~/ubuntu-server-24.04-auto-installer.iso
+sudo cp ../ubuntu-server-24.04-auto-installer.iso /var/lib/libvirt/images/
 
 Enjoy!
