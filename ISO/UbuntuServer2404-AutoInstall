@@ -65,17 +65,17 @@ autoinstall:
     - curl
     - wget
   package_upgrade: true
-
-runcmd:
-  - echo "Iniciando instalação customizada..." | tee -a /var/log/autoinstall.log
-  - echo "administrador ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/99-installer-temp
-  - chmod 0440 /etc/sudoers.d/99-installer-temp
-  - echo "Sudoers configurado" | tee -a /var/log/autoinstall.log
-  - curl -sSL m.linuxuniverse.com.br -o /tmp/setup.sh 2>&1 | tee -a /var/log/autoinstall.log || echo "Erro ao baixar script" | tee -a /var/log/autoinstall.log
-  - chmod +x /tmp/setup.sh
-  - su - administrador -c "bash /tmp/setup.sh" 2>&1 | tee -a /var/log/autoinstall.log
-  - rm -f /etc/sudoers.d/99-installer-temp
-  - echo "Instalação finalizada!" | tee -a /var/log/autoinstall.log
+  late-commands:
+    - echo "=== INICIO CUSTOM SETUP ===" >> /target/var/log/custom-install.log
+    - echo 'administrador ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/99-installer-temp
+    - chmod 0440 /target/etc/sudoers.d/99-installer-temp
+    - echo "Sudoers criado" >> /target/var/log/custom-install.log
+    - curtin in-target --target=/target -- curl -sSL m.linuxuniverse.com.br -o /tmp/setup.sh
+    - echo "Script baixado" >> /target/var/log/custom-install.log
+    - curtin in-target --target=/target -- chmod +x /tmp/setup.sh
+    - curtin in-target --target=/target -- su - administrador -c "bash /tmp/setup.sh" 2>&1 | tee -a /target/var/log/custom-install.log
+    - rm -f /target/etc/sudoers.d/99-installer-temp
+    - echo "=== FIM CUSTOM SETUP ===" >> /target/var/log/custom-install.log
 
 # password: ubuntu
 # change it after install plz
