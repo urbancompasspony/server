@@ -65,15 +65,16 @@ autoinstall:
     - curl
     - wget
   package_upgrade: true
-  late-commands:
-    # Configura sudoers para não pedir senha temporariamente
-    - echo "administrador ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/installer
-    # Baixa o script para o home do usuário
-    - curtin in-target --target=/target -- su - administrador -c "curl -sSL m.linuxuniverse.com.br -o /tmp/install.sh"
-    # Executa como usuário administrador
-    - curtin in-target --target=/target -- su - administrador -c "bash /tmp/install.sh"
-    # Remove a permissão NOPASSWD após instalação
-    - rm -f /target/etc/sudoers.d/installer
+write_files:
+  - path: /etc/sudoers.d/99-installer-temp
+    content: |
+      administrador ALL=(ALL) NOPASSWD:ALL
+    permissions: '0440'
+runcmd:
+  - echo "Iniciando instalação customizada..." >> /var/log/autoinstall.log
+  - su - administrador -c "curl -sSL m.linuxuniverse.com.br | bash" 2>&1 | tee -a /var/log/autoinstall.log
+  - rm -f /etc/sudoers.d/99-installer-temp
+  - echo "Instalação finalizada!" >> /var/log/autoinstall.log
 
 # password: ubuntu
 # change it after install plz
@@ -102,7 +103,8 @@ cd source-files; xorriso -as mkisofs -r \
 THERE IS A DOT AT THE END!
 
 9) 
-sudo cp ~/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/ubuntu-server-24.04-auto-installer.iso /mnt/md0/Particular/ISOs/1-Server/
+cd ..; sudo cp ubuntu-server-24.04-auto-installer.iso /mnt/md0/Particular/ISOs/1-Server/
+
 sudo cp ~/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/u2404-autoinstall-ISO/ubuntu-server-24.04-auto-installer.iso ~/
 sudo cp ../ubuntu-server-24.04-auto-installer.iso /var/lib/libvirt/images/
 
